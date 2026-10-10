@@ -547,3 +547,56 @@ with no worse final BPC. Promising variants go to seeds 1–2 and a 3-point lr c
 Caveats stated up front: one seed per variant; every variant uses A's lr, and the n-gram
 variants start with a large output gain, so an lr effect could mask or fake a result;
 the `placement` and `full` modes calibrate (kappa, alpha, gain) on 64 *training* windows.
+
+## Registered 2026-10-10, before `v3-big` and `v3-post`: bigger fuzzy models and post-training
+
+**Scope change (user, 2026-10-10):** "look at post training and maybe a slightly bigger model". The 100K cap is
+relaxed to ≤ 165K parameters for this track; the 97.5K model `D` (fuzzy delta mixer, first-order raw-firing HTSK
+FFN, 8 heads) stays the reference. Interpretation of "post-training": stages that run *after* pretraining from
+a saved checkpoint, each compared against the control of continuing the same training for the same extra characters.
+Seen before registering: `D` at 30M chars = 1.274 ± 0.009 (3 seeds), 100M = 1.208 (1 seed); nothing from any
+bigger width or any post-training stage.
+
+* **H13 (bigger).** `D` at d = 80 / 88 / 96 (117K / 139K / 162K params), 30M chars, lr 3e-2, 2 seeds: val BPC falls
+  monotonically with params, by ≥ 0.03 BPC per +40K params, with no seed diverging. *Basis:* the neural curves
+  fall ~0.1 per doubling at this size; the fuzzy arms' large-width failures were the old FFN, not the width.
+* **H14 (continuation control).** Resuming `D` (30M) for +10M chars at lr 3e-3 (warmup 50, cosine to 0.1×)
+  improves val BPC by ≥ 0.02. This is the control for H15–H16, not a post-training method.
+* **H15 (EMA).** Weight EMA (decay 0.999) during the +10M continuation improves on the continuation's raw weights
+  by < 0.01 BPC (the cosine decay already averages).
+* **H16 (distillation).** Distilling from a larger neural teacher (delta-mlp d = 128, 280K params, 60M chars;
+  logit KL, weight 0.5, T = 1) during the +10M continuation beats the continuation control by ≥ 0.02 BPC.
+  *Risk:* at char level with ~1.2 BPC the teacher's soft targets carry little beyond the data, so failure is plausible.
+* **Not tested here:** fine-tuning on a curated subset (no quality labels exist), RL, quantization, and
+  dynamic evaluation (it changes the evaluation protocol and would need its own label).
+* **Protocol.** Base models are trained with `--save-model`; continuation uses a different data-order seed
+  (100 + base seed). Raw `val_bpc` is always the headline; EMA is reported as `val_bpc_ema`. Seeds: 2 per cell.
+
+**Incident, 2026-10-10 17:15 (LR study).** The four `v3-lr` `lr1e-2` cells each trained ~1 h on a contended GPU and then
+crashed at the final sample generation (`index on cuda, other tensors on cpu`): they had been launched before the
+`train.py` merge-seam fix and Python had already loaded the old file. No record was written, so the cells are lost and
+rerun when `v3-lr` is resumed. The `lr2e-2` cells (launched after the fix) are running. The `v3-lr` launcher was stopped
+after that batch so the GPU serves `v3-big` / `v3-post`; `v3-lr` is **incomplete** (resume with `--workers 2`).
+Lesson: a train script should write its numeric record *before* any optional post-step (sampling) that can crash.
+
+### Outcomes, 2026-10-10 (`v3-big`, `v3-post`; CUDA, 2 seeds unless noted)
+
+| model | params | 30M val BPC | +10M continuation | + EMA 0.999 | + distillation (w 0.5) |
+|---|---|---|---|---|---|
+| D d = 72 | 97,520 | 1.2753 (1.282 / 1.269) | **1.2486** (1.2548 / 1.2423) | 1.2481 | 1.2496 (1.2556 / 1.2436) |
+| D d = 80 | 117,312 | 1.2485 | – | – | – |
+| D d = 88 | 138,896 | 1.2351 | – | – | – |
+| D d = 96 (1 seed post) | 162,272 | 1.2170 (1.222 / 1.212) | 1.1951 | 1.1948 | – |
+| teacher: delta-mlp d = 128, 60M chars | 280,480 | 1.1153 (1 seed) | | | |
+
+* **H13 supported.** BPC falls monotonically with size, no divergence: −0.040 from 97K to 139K (+41K), −0.032 from
+  117K to 162K (+45K), but only −0.018 for the last +23K (139K → 162K): the gain per parameter is tapering.
+* **H14 supported.** +10M chars at lr 3e-3 gives −0.027 / −0.026 at 97K and −0.027 at 162K. This is the control.
+* **H15 supported** (gain < 0.01): EMA adds −0.0005 at 97K and −0.0003 at 162K. It is not worth carrying.
+* **H16 refuted.** Distillation from a 280K-parameter teacher that is 0.15 BPC better does **not** beat plain
+  continuation (+0.001 on both seeds, i.e. no effect). The teacher's samples are no more coherent than the student's.
+* **Everything that "helped" post-training is more training.** The 0.027 gain equals what the 30M → 100M pretraining
+  curve already predicts for +10M chars. No post-training method here adds anything beyond compute.
+* **Generated text** (`flm/gen_samples.py`, `report/samples.json`): at 1.1–1.28 BPC all models write locally fluent
+  TinyStories-style prose with real words (non-word rate 0.4–0.9% at T 0.7 / top-k 20, 2.4–3.7% at T 1.0) but with
+  grammar slips, drifting characters and no narrative consistency. The failure is syntax and semantics, not spelling.
