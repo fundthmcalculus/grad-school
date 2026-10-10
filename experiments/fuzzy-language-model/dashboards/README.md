@@ -5,7 +5,7 @@ Two multi-page results dashboards, published as artifacts (private until shared 
 | dashboard | artifact | pages |
 |---|---|---|
 | **Tiny Fuzzy Language Models** (CPU phase) | https://claude.ai/artifact/XGJzPWz5T5i2wQvVE6C3Y4 | Overview and claims, size and quality, fuzzy components, tuning and memory, n-gram initialisation |
-| **Fuzzy LM Goal Track** (GPU phase) | https://claude.ai/artifact/9kWT8VFUhxs1gKhwLhgqc5 | Overview, where the deficit was, the comparison, bigger models and post-training, subwords, generated text, reading the model (rulebook), open gaps |
+| **Fuzzy LM Goal Track** (GPU phase) | https://claude.ai/artifact/9kWT8VFUhxs1gKhwLhgqc5 | Overview, where the deficit was, the comparison, bigger models and post-training, subwords, generated text, reading the model (rulebook), subword control, open gaps |
 
 Every number on a page comes from a dataset exported from the run records; aggregations are inspectable
 calculations on the dashboard. Regenerate the data:

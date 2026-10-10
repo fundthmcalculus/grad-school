@@ -35,6 +35,9 @@ GRIDS = [
     "v5-spend",
     "v5-final100k",
     "v5-long",
+    "v6-d-lr",
+    "v6-d-lr-edge",
+    "v6-ref-tune",
 ]
 CURVE_GRIDS = [
     "v3-final",
@@ -84,17 +87,17 @@ GAPS = [
     ),
     (
         "Subwords: a neural control on the same tokenizer",
-        "Until a neural BPE1024 model of the same size is tuned equally, the subword headline is a statement about subwords, not fuzziness",
-        "open",
-        "v6-d-lr, v6-ref-tune, v6-final10 (flm/grids_v6.py)",
-        "Grids written and arg-parsed; the GPU session will smoke-run one cell of each, then needs approval",
+        "Without it the subword headline is a statement about subwords, not fuzziness",
+        "partly closed",
+        "v6-final10: ten seeds at 30M characters, D at lr 6e-2 against the two best tuned references",
+        "At 10M characters the tuned fuzzy D leads the best of 24 tuned neural cells by 0.016 bits per character (D: 12 runs over six lrs; reference: one seed per cell). Not citable: one reference seed, 10M characters. v6-final10 is not started and needs the GPU session's user's go-ahead",
     ),
     (
         "D's learning rate on subwords",
-        "Only 3e-2 and 2e-2 were run (at 300M characters, one seed, within 0.002 of each other); the neural control gets a 4-lr search",
+        "The 30M, 100M and 300M subword runs used lr 3e-2; at 10M the optimum for D is 6e-2 (interior: 8e-2 and 1e-1 are worse), so those runs understate D",
         "open",
-        "v6-d-lr",
-        "Partly closed: 2e-2 vs 3e-2 is a tie at 300M; 4e-2 and 6e-2 not run",
+        "an lr study at 30M characters",
+        "Closed at 10M; open at 30M and beyond",
     ),
     (
         "Ten seeds",
