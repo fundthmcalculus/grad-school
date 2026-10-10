@@ -292,3 +292,31 @@ def _headline10():
 
 register("headline10", _headline10())
 register("headline10v2", _v2([32], list(range(10))))
+
+
+def _lrwidth():
+    """Per-width LR check (registered in RESULTS.md before running): every arm at d=96,
+    seed 0, 30M chars, with its d=32-tuned lr divided by 3 and by 10 (shortconv unchanged).
+    The undivided cell is the existing `scaling` seed-0 run."""
+    try:
+        arms = {a: v + best_tune(a) for a, v in {**ARMS, **ARMS_V2}.items()}
+    except RuntimeError:
+        return []
+    jobs = []
+    for arm, argv in arms.items():
+        i = argv.index("--lr")
+        base = float(argv[i + 1])
+        for div in (3, 10):
+            a2 = list(argv)
+            a2[i + 1] = f"{base / div:.4g}"
+            jobs.append(
+                (
+                    f"{arm}_lrdiv{div}_d96_L2_s0",
+                    a2
+                    + ["--d", "96", "--layers", "2", "--seed", "0", "--chars", "30e6"],
+                )
+            )
+    return jobs
+
+
+register("lrwidth", _lrwidth())

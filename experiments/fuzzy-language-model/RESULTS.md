@@ -321,3 +321,17 @@ each arm at its d = 32 tune setting applied at every width.
   large-width claim about these arms.
 * Timing columns come from 4–7 concurrent jobs on 4 cores. They show relative cost
   only (delta-rule arms ≈ 3–5× softmax per char at this T = 256), not throughput.
+
+### Registered 2026-10-10, before `lrwidth`: does the d = 32 LR transfer to d = 96?
+
+Every arm (all 10) at d = 96, seed 0, 30M chars, with its tuned LR ÷ 3 and ÷ 10. The
+×1 cell is the existing `scaling` seed-0 run. The check is identical for every arm.
+
+* **H10a.** For gru, flm, frlm-acc and frlm-delta (the arms that got worse with width),
+  a divided LR improves d = 96 by more than 0.05 BPC and restores a monotone curve, i.e.
+  d = 96 beats their d = 64 mean.
+* **H10b.** For the softmax / linear / gla / delta / HTSK-FRLM arms (which scaled
+  cleanly), the best divided LR moves d = 96 by less than 0.03 BPC.
+* **Consequence, decided before the data:** if H10a holds, the large-width rows of
+  those four arms are reported as LR-limited and are re-run at the transferred LR
+  before any architecture conclusion is drawn from them.
