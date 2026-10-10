@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "linear",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/gla-mlp_lr1e-2_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "linear",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 19812,
+ "params_nonemb": 16676,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.79879,
+ "evals": [
+  [
+   305,
+   2.1407
+  ],
+  [
+   610,
+   1.94207
+  ],
+  [
+   915,
+   1.84098
+  ],
+  [
+   1220,
+   1.79956
+  ],
+  [
+   1221,
+   1.79879
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.5685
+  ],
+  [
+   50,
+   5.5077
+  ],
+  [
+   100,
+   4.0963
+  ],
+  [
+   150,
+   3.2226
+  ],
+  [
+   200,
+   2.7223
+  ],
+  [
+   250,
+   2.4422
+  ],
+  [
+   300,
+   2.2813
+  ],
+  [
+   350,
+   2.1854
+  ],
+  [
+   400,
+   2.1094
+  ],
+  [
+   450,
+   2.0677
+  ],
+  [
+   500,
+   2.0295
+  ],
+  [
+   550,
+   1.9828
+  ],
+  [
+   600,
+   1.9586
+  ],
+  [
+   650,
+   1.9425
+  ],
+  [
+   700,
+   1.9234
+  ],
+  [
+   750,
+   1.9091
+  ],
+  [
+   800,
+   1.8894
+  ],
+  [
+   850,
+   1.8758
+  ],
+  [
+   900,
+   1.8642
+  ],
+  [
+   950,
+   1.8519
+  ],
+  [
+   1000,
+   1.8269
+  ],
+  [
+   1050,
+   1.8241
+  ],
+  [
+   1100,
+   1.8129
+  ],
+  [
+   1150,
+   1.8076
+  ],
+  [
+   1200,
+   1.8119
+  ],
+  [
+   1220,
+   1.813
+  ]
+ ],
+ "train_seconds": 519.7,
+ "wall_seconds": 615.77,
+ "chars_per_sec": 19247,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was not fish and seed down as bee car and away, but did not big be find again, it was sing. He came for them sad.\nOne day, she had it was ared was friends lirstong, there was a big, move. The learn airt, but a big trieghing the roomes. The made and their tool. I play with Tom said, \"That and",
+ "rule_init": {}
+}

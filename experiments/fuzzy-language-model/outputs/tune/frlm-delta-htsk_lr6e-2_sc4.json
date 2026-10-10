@@ -1,0 +1,183 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-delta-htsk_lr6e-2_sc4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "mean",
+  "max_len": 256
+ },
+ "params_total": 28392,
+ "params_nonemb": 25256,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.7468,
+ "evals": [
+  [
+   305,
+   2.13095
+  ],
+  [
+   610,
+   1.93918
+  ],
+  [
+   915,
+   1.81222
+  ],
+  [
+   1220,
+   1.7473
+  ],
+  [
+   1221,
+   1.7468
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9668
+  ],
+  [
+   50,
+   5.4596
+  ],
+  [
+   100,
+   3.9946
+  ],
+  [
+   150,
+   3.1517
+  ],
+  [
+   200,
+   2.6765
+  ],
+  [
+   250,
+   2.4163
+  ],
+  [
+   300,
+   2.2645
+  ],
+  [
+   350,
+   2.1785
+  ],
+  [
+   400,
+   2.1076
+  ],
+  [
+   450,
+   2.0669
+  ],
+  [
+   500,
+   2.0286
+  ],
+  [
+   550,
+   1.9841
+  ],
+  [
+   600,
+   1.9603
+  ],
+  [
+   650,
+   1.9378
+  ],
+  [
+   700,
+   1.9214
+  ],
+  [
+   750,
+   1.9053
+  ],
+  [
+   800,
+   1.8819
+  ],
+  [
+   850,
+   1.8641
+  ],
+  [
+   900,
+   1.8469
+  ],
+  [
+   950,
+   1.8301
+  ],
+  [
+   1000,
+   1.8001
+  ],
+  [
+   1050,
+   1.7908
+  ],
+  [
+   1100,
+   1.7762
+  ],
+  [
+   1150,
+   1.7667
+  ],
+  [
+   1200,
+   1.7659
+  ],
+  [
+   1220,
+   1.7665
+  ]
+ ],
+ "train_seconds": 1543.65,
+ "wall_seconds": 1889.76,
+ "chars_per_sec": 6480,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was not find the seel worm as again. But you looked down her friend was very made in thinks to came hand came insserled heas scared the hugged to play with her friend. They were like together, the red. Tom said, \"That go on the red asked happened. She was so him to surpla with the dethen and",
+ "rule_init": {}
+}

@@ -1,0 +1,185 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/h9/frlm-acc_mxsum_ffmean_s0.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "max_len": 256
+ },
+ "params_total": 28260,
+ "params_nonemb": 25124,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.75456,
+ "evals": [
+  [
+   305,
+   2.19884
+  ],
+  [
+   610,
+   1.9492
+  ],
+  [
+   915,
+   1.81399
+  ],
+  [
+   1220,
+   1.75532
+  ],
+  [
+   1221,
+   1.75456
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8619
+  ],
+  [
+   50,
+   5.4741
+  ],
+  [
+   100,
+   4.0395
+  ],
+  [
+   150,
+   3.2688
+  ],
+  [
+   200,
+   2.8328
+  ],
+  [
+   250,
+   2.5487
+  ],
+  [
+   300,
+   2.3692
+  ],
+  [
+   350,
+   2.2492
+  ],
+  [
+   400,
+   2.1588
+  ],
+  [
+   450,
+   2.1042
+  ],
+  [
+   500,
+   2.0597
+  ],
+  [
+   550,
+   2.0042
+  ],
+  [
+   600,
+   1.9703
+  ],
+  [
+   650,
+   1.9452
+  ],
+  [
+   700,
+   1.9239
+  ],
+  [
+   750,
+   1.9077
+  ],
+  [
+   800,
+   1.8801
+  ],
+  [
+   850,
+   1.8623
+  ],
+  [
+   900,
+   1.8439
+  ],
+  [
+   950,
+   1.8262
+  ],
+  [
+   1000,
+   1.7992
+  ],
+  [
+   1050,
+   1.7934
+  ],
+  [
+   1100,
+   1.777
+  ],
+  [
+   1150,
+   1.7693
+  ],
+  [
+   1200,
+   1.7708
+  ],
+  [
+   1220,
+   1.7708
+  ]
+ ],
+ "train_seconds": 673.99,
+ "wall_seconds": 939.04,
+ "chars_per_sec": 14841,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was a stop and bester would started to the walked and his patient it's haguan, it was sinciful came foret with the right.\nOne day, it was around. We cat you race ging. They were like cow. The little is noticed to learn too. She went saw what in the park. \"Thanke'Y kad. Max was so stetle and ",
+ "rule_init": {}
+}

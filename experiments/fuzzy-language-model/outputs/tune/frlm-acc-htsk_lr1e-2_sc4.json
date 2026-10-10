@@ -1,0 +1,183 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-acc-htsk_lr1e-2_sc4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "mean",
+  "max_len": 256
+ },
+ "params_total": 28260,
+ "params_nonemb": 25124,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.82284,
+ "evals": [
+  [
+   305,
+   2.28584
+  ],
+  [
+   610,
+   1.97302
+  ],
+  [
+   915,
+   1.86594
+  ],
+  [
+   1220,
+   1.82266
+  ],
+  [
+   1221,
+   1.82284
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8464
+  ],
+  [
+   50,
+   5.8207
+  ],
+  [
+   100,
+   4.5793
+  ],
+  [
+   150,
+   3.653
+  ],
+  [
+   200,
+   3.1074
+  ],
+  [
+   250,
+   2.7498
+  ],
+  [
+   300,
+   2.5095
+  ],
+  [
+   350,
+   2.3483
+  ],
+  [
+   400,
+   2.2248
+  ],
+  [
+   450,
+   2.1479
+  ],
+  [
+   500,
+   2.0901
+  ],
+  [
+   550,
+   2.0274
+  ],
+  [
+   600,
+   1.9936
+  ],
+  [
+   650,
+   1.9704
+  ],
+  [
+   700,
+   1.9548
+  ],
+  [
+   750,
+   1.9388
+  ],
+  [
+   800,
+   1.9165
+  ],
+  [
+   850,
+   1.9031
+  ],
+  [
+   900,
+   1.8911
+  ],
+  [
+   950,
+   1.8765
+  ],
+  [
+   1000,
+   1.8525
+  ],
+  [
+   1050,
+   1.8497
+  ],
+  [
+   1100,
+   1.8407
+  ],
+  [
+   1150,
+   1.8342
+  ],
+  [
+   1200,
+   1.8401
+  ],
+  [
+   1220,
+   1.8393
+  ]
+ ],
+ "train_seconds": 579.88,
+ "wall_seconds": 900.87,
+ "chars_per_sec": 17249,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was a smiled at the little dog.\"\nLily also walked Sue went to his friends. He will make a big on the squirl. Tim sayled his started to she reage. The dog all door be and flew a big, neewlood and wared. They wanted to play ball and pest away and still and the scare. They are many day. He was ",
+ "rule_init": {}
+}

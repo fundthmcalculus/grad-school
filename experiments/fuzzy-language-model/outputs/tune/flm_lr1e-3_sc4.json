@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.001,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/flm_lr1e-3_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 26112,
+ "params_nonemb": 22976,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.50214,
+ "evals": [
+  [
+   305,
+   3.31937
+  ],
+  [
+   610,
+   2.78917
+  ],
+  [
+   915,
+   2.56617
+  ],
+  [
+   1220,
+   2.5026
+  ],
+  [
+   1221,
+   2.50214
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8403
+  ],
+  [
+   50,
+   6.5143
+  ],
+  [
+   100,
+   5.7075
+  ],
+  [
+   150,
+   4.9744
+  ],
+  [
+   200,
+   4.3695
+  ],
+  [
+   250,
+   3.919
+  ],
+  [
+   300,
+   3.5994
+  ],
+  [
+   350,
+   3.3808
+  ],
+  [
+   400,
+   3.2182
+  ],
+  [
+   450,
+   3.1086
+  ],
+  [
+   500,
+   3.0147
+  ],
+  [
+   550,
+   2.9295
+  ],
+  [
+   600,
+   2.8594
+  ],
+  [
+   650,
+   2.8021
+  ],
+  [
+   700,
+   2.7494
+  ],
+  [
+   750,
+   2.7031
+  ],
+  [
+   800,
+   2.6574
+  ],
+  [
+   850,
+   2.6281
+  ],
+  [
+   900,
+   2.6003
+  ],
+  [
+   950,
+   2.5772
+  ],
+  [
+   1000,
+   2.5464
+  ],
+  [
+   1050,
+   2.5376
+  ],
+  [
+   1100,
+   2.5233
+  ],
+  [
+   1150,
+   2.5175
+  ],
+  [
+   1200,
+   2.5192
+  ],
+  [
+   1220,
+   2.5164
+  ]
+ ],
+ "train_seconds": 211.41,
+ "wall_seconds": 362.68,
+ "chars_per_sec": 47314,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time man a big neeen very, be somed and said, \"\"\n\"Hey awal, be lived hed the to was agred to nen Sore red on the saw camired saild to assseed siid she reamed, \"But thel rier got a dog, the her fler fun the mew timens to pliked the toor the wentes. The made and the to soun'te on's hadd the liss, the was ",
+ "rule_init": {}
+}
