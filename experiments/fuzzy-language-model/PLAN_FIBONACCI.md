@@ -1,3 +1,5 @@
+> **Status (2026-10-11):** finished: Fibonacci attention and the hybrid did not help (see REVIEW.md section 4). Clean summary: [`REVIEW.md`](REVIEW.md).
+
 # Plan: Fibonacci attention at story size (for the GPU session)
 
 CPU session, 2026-10-11. User direction: keep to story size for now, and try an attention model that

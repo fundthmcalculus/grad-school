@@ -1,3 +1,5 @@
+> **Status (2026-10-11):** superseded: context past story size was dropped. Clean summary: [`REVIEW.md`](REVIEW.md).
+
 # Plan: does the fuzzy recurrent model use more context? (for the GPU session)
 
 Written by the CPU session, 2026-10-11. The user's question: scale out attention and context until the

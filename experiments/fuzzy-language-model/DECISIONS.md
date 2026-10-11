@@ -105,3 +105,9 @@ This is still a reading of next-token prediction, not an explanation of why the 
 
 ## D13 (2026-10-11, scheduled check-in): the repetition-aware loss did not help coherence
 At the 13:06 check-in I pulled the GPU session's work (v23 warm-up sweep, cfwide, v24-diag, v25-rep, v26-hybrid, v27-cover and v28-emb queued), found item 4 (the repetition-aware loss) marked "coherence not rated", and rated it myself (set 9, one rater): baseline 7.25, weighted 6.62, unlikelihood 5.62 /15. The loss cut repeats 20% and the stories did not improve. The only measured correlate of low coherence is therefore not a usable training target by this route.
+
+## D14 (2026-10-11): clean-up and the 1.32M x 1B request (the owner asked for a clean write-up, dropped dead ends, and the run scheduled after the current GPU round)
+* **Done now (docs only):** `REVIEW.md` (single clean entry point), `PLAN_BIG1B.md` (the full job description), status banners on the plans that are finished, a pointer at the top of `README.md`. Nothing was deleted: every result stays in `RESULTS.md`, which is the record that numbers trace to.
+* **Deliberately not done now:** moving the dead levers' code and plans into an `archive/` folder. The GPU session's sweeps import code from disk while they run (a past defect), and it is mid-round (`v27-cover`, then `v28-emb`). The list of what to archive is in `REVIEW.md` section 10; it is a short job once the round ends.
+* **The run:** the request is sent to the GPU session with your instruction quoted, with the cap issue stated plainly: its user has to approve it; it said it will not run it without that. If its user declines, the record reads "not tested above 165K parameters".
+* **Follow-up:** a recurring check (every 45 minutes) for the end of `v28-emb`; when it ends I message the GPU session again and, if the archive is safe, do the archive pass. The job expires with this session or after 7 days.
