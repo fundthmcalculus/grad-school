@@ -998,3 +998,12 @@ all of it was graded.
 between 1.28 and 1.02 (extrapolating it to a "good" score of 12–13 would need ≈ 0.9 BPC; a guess, not a measurement).
 **Caveats:** one rater, who is also the author's model (no inter-rater check, preference for repetition-free text); n = 8 per model, so differences below ~1.5
 totals are not established; one sampling setting; the 600-character window; BPC for the BPE1536 row is the 2-seed 30M mean (1.1205), for the graded seed-0 checkpoint 1.122.
+
+### Second rater for the blinded coherence set (CPU session, 2026-10-11)
+
+A second Claude instance (the CPU session, which had not seen the key or the first rater's scores) scored all 56 texts in `report/coherence_blind.json` on grammar, consistency and plot, 1-5 each, before opening `coherence_key.json`; the scores are in `report/coherence_scores_rater2.json`. Both raters are the same model family, so this checks rater noise, not rater bias.
+
+- Agreement: total-score correlation 0.83 (G 0.79, C 0.75, P 0.59); 42 of 56 totals within 1 point. Rater 2 is harsher by 0.75 points on average (5.96 against 6.71), mostly on plot.
+- Rater 2 per-model totals (/15, mean ± se, n = 8): BPE1024 300M 8.62 ± 0.37; BPE1024 100M 7.25 ± 0.53; BPE1536 d40 30M 7.12 ± 0.40; BPE512 30M 6.62 ± 0.37; neural char teacher 4.38 ± 0.26; char D d96 3.88 ± 0.12; char D d72 3.88 ± 0.12.
+- The ranking by bits per character is reproduced (the two lowest character-D models tie). The subword-vs-character-teacher gap at similar BPC is larger under rater 2 (BPE1024 100M against the teacher: 2.9 points, against 1.6 for rater 1), so the weak-evidence reading holds in direction and is not smaller than first reported. Plot is the weakest axis for both raters (rater 2: 1.88/5 at 300M).
+- Caveats unchanged: same model family, n = 8 per model, one sampling setting. Neither rater is a human.
