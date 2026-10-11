@@ -1165,3 +1165,11 @@ wrong way**. **This also weakens the first coherence table:** the same 300M chec
 per model is a noisy estimate (the run-to-run noise of this measure is ~±1.5 totals). Pooling both rounds (n = 16): 300M ctx-256 **9.00**, 100M **7.87**; the new model has n = 8 only (7.62). **What survives:**
 the large separations in round 1 (subword vs character models, 3.9 → 7–9) are far outside this noise; the *fine* ordering among the three best (BPC 0.998–1.055) is not established, and a 0.024 BPC gain
 does not show up in the coherence score. Plot sense (P ≈ 2/5) did not move at all across 1.055 → 0.998 BPC.
+## Registered 2026-10-12, before `v13-state`: does more recurrent state keep helping? (CPU session)
+
+Verified from the records: v8-ctx ctx256 1.1324, ctx512 1.1232, ctx512 r32 1.1125 (30M characters, 2 seeds each).
+`v13-state`: 64 and 128 rules per head at ctx 512 (102,560 and 114,848 parameters).
+* **H46:** r64 beats r32 (1.1125) by more than 0.005 bits per character. ~50%.
+* **H47:** r128 beats r64 by less than r64 beats r32 (diminishing returns). ~65%.
+* **H48:** more rules make a rule's winning share more concentrated and the rulebook shorter to read, not longer: the
+  number of rules needed to cover 80% of winning positions per head grows by less than 2x from r32 to r128. ~50%.
