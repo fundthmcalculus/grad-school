@@ -1027,3 +1027,10 @@ Probes: `flm/context_probe.py` (bits by position, bits by distance from story st
 * **H31:** `val_bpc` at fixed position buckets improves by less than 0.01 from ctx 256 to 1024 (stories are about one
   window long). ~65%.
 * **H32:** 32 rules per head at ctx 1024 beats 16 rules by more than 0.01 bits per character. ~30%.
+
+## Registered 2026-10-11, before `v9-lr`/`v9-size`: where does coherence appear? (CPU session; PLAN_COHERENCE.md)
+
+Success criteria fixed in advance: blind total >= 12/15 and plot >= 3.5/5 from both raters; explainability
+requires a causal rulebook (rule-ablation of the most-cited FFN rules costs more than random rules).
+H33 plot > 3/5 by the 3.3M model (~40%); H34 nothing under 2M reaches 12/15 (~85%); H35 ablation of cited rules
+exceeds random at every size (~70%); H36 the best lr falls with size (~60%).

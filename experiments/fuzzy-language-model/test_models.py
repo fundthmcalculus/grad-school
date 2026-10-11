@@ -623,3 +623,19 @@ def test_context_probe_helpers():
         and bucket(10**6, STORY_EDGES) == len(STORY_EDGES) - 2
     )
     assert filler(0) == "" and filler(2).count(".") == 2 and filler(7).count(".") == 7
+
+
+def test_v9_grid_parses_and_sizes_match():
+    from flm import train
+    from flm.grids_v9 import SIZES
+    from flm.models import TinyLM
+    from flm.sweep import GRIDS
+
+    import flm.grids_v9  # noqa: F401
+
+    assert len(GRIDS["v9-size"]) == len(SIZES) and len(GRIDS["v9-lr"]) == 4
+    name, argv = GRIDS["v9-size"][0]
+    a = train.get_args(argv + ["--out", "x"])
+    a.vocab_size = 1024
+    assert (a.d, a.layers, a.ctx) == (96, 2, 512)
+    assert TinyLM(train.make_config(a)).n_params() == 251_168
