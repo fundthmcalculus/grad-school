@@ -38,6 +38,7 @@ GRIDS = [
     "v6-d-lr",
     "v6-d-lr-edge",
     "v6-ref-tune",
+    "v6-final10",
 ]
 CURVE_GRIDS = [
     "v3-final",
@@ -88,22 +89,29 @@ GAPS = [
     (
         "Subwords: a neural control on the same tokenizer",
         "Without it the subword headline is a statement about subwords, not fuzziness",
-        "partly closed",
-        "v6-final10: ten seeds at 30M characters, D at lr 6e-2 against the two best tuned references",
-        "At 10M characters the tuned fuzzy D leads the best of 24 tuned neural cells by 0.016 bits per character (D: 12 runs over six lrs; reference: one seed per cell). Not citable: one reference seed, 10M characters. v6-final10 is not started and needs the GPU session's user's go-ahead",
+        "supported",
+        "done at ten seeds and 30M characters (v6-final10); other tokenizers, sizes and budgets are the next gap",
+        "Tuned fuzzy D beats both tuned neural references by 0.027 and 0.030 bits per character (ten seeds each, more than 2 standard errors); D's worst seed beats the references' best. Caveats: one tokenizer, one size, one budget; the references were chosen at 10M characters, seed 0, which favours them; D runs about 1.5 times slower per character",
     ),
     (
         "D's learning rate on subwords",
-        "The 30M, 100M and 300M subword runs used lr 3e-2; at 10M the optimum for D is 6e-2 (interior: 8e-2 and 1e-1 are worse), so those runs understate D",
-        "open",
-        "an lr study at 30M characters",
-        "Closed at 10M; open at 30M and beyond",
+        "The 30M, 100M and 300M subword runs used lr 3e-2, while the 10M optimum is 6e-2",
+        "closed at 30M",
+        "an lr check at 100M and 300M, if those numbers are to be quoted",
+        "At 30M it does not matter: D at 6e-2 (ten seeds) scores 1.1291, D at 3e-2 (two seeds) 1.1292",
     ),
     (
         "Ten seeds",
-        "Every cell is 1 to 3 seeds; AGENTS.md makes ten the protocol",
+        "AGENTS.md makes ten the protocol; the subword comparison has them, nothing else does",
+        "partly closed",
+        "v4-final10 for the character-level claim",
+        "Done for subwords (v6-final10); the character-level comparison has three seeds",
+    ),
+    (
+        "Generality of the subword result",
+        "One tokenizer (BPE1024), one model size (about 93K parameters) and one budget (30M characters)",
         "open",
-        "v4-final10, v6-final10",
+        "other vocabularies, sizes and budgets with their own tuned references",
         "Not started",
     ),
     (
