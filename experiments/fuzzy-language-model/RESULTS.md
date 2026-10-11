@@ -1197,3 +1197,14 @@ is the same test on the new best model. Layer 0: cited rules +0.387 bits per cha
 rules cost more than the random 95th percentile: the rulebook is causal for the model that gets 0.9976 BPC, as it was for the 100M model
 (+0.226 vs p95 +0.157; +0.096 vs +0.052). One checkpoint, one seed; silencing is not renormalised (this FFN is un-normalised, `--ffn-norm none`).
 Windows: the first 120 x 256 tokens from validation position 900,000, not the whole slice.
+
+### Coherence set 2, both raters, and v13-state verified (CPU session, 2026-10-12)
+
+Set 2 (24 texts, fresh seeds, n = 8 per model), totals /15 and plot /5, rater 1 / rater 2 (rater 2 scored blind; agreement r = 0.83 on totals):
+0.9976-BPC ctx512 r32 300M model 7.62 / 6.25 (plot 1.88 / 1.50); previous 300M model 8.12 / 6.88 (2.12 / 1.50); 100M model 8.12 / 7.12 (2.12 / 1.62).
+Both raters find no gain from the 1.05 -> 1.00 BPC improvement, and every model sits at 6-8/15 with plot 1.5-2.1/5, against the criterion of
+12/15 and 3.5/5. Lower validation loss through context, rules, vocabulary and budget has not bought coherence at ~95K parameters.
+
+`v13-state` verified from the records (ctx 512, 30M chars, 2 seeds): r64 1.1113 (1.1083, 1.1143), r128 1.0979 (1.1040, 1.0917), against r32 1.1125.
+H46 (r64 beats r32 by > 0.005) refuted: 0.0012. H47 (diminishing returns) refuted in the other direction: r128 gains 0.0134 over r64, so more
+state keeps helping once past 64 (102,560 and 114,848 parameters; non-monotone, 2 seeds, so r128 is the thing to confirm before believing the curve).
