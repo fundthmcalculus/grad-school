@@ -41,3 +41,6 @@ register(
         for lr in ("3e-2", "6e-2")
     ],
 )
+
+# The same cells under another name for the CPU host (records in outputs/v11-hybrid-cpu, never the GPU's).
+register("v11-hybrid-cpu", list(__import__("flm.sweep").sweep.GRIDS["v11-hybrid"]))

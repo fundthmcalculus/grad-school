@@ -1118,3 +1118,12 @@ was not rerun at ctx 512.** (Predictions H30–H32 for these grids are the CPU s
 
 H42 the best hybrid beats D by > 0.01 bpc (~35%); H43 its name-recall gain at k = 24 exceeds D's 0.47 by > 0.3 bits (~35%);
 H44 layer order matters, |hybDF - hybFD| > 0.01 (~55%); H45 the hybrid's cited FFN rules stay causal (~70%).
+
+## Registered 2026-10-12, before `v13-state`: does more recurrent state keep helping? (CPU session)
+
+Verified from the records: v8-ctx ctx256 1.1324, ctx512 1.1232, ctx512 r32 1.1125 (30M characters, 2 seeds each).
+`v13-state`: 64 and 128 rules per head at ctx 512 (102,560 and 114,848 parameters).
+* **H46:** r64 beats r32 (1.1125) by more than 0.005 bits per character. ~50%.
+* **H47:** r128 beats r64 by less than r64 beats r32 (diminishing returns). ~65%.
+* **H48:** more rules make a rule's winning share more concentrated and the rulebook shorter to read, not longer: the
+  number of rules needed to cover 80% of winning positions per head grows by less than 2x from r32 to r128. ~50%.
