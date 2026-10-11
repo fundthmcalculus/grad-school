@@ -57,7 +57,7 @@ Scale phase: data to 3 billion characters (flat past 1B), then size on CPU (loss
 | Larger vocabularies (BPE1536, BPE2048) | gain shrank from 0.027 at 10M to 0.009 at 30M (2 seeds); not adopted | `v7-vocab`, `v7-confirm` |
 | Weight-shared depth (4 or 6 applications of 2 blocks) | 0.012 worse, 2 to 3 times the compute | `v15-share` |
 | Optimiser knobs other than warm-up (lr floor, beta2, clip, weight decay, lr 4e-2 to 9e-2) | flat | `v19-optA30` |
-| Consequent-first / PPMI / coverage rule initialisations (cf, cfls, assocls, succcf, cfwide, hybrids) | no gain over random initialisation | `v22-tribble`, `v26-hybrid`, `cfwide`; `v27-cover` still running |
+| Consequent-first / PPMI / coverage rule initialisations (cf, cfls, assocls, succcf, cfwide, hybrids, cover) | no gain over random initialisation; all cluster and cover hybrids worse than random | `v22-tribble`, `v26-hybrid`, `cfwide`, `v27-cover` |
 | Repetition-aware training loss (unlikelihood, repeat-weighted) | repeats fell 20% but blind coherence fell too (7.25 to 5.62 out of 15, one checkpoint) | `v25-rep`, coherence set 9 |
 | Automatic coherence proxies (repeats, out-of-vocabulary words, names, repeated sentences) | correlate with raters at only |r| up to 0.24 | `coherence_auto` |
 | Longer context past one story (1024, 2048 tokens) | never run (stories pack back to back, so extra context is another story) | `PLAN_CONTEXT.md` |
@@ -85,22 +85,22 @@ so differences under about 2 points are not resolved; 8 texts per model per set.
 
 The evidence says the remaining plausible levers are, in order:
 
-1. **Finish the current GPU round** (`v27-cover`, then `v28-emb`: embedding initialisation, scale, weight decay). These are loss-side screens; I expect them to be null like their predecessors and do not expect them to change coherence.
+1. **Finish the current GPU round** (`v27-cover` is finished and null; `v28-emb` is next: embedding initialisation, scale, weight decay). Loss-side screens; I expect null and no change in coherence.
 2. **The decisive experiment: 1.32M parameters on 1 billion characters** (`PLAN_BIG1B.md`). Today the 1.32M model has seen about 7 training tokens per parameter against about 3,300 for the 96K model on 1B, so size and data are not separated. It is above the GPU session's 99,999-parameter cap, so it
-   needs the GPU session's user to approve it. You asked me to schedule it after the current round; I have queued the request and set a follow-up (section 9).
+   needed the GPU session's user to approve it. **Approved (its user, verbatim: "approve the 1.32M run after the embedding screen"), for this run only; the cap stays for everything else.** Stage 1 (three 30M-character learning-rate runs) starts when `v28-emb` ends, then the GPU session reports seconds per character, then stage 2 (1B characters).
 3. **If scale moves blind coherence** (registered: total 10/15 or more and plot 2.5 or more from two raters): run the size ladder (`flm/grids_v9.py`, 0.25M to 7M, 100M characters) to find where plot passes 3.5, and re-certify explainability at that size with the calibrated reader (the reading needs more rules per layer at larger sizes, and the rule view needs a way to summarise 288+ rules).
 4. **If scale does not move it**: the conclusion is that this architecture at this scale does not produce plot, and the remaining options are a different mechanism (an explicit story or entity state read by the rules) or a different training signal. Do that only after a human rater has confirmed the null, because the measure is noisy.
 5. **In parallel, cheap and independent**: a human rater for the blind sets (two or three people reading 24 texts is enough to calibrate the Claude raters).
 
 ## 8. Decisions needed from you
 
-* **Parameter cap.** The GPU session works under a 99,999-parameter cap (its user's instruction). Items 2 and 3 need that lifted, by its user. I cannot change it from here.
+* **Parameter cap.** Lifted for the 1.32M x 1B run only (its user approved). Item 3 (the ladder, 0.25M to 7M) would need a further approval from that user.
 * **Human rater.** Who can read the blind sets (they are in `report/`; I can build a rating page in the demo if useful).
 * **Archive pass.** Move the dropped levers' code and plans out of the main tree (list in section 10). I did not do this now because the GPU session's sweeps import code from disk while they run; it is a safe 15-minute job once they finish.
 
 ## 9. What I scheduled
 
-A request to the GPU session to run the 1.32M x 1B job after `v28-emb` (it needs its user's approval for the cap, and said it will not run it without), and a recurring check that pings it when the round has finished. Details in `PLAN_BIG1B.md` and `DECISIONS.md` D14.
+The 1.32M x 1B job is approved and queued on the GPU host behind `v28-emb`; an hourly check on my side (`b6aa07ab`) reads its progress and rates the coherence set when stage 2 finishes. Details in `PLAN_BIG1B.md` and `DECISIONS.md` D14.
 
 ## 10. Map of this directory
 
