@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t512e24m25_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 97664,
+ "params_nonemb": 59648,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10916,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.24591
+  ],
+  [
+   100,
+   1.5971
+  ],
+  [
+   200,
+   1.44137
+  ],
+  [
+   300,
+   1.36655
+  ],
+  [
+   400,
+   1.31717
+  ],
+  [
+   500,
+   1.2755
+  ],
+  [
+   600,
+   1.23537
+  ],
+  [
+   700,
+   1.20166
+  ],
+  [
+   800,
+   1.17098
+  ],
+  [
+   900,
+   1.15046
+  ],
+  [
+   1000,
+   1.12742
+  ],
+  [
+   1100,
+   1.11388
+  ],
+  [
+   1160,
+   1.10916
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.274
+  ],
+  [
+   50,
+   8.0832
+  ],
+  [
+   100,
+   6.2708
+  ],
+  [
+   150,
+   5.3962
+  ],
+  [
+   200,
+   4.9032
+  ],
+  [
+   250,
+   4.6481
+  ],
+  [
+   300,
+   4.4685
+  ],
+  [
+   350,
+   4.3494
+  ],
+  [
+   400,
+   4.235
+  ],
+  [
+   450,
+   4.1676
+  ],
+  [
+   500,
+   4.0939
+  ],
+  [
+   550,
+   4.0386
+  ],
+  [
+   600,
+   3.9572
+  ],
+  [
+   650,
+   3.9012
+  ],
+  [
+   700,
+   3.8584
+  ],
+  [
+   750,
+   3.8143
+  ],
+  [
+   800,
+   3.7605
+  ],
+  [
+   850,
+   3.7053
+  ],
+  [
+   900,
+   3.6631
+  ],
+  [
+   950,
+   3.6347
+  ],
+  [
+   1000,
+   3.5959
+  ],
+  [
+   1050,
+   3.5573
+  ],
+  [
+   1100,
+   3.5443
+  ],
+  [
+   1150,
+   3.5221
+  ],
+  [
+   1159,
+   3.5239
+  ]
+ ],
+ "train_seconds": 81.44,
+ "wall_seconds": 95.59,
+ "chars_per_sec": 116682,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Sally. Sally had a big vaii. To time, she needed that the hubway put it on the big birthday.\nOne day, Sally came back to explore. She saw a small table. The hunter was very slid. Sally said, \"Ema, Mr. It is too quick. Can you be pretty?\"\nThen, a small red hosicus came up. The tree was too small and lesson. It was a big, red plane. The rabbit came and ran away. The thillwhere bit the star and the snayar. Sally cannotce it in her friends.\nSally was very surprised, she shouted. She was very sad, so she started to push. Whiskers felt bad. She barked. The ball was tied and tall. Flue came to use her tall bedal. Flue was happy.\n<|eot|>\nOnce upon a time, in a small town, there was a small, free. The family loved to bed the big, wheel. The little girl had many friends, like the sun, pull.\nOne day, the shell went to the paw. The girl was curi",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t640e16m25_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 97280,
+ "params_nonemb": 59648,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10792,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.24791
+  ],
+  [
+   100,
+   1.59322
+  ],
+  [
+   200,
+   1.43608
+  ],
+  [
+   300,
+   1.36535
+  ],
+  [
+   400,
+   1.30925
+  ],
+  [
+   500,
+   1.26628
+  ],
+  [
+   600,
+   1.22958
+  ],
+  [
+   700,
+   1.19538
+  ],
+  [
+   800,
+   1.16583
+  ],
+  [
+   900,
+   1.14296
+  ],
+  [
+   1000,
+   1.12402
+  ],
+  [
+   1100,
+   1.11385
+  ],
+  [
+   1160,
+   1.10792
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2775
+  ],
+  [
+   50,
+   8.0752
+  ],
+  [
+   100,
+   6.2672
+  ],
+  [
+   150,
+   5.3467
+  ],
+  [
+   200,
+   4.8853
+  ],
+  [
+   250,
+   4.6209
+  ],
+  [
+   300,
+   4.4416
+  ],
+  [
+   350,
+   4.3248
+  ],
+  [
+   400,
+   4.2485
+  ],
+  [
+   450,
+   4.1407
+  ],
+  [
+   500,
+   4.0817
+  ],
+  [
+   550,
+   4.023
+  ],
+  [
+   600,
+   3.9627
+  ],
+  [
+   650,
+   3.8882
+  ],
+  [
+   700,
+   3.8395
+  ],
+  [
+   750,
+   3.796
+  ],
+  [
+   800,
+   3.7379
+  ],
+  [
+   850,
+   3.6938
+  ],
+  [
+   900,
+   3.6677
+  ],
+  [
+   950,
+   3.6244
+  ],
+  [
+   1000,
+   3.5841
+  ],
+  [
+   1050,
+   3.5525
+  ],
+  [
+   1100,
+   3.5423
+  ],
+  [
+   1150,
+   3.5224
+  ],
+  [
+   1159,
+   3.5186
+  ]
+ ],
+ "train_seconds": 80.81,
+ "wall_seconds": 95.11,
+ "chars_per_sec": 117596,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Sally. Sally had a big, green toy. To her friend, Spot, came to find out.\nSpot ran to the big, tall toy. So Kitty, and Bogam had a big box. They all started to play in the park. The street said, \"Look, Lucy, that is more orange. Do you want to save my toys?\"\nSally's mom said, \"Yes, I am a family!\" The toys agreed and said, \"Yes, What are you doing?\"\nThe girl said, \"Yes, I'm an ambulbular you!\" Sue was excited, but he could not play with the toy again. She played in the park all day and had lots of fun. Now, she became good friends, and lived happily ever after.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. Tim loved to play with his toy car. He would play with his toy cars and extra fun playing with.\nOne day, Tim met a cat named Tom came to play. They played with water and had a fun day. They played together in the bed, and many sandweer were more fun.\nOne day, Tim went to the park with his hat. He was towen to the unput of the sky. He",
+ "rule_init": {},
+ "ngram_init": {}
+}

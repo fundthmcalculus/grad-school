@@ -82,3 +82,14 @@ Predictions: (1) `t256e32m15` worse by 0.005-0.03 — right (+0.026); (2) `t256e
 | `t768e16m25` | **101,376 (OVER the 99,999 cap: my parameter estimate was wrong)** | 1.0883 | −0.0227 (3/3) |
 Predictions: `t512e24m25` beats baseline by 0.003-0.010 — right (−0.0077, all 3 seeds); `t768e16m25` within 0.005 of it — wrong (−0.015 further), and it is over the cap so it does not count. First under-cap result in this line that is ahead of the baseline on every seed, but 3 seeds with paired sd ~0.006: not yet a claim.
 Registered before the next round (seeds 0-4 for all arms; existing seeds 0-2 reused): under-cap arms `t640e16m25` (~97.7K) and `t768e16m225` (FFN mult 2.25, ~98.3K), plus seeds 3-4 for `t512e24m25`. Prediction: both new arms beat `t512e24m25` (the more tokens kept at full width / the smaller the tail, the better, as the over-cap arm suggests), by 0.003-0.015; the 5-seed paired gain of `t512e24m25` stays between -0.004 and -0.010. A claim needs >= 0.005 better on >= 4 of 5 seeds for the final arm, then a 300M-scale confirmation.
+
+### Item 7, five-seed outcome (`v30-tiered`, 30M chars; baseline seeds 0-4 = 1.112 / 1.1129 / 1.108 / 1.0926 / 1.1219, mean 1.1095)
+| arm | params | mean ± sd | paired vs baseline | seeds better | per-seed paired |
+|---|---|---|---|---|---|
+| `t256e32m15` | 85,664 | 1.1350 ± 0.0045 | +0.0256 | 0/5 | +0.030 +0.021 +0.027 +0.038 +0.012 |
+| `t256e32m20` | 91,856 | 1.1283 ± 0.0047 | +0.0188 | 0/5 | +0.018 +0.009 +0.026 +0.037 +0.005 |
+| `t512e24m20` | 91,472 | 1.1137 ± 0.0100 | +0.0043 | 2/5 | +0.009 −0.006 +0.009 +0.031 −0.022 |
+| `t512e24m25` | 97,664 | 1.1059 ± 0.0048 | −0.0036 | 4/5 | −0.014 −0.007 −0.002 +0.018 −0.013 |
+| `t640e16m25` | 97,280 | 1.1046 ± 0.0064 | −0.0048 | 3/5 | −0.009 −0.005 +0.001 +0.017 −0.028 |
+| **`t768e16m225`** | **98,280** | **1.0965 ± 0.0061** | **−0.0130** | **4/5** | −0.025 −0.010 −0.010 +0.007 −0.026 |
+Predictions: both new arms beat `t512e24m25` by 0.003-0.015 — `t768e16m225` yes (by 0.0094), `t640e16m25` no (by 0.0012); `t512e24m25`'s 5-seed gain between −0.004 and −0.010 — narrowly wrong (−0.0036; the 3-seed −0.0077 shrank when seeds 3-4 came in: seed 3 is the baseline's lucky seed, 1.0926). The registered claim rule (>= 0.005 better on >= 4 of 5 seeds) is **met by `t768e16m225` only** (4/5 seeds beat by 0.010-0.026; seed 3 is +0.007). It is the first under-cap (98,280 params) configuration ahead of the 96K baseline at 30M characters. Per the plan it needs a 300M-character confirmation before it is a result: `v31-tiered300m`, seeds 0-1, vs v12-long512 (0.9976 / 1.0053), registered: the 30M gain (−0.013) shrinks at 300M (warm-up's did), prediction −0.003 to −0.010; counts as confirmed if better than the matching baseline seed by >= 0.003 on both seeds; if both seeds are within ±0.003 the 30M gain is a short-run effect and the cited recipe stays.
