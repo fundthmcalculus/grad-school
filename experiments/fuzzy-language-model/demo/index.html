@@ -59,6 +59,24 @@ td.rs { font-family: var(--mono); overflow-wrap: anywhere; }
 .note { color: var(--muted); font-size: 0.8rem; margin: 8px 0 0; }
 .err { color: var(--warn); font-size: 0.9rem; }
 .tblwrap { overflow-x: auto; }
+
+.struct { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 12px; }
+.struct .lay { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; font-size: 0.86rem; }
+.struct .lay b { display: block; margin-bottom: 4px; }
+.struct .step { display: flex; gap: 8px; align-items: baseline; margin: 2px 0; }
+.struct .step i { font-style: normal; color: var(--muted); min-width: 5.2rem; font-size: 0.78rem; }
+.rb { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 16px; }
+.rb button.rule { display: grid; grid-template-columns: 3.2rem 3rem 1fr; gap: 6px; text-align: left; width: 100%; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; padding: 4px 2px; font-size: 0.82rem; }
+.rb button.rule:hover, .rb button.rule.sel { background: var(--accent-soft); }
+.rb .mono, #insp .mono { font-family: var(--mono); }
+.tabs { display: flex; gap: 6px; margin-bottom: 8px; }
+.tabs button[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+.dims { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: 8px; }
+.dim { border: 1px solid var(--line); border-radius: 4px; padding: 4px 6px; }
+.dim .cap { font-size: 0.72rem; color: var(--muted); font-family: var(--mono); display: flex; justify-content: space-between; }
+svg { display: block; width: 100%; height: auto; }
+.ctx { font-size: 0.82rem; margin: 2px 0; font-family: var(--mono); overflow-wrap: anywhere; }
+tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--accent-soft); }
 </style>
 </head>
 <body>
@@ -107,6 +125,34 @@ td.rs { font-family: var(--mono); overflow-wrap: anywhere; }
       </div>
     </div>
   </section>
+
+  <section class="card" aria-label="Model structure">
+    <h2>How this model is built</h2>
+    <div class="struct" id="struct"></div>
+    <p class="note" id="struct-note"></p>
+  </section>
+
+  <section class="card" id="tl-card" hidden aria-label="Rule timeline">
+    <h2>Rule timeline: which fuzzy rules fired for each piece</h2>
+    <div class="tabs" id="tl-tabs"></div>
+    <div id="tl"></div>
+    <p class="note">Rows are the 14 rules with the largest total effect over this text; columns are the generated pieces. Teal means the rule's gate was positive, orange negative; stronger colour is a larger gate. Click a rule's label to see its membership functions, or a column to pick that piece above.</p>
+  </section>
+
+  <section class="card" aria-label="Rule browser">
+    <h2>Most used rules</h2>
+    <div class="rb" id="rb"></div>
+    <p class="note">Rules are ranked by how often each is the strongest at a position, over 48 validation windows. The pieces listed are the ones the rule raises most. Click a rule to inspect it.</p>
+  </section>
+
+  <section class="card" id="insp" hidden aria-label="Rule inspector">
+    <h2 id="insp-title"></h2>
+    <div class="note" id="insp-sub"></div>
+    <div class="dims" id="dims"></div>
+    <p class="note">Each panel is one of the 16 input dimensions of this rule. The curve is the rule's membership function on that dimension (its centre and width); the rule's firing is the product of these 16 curves. Gray bars show where the data falls on that dimension; teal bars show where it falls when this rule fires strongly. Panels are ordered from most to least selective (data spread divided by membership width): a high value means the rule only accepts a narrow part of the data on that dimension.</p>
+    <h2 style="margin-top:14px">Where it fires most</h2>
+    <div id="ctxs"></div>
+  </section>
 </main>
 
 <script>
@@ -143,7 +189,7 @@ $('go').onclick = async () => {
 };
 
 function render(d) {
-  const out = $('out'); out.textContent = '';
+  const out = $('out'); out.textContent = ''; spans = [];
   const p = document.createElement('span'); p.className = 'p'; p.textContent = d.prompt; out.appendChild(p);
   d.steps.forEach((s, i) => {
     const sp = document.createElement('span'); sp.className = 't'; sp.textContent = s.text; sp.tabIndex = 0;
@@ -152,8 +198,9 @@ function render(d) {
     sp.title = `probability ${(s.p * 100).toFixed(1)}%` + (s.rep ? ', repeats a three-piece run already in the text' : '');
     const pick = () => select(i, sp);
     sp.onclick = pick; sp.onfocus = pick; sp.onmouseenter = pick;
-    out.appendChild(sp);
+    out.appendChild(sp); spans.push(sp);
   });
+  timeline(d);
 }
 
 function select(i, el) {
@@ -172,11 +219,108 @@ function select(i, el) {
   const body = $('d-rules'); body.textContent = '';
   if (!s.rules || !s.rules.length) { body.innerHTML = '<tr><td colspan="5">Rules are not shown for this model or setting.</td></tr>'; return; }
   for (const r of s.rules) {
-    const tr = document.createElement('tr');
+    const tr = document.createElement('tr'); tr.className = 'clk'; tr.title = 'inspect this rule'; tr.onclick = () => inspect(r.layer, r.rule);
     const cells = [r.layer, r.rule, r.gate.toFixed(2), (r.contribution > 0 ? '+' : '') + r.contribution.toFixed(2), r.raises.map(vis).join('  ')];
     cells.forEach((c, k) => { const td = document.createElement('td'); td.textContent = c; if (k === 4) td.className = 'rs'; else td.className = 'n'; if (k === 3) td.classList.add(r.contribution >= 0 ? 'pos' : 'neg'); tr.appendChild(td); });
     body.appendChild(tr);
   }
+}
+
+// ---------- structure, rule browser, timeline, inspector ----------
+const SVGNS = 'http://www.w3.org/2000/svg';
+const sv = (tag, a, parent, text) => { const e = document.createElementNS(SVGNS, tag); for (const k in (a || {})) e.setAttribute(k, a[k]); if (text != null) e.textContent = text; if (parent) parent.appendChild(e); return e; };
+let tlLayer = 0, spans = [];
+
+async function loadModelViews() {
+  const id = $('model').value; if (!id) return;
+  try {
+    const st = await (await fetch('/structure?model=' + encodeURIComponent(id))).json();
+    const host = $('struct'); host.textContent = '';
+    for (const L of st.layers) {
+      const d = document.createElement('div'); d.className = 'lay';
+      d.innerHTML = '<b></b>';
+      d.querySelector('b').textContent = 'Layer ' + (L.layer + 1) + ' of ' + st.n_layers;
+      const rows = [
+        ['smooth', L.conv ? 'causal convolution over the last ' + L.conv + ' pieces' : 'none'],
+        ['remember', L.heads ? L.heads + ' heads, each ' + (L.mixer_rules_per_head || '?') + ' fuzzy memory rules over ' + L.head_dim + ' dimensions (the ' + L.mixer.replace('Mixer', '').toLowerCase() + ' recurrent mixer)' : L.mixer],
+        ['decide', L.ffn_rules ? L.ffn_rules + ' fuzzy rules over a ' + L.ffn_antecedent_dim + '-dimension antecedent, ' + (L.ffn_order === 1 ? 'first-order (each rule scales a linear function of its input)' : 'zero-order') + (L.ffn_norm === 'none' ? ', raw firing strengths' : ', normalised') : L.ffn]];
+      for (const [k, v] of rows) { const r = document.createElement('div'); r.className = 'step'; const i = document.createElement('i'); i.textContent = k; const t = document.createElement('span'); t.textContent = v; r.append(i, t); d.appendChild(r); }
+      host.appendChild(d);
+    }
+    $('struct-note').textContent = st.n_layers + ' layers, width ' + st.d_model + ', ' + st.params.toLocaleString() + ' parameters. Rule memberships below are the feed-forward ("decide") rules, which carry most of the prediction.';
+    const rl = await (await fetch('/rules?model=' + encodeURIComponent(id))).json();
+    const rb = $('rb'); rb.textContent = '';
+    for (const L of rl.layers) {
+      const col = document.createElement('div'); const h = document.createElement('h2'); h.textContent = 'Layer ' + (L.layer + 1); col.appendChild(h);
+      for (const r of L.rules.slice(0, 12)) {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'rule';
+        const a = document.createElement('span'); a.className = 'mono'; a.textContent = 'r' + r.rule;
+        const w = document.createElement('span'); w.className = 'mono'; w.textContent = r.wins_pct.toFixed(1) + '%';
+        const t = document.createElement('span'); t.textContent = r.raises.map((x) => JSON.stringify(x).slice(1, -1) || ' ').join('  ');
+        b.append(a, w, t); b.onclick = () => inspect(L.layer, r.rule); col.appendChild(b);
+      }
+      rb.appendChild(col);
+    }
+  } catch (e) { $('struct-note').textContent = 'Could not load the structure view: ' + e.message; }
+}
+$('model').addEventListener('change', loadModelViews);
+setTimeout(loadModelViews, 900);
+
+function timeline(d) {
+  const card = $('tl-card');
+  if (!d.explained || !d.steps.length || !d.steps[0].gates) { card.hidden = true; return; }
+  card.hidden = false;
+  const nl = d.steps[0].gates.length;
+  const tabs = $('tl-tabs'); tabs.textContent = '';
+  for (let l = 0; l < nl; l++) { const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Layer ' + (l + 1); b.setAttribute('aria-pressed', String(l === tlLayer)); b.onclick = () => { tlLayer = l; timeline(d); }; tabs.appendChild(b); }
+  const G = d.steps.map((s) => s.gates[tlLayer]);
+  const R = G[0].length, tot = new Array(R).fill(0);
+  for (const g of G) for (let r = 0; r < R; r++) tot[r] += Math.abs(g[r]);
+  const rows = tot.map((v, r) => [v, r]).sort((a, b) => b[0] - a[0]).slice(0, 14).map((x) => x[1]);
+  const gmax = Math.max(...G.flat().map(Math.abs), 1e-6);
+  const n = G.length, cw = Math.max(5, Math.min(14, 640 / n)), lw = 78, rh = 18, W = lw + n * cw + 4, H = rows.length * rh + 8;
+  const svg = sv('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Rule firing by piece' });
+  rows.forEach((r, i) => {
+    const t = sv('text', { x: 0, y: i * rh + 13, style: 'cursor:pointer;font-family:var(--mono);font-size:11px;fill:var(--fg)' }, svg, 'r' + r);
+    t.onclick = () => inspect(tlLayer, r); sv('title', {}, t, 'inspect rule ' + r);
+    G.forEach((g, j) => {
+      const v = g[r], c = sv('rect', { x: lw + j * cw, y: i * rh + 1, width: cw - 1, height: rh - 2, fill: v >= 0 ? 'var(--accent)' : 'var(--warn)', 'fill-opacity': Math.min(1, Math.abs(v) / gmax).toFixed(3), style: 'cursor:pointer' }, svg);
+      sv('title', {}, c, `rule ${r}, piece ${j + 1} ${JSON.stringify(d.steps[j].text)}: gate ${v}`);
+      c.onclick = () => spans[j] && spans[j].click();
+    });
+  });
+  $('tl').textContent = ''; $('tl').appendChild(svg);
+}
+
+async function inspect(layer, rule) {
+  const id = $('model').value;
+  $('insp').hidden = false; $('insp-title').textContent = `Layer ${layer + 1}, rule ${rule}`; $('insp-sub').textContent = 'Loading...'; $('dims').textContent = ''; $('ctxs').textContent = '';
+  $('insp').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  try {
+    const d = await (await fetch(`/rule?model=${encodeURIComponent(id)}&layer=${layer}&rule=${rule}`)).json();
+    if (d.error) throw new Error(d.error);
+    $('insp-sub').textContent = `Mean firing ${d.firing_mean}, 99th percentile ${d.firing_p99}. Firing is the product of the ${d.dims.length} membership functions below.`;
+    const host = $('dims');
+    for (const m of d.dims) {
+      const box = document.createElement('div'); box.className = 'dim';
+      const cap = document.createElement('div'); cap.className = 'cap';
+      const a = document.createElement('span'); a.textContent = 'dim ' + m.dim; const b = document.createElement('span'); b.textContent = 'sel ' + m.selectivity.toFixed(2);
+      b.title = 'data spread divided by membership width'; cap.append(a, b); box.appendChild(cap);
+      const W = 160, H = 64, svg = sv('svg', { viewBox: `0 0 ${W} ${H + 12}` }, box);
+      const x = (v) => (v - m.lo) / (m.hi - m.lo) * W, nb = m.all.length, bw = W / nb;
+      m.all.forEach((v, i) => sv('rect', { x: i * bw, y: H - v * H, width: bw - 0.5, height: v * H, fill: 'var(--line)' }, svg));
+      m.fires.forEach((v, i) => sv('rect', { x: i * bw + bw * 0.2, y: H - v * H, width: bw * 0.6, height: v * H, fill: 'var(--accent)', 'fill-opacity': 0.55 }, svg));
+      let pts = '';
+      for (let i = 0; i <= 60; i++) { const v = m.lo + (m.hi - m.lo) * i / 60, g = Math.exp(-0.5 * ((v - m.center) / m.sigma) ** 2); pts += `${x(v).toFixed(1)},${(H - g * H * 0.95).toFixed(1)} `; }
+      sv('polyline', { points: pts, fill: 'none', stroke: 'var(--warn)', 'stroke-width': 1.8 }, svg);
+      sv('line', { x1: x(m.center), y1: 0, x2: x(m.center), y2: H, stroke: 'var(--warn)', 'stroke-dasharray': '3 3', 'stroke-width': 1 }, svg);
+      sv('text', { x: 0, y: H + 10, style: 'font-size:9px' }, svg, m.lo.toFixed(1)); sv('text', { x: W, y: H + 10, 'text-anchor': 'end', style: 'font-size:9px' }, svg, m.hi.toFixed(1));
+      host.appendChild(box);
+    }
+    const cx = $('ctxs');
+    for (const c of d.contexts) { const p = document.createElement('div'); p.className = 'ctx'; p.textContent = `firing ${c.firing}   ...${c.context}  \u2192  ${JSON.stringify(c.next)}`; cx.appendChild(p); }
+    document.querySelectorAll('.rb button.rule').forEach((b) => b.classList.remove('sel'));
+  } catch (e) { $('insp-sub').textContent = 'Could not load the rule: ' + e.message; }
 }
 </script>
 </body>
