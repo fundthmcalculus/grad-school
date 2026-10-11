@@ -1114,3 +1114,7 @@ Context 512 vs 256: **−0.0092** (matches my `v8-ctx-b16` result, −0.0066 at 
 with a very small seed spread (0.0004). Both gains are ≈ 3 seed standard errors of the ctx-256 cell but only two seeds each; the 32-rule cell is the best BPE1024 D at 30M chars so far
 (1.1125, under 100K parameters: 96,416) and the first improvement over the ten-seed 1.1291 headline that is not within seed noise. **Not ten-seed validated, and its own neural control
 was not rerun at ctx 512.** (Predictions H30–H32 for these grids are the CPU session's in `RESULTS.md`; scoring is theirs.)
+## Registered 2026-10-11, before `v11-hybrid`: D plus Fibonacci attention (CPU session; PLAN_FIBONACCI.md stage 2)
+
+H42 the best hybrid beats D by > 0.01 bpc (~35%); H43 its name-recall gain at k = 24 exceeds D's 0.47 by > 0.3 bits (~35%);
+H44 layer order matters, |hybDF - hybFD| > 0.01 (~55%); H45 the hybrid's cited FFN rules stay causal (~70%).

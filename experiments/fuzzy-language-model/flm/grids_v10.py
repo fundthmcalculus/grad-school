@@ -47,3 +47,11 @@ register(
         for lr in LRS
     ],
 )
+
+# The same 12 cells under another name, for the CPU host: records land in outputs/v10-fib-cpu so they can
+# never be mistaken for (or overwrite) the GPU session's v10-fib records. The CPU host has a 60M-character
+# prefix of the BPE1024 stream, not the GPU host's 600M, so the two are not bit-comparable.
+register(
+    "v10-fib-cpu",
+    [(f"{n}", argv) for n, argv in __import__("flm.sweep").sweep.GRIDS["v10-fib"]],
+)
