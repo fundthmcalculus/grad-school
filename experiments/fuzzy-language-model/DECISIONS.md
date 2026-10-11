@@ -41,3 +41,13 @@ would change the decision.
   (3) explainability holds but thins as rules multiply (8 cited rules explain 23-35% of positions at 144 rules, 53-56% at 72).
 * **What would change this:** a blind two-rater grading that puts the 251K model at plot 2.5 or above (my single-rater scores can be wrong), or the GPU session's second-seed 300M run
   moving coherence.
+
+## D5 (2026-10-12, overnight): one more CPU point, 1.32M parameters
+* **Decision:** train D at d 192, 4 layers (1,323,904 parameters, 5.3x the 251K model, 14x the headline), BPE1024, ctx 512, batch 16, lr 2e-2 (a guess: the 93K model's optimum
+  was 6e-2 and larger models usually want less; untuned), 30M characters, seed 0, on this CPU: measured 2,900 characters per second, so about 3 hours.
+  Output `outputs/v9-cpu/d192-L4_30M_s0.{json,pt}`, log `outputs/v9-cpu/d192.log`.
+* **Why:** the 251K result left a question the cap cannot answer: is the flat coherence a property of tiny models or of this architecture? One 14x point separates them at no
+  GPU cost. You said to take the decisions and log them; this is the only experiment left that fits on this host overnight, and it ties up the CPU for about 3 hours, which I judged acceptable while you sleep.
+* **Predictions (registered before it finishes):** val BPC at most 0.93 (60%); blind plot (single rater, same protocol, fresh seeds) 2.0 or above (35%); total 10/15 or above (25%).
+* **After it finishes:** grade a blind set (1.32M, 251K, 93K at 300M; seeds 8-9), run rule-ablation with 8 and with 32 cited rules, log D6. If plot is still under 2.0 the conclusion in D4 stands for this architecture at 30M characters.
+* **I am not changing anything else while it runs** (jobs import code from disk; I do no code merges until it ends).
