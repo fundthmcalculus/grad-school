@@ -698,3 +698,37 @@ register(
         )
     ],
 )
+
+
+# v17-1b-s1 (G39/G40): seed 1 of the 1B-character run; needs FLM_TRAIN_SUFFIX=_1b
+_c = cell(
+    "D-d48-bpe1024-ctx512-r32_1000M_s1",
+    D,
+    d=48,
+    sc="8",
+    chars="1000e6",
+    seed=1,
+    lr="6e-2",
+)
+register(
+    "v17-1b-s1",
+    [
+        (
+            _c[0],
+            _c[1]
+            + [
+                "--tok",
+                "bpe1024",
+                "--warmup",
+                "100",
+                "--ctx",
+                "512",
+                "--batch",
+                "16",
+                "--rules",
+                "32",
+                "--save-model",
+            ],
+        )
+    ],
+)

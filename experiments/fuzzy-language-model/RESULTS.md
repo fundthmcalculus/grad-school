@@ -1420,3 +1420,9 @@ Gain over the two-seed 300M mean (1.0015) is −0.022 for 3.3× the data; the ea
 Rater 1 scores the 1B model **+1.63** over the 300M model and +1.38 over the 100M model (plot 2.38 vs 1.75 and 2.00), i.e. in the predicted direction and above the registered +1.0 threshold. **G38 is not decided:** it was registered on the mean of two raters
 and rests on n = 8 per model with per-set noise of ≈ ±1.5; a 1.6-point gap is about 3 s.e. of these means but a single rater's gap. Earlier rounds showed that a first-round gap can fail to replicate (the 300M model's 9.88 in set 1 vs 8.12 in set 2).
 If rater 2 agrees, this is the first in-cap lever that moved coherence beyond noise, and its mechanism, more training data seen, was not a surprise.
+
+## Registered 2026-10-11, before `v17-1b` seed 1: does the 1B-character result replicate?
+
+Same cell as `v17-1b` (BPE1024 D d = 48, ctx 512 / batch 16, 32 rules, lr 6e-2, 1,000M chars, `FLM_TRAIN_SUFFIX=_1b`), seed 1, saved; ~45 min. Seed 0 scored 0.9796; the 300M seed spread was 0.0054 (0.9976, 1.0053).
+* **G39.** Seed 1 scores ≤ 0.995 (within ~3 sd of the 300M-run spread of seed 0, so a replication of "about 0.98–0.99"), giving a two-seed mean ≤ 0.99 and beating the 300M two-seed mean (1.0015) by ≥ 0.01. *(~75%.)*
+* **G40.** A blind coherence set mixing the two 1B seeds against the 300M model (the CPU session grades alongside me) shows both 1B models above the 300M model by ≥ 0.8 totals each. *(~45%.)* Run only if rater 2 agrees on set 5.
