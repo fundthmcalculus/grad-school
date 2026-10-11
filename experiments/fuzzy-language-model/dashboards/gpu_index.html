@@ -15,6 +15,7 @@
     <button class="fl-tab" id="tab-comparison" data-page="comparison" role="tab" aria-selected="false">The comparison</button>
     <button class="fl-tab" id="tab-bigger" data-page="bigger" role="tab" aria-selected="false">Bigger models and post-training</button>
     <button class="fl-tab" id="tab-subwords" data-page="subwords" role="tab" aria-selected="false">Subwords</button>
+    <button class="fl-tab" id="tab-control" data-page="control" role="tab" aria-selected="false">Subword control</button>
     <button class="fl-tab" id="tab-text" data-page="text" role="tab" aria-selected="false">Generated text</button>
     <button class="fl-tab" id="tab-rules" data-page="rules" role="tab" aria-selected="false">Reading the model</button>
     <button class="fl-tab" id="tab-gaps" data-page="gaps" role="tab" aria-selected="false">Open gaps</button>
@@ -43,7 +44,7 @@
     <div class="fl-tile">
       <span class="fl-tile-label">Subword fuzzy model, 100M characters</span>
       <span class="fl-tile-value dash-skeleton" data-source="lead" data-field="sub100_txt" data-row="0">—</span>
-      <span class="fl-tile-note"><span data-source="lead" data-field="sub_params_txt" data-row="0">—</span> params, one seed, no neural control yet</span>
+      <span class="fl-tile-note"><span data-source="lead" data-field="sub_params_txt" data-row="0">—</span> params, one seed, run at a learning rate below D's optimum</span>
     </div>
   </section>
   <section class="fl-card" id="overview-ladder">
@@ -158,7 +159,27 @@
       <div class="fl-chart fl-short" id="chart-subcurves" data-source="gpu_curves"></div>
     </section>
   </div>
-  <p class="fl-note">Caveats: the subword result has few seeds and, so far, no neural control on the same tokenizer; D's learning rate was never tuned on subwords. Bits per character is not coherence.</p>
+  <p class="fl-note">Caveats: few seeds. The 30M, 100M and 300M runs used a learning rate of 3e-2, below D's optimum at 10M characters (see Subword control), so they understate D. A tuned neural control exists at 10M characters only. Bits per character is not coherence.</p>
+</template>
+
+<template id="tpl-control">
+  <section class="fl-card" id="control-result">
+    <h2>Fuzzy D against a tuned neural model on the same tokenizer</h2>
+    <p class="fl-note">BPE1024, about 93K parameters each (the neural MLP is padded to match), 10M characters, both sides tuned over learning rate. Fuzzy D: six learning rates, two seeds each, best shown. Neural: the best of 24 configurations (mixer, heads, short convolution, learning rate), one seed each. Bars start at 1.2. Not citable yet: one reference seed and a short run.</p>
+    <div class="fl-chart fl-short" id="chart-control" data-source="arm_stats"></div>
+  </section>
+  <div class="fl-grid">
+    <section class="fl-card" id="control-lr">
+      <h2>Fuzzy D's learning rate on subwords</h2>
+      <p class="fl-note">Two seeds per rate, whiskers one standard deviation. The optimum is interior: both neighbours of the best rate are worse. The 30M, 100M and 300M subword runs used 3e-2.</p>
+      <div class="fl-chart fl-short" id="chart-dlr" data-source="arm_stats"></div>
+    </section>
+    <section class="fl-card" id="control-grid">
+      <h2>The neural tuning grid</h2>
+      <p class="fl-note">Validation bits per character, seed 0, 10M characters. dh = delta rule with h heads, gla = gated linear attention, sc = short convolution width. The best cell is in bold.</p>
+      <div class="fl-tablewrap" id="grid-neural" data-source="arm_stats"></div>
+    </section>
+  </div>
 </template>
 
 <template id="tpl-text">
@@ -226,7 +247,7 @@
         const v = rs.map((r) => (r.val_bpc === '' ? NaN : Number(r.val_bpc))).filter(Number.isFinite);
         const e = rs.map((r) => (r.val_bpc_ema === '' ? NaN : Number(r.val_bpc_ema))).filter(Number.isFinite);
         out.push({
-          key: k, grid: rs[0].grid, arm: rs[0].arm, n: v.length, mean: mean(v), std: sd(v), ema_mean: mean(e),
+          key: k, grid: rs[0].grid, arm: rs[0].arm, n: v.length, mean: mean(v), std: sd(v), ema_mean: mean(e), lr: Number(rs[0].lr),
           params: Number(rs[0].params), tok: rs[0].tok, chars_m: Number(rs[0].chars_m), cps: Math.round(mean(rs.map((r) => Number(r.cps)))),
         });
       }
@@ -303,6 +324,8 @@
         ['Fuzzy D, characters', 'v3-final', 'D_100M', C[0], '100M characters'],
         ['Fuzzy D, BPE1024', 'v5-final100k', 'D-d48-bpe1024_100M', C[2], '100M characters'],
         ['Fuzzy D, BPE1024', 'v5-long', 'D-d48-bpe1024_300M_lr3e-2', C[2], '300M characters'],
+        ['Neural, BPE1024, best of 24 tuned cells', 'v6-ref-tune', 'delta-h8-sc4-lr4e-2', C[7], '10M characters, same tokenizer, both tuned'],
+        ['Fuzzy D, BPE1024, lr 6e-2', 'v6-d-lr', 'D-lr6e-2_10M', C[2], '10M characters, same tokenizer, both tuned'],
       ].map(([l, g, a, c, grp]) => item(l, arm(g, a), { color: c, group: grp })).filter(Boolean);
       F.bars(el, spec, { xDomain: [1.0, 1.4], xFmt: F.f2, valueFmt: F.f3 });
     },
@@ -472,6 +495,58 @@
         return { name: l, color: c, width: w, points: [...byX].map(([x, rs]) => ({ x: Number(x), y: d3.mean(rs.map((r) => Number(r.val_bpc))), label: `${F.f2(Number(x))}M characters · ${F.f3(d3.mean(rs.map((r) => Number(r.val_bpc))))} bits/char` })).sort((p, q) => p.x - q.x) };
       });
       F.lines(el, { series, xLog: true, height: 260, xLabel: 'characters seen (millions)', yFmt: F.f2, xFmt: d3.format('d'), xTickValues: [5, 10, 25, 50, 100, 300], yDomain: [1.0, 1.7] });
+    },
+
+    control(root) {
+      const st = dash.data('arm_stats');
+      let el = root.querySelector('#chart-control');
+      const rows = st.status === 'ok' ? st.data : [];
+      const neural = rows.filter((r) => r.grid === 'v6-ref-tune').sort((a, b) => a.mean - b.mean);
+      const dlr = rows.filter((r) => r.grid === 'v6-d-lr' || r.grid === 'v6-d-lr-edge').sort((a, b) => a.mean - b.mean);
+      if (!F.pending(el, st.status)) {
+        const items = [];
+        if (dlr[0]) items.push({ label: `Fuzzy D, lr ${dlr[0].lr} (best of ${dlr.length} rates) · ${F.fmtInt(dlr[0].params)}`, value: dlr[0].mean, err: dlr[0].std || 0, color: C[2], note: `${dlr[0].n} seeds` });
+        for (const r of neural.slice(0, 4)) items.push({ label: `Neural ${r.arm.replace('-lr', ', lr ').replace('-', ' ')} · ${F.fmtInt(r.params)}`, value: r.mean, color: C[7], note: '1 seed' });
+        if (dlr[0] && neural[0]) items.push({ label: 'Lead of fuzzy D over the best neural cell', value: neural[0].mean - dlr[0].mean, color: C[0], note: 'bits/char', _delta: true });
+        const main = items.filter((i) => !i._delta);
+        F.bars(el, main, { xDomain: [1.2, 1.3], xFmt: F.f2, valueFmt: F.f4, rowH: 32 });
+        const lead = items.find((i) => i._delta);
+        if (lead) {
+          const note = document.createElement('div');
+          note.className = 'fl-note';
+          note.textContent = `Lead of the best fuzzy D over the best neural cell: ${F.f4(lead.value)} bits per character.`;
+          el.append(note);
+        }
+      }
+      el = root.querySelector('#chart-dlr');
+      if (!F.pending(el, st.status)) {
+        const pts = [...dlr].sort((a, b) => a.lr - b.lr).map((r) => ({ x: r.lr, y: r.mean, lo: r.mean - (r.std || 0), hi: r.mean + (r.std || 0), label: `lr ${r.lr} · ${F.f4(r.mean)} ± ${F.f4(r.std || 0)} bits/char · ${r.n} seeds` }));
+        F.lines(el, { series: [{ name: 'Fuzzy D, BPE1024', color: C[2], width: 3, points: pts }], xLog: true, height: 240, xLabel: 'learning rate', yFmt: F.f3, xFmt: d3.format('~e'), xTickValues: [2e-2, 3e-2, 4e-2, 6e-2, 8e-2, 1e-1] });
+      }
+      const box = root.querySelector('#grid-neural');
+      if (st.status !== 'ok') { box.textContent = ''; return; }
+      box.textContent = '';
+      const cfgs = ['delta-h4-sc4', 'delta-h4-sc8', 'delta-h8-sc4', 'delta-h8-sc8', 'gla-h8-sc4', 'gla-h8-sc8'];
+      const lrs = ['2e-2', '3e-2', '4e-2', '6e-2'];
+      const best = neural[0] && neural[0].arm;
+      const table = document.createElement('table');
+      table.className = 'fl-table';
+      const head = document.createElement('tr');
+      for (const h of ['Configuration', ...lrs.map((l) => 'lr ' + l)]) { const th = document.createElement('th'); th.textContent = h; head.append(th); }
+      table.append(head);
+      for (const c of cfgs) {
+        const tr = document.createElement('tr');
+        const t0 = document.createElement('td'); t0.textContent = c; tr.append(t0);
+        for (const l of lrs) {
+          const r = neural.find((x) => x.arm === `${c}-lr${l}`);
+          const td = document.createElement('td');
+          td.textContent = r ? F.f4(r.mean) : '';
+          if (r && r.arm === best) td.style.fontWeight = '700';
+          tr.append(td);
+        }
+        table.append(tr);
+      }
+      box.append(table);
     },
 
     text(root) {

@@ -44,8 +44,9 @@ this document and `RESULTS.md` differ, `RESULTS.md` is the record.
    fuzzy model that scores **1.274** vs **1.293** for the size-near neural reference at 30M
    characters (3 seeds; a 2.85-standard-error lead that is **not yet citable**: the reference
    is 4.6% smaller and less tuned). A BPE1024 version (93K params) reaches **1.129** at 30M
-   (2 seeds), **1.055** at 100M and **1.021** at 300M (1 seed each), **with no neural control on the
-   same tokenizer yet**. Post-training adds nothing beyond compute. The open fairness gaps are listed in §12.
+   (2 seeds), **1.055** at 100M and **1.021** at 300M (1 seed each), and, at 10M characters on the same
+   tokenizer, a tuned neural model trails the tuned fuzzy one by **0.016** (§11; one reference seed, so not citable).
+   Post-training adds nothing beyond compute. The open fairness gaps are listed in §12.
 
 ## 2. Questions
 
@@ -416,13 +417,22 @@ the text's probability, so the reported BPC is, if anything, conservative for th
 | `v5-long` (300M, 1 seed) | BPE1024 D d = 48, lr 3e-2 / lr 2e-2 | 93,344 | **1.0212** / 1.0227 |
 
 * **Caveats the GPU session asked to be stated:** the subword result is **2 seeds at 30M and 1 seed at 100M**;
-  there is **no neural control on the same tokenizer yet**; and the 150K-vs-162K comparisons are at equal
+  the neural control on the same tokenizer exists **at 10M characters only** (below); the 30M, 100M and 300M runs used
+  lr 3e-2, which is **below D's optimum of 6e-2 at 10M**, so they understate D; and the 150K-vs-162K comparisons are at equal
   *characters*, not equal steps (BPE sees ≈ 2.4× more characters per step, so it takes fewer optimizer steps and
   its warm-up is a larger share of training).
 * A larger vocabulary buys the most at roughly constant parameters (512 < 768 < 1024, monotone); more FFN rules
   or a wider antecedent buy ≈ 0 (inside the 0.01 noise). The trend is untested above 1024.
 * The 93K subword model at 30M chars (1.129) beats the 97.5K character model at 100M (1.208).
 * **Returns on data shrink:** 30M → 100M gave −0.074 and 100M → 300M gave −0.034 (single seeds), so 1B characters would be expected to give about −0.02. The two learning rates tried at 300M (3e-2 and 2e-2) differ by 0.0015, inside seed noise.
+* **The subword control (`v6-*`, 10M characters, BPE1024, ~93K parameters each; the GPU session ran it, the CPU
+  session built the grids and verified the numbers from the records).** Fuzzy D over six learning rates (2 seeds each):
+  2e-2 → 1.2809, 3e-2 → 1.2604, 4e-2 → 1.2542, **6e-2 → 1.2502 ± 0.0018**, 8e-2 → 1.2519, 1e-1 → 1.2628, so the
+  optimum is interior. The neural reference (delta rule or gated linear attention, MLP padded to 93,376–93,392
+  parameters; 24 cells over heads, short convolution and lr, one seed each): best **1.2666** (delta, 8 heads, short-conv 4,
+  lr 4e-2), then 1.2694 and 1.2710. **Tuned fuzzy D leads the best tuned neural cell by 0.016 bits per character**,
+  against D's own seed spread of 0.002; the reference is one seed. Not citable (one reference seed, 10M characters);
+  `v6-final10` (ten seeds at 30M characters) is the test.
 * **Text is better but not coherent.** At T 0.7 / top-k 20 the BPE1024 model invents more non-words (2.2%) than
   the character models (0.4–0.9%); sampling at T 0.5 / top-k 10 drops that to 0.65% at the price of looping
   ("They did not like the box. They did not like the box.", repeated-sentence share 2.9%). Samples show
@@ -434,8 +444,8 @@ the text's probability, so the reported BPC is, if anything, conservative for th
 | gap | why it matters | how it closes |
 |---|---|---|
 | **Char-level D vs the reference at equal effort** | 4.6% parameter mismatch; D searched far more than the reference; 3 seeds | `v4-ref-tune`, `v3-lr`, `v4-final10` (`PLAN_GPU.md`) |
-| **No neural control on the same tokenizer** | the subword headline is a statement about subwords until a neural BPE1024 model of the same size is tuned equally | `v6-d-lr`, `v6-ref-tune`, `v6-final10` (`flm/grids_v6.py`, ~2–3 GPU-h) |
-| **D's lr on subwords**: only 3e-2 and 2e-2 were run (300M chars, 1 seed, a tie within 0.002) | the neural control gets a 4-lr search | `v6-d-lr` (4e-2 and 6e-2 not run) |
+| **Neural control on the same tokenizer**: *partly closed* | at 10M characters the best of 24 tuned neural cells (1 seed each) trails tuned D by 0.016; ten seeds at 30M (`v6-final10`, ~1 GPU-h) is not started and needs the GPU session's user's go-ahead | `v6-final10` |
+| **D's lr on subwords**: tuned at 10M characters (optimum 6e-2, interior), **not at 30M and beyond** | the 30M, 100M and 300M subword runs used 3e-2, which understates D; at 300M, 3e-2 and 2e-2 tie | an lr study at 30M characters |
 | **Ten seeds** | every cell is 1–3 seeds; AGENTS.md makes ten the protocol | `v4-final10`, `v6-final10` |
 | **LR transfer (H10a) and `v3-lr`** | incomplete: the 1e-2 cells were lost to a crash from a stale `train.py`, the 2e-2 cells were killed for VRAM contention | resume `v3-lr`, `lrwidth` |
 | **Coherence** | BPC is not coherence; text loops at low temperature | a coherence grader, or longer context and larger models |
