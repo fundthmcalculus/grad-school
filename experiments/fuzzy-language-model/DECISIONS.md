@@ -72,3 +72,10 @@ You asked me to take every decision, so these are decided rather than left open.
 * **Stop condition reached:** every in-cap lever and every size I can run here has been tried, none moved blind coherence, and the criterion (12/15, plot 3.5/5, both raters) is not met. I am recording
   that as the result, not continuing to generate runs. The result stands as: the fuzzy recurrent model learns fluent, locally consistent children's text and its rules are causal but diffuse; plot is not reached at
   93K-1.32M parameters and up to 1B characters of data.
+
+## D8 (2026-10-11): second rater on set 7, and the request I sent
+* The GPU session rated set 7 blind (r = 0.75 with me): 1.32M model 7.81 +/- 0.51 (plot 1.88 / 1.75), 96K at 1B characters 7.00 +/- 0.41, 96K at 300M characters 6.12 +/- 0.19. With two raters the order follows size and
+  data (1.32M > 1B > 300M) but each gap is only 1-2 standard errors, and the best mean total of any model across seven sets is about 8.2/15 (plot 1.4-2.4 /5). A 14x parameter increase bought about 0.8 points against about 2 points
+  of set-to-set noise. The conclusion in D6/D7 stands: the criterion is not met and the effect of size is not separated from data.
+* **Delegation:** I sent the GPU session the request to put the 1.32M x 1B-character run to its user (cell, flags, and the fact that it is above its cap), and said it should run it only if approved. The GPU session had already
+  said it will not run it without that approval, so it is waiting on you (and on whoever sets that session's cap). If it is declined, the record reads "not tested above 165K parameters."
