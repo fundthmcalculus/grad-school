@@ -1438,3 +1438,21 @@ Same cell as `v17-1b` (BPE1024 D d = 48, ctx 512 / batch 16, 32 rules, lr 6e-2, 
 Inter-rater agreement on totals r = 0.60 (rater means 7.88 and 6.92; the weakest of the five sets). **G38 supported, marginally:** 1B − 300M = **+1.38** (rater 1 +1.63, rater 2 +1.12), above the registered +1.0 and just above 2 s.e. of the difference (1.28);
 1B − 100M = +1.00. Both raters rank the 1B model first on totals and on plot (but plot is only 1.6–2.4 / 5). **Cautions:** the 300M model scored 6.81 here and 8.12 (two raters) in set 2, a 1.3-point swing from different seeds, so the
 set-to-set noise is as large as the effect; one seed of the 1B model (a second seed is running, G39/G40); n = 8 per model. The result is consistent with "coherence tracks training length", it is not an established effect, and the level (8.2 / 15, plot ≈ 2 / 5) is far from the 12 / 3.5 criterion.
+
+### Outcome `v17-1b` seed 1 (G39; same cell, seed 1, 96,416 params, 1,000M chars, 2,638 s)
+
+Curve at 25 / 50 / 75 / 100%: 1.1020 / 1.0608 / 1.0126 / **0.98446**. **G39 supported** (≤ 0.995). Two seeds at 1B chars: 0.9796 and 0.9845, **mean 0.9820 ± 0.0024**; the 300M two-seed mean is 1.0015 ± 0.0039, so 3.3× more data gave **−0.0195**
+(≈ 4 s.e. of the 300M mean). The 1B result replicates on loss; both seeds are in the repo.
+
+### Coherence set 6 (G40: the replication; fresh seeds 10–11; blind; both 1B seeds vs the 300M seed-0 model; rater 1 only so far, `coherence6_scores_rater1.json` written before the key was opened; key withheld)
+
+| model | val BPC | G | C | P | total (3–15) ± s.e., n = 8 |
+|---|---|---|---|---|---|
+| BPE1024 D, ctx 512, 32 rules, 300M chars, seed 0 | 0.9976 | 3.50 | 2.50 | 2.00 | **8.00 ± 0.35** |
+| same, **1B chars, seed 1** | 0.9845 | 3.38 | 2.62 | 1.75 | 7.75 ± 0.52 |
+| same, **1B chars, seed 0** | 0.9796 | 3.12 | 2.25 | 1.62 | 7.00 ± 0.35 |
+
+**G40 refuted (rater 1).** Both 1B models score *below* the 300M model (−0.25 and −1.00), not ≥ 0.8 above it. The 1B seed-0 checkpoint itself scored **8.88** in set 5 and **7.00** here (rater 1, different seeds): a 1.9-point swing from text sampling alone,
+which is larger than the +1.38 "effect" found in set 5. **So the apparent gain from 1B characters of training in set 5 did not replicate, and the honest reading is that coherence did not measurably change between 300M and 1B characters (loss −0.0195)**:
+pooling rater 1 across sets 5 and 6 (n = 16 per model) gives 1B seed 0 = 7.94 vs 300M seed 0 = 7.63 (+0.31, well inside noise). The earlier hypothesis "coherence tracks training length" is **not supported** beyond the 30M → 100M range where gaps were large;
+loss improved by 0.02–0.03 BPC with no coherence signal visible through a measure whose set-to-set noise is ± 1.5–2. A second rater has not scored set 6 (the key stays unpublished until one has, or this note is superseded).
