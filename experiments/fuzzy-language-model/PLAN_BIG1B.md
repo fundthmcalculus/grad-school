@@ -46,3 +46,16 @@ The GPU session's user approved the run directly: "approve the 1.32M run after t
 | **2e-2** | **0.8214** | 164.9 |
 | 4e-2 | 0.8254 | 165.1 |
 Cost: 30M characters in ~165 s = ~182K characters/s (the JSON's chars_per_sec 57K counts tokens); the 1B-character run extrapolates to ~5,500 s (~1.5 h) plus evaluation. lr 2e-2 chosen (the middle of the grid, so the optimum is bracketed). Stage 2 started automatically (`/tmp/chain5.sh`) at lr 2e-2. Note the 30M result 0.821 is already below the registered 1B range's lower edge (0.70-0.78) only if it keeps falling; the prediction stands unchanged.
+
+## Stage 2 outcome (GPU, 2026-10-11): 1,323,904 params, 1B characters, lr 2e-2, warm-up 300, seed 0, 38,653 steps, 5,500 s
+**Validation BPC 0.6355** (evals: 25k 0.679, 30k 0.656, 35k 0.641, final 0.635). Prediction 0.70-0.78 (65%): **wrong, better than the range**; below the 96K 1B model (0.982) by 0.35: right (>0.15). Checkpoint `outputs/v29-big1b/d192-L4_1000M_s0.pt` (5,318,077 bytes) kept on the GPU host, not committed (over the 5 MB rule).
+
+### Blind coherence, set 10 (`report/coherence10_*`; fresh seeds 20-21; 3 models x 8 texts; T 0.5 / top-k 10, 600 characters; rubric G/C/P 1-5, total 3-15)
+Two independent Claude sub-agent raters (A, B), each told to read only the blind file; scores were written to files before I opened the key.
+| model | rater A total (G/C/P) | rater B total (G/C/P) |
+|---|---|---|
+| **1.32M, 1B chars (BPC 0.636)** | **9.62** (3.75 / 3.00 / 2.88) | **10.38** (3.88 / 3.50 / 3.00) |
+| 96K, 1B chars (0.982) | 5.25 (2.38 / 1.50 / 1.38) | 5.50 (2.75 / 1.38 / 1.38) |
+| 96K, 3B chars (0.978) | 5.38 (2.50 / 1.50 / 1.38) | 5.38 (2.50 / 1.50 / 1.38) |
+Predictions: total >= 10 AND plot >= 2.5 from both raters (30%): **strictly not met** (A 9.62 < 10; B 10.38; plot 2.88 / 3.00 both pass); total within 2 points of the 96K 1B model (55%): **wrong** (+4.4 / +4.9). The gap to the 96K models is about 4.5 points of 15, roughly 2-3x the set-to-set noise recorded earlier (1.5-2), with the same sign from both raters, and plot rises from ~1.4 to ~3.0 of 5. On the registered decision rule this is the borderline case; on the substance, **size x data moves coherence where data alone (30M -> 3B at 96K) and every sub-100K lever did not**. Caveats: one seed, one checkpoint per arm, 8 texts, two raters from the same model family (not human), the rater scale differs from the CPU session's raters (this pair scored the 96K models ~5.4, the CPU rater ~7.3 on other sets), so only the within-set comparison is meaningful; the 1.32M run changes both parameters (13x) and data (30M -> 1B), but the 96K 1B/3B arms already show data alone is flat, so the lift is attributed to size at sufficient data, not separated further. The 99,999-parameter cap exception covered this run only.
+Not yet done (per the plan's rule): `flm.rule_ablation`, `flm.rule_reader`, `flm.rule_story` on the checkpoint (CPU session's tools); the size ladder (`flm/grids_v9.py`) is NOT approved; a human rater.
