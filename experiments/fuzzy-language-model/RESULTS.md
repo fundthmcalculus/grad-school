@@ -1244,3 +1244,15 @@ Differences (flm.compare-style rule, real if |Δ| > 2 s.e.): r128 − r32 = −0
 **Correction to my own earlier claim:** the "r32 seed spread of 0.0004" and "gain outside seed noise" from the two-seed `v8-rules` cell were a two-seed fluke; r32's five-seed sd is 0.0107 (seed 3 at 1.093, seed 4 at 1.122).
 What does survive: ctx 512 + 32 rules (mean 1.1095, n = 5) vs the ten-seed ctx-256 / 16-rule baseline (1.1291 at lr 6e-2): −0.0196, ≈ 4 standard errors, so that combination does beat the baseline (the two changes are not separated).
 The rule count from 32 to 128 is a trend of about −0.009 that five seeds cannot confirm.
+
+### Outcome `v14-state2`, new cells only (r192 and r256; the r64/r128 seeds 2–3 cells of that grid duplicate `v14-rule-seeds` and were not rerun; BPE1024 D d = 48, ctx 512 / batch 16, lr 6e-2, 30M chars, seeds 0–1; ~2 min each, one at a time)
+
+| rules per head | params | val BPC (seeds) | mean |
+|---|---|---|---|
+| 192 | 127,136 | 1.0945 / 1.1154 | 1.1050 |
+| 256 | 139,424 | 1.1025 / 1.1118 | 1.1072 |
+| (128, five seeds, for reference) | 114,848 | 1.104 1.092 1.101 1.095 1.109 | 1.1002 ± 0.0031 |
+
+r192 and r256 are **not better than r128**: both means sit inside r128's five-seed noise (seed sd ≈ 0.007–0.011; r192's two seeds differ by 0.021). **The rule-count curve from 32 to 256 is flat within noise** (1.1095, 1.1082, 1.1002, 1.1050, 1.1072);
+the one trend the five-seed r32/r64/r128 comparison could not confirm (−0.009) is not continued by r192/r256. At 30M chars, adding rules beyond ~32 per head within the ≤ 165K cap does not reliably help. Throughput falls with rules
+(119K → 91K → 84K chars/s for r32 → r192 → r256). This closes the "more recurrent state" lever for loss at this budget; coherence was not re-graded (the loss gain was < 0.02, the registered condition for re-grading).
