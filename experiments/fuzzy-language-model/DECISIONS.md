@@ -102,3 +102,6 @@ This is still a reading of next-token prediction, not an explanation of why the 
 * Rule-set and token repetition within a text track the raters at about -0.3 (3-4 null sd); the number of active rules and usage entropy do not. So the rule view can *flag* the repetitive stories, and I added a repeat marker to the demo page.
 * The reading is not less faithful in loops (0.80 vs 0.71), so repetition is explained by the rules, not hidden from them.
 * It still does not explain plot; the r is about -0.3 on 144 pooled texts, and the criterion (12/15, plot 3.5/5) is untouched.
+
+## D13 (2026-10-11, scheduled check-in): the repetition-aware loss did not help coherence
+At the 13:06 check-in I pulled the GPU session's work (v23 warm-up sweep, cfwide, v24-diag, v25-rep, v26-hybrid, v27-cover and v28-emb queued), found item 4 (the repetition-aware loss) marked "coherence not rated", and rated it myself (set 9, one rater): baseline 7.25, weighted 6.62, unlikelihood 5.62 /15. The loss cut repeats 20% and the stories did not improve. The only measured correlate of low coherence is therefore not a usable training target by this route.
