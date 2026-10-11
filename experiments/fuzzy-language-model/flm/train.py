@@ -130,6 +130,9 @@ def get_args(argv=None):
     p.add_argument(
         "--tok", default="", help="subword stream, e.g. bpe512 (default: characters)"
     )
+    p.add_argument(
+        "--emb-dim", type=int, default=0, help="factorized tied embedding width (0 = d)"
+    )
     p.add_argument("--ffn-order", type=int, default=0, choices=[0, 1])
     p.add_argument("--ffn-width", default="", choices=["", "dim", "rule", "shared"])
     p.add_argument("--ffn-norm", default="softmax", choices=["softmax", "none"])
@@ -164,6 +167,7 @@ def make_config(a) -> ModelConfig:
         width_share=a.width_share,
         n_unique=a.n_unique,
         ffn_order=a.ffn_order,
+        emb_dim=a.emb_dim,
         ffn_width=a.ffn_width,
         ffn_norm=a.ffn_norm,
         ante_taps=a.ante_taps,

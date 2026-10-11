@@ -1,0 +1,215 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 56,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v16-factemb\\D-d56-e32-ctx512-r32_30M_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 32,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 56,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 32,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 95968,
+ "params_nonemb": 61408,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.14998,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.44856
+  ],
+  [
+   580,
+   1.2839
+  ],
+  [
+   870,
+   1.19394
+  ],
+  [
+   1160,
+   1.14998
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.1198
+  ],
+  [
+   50,
+   8.2979
+  ],
+  [
+   100,
+   6.5863
+  ],
+  [
+   150,
+   5.6952
+  ],
+  [
+   200,
+   5.2115
+  ],
+  [
+   250,
+   4.9364
+  ],
+  [
+   300,
+   4.7396
+  ],
+  [
+   350,
+   4.5893
+  ],
+  [
+   400,
+   4.4732
+  ],
+  [
+   450,
+   4.3479
+  ],
+  [
+   500,
+   4.2646
+  ],
+  [
+   550,
+   4.1796
+  ],
+  [
+   600,
+   4.113
+  ],
+  [
+   650,
+   4.0465
+  ],
+  [
+   700,
+   3.9918
+  ],
+  [
+   750,
+   3.9563
+  ],
+  [
+   800,
+   3.8923
+  ],
+  [
+   850,
+   3.8394
+  ],
+  [
+   900,
+   3.806
+  ],
+  [
+   950,
+   3.7581
+  ],
+  [
+   1000,
+   3.7175
+  ],
+  [
+   1050,
+   3.6904
+  ],
+  [
+   1100,
+   3.6723
+  ],
+  [
+   1150,
+   3.6744
+  ],
+  [
+   1159,
+   3.67
+  ]
+ ],
+ "train_seconds": 80.47,
+ "wall_seconds": 87.37,
+ "chars_per_sec": 118085,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big ander. The owner had green treats at her house. Now, the supploo was back.\nThen, the moder became goodt. But then, a little boy came to visit. The moder pollow said, \"Let's sling the perfect clothes and Mariry!\" The bunny was so happy.\nThen, the lunzz car saw the hit up and said, \"Thank you, friendly!\" The little girl was happy to learn the rubbles and said, \"I am the anrm fit!\" The little girl learned that everyone was not even more fun to play with the best places.\n<|eot|>\nOne day, a little girl named Sue went to come with her valmty. She saw a big, organize on the ground on it. She wanted to break some gire and see a pretty bug.\nA little girl came to the bird. She wanted to play with the bird. Sue thought about it. The bird was very realized that she could say goodbye. She took out the tree. The bird was very happy.\nSuddenly, Amy saw the bird plant and said, \"Hello, ha friend, queen, please!\" Sue did not want to learn",
+ "rule_init": {},
+ "ngram_init": {}
+}

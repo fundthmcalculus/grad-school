@@ -62,6 +62,9 @@ class ModelConfig:
     # FFN-only width override: "" = follow width_share | dim: (R,da) | rule: one per rule | shared: one per dim
     ffn_width: str = ""
     ffn_norm: str = "softmax"  # softmax: fuzzy partition over rules | none: raw firing
+    emb_dim: int = (
+        0  # factorized tied embedding: tokens live in emb_dim < d_model dims and are projected up (0 = d_model)
+    )
     ante_taps: int = (
         1  # layer-0 TSK FFN antecedent reads the last `ante_taps` positions
     )
@@ -649,8 +652,10 @@ class TinyLM(nn.Module):
     def __init__(self, cfg: ModelConfig):
         super().__init__()
         self.cfg = cfg
-        self.emb = nn.Embedding(cfg.vocab_size, cfg.d_model)
+        e = cfg.emb_dim or cfg.d_model
+        self.emb = nn.Embedding(cfg.vocab_size, e)
         nn.init.normal_(self.emb.weight, std=0.1)
+        self.up = nn.Linear(e, cfg.d_model, bias=False) if e != cfg.d_model else None
         if cfg.mixer == "gru":
             self.core = GRUModelCore(cfg)
             self.blocks = nn.ModuleList()
@@ -662,18 +667,31 @@ class TinyLM(nn.Module):
         self.norm = nn.RMSNorm(cfg.d_model)
         # tied unembedding
 
-    def forward(self, idx, step=False):
+    def embed(self, idx):
         x = self.emb(idx)
+        return x if self.up is None else self.up(x)
+
+    def logits(self, h):
+        """Tied unembedding; with a factorized embedding the state is projected down first."""
+        h = self.norm(h)
+        if self.up is not None:
+            h = h @ self.up.weight
+        return h @ self.emb.weight.T
+
+    def forward(self, idx, step=False):
+        x = self.embed(idx)
         if self.core is not None:
             x = self.core(x)
         for i in range(len(self.blocks) and self.cfg.n_layers):
             x = self.blocks[i % len(self.blocks)](x, step=step)
-        return self.norm(x) @ self.emb.weight.T
+        return self.logits(x)
 
     def n_params(self, exclude_embedding=False):
         n = sum(p.numel() for p in self.parameters())
         if exclude_embedding:
-            n -= self.emb.weight.numel()
+            n -= self.emb.weight.numel() + (
+                self.up.weight.numel() if self.up is not None else 0
+            )
         return n
 
     @torch.no_grad()
@@ -710,7 +728,7 @@ def init_rules_from_data(
     done = {}
     for li, blk in enumerate(model.blocks):
         # rerun from the bottom each time so lower layers' new rules are reflected
-        x = model.emb(idx)
+        x = model.embed(idx)
         for b in model.blocks[:li]:
             x = b(x)
         mix = blk.mix

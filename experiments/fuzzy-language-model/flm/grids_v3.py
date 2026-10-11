@@ -628,3 +628,39 @@ for L in (4, 6):
             )
         )
 register("v15-share", jobs)
+
+
+# v16-factemb (G35/G36): factorized tied embedding, body widened at <= 100K parameters
+jobs = []
+for d, e in ((56, 32), (56, 24), (64, 16)):
+    for s in (0, 1):
+        c = cell(
+            f"D-d{d}-e{e}-ctx512-r32_30M_s{s}",
+            D,
+            d=d,
+            sc="8",
+            chars="30e6",
+            seed=s,
+            lr="6e-2",
+        )
+        jobs.append(
+            (
+                c[0],
+                c[1]
+                + [
+                    "--tok",
+                    "bpe1024",
+                    "--warmup",
+                    "100",
+                    "--ctx",
+                    "512",
+                    "--batch",
+                    "16",
+                    "--rules",
+                    "32",
+                    "--emb-dim",
+                    str(e),
+                ],
+            )
+        )
+register("v16-factemb", jobs)

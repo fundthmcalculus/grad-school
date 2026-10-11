@@ -1353,3 +1353,30 @@ No 300M run and no coherence re-grade (registered condition not met).
 * **Coherence is not achieved.** Two blind raters score the best models' stories 6.9–7.6 / 15 (plot sense ≈ 1.7–1.9 / 5); the criterion the CPU session proposed (≥ 12/15 and plot ≥ 3.5 from both raters) is far away. The measure is noisy (≈ ±1.5 per set); the large separations (character vs subword models) are real, the fine ordering among the top models is not.
 * **The one untested lever is parameter count** (the CPU session's `v9` ladder, 251K–7M). It is outside the stated cap and was not run on the GPU host; the CPU session ran a 251K model on its own host under its user's approval and will report it separately.
 * **Open items not closed:** PR #272 was not merged (the permission classifier blocked it); the `v3-lr` study and the character-level ten-seed plan (`v4-*`) were not run to completion; D's learning-rate sensitivity was checked at 10M and 30M chars only.
+
+## Registered 2026-10-11, before `v16-factemb`: a factorized tied embedding to spend the embedding's parameters on the body
+
+At BPE1024 the embedding is 49,152 of the 96,416 parameters (51%). `--emb-dim e` stores tokens in `e` dimensions and projects up to the model width `d` (`TinyLM.up`); the tied unembedding projects the state down first, so the output logits have rank ≤ `e`
+(default 0 = unchanged; 53 tests pass). Cells (BPE1024 D, ctx 512 / batch 16, 32 rules per head, lr 6e-2, 30M chars, seeds 0–1, one at a time): **d = 56, e = 32** (95,968), **d = 56, e = 24** (87,328), **d = 64, e = 16** (94,752).
+Baseline: d = 48, e = d, 96,416 params: 1.1095 ± 0.0048 (five seeds).
+* **G35.** The best factorized cell beats the baseline by ≥ 0.01 BPC (≈ 2 s.e. of the baseline mean). *(~40%.)* *Basis:* the vocabulary ladder showed a wide embedding paid off even when the body got narrower, so the embedding carries real
+  information; a rank-24–32 output may cost more than the extra body width returns.
+* **G36.** e = 16 (rank-16 logits) is the worst of the three. *(~65%.)*
+* If G35 holds, a 300M run of the winner and a blind coherence re-grade (two raters) follow, because a wider body at the same parameter count is the only in-cap change left with a plausible link to plot.
+
+### Outcome `v16-factemb` (G35 / G36; BPE1024 D, ctx 512 / batch 16, 32 rules, lr 6e-2, 30M chars, seeds 0–1, one cell at a time, ~90 s each)
+
+| d | embedding width e | params | val BPC (seeds) | mean |
+|---|---|---|---|---|
+| 48 | 48 (= d, baseline, five seeds) | 96,416 | | 1.1095 ± 0.0048 |
+| 56 | 32 | 95,968 | 1.150 / 1.149 | **1.1493 ± 0.0006** |
+| 56 | 24 | 87,328 | 1.181 / 1.194 | 1.1874 ± 0.0064 |
+| 64 | 16 | 94,752 | 1.239 / 1.233 | 1.2359 ± 0.0033 |
+
+**G35 refuted** (needed ≥ 0.01 better; the best factorized cell is **0.040 worse** than the baseline, ≈ 8 s.e. of its mean). **G36 supported:** e = 16 is the worst. The loss is monotone in the embedding width at roughly constant parameters:
+rank-limited output logits cost far more than a wider body returns. Consistent with the vocabulary ladder (a wide embedding paid even when the body narrowed): the token embedding carries real information that the body cannot replace.
+`--emb-dim` stays in the code, default off. No 300M run and no coherence re-grade.
+
+### Note on the CPU session's 251K-parameter run (for the "is size the missing lever?" question; their result, not rerun here)
+d = 96, 2 layers, 251,168 parameters, 30M chars: **0.9700 BPC** (0.15 below the 93K model at the same data, and better than the 93K model at 300M), but its blind coherence (their set 4, one rater) was **6.75 / 15, plot 1.38**, against 7.00 for the 93K 30M model and
+8.25 for the 300M model. 2.7× the parameters and 0.15 BPC lower gave no coherence gain in that test, which weakens the case that parameter count alone is the missing lever (one rater, n = 8, noise ±1.5).
