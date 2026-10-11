@@ -96,3 +96,9 @@ You asked me to take every decision, so these are decided rather than left open.
 The GPU session's `rule_dist` showed a single winning rule is an unfaithful reading. I built the calibrated reader it listed as unrun: 8 rules per position and layer plus the embedding and mixer terms recover 94% of the model's top-10 hit rate (0.767 vs 0.814) and 70% of its top-10 set;
 16 rules recover 98%. Rules alone do not (0.679 even with all 72). So the honest explainability claim is: **the fuzzy rules supply most of the prediction, a readable 8-16 rules per position and layer plus named non-rule terms reproduce it; the rule book alone does not.** Two of my three predictions were wrong.
 This is still a reading of next-token prediction, not an explanation of why the stories are not coherent.
+
+## D12 (2026-10-12): rule-view analysis done (user chose it); what I took from it
+* Rule roles are stable and readable (90-95% of the top rules keep their label across data halves): that is a real explainability result for the rules themselves.
+* Rule-set and token repetition within a text track the raters at about -0.3 (3-4 null sd); the number of active rules and usage entropy do not. So the rule view can *flag* the repetitive stories, and I added a repeat marker to the demo page.
+* The reading is not less faithful in loops (0.80 vs 0.71), so repetition is explained by the rules, not hidden from them.
+* It still does not explain plot; the r is about -0.3 on 144 pooled texts, and the criterion (12/15, plot 3.5/5) is untouched.

@@ -1563,3 +1563,19 @@ Replay each rated text (176 texts, sets 1, 2, 4, 5, 7, 8) through its own checkp
 * **P3:** at least a third of the 20 most-used rules per layer of the 3B model have a stable label: the top-10 next pieces by summed positive effect agree across two disjoint halves of the validation windows with Jaccard >= 0.3 (50%).
 * **P4:** the 8-rule reading's fidelity (top-1 agreement with the model) is lowest in the first 16 positions of a text and inside repetition loops (a token trigram already seen) (55%).
 * **Manipulation check:** shuffling the rater scores across texts must bring every correlation to about 0 (|r| < 0.15).
+
+### Outcome of the rule-view analysis (`flm/rule_story.py`; CPU session, 2026-10-12; 144 rated texts from 9 BPE1024 checkpoints, sets 1, 2, 4, 5, 7, 8; 3B checkpoint for the rule labels)
+
+**Q3: rule usage vs the rater scores** (Pearson r over texts; null sd from 500 shuffles of the rater totals in brackets):
+| per-text statistic | r total | r plot |
+|---|---|---|
+| m80 (rules to cover 80% of the rule score) | +0.07 (0.08) | +0.08 |
+| rule-usage entropy | +0.06 (0.09) | +0.07 |
+| rule-set self-similarity | **-0.27** (0.08) | **-0.32** |
+| share of repeated token trigrams (text-level) | **-0.27** (0.08) | **-0.34** |
+| 8-rule reading's top-1 agreement | +0.10 (0.09) | +0.03 |
+Texts whose rule sets and token trigrams repeat more earn lower scores, at about 3 to 4 null standard deviations. The number of active rules and usage entropy carry no signal. Pooled over nine checkpoints, so a model effect and a text effect are not separated; 144 texts; correlations of this size explain about 7-11% of the variance.
+Registered: P1 (|r| >= 0.3 between self-similarity and total) **marginally refuted** on the total (-0.27), met on plot (-0.32); P2 (m80 uncorrelated with plot) **supported** (+0.08); manipulation check: a single shuffle gave |r| up to 0.21 (agreement) because the null sd is 0.08, so the registered 0.15 bound was too tight; the 500-shuffle null is the proper check and the real correlations sit 3-4 sd outside it.
+**Q1: where the reading fails:** top-1 agreement of the 8-rule reading with the model is 0.735 in the first 16 positions of a text and 0.723 later; it is **0.80 inside repeated trigrams and 0.71 outside them**. P4 (lowest early and inside repetition loops) **refuted** on both counts: the reading is *more* faithful when the model repeats itself, so loops are easy for the rules to read.
+**Q2: rule roles are stable and readable:** of the 20 most-used rules per layer, 95% (layer 0) and 90% (layer 1) have the same top-10 favoured next pieces across two disjoint halves of the validation windows (Jaccard >= 0.3; P3 **supported**, registered 33%). Examples: layer 0 rule 68 raises word endings ('ing', 'ed') and is favoured before punctuation; layer 0 rule 63 raises ' my', "'s", ' loved', ' liked'; layer 1 rule 3 raises ' the', ' his', ' her', ' to' (a determiner rule, the most used, 9,105 wins); layer 1 rule 5 raises ' Tom', ' Tim', ' She' and is favoured at story boundaries and sentence starts (a new-subject rule).
+**Reading:** this is the first measurement that ties the rule view to the coherence criterion: repetition, visible as the same rules firing again and again, is the part of "incoherent" the rules can see. It does not explain plot, and the effect is modest (r about -0.3 over texts pooled across models).
