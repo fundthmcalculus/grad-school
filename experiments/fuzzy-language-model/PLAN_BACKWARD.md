@@ -87,3 +87,26 @@ Three candidate causes: (H1) the hot output scale (the construction picked gain 
 Cells (30M characters, 96K model; `flm/run_tribble2.py`): `cfg1` (centroid init, gain capped at 1; seeds 0-2); `cfw300` (centroid init, warm-up 300; seeds 0-2; the warm-up-alone reference is v19-optA30's wu300, mean 1.0997); `random-save` and `cf-save` (seed 0, checkpoints saved).
 Predictions: H1: `cfg1` improves on `cf` (1.1626) by at least 0.02, but stays worse than random (1.1095) by at least 0.01. H2: `cfw300` improves on `cf` by at least 0.02 and stays worse than the random wu300 reference. H3: after training the effective number of rules used (exp of the entropy of the winning-rule distribution, layer 0 and layer 1)
 is at least 10% lower for `cf-save` than `random-save`. If H1/H2 close the whole gap (cfg1 or cfw300 within 0.005 of random) the construction becomes a candidate again; otherwise the TRIBBLE-order construction is dropped for this model.
+
+### Registered 2026-10-11 (after seeing the `v24-diag` first pass, before the follow-up cell): `cfwide`
+The first pass found layer 1's FFN dead after training in the consequent-first model (effective rules 3.2 vs 43.4, mean |gate| 0.0 vs 0.18; see Outcome below). A raw-firing Gaussian rule that stops firing gets no gradient, and the construction sets each rule's width from its *own group's* spread, which is narrower than the global spread.
+`cfwide` = the same construction with every rule's width set to the global input std (centres still at the group means). Cell: 30M characters, seeds 0-2 (`flm/run_tribble2.py`, queued behind the chain). Prediction: layer-1 effective rules back above 20 and the final BPC within 0.01 of random; if BPC is still worse than random by 0.02 or more, the construction is dropped for this model.
+
+## Outcome `v24-diag` first pass (GPU, 96K, 30M characters; seeds 0-2 unless noted)
+| cell | BPC (s0 / s1 / s2) | mean | note |
+|---|---|---|---|
+| random | | 1.1110 | v22-tribble, same seeds |
+| random, warm-up 300 | | 1.0997 | v19-optA30 |
+| `cf` (centroid, gain chosen = 1,024) | | 1.1402 | v22-tribble, seeds 0-2 |
+| **`cfg1`** (gain capped at 1) | 1.1403 / 1.1525 / 1.1455 | **1.1461** | no better than `cf` (+0.006) |
+| **`cfw300`** (warm-up 300) | 1.1303 / 1.1190 / 1.1365 | **1.1286** | -0.0116 vs `cf`; the same size as the warm-up effect on random (-0.0113): no interaction |
+
+**Rule usage after training (seed 0, 128 validation windows; winner = argmax of |gate| x ||consequent||):**
+| model | layer 0: effective rules (of 72) / rules with >1% share / mean abs gate | layer 1: same |
+|---|---|---|
+| random | 56.1 / 38 / 0.406 | 43.4 / 24 / 0.181 |
+| `cf` (consequent-first) | 46.4 / 29 / 0.500 | **3.2 / 6 / 0.000** |
+
+**Predictions scored.** H1 (gain cap closes >= 0.02): **wrong**: capping the gain changed nothing (+0.006), so the hot output scale is not the cause. H2 (warm-up 300 closes >= 0.02): **wrong**: it closes 0.012, exactly what it gives a random init, so the harm is not an instability that a slower start cures.
+H3 (>= 10% fewer effective rules): **right, and much stronger than registered**: layer 0 uses 17% fewer effective rules, and **layer 1's FFN is essentially dead after training (3.2 effective rules, mean |gate| 0.000)**: the consequent-first model is running with a one-layer FFN, which accounts for a loss of ~0.05 BPC.
+Mechanism (hypothesis, not yet tested; `cfwide` below tests it): raw-firing Gaussian rules (`ffn_norm none`) get no gradient once they stop firing, and the construction gives each rule the width of its own group, narrower than the global spread, so in layer 1 (where the input moves as layer 0 trains) the rules are pushed off the data and die.

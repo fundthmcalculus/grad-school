@@ -22,6 +22,7 @@ from flm.conseq_first import init_conseq_first
 VARIANTS = {
     "cf": dict(groups="emb", mode="centroid", emb=False),
     "cfg1": dict(groups="emb", mode="centroid", emb=False, gains=(0.25, 1.0)),
+    "cfwide": dict(groups="emb", mode="centroid", emb=False, widths="global"),
     "cfw300": dict(
         groups="emb", mode="centroid", emb=False
     ),  # same init; the driver sets --warmup 300
@@ -71,6 +72,7 @@ def main():
             groups=cfg["groups"],
             token_stats=stats,
             **({"gains": cfg["gains"]} if "gains" in cfg else {}),
+            widths=cfg.get("widths", "group"),
         )
         print("conseq-first init:", info, flush=True)
         return {"variant": variant, **{k: v for k, v in info.items()}}

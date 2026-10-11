@@ -17,6 +17,7 @@ OUT = Path("outputs/v24-diag")
 CELLS = [("cfg1", s, []) for s in range(3)] + [
     ("cfw300", s, ["--warmup", "300"]) for s in range(3)
 ]
+CELLS += [("cfwide", s, []) for s in range(3)]
 CELLS += [("random-save", 0, ["--save-model"]), ("cf-save", 0, ["--save-model"])]
 
 if __name__ == "__main__":

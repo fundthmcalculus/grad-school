@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v24-diag\\cf-save_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.13978,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.1558
+  ],
+  [
+   100,
+   1.59523
+  ],
+  [
+   200,
+   1.43951
+  ],
+  [
+   300,
+   1.36979
+  ],
+  [
+   400,
+   1.32559
+  ],
+  [
+   500,
+   1.28904
+  ],
+  [
+   600,
+   1.25184
+  ],
+  [
+   700,
+   1.22069
+  ],
+  [
+   800,
+   1.19222
+  ],
+  [
+   900,
+   1.17113
+  ],
+  [
+   1000,
+   1.1564
+  ],
+  [
+   1100,
+   1.14385
+  ],
+  [
+   1160,
+   1.13978
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.9697
+  ],
+  [
+   50,
+   7.9344
+  ],
+  [
+   100,
+   6.1971
+  ],
+  [
+   150,
+   5.339
+  ],
+  [
+   200,
+   4.9032
+  ],
+  [
+   250,
+   4.6555
+  ],
+  [
+   300,
+   4.4905
+  ],
+  [
+   350,
+   4.3778
+  ],
+  [
+   400,
+   4.2996
+  ],
+  [
+   450,
+   4.2199
+  ],
+  [
+   500,
+   4.155
+  ],
+  [
+   550,
+   4.083
+  ],
+  [
+   600,
+   4.0251
+  ],
+  [
+   650,
+   3.9688
+  ],
+  [
+   700,
+   3.9165
+  ],
+  [
+   750,
+   3.8874
+  ],
+  [
+   800,
+   3.8319
+  ],
+  [
+   850,
+   3.7808
+  ],
+  [
+   900,
+   3.7569
+  ],
+  [
+   950,
+   3.7118
+  ],
+  [
+   1000,
+   3.6804
+  ],
+  [
+   1050,
+   3.6516
+  ],
+  [
+   1100,
+   3.6427
+  ],
+  [
+   1150,
+   3.6415
+  ],
+  [
+   1159,
+   3.6398
+  ]
+ ],
+ "train_seconds": 79.11,
+ "wall_seconds": 93.5,
+ "chars_per_sec": 120114,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Spient. Spipped and a little girl went to her friend, a little girl named Lucy. Sue was very sad because she wanted to help her magic wind.\nLama and her friend, TV was very making a new adventure. She said, \"Let's slid, Lucy, Lucy!\" Lucy smiled and said, \"Let's success sandwic away.\" They then they walked and walked to the gentle. Lucy was very happy.\nBut then, Lucy went to the park's nest. She said, \"I will wear her. Why are you four!\" Lucy said, \"I can have a friend to make my favorite place.\" Lucy was very curious and hugged Lucy's friend, come outside. They had a good friend, the girl and they all were happy. They learned that have fun and had fun.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to make a bushtrrip. The sun was number. Lily loved to bring her friends, in her room. But when her mom was, she had to buy a big bus. Every day, she would not run to the park.\nOne day, Lily went to the park with her mom. She looked around towards the bush and decided to make her",
+ "rule_init": {
+  "variant": "cf",
+  "L0.ffn": {
+   "gain": 4,
+   "ce_nats": 6.8982
+  },
+  "L1.ffn": {
+   "gain": 4,
+   "ce_nats": 6.9068
+  }
+ },
+ "ngram_init": {}
+}

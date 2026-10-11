@@ -60,6 +60,7 @@ def init_conseq_first(
     gains: tuple = (0.25, 1, 4, 16, 64, 256, 1024),
     ridge: float = 1e-2,
     groups: str = "emb",
+    widths: str = "group",
     token_stats: dict | None = None,
 ) -> dict:
     """Build every TSK FFN rule consequent-first from the windows ``idx`` (B, T+1). Returns diagnostics."""
@@ -99,7 +100,9 @@ def init_conseq_first(
             m = grp == used[r % len(used)]
             if int(m.sum()) >= 4:
                 centers[r] = u[m].mean(0)
-                stds[r] = u[m].std(0).clamp(min=0.25 * gstd)
+                stds[r] = (
+                    gstd if widths == "global" else u[m].std(0).clamp(min=0.25 * gstd)
+                )
             else:
                 centers[r] = u[torch.randint(0, len(u), (1,), generator=generator)][0]
                 stds[r] = gstd
