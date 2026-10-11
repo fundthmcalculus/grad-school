@@ -1554,3 +1554,12 @@ Hit rate of the true next token in the top 10, model vs the reading, by token cl
 | model p < 0.05 | 10,100 | 0.396 | 0.326 | 0.070 |
 Registered: the gap smallest for punctuation and frequent pieces and largest for capitalised pieces (65%): **refuted** (capitalised pieces, names, have the smallest gap, 0.017; other content pieces the largest, 0.059); the reading far below the model when the model is unsure (70%): **refuted** (0.326 vs 0.396, a gap of 0.07).
 **Reading:** the 8-rule reading tracks the model within 0.07 in every class and probability band, so it is not failing on any particular kind of token; it loses most on rare content pieces and on positions where the model itself is unsure. This is next-token fidelity only; it says nothing about plot.
+
+## Registered 2026-10-12, before `flm/rule_story.py`: do rule-usage statistics track coherence? (CPU session; plan: rule-view analysis)
+
+Replay each rated text (176 texts, sets 1, 2, 4, 5, 7, 8) through its own checkpoint and compute per text: mean number of rules needed to cover 80% of the rule score per layer (m80), the entropy of the rule-usage distribution, and rule-set self-similarity (mean over positions of the largest Jaccard overlap between the position's top-8 rule set and any earlier position's). Correlate with the mean rater total and plot.
+* **P1:** rule-set self-similarity correlates negatively with the rater total, |r| >= 0.3 (45%).
+* **P2:** m80 does not correlate with plot, |r| < 0.2 (60%).
+* **P3:** at least a third of the 20 most-used rules per layer of the 3B model have a stable label: the top-10 next pieces by summed positive effect agree across two disjoint halves of the validation windows with Jaccard >= 0.3 (50%).
+* **P4:** the 8-rule reading's fidelity (top-1 agreement with the model) is lowest in the first 16 positions of a text and inside repetition loops (a token trigram already seen) (55%).
+* **Manipulation check:** shuffling the rater scores across texts must bring every correlation to about 0 (|r| < 0.15).
