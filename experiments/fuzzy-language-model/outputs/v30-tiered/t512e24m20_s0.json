@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t512e24m20_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 91472,
+ "params_nonemb": 53456,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.12098,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.23349
+  ],
+  [
+   100,
+   1.61083
+  ],
+  [
+   200,
+   1.44761
+  ],
+  [
+   300,
+   1.37745
+  ],
+  [
+   400,
+   1.32356
+  ],
+  [
+   500,
+   1.27408
+  ],
+  [
+   600,
+   1.24245
+  ],
+  [
+   700,
+   1.21065
+  ],
+  [
+   800,
+   1.18035
+  ],
+  [
+   900,
+   1.15691
+  ],
+  [
+   1000,
+   1.13921
+  ],
+  [
+   1100,
+   1.12449
+  ],
+  [
+   1160,
+   1.12098
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2241
+  ],
+  [
+   50,
+   8.0594
+  ],
+  [
+   100,
+   6.2584
+  ],
+  [
+   150,
+   5.3913
+  ],
+  [
+   200,
+   4.9361
+  ],
+  [
+   250,
+   4.6756
+  ],
+  [
+   300,
+   4.5046
+  ],
+  [
+   350,
+   4.3883
+  ],
+  [
+   400,
+   4.2966
+  ],
+  [
+   450,
+   4.2008
+  ],
+  [
+   500,
+   4.1377
+  ],
+  [
+   550,
+   4.0659
+  ],
+  [
+   600,
+   4.0019
+  ],
+  [
+   650,
+   3.9402
+  ],
+  [
+   700,
+   3.886
+  ],
+  [
+   750,
+   3.8556
+  ],
+  [
+   800,
+   3.7962
+  ],
+  [
+   850,
+   3.7407
+  ],
+  [
+   900,
+   3.7108
+  ],
+  [
+   950,
+   3.6652
+  ],
+  [
+   1000,
+   3.6265
+  ],
+  [
+   1050,
+   3.5982
+  ],
+  [
+   1100,
+   3.5819
+  ],
+  [
+   1150,
+   3.5833
+  ],
+  [
+   1159,
+   3.5797
+  ]
+ ],
+ "train_seconds": 80.45,
+ "wall_seconds": 94.61,
+ "chars_per_sec": 118121,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Spity. Spity loved to at her house. One day, Sope went to the park with his mom. They were very cupery.\n Kin, Spibo loved to viet. Spippo was happy and went to the park with her mom. She said, \"Let's organize the ways. That's a clear, but they are not missy?\"\nSim said, \"I am sorry and full!\" So they decided to say, \"That's a big marger is a special song. I think I have you go to play too.\"\nSrom that day on, Spippe and she played together everything in the big tree. Spike was very happy, so she was happy. He wanted to take the ready and try the expaling spey on the tire. His mother and the lady smiled. And they became best friends and always rest to arrived each other.\n<|eot|>\nOne day, a little boy named Tim had an idea. He loved to buy a big bed to play with you. He could not have a funny pipe. \nOne day, Tim and his friend, an anset old cat outside. The cat saw a cup",
+ "rule_init": {},
+ "ngram_init": {}
+}

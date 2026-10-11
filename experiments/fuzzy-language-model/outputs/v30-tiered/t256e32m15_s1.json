@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t256e32m15_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 85664,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.13368,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.23654
+  ],
+  [
+   100,
+   1.63934
+  ],
+  [
+   200,
+   1.47869
+  ],
+  [
+   300,
+   1.40222
+  ],
+  [
+   400,
+   1.34736
+  ],
+  [
+   500,
+   1.30225
+  ],
+  [
+   600,
+   1.26223
+  ],
+  [
+   700,
+   1.22847
+  ],
+  [
+   800,
+   1.19895
+  ],
+  [
+   900,
+   1.17312
+  ],
+  [
+   1000,
+   1.15236
+  ],
+  [
+   1100,
+   1.14051
+  ],
+  [
+   1160,
+   1.13368
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2283
+  ],
+  [
+   50,
+   8.1659
+  ],
+  [
+   100,
+   6.3886
+  ],
+  [
+   150,
+   5.4748
+  ],
+  [
+   200,
+   5.0136
+  ],
+  [
+   250,
+   4.7441
+  ],
+  [
+   300,
+   4.5598
+  ],
+  [
+   350,
+   4.4374
+  ],
+  [
+   400,
+   4.3577
+  ],
+  [
+   450,
+   4.2473
+  ],
+  [
+   500,
+   4.1875
+  ],
+  [
+   550,
+   4.129
+  ],
+  [
+   600,
+   4.0692
+  ],
+  [
+   650,
+   3.9955
+  ],
+  [
+   700,
+   3.945
+  ],
+  [
+   750,
+   3.8986
+  ],
+  [
+   800,
+   3.8427
+  ],
+  [
+   850,
+   3.7945
+  ],
+  [
+   900,
+   3.7676
+  ],
+  [
+   950,
+   3.7233
+  ],
+  [
+   1000,
+   3.6771
+  ],
+  [
+   1050,
+   3.6455
+  ],
+  [
+   1100,
+   3.6307
+  ],
+  [
+   1150,
+   3.6095
+  ],
+  [
+   1159,
+   3.6062
+  ]
+ ],
+ "train_seconds": 80.58,
+ "wall_seconds": 94.85,
+ "chars_per_sec": 117924,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Suddenly ??? great me is a special pin.???\nSue looked at Fin and said, \"That's okay, Tim! You can play with my beautiful surprise too.\"\nSo, Tim felt dark. He felt bad and pokeed a big tree. He sling his head. He jumped and changer. He sighed and saved the plang, but they couldn't warnee.\n<|eot|>\nOne day, a little girl named Lily found a bench from her room. She wanted to see it. But she could not get the palm. She wanted to play with her. But the penchar was not a good idea. Lily asked her mom for help.\nLily wanted to play with her friends. She knew she could see her pench, but she was too nice. She remembered. She barked. She did not know. She tried to share the door with her.\nLily ran over her room to play. She saw it a big barch. She thought she could not play with her. Lily was sad and surprised.\nLily said, \"I am sorry, but you did not find your pen. It can not makes it.\" Lily penched and hugged her. She said, \"I will help you be careful. We can make learn",
+ "rule_init": {},
+ "ngram_init": {}
+}
