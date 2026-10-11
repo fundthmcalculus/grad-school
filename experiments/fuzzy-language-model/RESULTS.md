@@ -1142,3 +1142,26 @@ BPE1024 D d = 48, 32 rules per head, ctx 512 / batch 16, lr 6e-2, warm-up 100, 3
 * **G30.** val BPC ≤ 1.00 (a gain ≥ 0.02 over 1.0212; the 30M gain from ctx 512 plus 32 rules was ≈ 0.02 over ctx 256 / 16 rules). *(~55%.)*
 * **G31.** Blind coherence total (same rubric, same 600-char protocol, new set mixing this model with the previous 300M model and the 100M model, labels removed) exceeds the previous 300M model's
   9.88 by ≥ 1.0. *(~40%.)* The plot score (P) is the one to watch.
+
+### Outcome `v12-long512` (G30; BPE1024 D d = 48, 32 rules/head, ctx 512 / batch 16, lr 6e-2, 300M chars, seed 0)
+
+**val BPC 0.9976** at **96,416 parameters** (curve at 25 / 50 / 75 / 100%: 1.1372 / 1.0804 / 1.0275 / 0.9976; 119K chars/s alone, ~25 min). **G30 supported (≤ 1.00), by 0.002**, which is
+inside what one seed can move, so "below 1.0" is a one-seed statement; the margin over the previous 300M model (1.0212, ctx 256 / 16 rules, lr 3e-2) is 0.024. It is the first model under 100K
+parameters below one bit per character. Single seed; no neural control at this configuration; the lr was 6e-2 here against 3e-2 in the reference run (D's lr barely mattered at 30M chars,
+but this is a second difference besides ctx and rules).
+
+### Outcome of coherence set 2 (G31; blind, fresh texts: seeds 2 and 3, same 4 prompts, T 0.5 / top-k 10, 600 chars; rater 1 = Claude GPU session; `report/coherence2_blind.json`, scores `coherence2_scores_rater1.json`, written before the key was opened; the key is withheld until rater 2 has scored)
+
+| model | val BPC | G | C | P | total (3–15) ± s.e., n = 8 |
+|---|---|---|---|---|---|
+| BPE1024 D, ctx 512, 32 rules, 300M (new) | 0.9976 | 3.25 | 2.50 | 1.88 | **7.62 ± 0.35** |
+| BPE1024 D, ctx 256, 300M | 1.0212 | 3.50 | 2.50 | 2.12 | 8.12 ± 0.51 |
+| BPE1024 D, ctx 256, 100M | 1.0548 | 3.38 | 2.62 | 2.12 | 8.12 ± 0.65 |
+
+(An earlier attempt reusing seeds 0–1 was discarded unscored-for-this-purpose: its texts were deterministic repeats of the first set, so rater 1 could tell which were the new model's. Seeds 2–3 fix that.)
+
+**G31 refuted:** the new model does not exceed the previous 300M model's 9.88 by 1.0; on fresh texts it scores 7.62 against 8.12 for both older models, i.e. **no difference at this sample size, and the sign is the
+wrong way**. **This also weakens the first coherence table:** the same 300M checkpoint scored 9.88 ± 0.28 on seeds 0–1 and 8.12 ± 0.51 on seeds 2–3 (a 1.8-point swing, ≈ 3 s.e.), so one 8-story sample
+per model is a noisy estimate (the run-to-run noise of this measure is ~±1.5 totals). Pooling both rounds (n = 16): 300M ctx-256 **9.00**, 100M **7.87**; the new model has n = 8 only (7.62). **What survives:**
+the large separations in round 1 (subword vs character models, 3.9 → 7–9) are far outside this noise; the *fine* ordering among the three best (BPC 0.998–1.055) is not established, and a 0.024 BPC gain
+does not show up in the coherence score. Plot sense (P ≈ 2/5) did not move at all across 1.055 → 0.998 BPC.

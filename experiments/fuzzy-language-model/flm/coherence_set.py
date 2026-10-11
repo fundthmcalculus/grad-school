@@ -8,6 +8,7 @@ length. Writes <out>_blind.json (id + text, shuffled, labels removed) and <out>_
 """
 
 import json
+import os
 import random
 import sys
 from pathlib import Path
@@ -26,6 +27,9 @@ PROMPTS = [
     "One day, a girl named Mia found",
 ]
 CHARS = 600
+SEEDS = tuple(
+    int(x) for x in os.environ.get("COH_SEEDS", "0,1").split(",")
+)  # fresh seeds => fresh texts
 
 
 def gen(model, enc, dec, prompt, seed):
@@ -56,7 +60,7 @@ def main():
             enc, dec = char_encode, char_decode
         meta = json.loads(Path(c).with_suffix(".json").read_text())
         for p in PROMPTS:
-            for seed in (0, 1):
+            for seed in SEEDS:
                 items.append(
                     {
                         "model": Path(c).stem,
