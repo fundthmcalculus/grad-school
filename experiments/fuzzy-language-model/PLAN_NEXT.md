@@ -74,3 +74,11 @@ Predictions: (1) `t256e32m15` worse by 0.005-0.03 — right (+0.026); (2) `t256e
 
 ### Item 7 follow-up, registered before running (`v30-tiered`, arms added to the same driver, seeds 0-2)
 `t512e24m25` (512 head, tail 24, FFN mult 2.5; ~97.7K params, under the cap) and `t768e16m25` (768 head, tail 16, mult 2.5). Reasoning: the 512-head arm matched baseline with 4.9K fewer parameters, so spending the savings on more FFN rules should now buy something. Prediction: `t512e24m25` beats the baseline by 0.003-0.010 (a ranking at 3 seeds; ~35% that it beats it by >= 0.005 on all 3 seeds); `t768e16m25` is within 0.005 of `t512e24m25` (the tail matters little by then). Prior: small.
+
+### Item 7 follow-up outcome (seeds 0-2; baseline 1.1095 at 96,416 params)
+| arm | params | mean BPC | paired vs baseline |
+|---|---|---|---|
+| `t512e24m25` | 97,664 | 1.1033 | **−0.0077 (3/3 better)** |
+| `t768e16m25` | **101,376 (OVER the 99,999 cap: my parameter estimate was wrong)** | 1.0883 | −0.0227 (3/3) |
+Predictions: `t512e24m25` beats baseline by 0.003-0.010 — right (−0.0077, all 3 seeds); `t768e16m25` within 0.005 of it — wrong (−0.015 further), and it is over the cap so it does not count. First under-cap result in this line that is ahead of the baseline on every seed, but 3 seeds with paired sd ~0.006: not yet a claim.
+Registered before the next round (seeds 0-4 for all arms; existing seeds 0-2 reused): under-cap arms `t640e16m25` (~97.7K) and `t768e16m225` (FFN mult 2.25, ~98.3K), plus seeds 3-4 for `t512e24m25`. Prediction: both new arms beat `t512e24m25` (the more tokens kept at full width / the smaller the tail, the better, as the over-cap arm suggests), by 0.003-0.015; the 5-seed paired gain of `t512e24m25` stays between -0.004 and -0.010. A claim needs >= 0.005 better on >= 4 of 5 seeds for the final arm, then a 300M-scale confirmation.

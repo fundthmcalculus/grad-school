@@ -1,4 +1,4 @@
-"""GPU screen of the frequency-tiered embedding (`v30-tiered`): 30M characters, seeds 0-2; baseline = v22-tribble random (96,416 params)."""
+"""GPU screen of the frequency-tiered embedding (`v30-tiered`): 30M characters, seeds 0-4; baseline = v22-tribble random (96,416 params)."""
 
 import os
 import subprocess
@@ -13,11 +13,12 @@ ARMS = {  # name: (head tokens, tail width, ffn mult)
     "t256e32m20": (256, 32, "2.0"),
     "t512e24m20": (512, 24, "2.0"),
     "t512e24m25": (512, 24, "2.5"),
-    "t768e16m25": (768, 16, "2.5"),
+    "t640e16m25": (640, 16, "2.5"),
+    "t768e16m225": (768, 16, "2.25"),
 }
 if __name__ == "__main__":
     (OUT / "logs").mkdir(parents=True, exist_ok=True)
-    for seed in range(3):
+    for seed in range(5):
         for name, (nh, e, m) in ARMS.items():
             out = OUT / f"{name}_s{seed}.json"
             if out.exists():
