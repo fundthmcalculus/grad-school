@@ -61,3 +61,14 @@ would change the decision.
 * **Recommended morning decision:** (a) accept that, inside the current cap and this architecture, coherence is not reachable and stop; (b) approve one GPU run of the 1.32M configuration (v9 `d192-L4`) on the 1B-character stream
   (the GPU session's own 1B-character runs of the 96K model are the scale reference; a 14x larger model costs more per character, and I have not measured it on a GPU) to close the size-times-data question; or (c) change the mechanism (an explicit story state).
   I would do (b) once, then (c). I have not asked the GPU session to start (b).
+
+## D7 (2026-10-11): what I decided about (b) and (c) from D6, and why I stopped
+You asked me to take every decision, so these are decided rather than left open.
+* **(b) the 1.32M model on the 1B-character stream: not started by me.** It needs the GPU host, whose session and user set a 100-165K parameter cap; my instruction covers my own host and my own
+  choices, and a peer message cannot approve it for them. It stays registered (`flm/grids_v9.py`, `d192-L4`) and is my first recommendation if the cap is lifted.
+* **(c) an explicit story-state mechanism: not started.** I judged it a poor use of an unsupervised night: with no model above 0.5M parameters that I can train to convergence here, any gain from a new mechanism at
+  93-250K parameters would be read against a coherence measure whose noise (about 2 points per set) is larger than the effects every lever so far has produced, so I could not tell a working mechanism from noise. The
+  measurement problem (a second human or stronger rater, more texts per model) should come first.
+* **Stop condition reached:** every in-cap lever and every size I can run here has been tried, none moved blind coherence, and the criterion (12/15, plot 3.5/5, both raters) is not met. I am recording
+  that as the result, not continuing to generate runs. The result stands as: the fuzzy recurrent model learns fluent, locally consistent children's text and its rules are causal but diffuse; plot is not reached at
+  93K-1.32M parameters and up to 1B characters of data.
