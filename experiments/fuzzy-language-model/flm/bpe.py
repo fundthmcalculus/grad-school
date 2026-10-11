@@ -16,6 +16,7 @@ is directly comparable with every character-level number in this experiment: sam
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -48,7 +49,8 @@ def paths(v: int):
     d = data_dir()
     return {
         "tok": d / f"bpe{v}.json",
-        "train": d / f"train_bpe{v}.bin",
+        # FLM_TRAIN_SUFFIX=_1b reads the longer stream (same tokenizer, identical prefix)
+        "train": d / f"train_bpe{v}{os.environ.get('FLM_TRAIN_SUFFIX', '')}.bin",
         "valid": d / f"valid_bpe{v}.bin",
         "lens": d / f"lens_bpe{v}.npy",
     }

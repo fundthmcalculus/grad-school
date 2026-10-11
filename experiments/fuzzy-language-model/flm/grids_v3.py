@@ -664,3 +664,37 @@ for d, e in ((56, 32), (56, 24), (64, 16)):
             )
         )
 register("v16-factemb", jobs)
+
+
+# v17-1b (G37/G38): the best 96K configuration on 1B characters; needs FLM_TRAIN_SUFFIX=_1b in the environment
+_c = cell(
+    "D-d48-bpe1024-ctx512-r32_1000M_s0",
+    D,
+    d=48,
+    sc="8",
+    chars="1000e6",
+    seed=0,
+    lr="6e-2",
+)
+register(
+    "v17-1b",
+    [
+        (
+            _c[0],
+            _c[1]
+            + [
+                "--tok",
+                "bpe1024",
+                "--warmup",
+                "100",
+                "--ctx",
+                "512",
+                "--batch",
+                "16",
+                "--rules",
+                "32",
+                "--save-model",
+            ],
+        )
+    ],
+)

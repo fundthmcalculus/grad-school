@@ -1394,3 +1394,29 @@ Blindness: the key and the CPU rater's scores were in my working tree from the p
 **Reading:** with two raters, 2.6× the parameters at 0.15 BPC lower loss (251K, 30M chars) is **not more coherent** than the 93K model at the same data (6.81 vs 7.19, inside noise), and it is the *lowest* of the three; the highest total goes to the 96K model that trained on 10× more data
 (300M chars). So in these sets coherence tracks training length (and/or the ctx-512 / 32-rule configuration) better than validation loss or parameter count. That is an observation on n = 8 per model with a ±1.5 per-set noise, three models, and confounds (context length, rules, data), not a mechanism.
 It weakens the case that parameter count alone is the missing lever; whether data volume is a lever is untested beyond 300M chars at this size.
+
+## Registered 2026-10-11, before `v17-1b`: does 3.3× more data keep paying, and does coherence follow?
+
+The coherence sets 1–4 ranked the 96K model trained on 300M chars above every model trained on 30M chars, including a 251K model with lower validation loss. The one untested in-cap lever the data point to is training length.
+Cell: BPE1024 D d = 48, ctx 512 / batch 16, 32 rules per head, lr 6e-2, warm-up 100, **1,000M characters** (≈ 38.6K steps; the tokenizer is the same, the stream `train_bpe1024_1b.bin` was encoded from the first 1.3B chars and its first
+tokens are identical to the 600M-char stream, so earlier runs are unaffected; read with `FLM_TRAIN_SUFFIX=_1b`), seed 0, saved; ~45 min alone. 96,416 params. References: 300M chars, same config: 0.9976 (seed 0) / 1.0053 (seed 1).
+* **G37.** val BPC ≤ 0.975. *(~55%.)* *Basis:* 30M → 100M → 300M gave −0.074 and −0.034 (ctx 256); the same ratio again suggests ≈ −0.025 to −0.03 from 1.0015.
+* **G38.** A blind two-rater coherence set (new texts, seeds 8–9; the 1B model vs the 300M seed-0 model vs the 100M model; 8 texts each) scores the 1B model ≥ 1.0 above the 300M model (mean of raters). *(~40%.)* This is the first direct test of "coherence follows training length".
+* **Stopping rule:** if G37 fails by more than 0.015 (BPC > 0.99), more data under this cap is saturated and I stop training-length experiments.
+
+### Outcome `v17-1b` (G37; BPE1024 D d = 48, ctx 512 / batch 16, 32 rules, lr 6e-2, **1,000M chars** = 38,653 steps, seed 0, 96,416 params, 2,639 s of training)
+
+Curve at 25 / 50 / 75 / 100%: 1.0960 / 1.0537 / 1.0060 / **0.9796** (final eval 0.97958). **G37 missed by 0.0046** (≤ 0.975 predicted; ~55%). The stopping rule (> 0.99 = saturated) did not trigger.
+Gain over the two-seed 300M mean (1.0015) is −0.022 for 3.3× the data; the earlier steps were −0.074 (30M → 100M) and −0.034 (100M → 300M, ctx 256), so each tripling now buys about a third to two-thirds of the last. One seed.
+
+### Coherence set 5 (G38, preliminary: ONE rater so far; fresh seeds 8–9; blind; 1B model vs 300M seed-0 model vs 100M model; scores `coherence5_scores_rater1.json` written before the key was opened; key withheld pending a second rater)
+
+| model | G | C | P | total (3–15) ± s.e., n = 8 |
+|---|---|---|---|---|
+| BPE1024 D, ctx 512, 32 rules, **1B chars** (val 0.9796) | 3.62 | 2.88 | 2.38 | **8.88 ± 0.37** |
+| BPE1024 D, ctx 256, 100M chars (val 1.0548) | 3.00 | 2.50 | 2.00 | 7.50 ± 0.18 |
+| BPE1024 D, ctx 512, 32 rules, 300M chars (val 0.9976) | 3.00 | 2.50 | 1.75 | 7.25 ± 0.52 |
+
+Rater 1 scores the 1B model **+1.63** over the 300M model and +1.38 over the 100M model (plot 2.38 vs 1.75 and 2.00), i.e. in the predicted direction and above the registered +1.0 threshold. **G38 is not decided:** it was registered on the mean of two raters
+and rests on n = 8 per model with per-set noise of ≈ ±1.5; a 1.6-point gap is about 3 s.e. of these means but a single rater's gap. Earlier rounds showed that a first-round gap can fail to replicate (the 300M model's 9.88 in set 1 vs 8.12 in set 2).
+If rater 2 agrees, this is the first in-cap lever that moved coherence beyond noise, and its mechanism, more training data seen, was not a surprise.
