@@ -61,3 +61,17 @@ change the cited recipe; if it also holds at a longer budget it is run on the 1B
   `--beta2`, `--clip` default to the old behaviour, so earlier runs are reproduced exactly).
 * A screen result is a ranking, never a citable number (AGENTS.md: ten seeds for claims).
 * Do not run more than three CPU jobs at once with four threads each while the GPU job is running (it needs one core).
+
+## Registered 2026-10-11, before `v19-small`: a small CPU screen beside the GPU job (user: "do the small CPU tests concurrently with the GPU")
+
+Four knobs from stage A, seeds 0 and 1, 4M characters (8 jobs, ~1.7 h at the measured 5.4K chars/s total), each **paired by seed** with the pilot's `base_s0` / `base_s1`
+(1.4220 / 1.4399; same seed means the same initialisation and the same training windows, so the paired difference is far less noisy than the 0.0103 sd across seeds).
+Rule: a knob counts as having an effect only if both paired differences have the same sign and their mean exceeds 0.010 BPC; anything smaller is "not resolved", not "no effect".
+Predictions: lr floor 0.0 better (negative paired delta); beta2 0.95 better; lr 4e-2 and 9e-2 both worse (the 6e-2 optimum holds). Nothing here is citable; a winner goes to the GPU for 30M x 5 seeds.
+
+### Stage B parameter counts (measured 2026-10-11 by building each model; cap 99,999)
+
+Reference d 48 x 2 layers: 96,416. d 40 x 3 layers: 93,308. d 56 x 1 layer: 88,076. d 32 x 4: 81,440. d 56 x 2 layers: 118,752 (over cap, excluded). heads 4: 95,632; heads 16: 97,984.
+tsk-dim 8: 93,344; tsk-dim 24: 99,488. FFN mult 1.0: 90,224; FFN mult 2.0: 102,608 (over cap, excluded). shortconv 4: 96,032; shortconv 16: 97,184.
+The in-cap candidates for the capacity screen are therefore: (d 40, L 3), (d 56, L 1), heads 4/16, tsk-dim 8/24, FFN mult 1.0, shortconv 4/16.
+Note the cap leaves about 3,600 parameters unspent in the reference; tsk-dim 24 (99,488) is the only single-knob move that spends nearly all of them.

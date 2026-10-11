@@ -55,3 +55,16 @@ register(
         }
     ),
 )
+
+
+# small CPU screen (user-approved to run beside the GPU job): four optimiser knobs, seeds 0-1, paired with the pilot's base_s0/s1
+_SMALL = {
+    "floor0": (["--lr-floor", "0.0"], {}),
+    "b2-95": (["--beta2", "0.95"], {}),
+    "lr4": ([], {"lr": "4e-2"}),
+    "lr9": ([], {"lr": "9e-2"}),
+}
+register(
+    "v19-small",
+    [_cell(t, s, ex, **ck) for t, (ex, ck) in _SMALL.items() for s in (0, 1)],
+)
