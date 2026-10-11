@@ -30,21 +30,40 @@ def main(seed=0, d=48, windows=64, ctx=256, eval_chars=300_000):
     idx = torch.from_numpy(
         np.stack([train[i : i + ctx + 1] for i in starts]).astype(np.int64)
     )
+    from flm.assoc import bigram_counts, equal_mass_groups, ppmi_svd
+
+    V = a.vocab_size
+    stream = np.asarray(train[:60_000_000])
+    C = bigram_counts(stream, V)
+    pred, succ = ppmi_svd(C, d)
+    freq = C.sum(0)
+    stats = {
+        "succ": torch.from_numpy(succ).float(),
+        "freq_groups": {72: equal_mass_groups(freq, 72)},
+    }
     out = {}
-    for name in ("random", "data", "cf", "cf-ls"):
+    variants = [("random", None, None, "random"), ("data", None, None, "random")]
+    for emb in ("random", "succ"):
+        for grp in ("emb", "freq", "assoc"):
+            for mode in ("centroid", "ls"):
+                variants.append((f"{grp}/{mode}/emb={emb}", grp, mode, emb))
+    for name, grp, mode, emb in variants:
         torch.manual_seed(seed)
         m = TinyLM(T.make_config(a))
+        if emb == "succ":
+            w = torch.from_numpy(succ).float()
+            m.emb.weight.data.copy_(w * (0.1 / w.pow(2).mean().sqrt()))
         g = torch.Generator().manual_seed(seed)
         info = {}
         if name == "data":
             info = init_rules_from_data(m, idx[:, :-1], generator=g)
-        elif name in ("cf", "cf-ls"):
+        elif grp is not None:
             info = init_conseq_first(
-                m, idx, g, mode="centroid" if name == "cf" else "ls"
+                m, idx, g, mode=mode, groups=grp, token_stats=stats
             )
         bpc = T.evaluate(m, val, ctx, eval_chars)
         out[name] = bpc
-        print(f"{name:7s} init val BPC {bpc:.4f}  {info}", flush=True)
+        print(f"{name:28s} init val BPC {bpc:.4f}", flush=True)
     return out
 
 

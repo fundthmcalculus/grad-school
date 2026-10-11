@@ -59,6 +59,8 @@ def init_conseq_first(
     mode: str = "centroid",
     gains: tuple = (0.25, 1, 4, 16, 64, 256, 1024),
     ridge: float = 1e-2,
+    groups: str = "emb",
+    token_stats: dict | None = None,
 ) -> dict:
     """Build every TSK FFN rule consequent-first from the windows ``idx`` (B, T+1). Returns diagnostics."""
     assert mode in ("centroid", "ls")
@@ -79,7 +81,14 @@ def init_conseq_first(
         u = ffn.ante(blk.n2(x)).reshape(-1, ffn.da)
         R = ffn.R
         # 1. answers first: group the next-token embeddings
-        grp_tok = _spherical_kmeans(E, freq + 1e-6 * (freq == 0), R, generator)
+        if groups == "emb":
+            grp_tok = _spherical_kmeans(E, freq + 1e-6 * (freq == 0), R, generator)
+        elif groups == "freq":  # equal-mass buckets of the unigram frequency
+            grp_tok = torch.from_numpy(token_stats["freq_groups"][R])
+        else:  # "assoc": k-means of the successor vectors of the bigram PPMI-SVD
+            grp_tok = _spherical_kmeans(
+                token_stats["succ"], freq + 1e-6 * (freq == 0), R, generator
+            )
         grp = grp_tok[tgt]
         used = torch.unique(grp)
         # 2. backward to the antecedents of each answer group

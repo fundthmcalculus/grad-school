@@ -38,3 +38,23 @@ of the next token through the output map) and place each head's key rules on the
 ## Other uses of the same idea (not run)
 * a gradient-free *fit* of only the readout/consequents given fixed antecedents (closed-form, seconds): what a fully TRIBBLE-style model would be, with a quality number to compare to a trained one;
 * backward target propagation across layers instead of the forward layer-by-layer pass used here.
+
+## Clustered answers: by frequency or by association (user request, 2026-10-11; init-only, seed 0, same check; `flm/assoc.py`)
+Answer groups can now come from (`freq`) equal-probability-mass buckets of unigram frequency, (`assoc`) a spherical k-means of the successor vectors of a PPMI-SVD of the bigram counts
+(60M training tokens, k = 48, context smoothing 0.75), or (`emb`) the model's own random embedding (the first measurement). The tied embedding is either random or **set to the PPMI-SVD successor vectors** (`emb=succ`, rms 0.1).
+Init validation BPC (uniform 3.16; **unigram 2.617**; random init 3.2928; antecedent-first 3.2922):
+
+| answer groups | consequents | embedding random | embedding = PPMI-SVD successor |
+|---|---|---|---|
+| model embedding (`emb`) | centroid | 3.1588 | **2.8123** |
+| model embedding (`emb`) | least squares | 3.0024 | 3.0240 |
+| frequency (`freq`) | centroid | 3.1210 | 2.9295 |
+| frequency (`freq`) | least squares | 3.0018 | 3.0181 |
+| association (`assoc`) | centroid | 3.1709 | 2.8123 (same clusters as `emb` here) |
+| association (`assoc`) | least squares | **2.9789** | 3.0240 |
+
+**Reading.** (1) The choice of how to cluster the answers moves the starting loss by only 0.02-0.15 BPC: frequency and association are no better than the random-embedding k-means once the consequents are fit by least squares (3.00 / 3.00 / 2.98).
+(2) What helps is a *meaningful embedding* with centroid consequents (2.81, the best), not the clustering rule. (3) **Nothing reaches the unigram (2.617)**, and the PPMI-SVD embedding explains part of why: PPMI divides out the
+token marginals, so the embedding carries no frequency direction and the bias-free tied readout cannot express a unigram prior. Next (not run): add a log-frequency dimension to the aligned embedding.
+(4) Init-only: the n-gram init (RESULTS.md) showed head starts like this wash out within ~100 steps. The test that matters is the training curve (stage 1b), which needs the GPU and the `--rule-init conseq` hook.
+A different reading of "clustered embeddings" would be to *share* embedding rows within frequency/association clusters (the embedding is 49K of the 96K parameters); that is a parameter-budget test, not built.
