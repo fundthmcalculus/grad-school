@@ -454,6 +454,8 @@ the text's probability, so the reported BPC is, if anything, conservative for th
 | **Coherence** | BPC is not coherence; text loops at low temperature | a coherence grader, or longer context and larger models |
 | **One GPU, one tokenizer family** | unreplicated | `COORDINATION.md` |
 
+Vocabulary ladder (`v7-vocab`, `v7-confirm`, two seeds each, lr 3e-2): at 10M characters BPE1536 d40 (93,792 parameters) scored 1.2336 and BPE2048 d32 1.2378 against 1.2604 for BPE1024 d48, but at 30M characters the 1536 gain shrank from 0.027 to 0.009 (1.1205 against 1.1291) and 2048 lost its edge (1.1316), so the 10M screens overstated larger vocabularies. The headline stays BPE1024 d48; BPE1536 d40 needs ten seeds and its own neural control before any fuzzy-vs-neural claim at that vocabulary.
+
 Only the `v6-final10` comparison of §11 may be quoted in the proposal, with its caveats; the character-level claims wait for the first row of this table.
 
 ## References

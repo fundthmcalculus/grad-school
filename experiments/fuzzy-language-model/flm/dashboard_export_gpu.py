@@ -39,6 +39,8 @@ GRIDS = [
     "v6-d-lr-edge",
     "v6-ref-tune",
     "v6-final10",
+    "v7-vocab",
+    "v7-confirm",
 ]
 CURVE_GRIDS = [
     "v3-final",
@@ -109,10 +111,10 @@ GAPS = [
     ),
     (
         "Generality of the subword result",
-        "One tokenizer (BPE1024), one model size (about 93K parameters) and one budget (30M characters)",
+        "The fuzzy-vs-neural comparison is one tokenizer (BPE1024), one model size (about 93K parameters) and one budget (30M characters)",
         "open",
-        "other vocabularies, sizes and budgets with their own tuned references",
-        "Not started",
+        "ten seeds for BPE1536 d40 plus a tuned neural reference at that vocabulary; other sizes and budgets",
+        "Vocabulary ladder run at two seeds: BPE1536 d40 scores 1.1205 at 30M characters against 1.1291 for BPE1024 (gain 0.009, down from 0.027 at 10M); BPE2048 d32 1.1316, no edge. The 10M screens overstated larger vocabularies. The headline stays BPE1024 d48",
     ),
     (
         "Learning-rate study (v3-lr) and H10a",
