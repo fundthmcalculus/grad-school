@@ -124,3 +124,13 @@ Stage 2 (`v23-wu300m`, 300M characters, seeds 0-1, saved checkpoints): warm-up 3
 
 Predictions: monotone through 300 — right; plateau/reversal by 600 — right (mild reversal); 200 ≈ −0.005 — wrong (−0.008, better than predicted); 450 ≈ −0.011 — right (−0.010).
 Caveat stands: at 30M (1,160 steps) a 300-step warm-up is 26% of the run; v23-wu300m tests whether it survives at 300M.
+
+## v23-wu300m outcome (300M chars, seeds 0–1, GPU)
+
+| warm-up | s0 | s1 | mean | Δ vs warm-up 100 (0.9976 / 1.0053) |
+|---|---|---|---|---|
+| 100 (v12-long512) | 0.9976 | 1.0053 | 1.0015 | – |
+| 300 | 0.9946 | 1.0066 | 1.0006 | −0.0030 / +0.0013 |
+| 1000 | 0.9952 | 0.9953 | 0.9953 | −0.0024 / −0.0100 |
+
+Prediction (effect shrinks to within 0.005 at 300M) — right for warm-up 300 (mean −0.001, seed-split sign). Warm-up 300 does not win by >0.01 in both seeds, so the cited recipe is unchanged. Warm-up 1000 is the only suggestive cell (−0.006 mean, 2/2 seeds) but n=2 and unregistered as a winner: a screen/ranking, not a claim. The 30M warm-up gain is largely a short-run effect.
