@@ -907,3 +907,21 @@ run experiments" instruction, one sweep at a time.
 * **H26.** D's ten-seed mean is lower than both references' by a *real* margin. Predicted lead **0.01–0.02 BPC** over the better
   reference. *(~60% it stays real: the 10M lead was 0.016 with a one-seed reference and the lead usually shrinks with training.)*
   A null ("within noise") would be reported as the result, with the 1.5× throughput cost.
+
+### Outcome `v6-final10` (H26; BPE1024, ~93.3K params, 30M chars, seeds 0–9, 30/30 finite, `python -m flm.compare v6-final10 --ref D`)
+
+| arm | params | val BPC (mean ± std, n = 10) | Δ vs D | 2 × s.e. | verdict |
+|---|---|---|---|---|---|
+| **D (fuzzy), lr 6e-2** | 93,344 | **1.1291 ± 0.0039** | | | |
+| ref2: delta h4, sc4, lr 6e-2 | 93,376 | 1.1564 ± 0.0044 | +0.0274 | 0.0037 | D better, real |
+| ref1: delta h8, sc4, lr 4e-2 | 93,392 | 1.1593 ± 0.0038 | +0.0303 | 0.0034 | D better, real |
+
+**H26 supported on direction and reality, missed on size.** The fuzzy model beats both tuned neural references on the same
+tokenizer at the same parameter count by 0.027–0.030 BPC, about 8× the registered 2-standard-error bar; the predicted lead was 0.01–0.02,
+so the lead is larger than predicted. The references were selected at 10M chars, seed 0, over 24 cells (winner's curse favours
+them, not D). Two incidental findings: (1) D at lr 6e-2 (1.1291, ten seeds) equals D at lr 3e-2 (1.1292, two seeds, `v5-final100k`), so
+at 30M chars the learning rate between 3e-2 and 6e-2 does not matter; the 10M-char optimum of 6e-2 does not carry any advantage at 30M;
+(2) D's seed std (0.0039) is not smaller than the references' (0.0038–0.0044), so D is not more fragile.
+**Standing caveats:** one tokenizer (BPE1024), one size (93K), one data budget (30M chars), no 100M/300M ten-seed run, and D trains ≈ 1.5× slower
+per character. The comparison is at equal parameters and equal characters; at equal wall-clock the neural models would see 1.5× more text.
+The character-level claim is a separate, older comparison (2–3 seeds, `v3-final`/`v3-ref`).

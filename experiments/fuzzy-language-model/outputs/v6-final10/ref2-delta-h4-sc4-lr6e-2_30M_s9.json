@@ -1,0 +1,207 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 4,
+  "rules": 16,
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 9,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-final10\\ref2-delta-h4-sc4-lr6e-2_30M_s9.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 4,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93376,
+ "params_nonemb": 44224,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.16211,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.39257
+  ],
+  [
+   580,
+   1.27557
+  ],
+  [
+   870,
+   1.19945
+  ],
+  [
+   1160,
+   1.16211
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3165
+  ],
+  [
+   50,
+   8.127
+  ],
+  [
+   100,
+   6.2959
+  ],
+  [
+   150,
+   5.3751
+  ],
+  [
+   200,
+   4.9121
+  ],
+  [
+   250,
+   4.6697
+  ],
+  [
+   300,
+   4.536
+  ],
+  [
+   350,
+   4.4111
+  ],
+  [
+   400,
+   4.3245
+  ],
+  [
+   450,
+   4.2419
+  ],
+  [
+   500,
+   4.189
+  ],
+  [
+   550,
+   4.1268
+  ],
+  [
+   600,
+   4.0785
+  ],
+  [
+   650,
+   4.0285
+  ],
+  [
+   700,
+   3.9851
+  ],
+  [
+   750,
+   3.9541
+  ],
+  [
+   800,
+   3.9135
+  ],
+  [
+   850,
+   3.8612
+  ],
+  [
+   900,
+   3.8335
+  ],
+  [
+   950,
+   3.7761
+  ],
+  [
+   1000,
+   3.7652
+  ],
+  [
+   1050,
+   3.7465
+  ],
+  [
+   1100,
+   3.7167
+  ],
+  [
+   1150,
+   3.7026
+  ],
+  [
+   1159,
+   3.6992
+  ]
+ ],
+ "train_seconds": 106.31,
+ "wall_seconds": 113.14,
+ "chars_per_sec": 89384,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Ben.\n\"Look, Tom, this is how. It is time. It needs that? I am brave!\"\nLily and Tom nod. Anna and Lily were Kitty. They loved to go inside and seek. One day, they saw a polite box. The next day, they saw a tidy tree. The cuiger was chairs.\n\"What's that?\" Lily says, \"Yes, it is a silly is a little bunny. You can sit and others!\"\n\"Look, don't you help the ocean. We are angry. We need to play with it. They are not snear. We have to do again.\"\n\"Whoo's bowly?\" Mom said, come back.\n\"Yes, it's just a big, red balloon. We can play with the treasure. You are very spray on each other. We have to share the bottle. Do you want to play with you, but not a book. Today. You have to be safe and fun!\" They missed her best and scary cars.\n<|eot|>\nOnce upon a time, in a small town, there lived a little boy named Tim. Tom loved to play with the leaf. One day, Tim wanted to open the cup",
+ "rule_init": {},
+ "ngram_init": {}
+}
