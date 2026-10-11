@@ -1007,3 +1007,23 @@ A second Claude instance (the CPU session, which had not seen the key or the fir
 - Rater 2 per-model totals (/15, mean ± se, n = 8): BPE1024 300M 8.62 ± 0.37; BPE1024 100M 7.25 ± 0.53; BPE1536 d40 30M 7.12 ± 0.40; BPE512 30M 6.62 ± 0.37; neural char teacher 4.38 ± 0.26; char D d96 3.88 ± 0.12; char D d72 3.88 ± 0.12.
 - The ranking by bits per character is reproduced (the two lowest character-D models tie). The subword-vs-character-teacher gap at similar BPC is larger under rater 2 (BPE1024 100M against the teacher: 2.9 points, against 1.6 for rater 1), so the weak-evidence reading holds in direction and is not smaller than first reported. Plot is the weakest axis for both raters (rater 2: 1.88/5 at 300M).
 - Caveats unchanged: same model family, n = 8 per model, one sampling setting. Neither rater is a human.
+
+## Registered 2026-10-11, before `v8-ctx`: does more context help D? (CPU session; plan in PLAN_CONTEXT.md)
+
+D is the fuzzy recurrent mixer (`fuzzydelta`), so context scaling is the recurrent-model question.
+Probes: `flm/context_probe.py` (bits by position, bits by distance from story start, name recall).
+
+* **H29 (baseline, 100M BPE1024 D checkpoint, ctx 256), registered before running the probe:** name-recall gain
+  above 2 bits at k = 0 and near 0 by k = 24; bits drop from the 0-255 bucket to the 256-511 bucket and do
+  not improve past 256. **Outcome (24 windows of 1,024 tokens, CPU):** gain 2.01 bits at k = 0 (borderline), 1.75 (k=1),
+  1.26 (k=3), 1.35 (k=6), 1.07 (k=12), 0.79 (k=24, 280 tokens): decays smoothly, not to 0, so "near 0 by 24" is
+  **refuted**. Bits by position 1.072 / 1.080 / 1.061 for 0-255 / 256-511 / 512-1023: no drop at the second
+  bucket (**refuted**) and a small improvement past 256 (**refuted**, but 24 windows, so within noise);
+  the model run at 4x its training length does not break down. Bits by story distance: 0.900 (0-63 tokens),
+  1.11-1.12 afterwards: the story opening is cheap, the body is flat. The prior margin is 1.4-2.3 bits, so the
+  gain is measured against a name preference of similar size; treat k >= 12 as weak. Not yet seen at ten seeds
+  or on other checkpoints.
+* **H30:** name-recall gain at k = 24 (280 tokens) rises with training ctx (256 < 512 < 1024) by more than 0.3 bits. ~50%.
+* **H31:** `val_bpc` at fixed position buckets improves by less than 0.01 from ctx 256 to 1024 (stories are about one
+  window long). ~65%.
+* **H32:** 32 rules per head at ctx 1024 beats 16 rules by more than 0.01 bits per character. ~30%.

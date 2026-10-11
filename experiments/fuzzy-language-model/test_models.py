@@ -605,3 +605,21 @@ def test_ffn_rule_rows_structure(first_order):
     ) == first_order
     assert rows[0]["wins"] >= rows[1]["wins"]  # most used first within a layer
     assert abs(sum(x["wins"] for x in rows if x["layer"] == 0)) <= 1.0 + 1e-9
+
+
+def test_context_probe_helpers():
+    from flm.context_probe import POS_EDGES, STORY_EDGES, bucket, filler
+
+    assert [bucket(t, POS_EDGES) for t in (0, 255, 256, 1023, 1024, 5000)] == [
+        0,
+        0,
+        1,
+        2,
+        3,
+        3,
+    ]
+    assert (
+        bucket(0, STORY_EDGES) == 0
+        and bucket(10**6, STORY_EDGES) == len(STORY_EDGES) - 2
+    )
+    assert filler(0) == "" and filler(2).count(".") == 2 and filler(7).count(".") == 7
