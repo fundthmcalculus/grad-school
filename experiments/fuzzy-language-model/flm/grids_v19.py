@@ -68,3 +68,27 @@ register(
     "v19-small",
     [_cell(t, s, ex, **ck) for t, (ex, ck) in _SMALL.items() for s in (0, 1)],
 )
+
+
+# stage A at 30M characters (GPU): same 13 cells x 3 seeds, resolves differences of ~0.01 BPC
+register(
+    "v19-optA30",
+    _grid(
+        {
+            "base": ([], {}),
+            "floor0": (["--lr-floor", "0.0"], {}),
+            "floor3": (["--lr-floor", "0.3"], {}),
+            "b2-95": (["--beta2", "0.95"], {}),
+            "b2-999": (["--beta2", "0.999"], {}),
+            "clip03": (["--clip", "0.3"], {}),
+            "clip0": (["--clip", "0"], {}),
+            "wu30": ([], {"warmup": "30"}),
+            "wu300": ([], {"warmup": "300"}),
+            "lr4": ([], {"lr": "4e-2"}),
+            "lr9": ([], {"lr": "9e-2"}),
+            "wd0": (["--wd", "0.0"], {}),
+            "wd1": (["--wd", "0.1"], {}),
+        },
+        chars="30e6",
+    ),
+)
