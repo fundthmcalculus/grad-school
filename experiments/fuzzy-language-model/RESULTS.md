@@ -1101,3 +1101,16 @@ Single seed per cell, so differences < ~0.01 are not established.
 * **Caveats:** 10M characters is short (attention induction behaviour is known to appear later than loss differences); the attention arms use 4 heads, ctx 512 and FFN mult 2.0 per
   the CPU session's grid, not a tuned configuration; one seed. So the safe reading is "at this budget and size, Fibonacci attention beats dense Gaussian attention by ~0.03 BPC,
   and neither approaches D on loss or on name recall"; not "attention cannot do it". A 30M-char two-seed run of the best attention arm (per the plan's rule) was not run.
+
+## Outcome `v8-ctx` and `v8-rules` (GPU session ran the CPU session's grids, 2026-10-11; BPE1024 D d = 48, lr 6e-2, 30M chars, seeds 0–1, constant tokens per step)
+
+| cell | params | val BPC |
+|---|---|---|
+| ctx 256, 16 rules/head | 93,344 | 1.1324 ± 0.0031 (1.129 / 1.135) |
+| ctx 512, 16 rules/head | 93,344 | 1.1232 ± 0.0019 (1.125 / 1.121) |
+| ctx 512, **32 rules/head** | 96,416 | **1.1125 ± 0.0004** (1.112 / 1.113) |
+
+Context 512 vs 256: **−0.0092** (matches my `v8-ctx-b16` result, −0.0066 at lr 3e-2: both small, same sign). Doubling the rules per head at ctx 512: **−0.0107** for +3.1K params,
+with a very small seed spread (0.0004). Both gains are ≈ 3 seed standard errors of the ctx-256 cell but only two seeds each; the 32-rule cell is the best BPE1024 D at 30M chars so far
+(1.1125, under 100K parameters: 96,416) and the first improvement over the ten-seed 1.1291 headline that is not within seed noise. **Not ten-seed validated, and its own neural control
+was not rerun at ctx 512.** (Predictions H30–H32 for these grids are the CPU session's in `RESULTS.md`; scoring is theirs.)
