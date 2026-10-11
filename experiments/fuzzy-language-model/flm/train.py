@@ -41,6 +41,14 @@ def get_args(argv=None):
     p.add_argument("--decay", default="fixed", choices=["none", "fixed", "data"])
     p.add_argument("--ctx", type=int, default=256)
     p.add_argument(
+        "--layer-mixers",
+        default="",
+        help="comma-separated mixer per layer (cycled), e.g. fuzzydelta,fibgauss",
+    )
+    p.add_argument(
+        "--attn-heads", type=int, default=0, help="heads of attention mixers"
+    )
+    p.add_argument(
         "--fib-local",
         type=int,
         default=8,
@@ -160,6 +168,8 @@ def make_config(a) -> ModelConfig:
         ffn_norm=a.ffn_norm,
         ante_taps=a.ante_taps,
         fib_local=a.fib_local,
+        layer_mixers=a.layer_mixers,
+        attn_heads=a.attn_heads,
     )
 
 

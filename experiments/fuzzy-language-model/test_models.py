@@ -668,3 +668,19 @@ def test_fibonacci_attention():
         assert torch.allclose(
             a(x)[:, :4], sparse(x)[:, :4], atol=1e-5
         )  # first 4 positions see everything
+
+
+def test_hybrid_layers_and_attn_heads():
+    from flm.models import FibGaussianAttention, FuzzyDeltaMixer, ModelConfig, TinyLM
+
+    c = dict(vocab_size=50, d_model=32, n_layers=2, n_heads=4, max_len=32, ffn="mlp")
+    m = TinyLM(
+        ModelConfig(
+            mixer="fuzzydelta", layer_mixers="fuzzydelta,fibgauss", attn_heads=2, **c
+        )
+    )
+    assert isinstance(m.blocks[0].mix, FuzzyDeltaMixer)
+    assert isinstance(m.blocks[1].mix, FibGaussianAttention) and m.blocks[1].mix.H == 2
+    assert m(torch.randint(0, 50, (2, 32))).shape == (2, 32, 50)
+    plain = TinyLM(ModelConfig(mixer="softmax", **c))
+    assert plain.blocks[0].mix.H == 4  # attn_heads = 0 follows n_heads

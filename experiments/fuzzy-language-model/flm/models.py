@@ -69,6 +69,9 @@ class ModelConfig:
     # Fibonacci-lag attention (fibsoftmax / fibgauss): every lag 0..fib_local-1 is visible, beyond that
     # only the Fibonacci lags (13, 21, 34, ...); fib_local >= max_len makes it dense causal attention
     fib_local: int = 8
+    # hybrids: comma-separated mixer per layer (cycled), e.g. "fuzzydelta,fibgauss"; "" = every layer `mixer`
+    layer_mixers: str = ""
+    attn_heads: int = 0  # heads of the attention mixers (0 = n_heads)
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -128,7 +131,7 @@ class ShortConv(nn.Module):
 class SoftmaxAttention(nn.Module):
     def __init__(self, cfg: ModelConfig):
         super().__init__()
-        d, H = cfg.d_model, cfg.n_heads
+        d, H = cfg.d_model, cfg.attn_heads or cfg.n_heads
         assert d % H == 0
         self.H, self.dh = H, d // H
         self.qkv = nn.Linear(d, 3 * d, bias=False)
@@ -622,7 +625,8 @@ class Block(nn.Module):
         super().__init__()
         self.n1 = nn.RMSNorm(cfg.d_model)
         self.conv = ShortConv(cfg.d_model, cfg.shortconv) if cfg.shortconv > 1 else None
-        self.mix = MIXERS[cfg.mixer](cfg)
+        kinds = [m for m in cfg.layer_mixers.split(",") if m]
+        self.mix = MIXERS[kinds[idx % len(kinds)] if kinds else cfg.mixer](cfg)
         self.n2 = nn.RMSNorm(cfg.d_model) if cfg.ffn != "none" else None
         if cfg.ffn == "tsk":  # multi-tap antecedent applies to the first block only
             self.ffn = TSKFFN(cfg, taps=cfg.ante_taps if idx == 0 else 1)

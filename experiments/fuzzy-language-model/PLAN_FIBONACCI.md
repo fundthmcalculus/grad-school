@@ -39,3 +39,19 @@ recall by filler length is the real test: k = 3 puts the name at about lag 50, k
 
 **Caveats.** One seed; 10M characters (10M screens overstated larger vocabularies at 30M, so a 30M check is
 required before believing any ordering); attention arms differ from D by 1.7% in parameters; lr tuned at only two values.
+
+## Stage 2: hybrid of D and Fibonacci attention (`v11-hybrid`)
+
+v10 result (GPU session, 10M characters, seed 0; the CPU session reproduced the attention cells on its own host and
+BPE stream: dense-gauss 1.353, fibgauss-L8 1.323, both within 0.001 of the GPU numbers): D 1.2534, fibgauss L8
+1.3227, dense 1.3536. Fibonacci beats dense by 0.031 (H37 refuted), and both attention arms trail D by 0.07 and
+recall no names at 10M characters while D recalls them (2.1 bits at k = 0, 0.47 at k = 24). So D is the memory;
+the question is whether a sparse exact-retrieval layer adds to it. `flm/grids_v11.py`: `hybDF` (layer 0 D mixer,
+layer 1 fibgauss) and `hybFD` (reverse), lr 3e-2 and 6e-2, 4 cells, ~94,144 parameters; new flags
+`--layer-mixers fuzzydelta,fibgauss` and `--attn-heads 4`. Run with `--workers 1`.
+
+* **H42:** the best hybrid beats D (1.2534) by more than 0.01 bits per character. ~35%.
+* **H43:** name-recall gain at k = 24 of the best hybrid exceeds D's 0.47 bits by more than 0.3. ~35%.
+* **H44:** order matters: |hybDF - hybFD| > 0.01. ~55%.
+* **H45:** if H42 holds, the hybrid's rulebook (FFN rules plus the attention layer's per-head lag usage) stays readable:
+  rule-ablation of cited rules still costs more than random. ~70%.

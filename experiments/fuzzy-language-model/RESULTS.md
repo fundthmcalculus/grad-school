@@ -1101,3 +1101,8 @@ Single seed per cell, so differences < ~0.01 are not established.
 * **Caveats:** 10M characters is short (attention induction behaviour is known to appear later than loss differences); the attention arms use 4 heads, ctx 512 and FFN mult 2.0 per
   the CPU session's grid, not a tuned configuration; one seed. So the safe reading is "at this budget and size, Fibonacci attention beats dense Gaussian attention by ~0.03 BPC,
   and neither approaches D on loss or on name recall"; not "attention cannot do it". A 30M-char two-seed run of the best attention arm (per the plan's rule) was not run.
+
+## Registered 2026-10-11, before `v11-hybrid`: D plus Fibonacci attention (CPU session; PLAN_FIBONACCI.md stage 2)
+
+H42 the best hybrid beats D by > 0.01 bpc (~35%); H43 its name-recall gain at k = 24 exceeds D's 0.47 by > 0.3 bits (~35%);
+H44 layer order matters, |hybDF - hybFD| > 0.01 (~55%); H45 the hybrid's cited FFN rules stay causal (~70%).
