@@ -1480,3 +1480,16 @@ Rule-ablation of the 1.32M model (`outputs/v9-cpu/ablation_d192_k{8,32}.json`, 8
 (cited cost above the random 95th percentile every time), but the effects are tiny: silencing the 8 most-cited rules costs +0.029 BPC in layer 0 and +0.002 to +0.006 in layers 1-3 (random 95th percentile
 +0.012, +0.001, +0.001, +0.001); 32 rules cost +0.064, +0.008, +0.007, +0.012. They win 22-60% of positions (k = 8) and 45-86% (k = 32). The rulebook is causal but the function is spread over many rules:
 a short rulebook explains little of a 1.3M model.
+
+### Coherence set 7 (CPU session's; seeds 12–13; 24 texts) rated by the GPU session as a second rater (`coherence7_scores_rater_gpu.json`, written before I opened the key or the CPU rater's file, both of which were in my tree)
+
+| model | params | val BPC | GPU rater | CPU rater | mean of raters ± s.e. (n = 8) | plot (GPU / CPU) |
+|---|---|---|---|---|---|---|
+| d = 192, 4 layers (CPU run, 30M chars) | 1,323,904 | 0.8300 | 8.12 | 7.50 | 7.81 ± 0.51 | 1.88 / 1.75 |
+| BPE1024 D, ctx 512, 32 rules, 1B chars (seed 0) | 96,416 | 0.9796 | 7.12 | 6.88 | 7.00 ± 0.41 | 1.75 / 1.38 |
+| same, 300M chars (seed 0) | 96,416 | 0.9976 | 6.50 | 5.75 | 6.12 ± 0.19 | 1.38 / 1.00 |
+
+Inter-rater agreement r = 0.75 (rater means 7.25 and 6.71). **Reading:** in this set the ordering follows size and data (1.32M > 96K@1B > 96K@300M), but the gaps are small against the noise: 1.32M vs 96K@1B = +0.81 (≈ 1.2 s.e.), 96K@1B vs 96K@300M = +0.88 (≈ 2 s.e.).
+Set 6 (same 96K checkpoints, other seeds) had 300M ≥ 1B, so the 1B-over-300M ordering has now appeared in sets 5 and 7 and reversed in set 6; across seven sets and ≈ 20 models the **highest mean total of any model is ≈ 8.2 / 15 with plot ≈ 1.4–2.4 / 5**,
+including a model with 14× the parameters and 0.15–0.17 lower validation loss than the 96K model at the same data. **Nothing measured here approaches the 12 / 3.5 criterion**; a 14× increase in parameters bought ≈ 0.8 total points against set-to-set noise of ≈ 2.
+The 1.32M model saw only about 7 tokens per parameter, so size and data are not separated (the CPU session's caveat); the 1.32M configuration on the 1B-character stream was not run.
