@@ -38,3 +38,11 @@ One seed; lr at 1B is the 30M optimum, not tuned at 1B; the 1B stream is a singl
 
 ## Approval (GPU session, 2026-10-11)
 The GPU session's user approved the run directly: "approve the 1.32M run after the embedding screen". Scheduled: stage 1 (3 x 30M-character lr runs) starts when `v28-emb` finishes (`/tmp/chain4.sh`); stage 2 starts after the stage-1 cost report, at the best stage-1 learning rate. This is one explicit exception to the 99,999-parameter cap, for this run only; the cap stays in force for everything else.
+
+## Stage 1 outcome (GPU, 2026-10-11; 1,323,904 params, d192 x 4 layers, 30M characters, seed 0, warm-up 300)
+| lr | val BPC | train seconds |
+|---|---|---|
+| 1e-2 | 0.8273 | 166.5 |
+| **2e-2** | **0.8214** | 164.9 |
+| 4e-2 | 0.8254 | 165.1 |
+Cost: 30M characters in ~165 s = ~182K characters/s (the JSON's chars_per_sec 57K counts tokens); the 1B-character run extrapolates to ~5,500 s (~1.5 h) plus evaluation. lr 2e-2 chosen (the middle of the grid, so the optimum is bracketed). Stage 2 started automatically (`/tmp/chain5.sh`) at lr 2e-2. Note the 30M result 0.821 is already below the registered 1B range's lower edge (0.70-0.78) only if it keeps falling; the prediction stands unchanged.
