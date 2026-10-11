@@ -528,3 +528,31 @@ register(
         )
     ],
 )
+
+
+# v14-rule-seeds (H49/H50): r32 / r64 / r128 at ctx 512, 30M chars, seeds 2-4 (extends v8-rules / v13-state)
+jobs = []
+for r in (32, 64, 128):
+    for s in (2, 3, 4):
+        c = cell(
+            f"D-ctx512-r{r}_30M_s{s}", D, d=48, sc="8", chars="30e6", seed=s, lr="6e-2"
+        )
+        jobs.append(
+            (
+                c[0],
+                c[1]
+                + [
+                    "--tok",
+                    "bpe1024",
+                    "--warmup",
+                    "100",
+                    "--ctx",
+                    "512",
+                    "--batch",
+                    "16",
+                    "--rules",
+                    str(r),
+                ],
+            )
+        )
+register("v14-rule-seeds", jobs)

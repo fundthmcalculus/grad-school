@@ -1222,3 +1222,25 @@ Both raters find no gain from the 1.05 -> 1.00 BPC improvement, and every model 
 `v13-state` verified from the records (ctx 512, 30M chars, 2 seeds): r64 1.1113 (1.1083, 1.1143), r128 1.0979 (1.1040, 1.0917), against r32 1.1125.
 H46 (r64 beats r32 by > 0.005) refuted: 0.0012. H47 (diminishing returns) refuted in the other direction: r128 gains 0.0134 over r64, so more
 state keeps helping once past 64 (102,560 and 114,848 parameters; non-monotone, 2 seeds, so r128 is the thing to confirm before believing the curve).
+
+## Registered 2026-10-11, before `v14-rule-seeds`: are the rule-count steps real? (GPU session)
+
+`v13-state` found r32 → r64 −0.0012 and r64 → r128 −0.0134 on two seeds, a non-smooth curve. Same config as `v8-rules` / `v13-state` (BPE1024 D d = 48, ctx 512 / batch 16, lr 6e-2, 30M chars), seeds 2–4 added for r32, r64 and r128
+(9 cells, one at a time, ~100 s each). Pooled with seeds 0–1 this gives five seeds per rule count.
+* **G49.** With five seeds, r128 beats r32 by ≥ 0.005 BPC (a real gain of the 2-s.e. kind, using `flm.compare`'s rule). *(~65%.)*
+* **G50.** With five seeds, r64 is within 0.005 of r32 (the smooth curve was a two-seed artefact, or r64 is truly no better). *(~55%.)*
+* The cap: r64 (102.6K) and r128 (114.8K) exceed 100K; this is a question about the relaxed-cap track (≤ 165K) and about the shape of the rule-count curve, not a new sub-100K model.
+
+### Outcome `v14-rule-seeds` (G49 / G50; BPE1024 D d = 48, ctx 512 / batch 16, lr 6e-2, 30M chars, seeds 0–4 pooled from `v8-rules`, `v13-state`, `v14-rule-seeds`)
+
+| rules per head | params | val BPC, mean ± s.e. (sd), n = 5 | per-seed |
+|---|---|---|---|
+| 32 | 96,416 | 1.1095 ± 0.0048 (0.0107) | 1.112 1.113 1.108 1.093 1.122 |
+| 64 | 102,560 | 1.1082 ± 0.0034 (0.0077) | 1.108 1.114 1.106 1.097 1.116 |
+| 128 | 114,848 | 1.1002 ± 0.0031 (0.0068) | 1.104 1.092 1.101 1.095 1.109 |
+
+Differences (flm.compare-style rule, real if |Δ| > 2 s.e.): r128 − r32 = −0.0093 (2 s.e. 0.0114) within noise; r64 − r32 = −0.0013 (0.0118) within noise; r128 − r64 = −0.0080 (0.0092) within noise.
+**G49 refuted** (the r128 gain is a point estimate of 0.009 but not a real effect at five seeds). **G50 supported** (r64 is within 0.005 of r32).
+**Correction to my own earlier claim:** the "r32 seed spread of 0.0004" and "gain outside seed noise" from the two-seed `v8-rules` cell were a two-seed fluke; r32's five-seed sd is 0.0107 (seed 3 at 1.093, seed 4 at 1.122).
+What does survive: ctx 512 + 32 rules (mean 1.1095, n = 5) vs the ten-seed ctx-256 / 16-rule baseline (1.1291 at lr 6e-2): −0.0196, ≈ 4 standard errors, so that combination does beat the baseline (the two changes are not separated).
+The rule count from 32 to 128 is a trend of about −0.009 that five seeds cannot confirm.
