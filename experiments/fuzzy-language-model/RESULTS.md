@@ -1281,6 +1281,21 @@ Sanity check: S023 (A) and S029 (D) are character-identical texts (the 4-gram bl
 i.e. it damages grammar more than it removes loops. **Reading:** the baseline decoding is already the best of the four; coherence at this model size is not limited by the sampler. Noise ±1.5; n = 8 per arm, so only the
 C/B-versus-A gaps (≈ 2 totals) are readable; one rater; not independently graded (the CPU session may re-grade `coherence3_blind.json`; the key is withheld until then).
 
+## Outcome of the 251K CPU run (CPU session, 2026-10-12; user-approved, my host only; plan in DECISIONS.md D1-D2)
+
+D at d 96, 2 layers (251,168 parameters), BPE1024, ctx 512, batch 16, lr 3e-2 (untuned at this size), 30M characters, seed 0, trained on CPU
+(8 threads, 38 minutes): **0.9700 BPC** (`outputs/v9-cpu/d96-L2_30M_s0.json`). For comparison at the same 30M characters, the 93K model scores 1.1232 (ctx 512)
+and 1.1291 (ctx 256, ten seeds); the 93K model needed 300M characters to reach 0.9976. So 2.7x the parameters is worth more loss than 10x the data.
+
+Blind coherence (set 4, `report/coherence4_*`, fresh seeds 6-7, 3 models x 8 texts, **one rater**: the CPU session, scores written before the key was opened;
+the second rater was not available overnight): totals /15, plot /5: 251K at 30M 6.75 +/- 0.75, plot 1.38; 93K at 30M (ctx 256) 7.00 +/- 0.50, plot 1.25;
+93K at 300M (0.9976 BPC) 8.25 +/- 0.49, plot 1.75. **No coherence gain from 2.7x the parameters at 0.15 BPC lower loss.** The registered predictions (D2): plot within 0.5
+of the control (supported: +0.13), BPC at least 0.04 lower (supported: 0.153). The decision rule (plot up by 0.5 or more means size is the lever) did not fire.
+
+Rule-ablation (`outputs/v9-cpu/ablation.json`): cited rules are still causal in both layers (layer 0: +0.099 cited vs random p95 +0.028; layer 1: +0.014 vs +0.008), but with 144
+FFN rules per layer the 8 most-cited rules win only 23% and 35% of positions (72 rules: 53% and 56%) and removing them costs far less (+0.099 vs +0.387 in layer 0).
+So the rulebook stays causal but a short rulebook explains less of the model as the rule count grows.
+
 ## Registered 2026-10-11, before `v12-long512` seed 1: is the 0.9976-BPC headline a one-seed fluke?
 
 Same config as `v12-long512` (BPE1024 D d = 48, 32 rules per head, ctx 512 / batch 16, lr 6e-2, 300M chars), seed 1, saved. The seed-0 run scored 0.9976; the five-seed 30M-char spread of this configuration is sd 0.011.
