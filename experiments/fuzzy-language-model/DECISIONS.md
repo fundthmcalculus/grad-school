@@ -79,3 +79,9 @@ You asked me to take every decision, so these are decided rather than left open.
   of set-to-set noise. The conclusion in D6/D7 stands: the criterion is not met and the effect of size is not separated from data.
 * **Delegation:** I sent the GPU session the request to put the 1.32M x 1B-character run to its user (cell, flags, and the fact that it is above its cap), and said it should run it only if approved. The GPU session had already
   said it will not run it without that approval, so it is waiting on you (and on whoever sets that session's cap). If it is declined, the record reads "not tested above 165K parameters."
+
+## D9 (2026-10-11): correction and new direction from the user
+* **Correction:** the GPU run the user started is **3B characters on the 96K model** (`v18-3b`, about 2.2 hours; sizing run `v18-3b-size`: 1.1052 BPC at 30M characters in 82 s), not the 1.32M configuration on 1B characters. I had assumed the latter;
+  my progress page said so and is corrected. The 1.32M x 1B request to the GPU session is moot.
+* **User instruction relayed by the GPU session:** focus on truly tiny models and make nothing larger yet. I am following it: no further CPU runs above 96K parameters, and the 251K and 1.32M CPU results stay on record as evidence only.
+* **Next, inside that scope:** when `v18-3b` finishes, rate its coherence set blind as second rater, refresh the progress page (https://claude.ai/artifact/SEDQDg6ZPvBeHZZth515kP), and record whether 3B characters moves blind coherence.
