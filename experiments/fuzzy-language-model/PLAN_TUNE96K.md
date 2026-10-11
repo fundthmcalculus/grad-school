@@ -75,3 +75,16 @@ Reference d 48 x 2 layers: 96,416. d 40 x 3 layers: 93,308. d 56 x 1 layer: 88,0
 tsk-dim 8: 93,344; tsk-dim 24: 99,488. FFN mult 1.0: 90,224; FFN mult 2.0: 102,608 (over cap, excluded). shortconv 4: 96,032; shortconv 16: 97,184.
 The in-cap candidates for the capacity screen are therefore: (d 40, L 3), (d 56, L 1), heads 4/16, tsk-dim 8/24, FFN mult 1.0, shortconv 4/16.
 Note the cap leaves about 3,600 parameters unspent in the reference; tsk-dim 24 (99,488) is the only single-knob move that spends nearly all of them.
+
+## Outcome `v19-small` (CPU, 4M characters, seeds 0-1, paired with the pilot's base_s0/s1 = 1.4220 / 1.4399; 8 jobs, 740-870 s each)
+Paired differences (variant - base; negative = better), seed 0 / seed 1:
+
+| knob | delta s0 | delta s1 | registered rule (same sign, mean > 0.010) | prediction |
+|---|---|---|---|---|
+| lr floor 0.0 | +0.0107 | +0.0098 | **worse by 0.010** (mean 0.0103, just over the line) | predicted better: **wrong** |
+| beta2 0.95 | -0.0024 | -0.0044 | not resolved (mean -0.003) | predicted better: not confirmed |
+| lr 4e-2 | +0.0011 | +0.0053 | not resolved | predicted worse: not confirmed |
+| lr 9e-2 | -0.0094 | -0.0098 | not resolved by the rule (mean -0.0096, consistent sign) | predicted worse: **wrong direction** |
+
+**Reading.** At 4M characters a higher lr (9e-2) looks better and a lower floor looks worse; both are the usual short-budget behaviour (a short run is dominated by early progress, so the schedule tail matters less and a hotter lr pays),
+and neither is claimed for the 30M-1B regime where 6e-2 was the measured optimum. The two predictions that were wrong are recorded as wrong. `v19-optA30` (GPU, 30M characters, 3 seeds) is the test that counts.
