@@ -1,0 +1,142 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 4000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 4,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-pilot\\base_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 155,
+ "chars_seen": 4010100,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.42199,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   38,
+   1.89087
+  ],
+  [
+   76,
+   1.65331
+  ],
+  [
+   114,
+   1.54045
+  ],
+  [
+   152,
+   1.42743
+  ],
+  [
+   155,
+   1.42199
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3706
+  ],
+  [
+   50,
+   8.1268
+  ],
+  [
+   100,
+   6.2495
+  ],
+  [
+   150,
+   5.2795
+  ],
+  [
+   154,
+   5.2182
+  ]
+ ],
+ "train_seconds": 694.25,
+ "wall_seconds": 974.41,
+ "chars_per_sec": 1829,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 4,
+ "device": "cpu",
+ "device_name": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big warm bird. \nThe little boy took the shike. Then, she was sp need to set. He would be more and pushed to play with the window. Kitty and her friend to go back to the vitchen. So, she poing his box. He was very slument he decided to gliske up. They played with the srms and sand and each other. They had a lot of fun day.\nMax thought about her ant likeso and fulls. He decided to make your toys in the tree. But when the oven is a special set. He thanks a bone. But Mrere are you for it and can do all it. Tho is a big hug.\n<|eot|>\nOnce upon a time, there was a little cat named Bob! Tim lived in a small friend. Onen was both store and found a red buck in. The pare tike were very brave and a new friend. One day, her friend, playing, he saw a trip in the box. One day, the dog was a small boy named Tim. Tim was very happy and tried to play. He went for his friends, but he would jourse his friends to play in the park. Tom was so happy to play with the town.\nOne day, Tim showed the marray",
+ "rule_init": {},
+ "ngram_init": {}
+}

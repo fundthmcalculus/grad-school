@@ -61,6 +61,11 @@ def get_args(argv=None):
     p.add_argument("--lr", type=float, default=3e-3)
     p.add_argument("--wd", type=float, default=0.01)
     p.add_argument("--warmup", type=int, default=200)
+    p.add_argument(
+        "--lr-floor", type=float, default=0.1, help="final lr as a fraction of --lr"
+    )
+    p.add_argument("--beta2", type=float, default=0.98)
+    p.add_argument("--clip", type=float, default=1.0, help="grad-norm clip (0 = off)")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--threads", type=int, default=1)
     p.add_argument(
@@ -305,14 +310,16 @@ def main(argv=None):
             {"params": other_p, "weight_decay": 0.0},
         ],
         lr=a.lr,
-        betas=(0.9, 0.98),
+        betas=(0.9, a.beta2),
     )
 
     def lr_at(s):
         if s < a.warmup:
             return a.lr * (s + 1) / a.warmup
         frac = (s - a.warmup) / max(1, steps - a.warmup)
-        return a.lr * (0.1 + 0.9 * 0.5 * (1 + math.cos(math.pi * frac)))
+        return a.lr * (
+            a.lr_floor + (1 - a.lr_floor) * 0.5 * (1 + math.cos(math.pi * frac))
+        )
 
     hi = len(train) - a.ctx - 2
     curve, evals = [], []
@@ -354,7 +361,8 @@ def main(argv=None):
             loss_opt = loss
         opt.zero_grad(set_to_none=True)
         loss_opt.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        if a.clip > 0:
+            torch.nn.utils.clip_grad_norm_(model.parameters(), a.clip)
         opt.step()
         if ema_model is not None:
             with torch.no_grad():
