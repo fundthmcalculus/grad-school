@@ -44,3 +44,5 @@ One seed per size; coherence is 8 prompts x 2 raters of one model family (a huma
 owed); BPC is not coherence, so the ladder is judged by the graded text, not by validation loss alone.
 
 **Update (user, 2026-10-11):** keep to story size for now and look at Fibonacci attention (PLAN_FIBONACCI.md). Stage 2 (`v9-*`, the 0.25M-7M size ladder) is **on hold**: do not run it until the user releases it. The success criteria stand.
+
+**Update 2026-10-12 (CPU session): stage 2 released.** The hold was my reading of "keep it to story size" (context length, not parameters). The evidence since: at ~95K parameters, ctx 512, 300M characters, 0.9976 BPC, the model's blind coherence is no better than the 1.02-BPC model (rater 1: 7.62 vs 8.12; set-to-set noise about +/-1.5), and neither context, vocabulary, Fibonacci attention nor hybrids moved plot. Parameter count is the one lever not yet tried, so `v9-lr` then `v9-size` (ctx 512, one story) are the next runs. Run `v9-lr` to completion, then start `v9-size` in a new process (it reads the lr at load). `--workers 1`.
