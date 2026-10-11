@@ -998,3 +998,39 @@ all of it was graded.
 between 1.28 and 1.02 (extrapolating it to a "good" score of 12–13 would need ≈ 0.9 BPC; a guess, not a measurement).
 **Caveats:** one rater, who is also the author's model (no inter-rater check, preference for repetition-free text); n = 8 per model, so differences below ~1.5
 totals are not established; one sampling setting; the 600-character window; BPC for the BPE1536 row is the 2-seed 30M mean (1.1205), for the graded seed-0 checkpoint 1.122.
+
+> Naming note: the GPU session's batch-32 context test below is `v8a-ctx` (hypotheses G29 / G29b). The CPU session's `v8-ctx` grid and its H29 (`PLAN_CONTEXT.md`) are a different experiment.
+
+## Registered 2026-10-11, before `v8a-ctx`: does a longer context help (plot needs longer memory)?
+
+Coherence grading (above) found plot sense the weakest axis. The BPE1024 model reads 256 tokens ≈ 900 characters; TinyStories are often longer. Cells:
+BPE1024 D d = 48, 30M chars, lr 3e-2, warm-up 100, seeds 0–1, context ∈ {128, 512} tokens (baseline: 256 tokens, 1.1292 at lr 3e-2 two seeds; 1.1291 ten seeds
+at lr 6e-2). The validation metric is the same bits per character on the same text, but its windows are `ctx`-long (non-overlapping), so a longer-context model is also evaluated
+with a longer window; the comparison is "best model you can build with this context", not "same model, more context at test time".
+* **G29.** ctx 512 beats ctx 256 by ≥ 0.01 BPC, and ctx 128 is worse than ctx 256 by ≥ 0.02. *(~65% for both.)* *Basis:* in-context learning on a short
+  story gets better with more context; the delta-rule state decays (data-dependent) so the gain may flatten.
+* A coherence re-grade of the 512 model is run only if G29's first part holds.
+
+### Outcome `v8a-ctx` as registered (30M chars, 2 seeds, batch 32)
+
+| context | val BPC | steps |
+|---|---|---|
+| 128 tokens | 1.1357 ± 0.0015 | ≈ 2300 |
+| 256 tokens (baseline) | 1.1292 (2 seeds) | ≈ 1160 |
+| 512 tokens | 1.1570 ± 0.0020 | ≈ 580 |
+
+**G29 refuted as registered** (512 is worse by 0.028, not better by 0.01; 128 is worse by only 0.007, not by ≥ 0.02). **But the design is confounded:** at a fixed
+character budget and batch size, doubling the context halves the number of optimizer steps (≈ 580 vs 1160), and the warm-up/cosine schedule is the same. So this
+cannot separate "longer context hurts" from "fewer updates hurt". Registered amendment, **G29b**: hold tokens per step constant (ctx 512 with batch 16, ≈ 1160 steps, the
+same as the 256 baseline), 2 seeds; if ctx 512 is then ≥ 0.01 better than 1.1292, the first run's loss was the step count, not the context. *(~45%.)*
+
+### Outcome `v8-ctx-b16` (G29b: ctx 512, batch 16, 1160 steps = the ctx-256 baseline's step count; 30M chars, 2 seeds)
+
+ctx 512: **1.1226 ± 0.0034** (1.126 / 1.119) against ctx 256: 1.1292, a gain of 0.0066. **G29b missed (needed ≥ 0.01; predicted ~45%).** It does settle the confound:
+the batch-32 ctx-512 run's 1.1570 was a step-count effect (580 steps), not a context effect; with steps matched the longer context is slightly *better*, by about
+1.5–2 seed standard errors (not established). ctx 128 at batch 32 (2× the steps) was only 0.007 worse than 256, so context length is a weak lever for BPE1024 D
+at this size; the validation windows also lengthen with ctx, which flatters the longer-context models somewhat.
+
+**Operational finding (2026-10-11):** two concurrent `ctx 512 / batch 16` jobs ran > 40 min with no first eval and ~11 GB VRAM, while the same cell alone takes
+**86 s**. On this laptop GPU, running heavy cells concurrently can stall everything (VRAM spill); run long-context or large-batch cells **one at a time**.
+(Earlier 4-way concurrent batch-32 ctx-512 jobs did finish, so the failure is not deterministic.)

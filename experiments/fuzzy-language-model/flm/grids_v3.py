@@ -445,3 +445,52 @@ for k, (tok, d, h) in (
             )
         )
 register("v7-confirm", jobs)
+
+
+# v8a-ctx (G29): context length 128 / 512 tokens, BPE1024 D d=48, 30M chars, 2 seeds, saved
+jobs = []
+for ctx in (128, 512):
+    for s in (0, 1):
+        c = cell(
+            f"D-d48-bpe1024-ctx{ctx}_30M_s{s}", D, d=48, sc="8", chars="30e6", seed=s
+        )
+        jobs.append(
+            (
+                c[0],
+                c[1]
+                + [
+                    "--tok",
+                    "bpe1024",
+                    "--warmup",
+                    "100",
+                    "--ctx",
+                    str(ctx),
+                    "--save-model",
+                ],
+            )
+        )
+register("v8a-ctx", jobs)
+
+
+# v8a-ctx-b16 (G29b; sweep dir stays v8-ctx-b16): ctx 512 at batch 16 so tokens per step and step count match the 256 baseline
+jobs = []
+for s in (0, 1):
+    c = cell(f"D-d48-bpe1024-ctx512b16_30M_s{s}", D, d=48, sc="8", chars="30e6", seed=s)
+    jobs.append(
+        (
+            c[0],
+            c[1]
+            + [
+                "--tok",
+                "bpe1024",
+                "--warmup",
+                "100",
+                "--ctx",
+                "512",
+                "--batch",
+                "16",
+                "--save-model",
+            ],
+        )
+    )
+register("v8-ctx-b16", jobs)
