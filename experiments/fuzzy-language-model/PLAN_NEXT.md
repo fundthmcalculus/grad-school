@@ -49,3 +49,13 @@ Registered before running: (1) `ppmi`/`ppmip` give a head start that is gone by 
 
 ### Item 4 coherence follow-up (CPU session, set 9, 2026-10-11; one rater, scores before the key)
 Baseline (v24-diag/random-save_s0) 7.25/15 (plot 1.50); repeat-weighted 6.62; unlikelihood 5.62 (plot 1.12). Unlikelihood cut repeats ~20% yet scored ~1.6 lower (~2 SE, one checkpoint per arm, one rater). Fewer repeats did not mean better stories here, so repetition looks like a symptom, not the bottleneck; unlikelihood is not adopted. A second rater on report/coherence9_blind.json would firm this up (the key is pushed, so a rater here is less blind). Files: report/coherence9_*, DECISIONS.md D13.
+
+### Item 6 outcome (`v28-emb`, GPU, 30M chars, seeds 0-4; random baseline 1.1095)
+| arm | BPC mean ± sd | paired vs random | seeds better |
+|---|---|---|---|
+| `ppmi` (successor vectors init) | 1.1057 ± 0.0041 | −0.0037 | 3/5 |
+| `ppmip` (predecessor vectors init) | 1.1039 ± 0.0064 | −0.0056 | 4/5 |
+| `std05` (init x0.5) | 1.1168 ± 0.0050 | +0.0073 | 1/5 |
+| `std20` (init x2) | 1.1153 ± 0.0088 | +0.0058 | 1/5 |
+| `nowd` (no weight decay on embedding) | 1.1111 ± 0.0102 | +0.0016 | 2/5 |
+Predictions: all within ±0.01 — right for every arm; PPMI win rule (>= 0.01 better on >= 4/5 seeds) — not met (best −0.0056, one seed +0.021). `nowd` I expected slightly better; it is slightly worse (noise). Embedding init and scale and decay are null at this size; the best arm (predecessor-vector init) is a ranking of -0.006 at the seed spread (sd ~0.006-0.010), not a claim. Remaining untested embedding ideas: frequency-tiered widths (new model code), untied output (over the cap).

@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v28-emb\\std05_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.12038,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.19341
+  ],
+  [
+   100,
+   1.58853
+  ],
+  [
+   200,
+   1.43747
+  ],
+  [
+   300,
+   1.3632
+  ],
+  [
+   400,
+   1.3176
+  ],
+  [
+   500,
+   1.27656
+  ],
+  [
+   600,
+   1.23711
+  ],
+  [
+   700,
+   1.20546
+  ],
+  [
+   800,
+   1.17882
+  ],
+  [
+   900,
+   1.15832
+  ],
+  [
+   1000,
+   1.13834
+  ],
+  [
+   1100,
+   1.12473
+  ],
+  [
+   1160,
+   1.12038
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.0899
+  ],
+  [
+   50,
+   8.0975
+  ],
+  [
+   100,
+   6.2634
+  ],
+  [
+   150,
+   5.3737
+  ],
+  [
+   200,
+   4.8826
+  ],
+  [
+   250,
+   4.6291
+  ],
+  [
+   300,
+   4.4505
+  ],
+  [
+   350,
+   4.3381
+  ],
+  [
+   400,
+   4.2295
+  ],
+  [
+   450,
+   4.1759
+  ],
+  [
+   500,
+   4.0994
+  ],
+  [
+   550,
+   4.052
+  ],
+  [
+   600,
+   3.9766
+  ],
+  [
+   650,
+   3.922
+  ],
+  [
+   700,
+   3.8811
+  ],
+  [
+   750,
+   3.8353
+  ],
+  [
+   800,
+   3.7843
+  ],
+  [
+   850,
+   3.7322
+  ],
+  [
+   900,
+   3.6975
+  ],
+  [
+   950,
+   3.6759
+  ],
+  [
+   1000,
+   3.6385
+  ],
+  [
+   1050,
+   3.6017
+  ],
+  [
+   1100,
+   3.588
+  ],
+  [
+   1150,
+   3.5685
+  ],
+  [
+   1159,
+   3.5683
+  ]
+ ],
+ "train_seconds": 79.36,
+ "wall_seconds": 93.45,
+ "chars_per_sec": 119736,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Spient. She was happy and loved to teach her.\nOne day, Sprediby puts on the big tree to move. She was beautiful and always reliabed her bedible gature. She was ready to see how to slide. Sandy was very thirts.\nAs the frog had a big, soon was very pretty. But he was very careful. He saw something a family in a bowboss and found a bed. Spippy was very happy. Spow could help a special set.\nShe saw a bed. But Mady said, \"Tim, can you help me borbo?\"\nSara and Cpeted, \"Can I help you find the monstasion?\" \nSara ready for a friend, Sam and Sam were gone. Tom and Sam decided to make a new friend. They were happy to see her family and had green. They both tripped and wanted to play together. They had so much fun.\nThey all enjoyed on the day. They barted down and went home. They were so happy. They played with their vegetable together and had fun. They had fun and they played together all day.\n<|eot|>\nOnce upon a time",
+ "rule_init": {},
+ "ngram_init": {}
+}
