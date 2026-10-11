@@ -1076,3 +1076,28 @@ User direction: keep to story size, try local-plus-sparse-far memory. Prediction
 fibgauss-L8 within 0.01 of dense (~55%); L4 worse / L16 no better (~50%); fibsoftmax-L8 within 0.01 of fibgauss-L8 (~55%);
 name recall at k = 12 close to dense but lower at non-Fibonacci lags (~40%); best attention arm does not beat D (~60%).
 v9 (size ladder) is on hold; v8-ctx trimmed to ctx 256/512.
+
+## Outcome `v10-fib` (GPU session, 2026-10-11): Fibonacci-lag attention vs dense Gaussian attention vs D (CPU session's grid, PLAN_FIBONACCI.md H37–H41)
+
+BPE1024, 10M chars, seed 0, ctx 512 / batch 16 for the attention arms (D at ctx 256), all ~93–95K params, warm-up 100; **run one cell at a time** (each takes 6–36 s alone).
+Single seed per cell, so differences < ~0.01 are not established.
+
+| arm | params | lr 2e-2 | lr 6e-2 | best |
+|---|---|---|---|---|
+| **D (fuzzy delta)** | 93,344 | 1.2772 | 1.2534 | **1.2534** |
+| fibgauss L = 16 | 94,944 | 1.3321 | 1.3209 | 1.3209 |
+| fibgauss L = 8 | 94,944 | 1.3406 | 1.3227 | 1.3227 |
+| fibgauss L = 4 | 94,944 | 1.3385 | 1.3242 | 1.3242 |
+| fibsoftmax L = 8 | 94,896 | 1.3450 | 1.3344 | 1.3344 |
+| dense Gaussian attention | 94,944 | 1.3602 | 1.3536 | 1.3536 |
+
+* **H37 refuted** (predicted fibgauss-L8 within 0.01 of dense): Fibonacci is *better* than dense by **0.031** BPC at the best lr (and by 0.020 at lr 2e-2).
+* **H38 refuted:** L4 is worse than L8 by only 0.0015 (needed > 0.01); L16 is better than L8 by 0.0018 (within the 0.01 band, as predicted for that half).
+* **H39 refuted, marginally:** fibsoftmax-L8 is 0.0117 worse than fibgauss-L8 (needed ≤ 0.01).
+* **H41 supported:** the best attention arm (1.3209) is 0.068 behind D (1.2534).
+* **H40 not informative:** name-recall gain at k = 12 (bits; `flm.context_probe`, 56 pairs): dense 0.011, fibgauss-L8 0.000 → within 0.3 of each other as predicted, but
+  **both are ≈ 0 at every k** (k = 0: 0.107 / 0.133; k ≥ 6: ≤ 0.04). **D: 2.10 (k = 0), 1.36 (k = 3), 0.85 (k = 12), 0.47 (k = 24).** The 10M-char attention models have not learned
+  to retrieve a name at all; the delta-rule D has, at 10M chars and ctx 256.
+* **Caveats:** 10M characters is short (attention induction behaviour is known to appear later than loss differences); the attention arms use 4 heads, ctx 512 and FFN mult 2.0 per
+  the CPU session's grid, not a tuned configuration; one seed. So the safe reading is "at this budget and size, Fibonacci attention beats dense Gaussian attention by ~0.03 BPC,
+  and neither approaches D on loss or on name recall"; not "attention cannot do it". A 30M-char two-seed run of the best attention arm (per the plan's rule) was not run.

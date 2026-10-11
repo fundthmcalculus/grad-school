@@ -1,0 +1,149 @@
+{
+ "args": {
+  "mixer": "fibgauss",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 4,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "fixed",
+  "ctx": 512,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 10000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v10-fib\\fibgauss-L8-lr6e-2_10M_s0.json",
+  "save_model": true,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 4,
+  "mixer": "fibgauss",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 8,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8
+ },
+ "params_total": 94944,
+ "params_nonemb": 45792,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.3227,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.65142
+  ],
+  [
+   192,
+   1.4882
+  ],
+  [
+   288,
+   1.38337
+  ],
+  [
+   384,
+   1.32247
+  ],
+  [
+   387,
+   1.3227
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3862
+  ],
+  [
+   50,
+   8.4202
+  ],
+  [
+   100,
+   6.503
+  ],
+  [
+   150,
+   5.5422
+  ],
+  [
+   200,
+   5.0497
+  ],
+  [
+   250,
+   4.7552
+  ],
+  [
+   300,
+   4.5405
+  ],
+  [
+   350,
+   4.3823
+  ],
+  [
+   386,
+   4.298
+  ]
+ ],
+ "train_seconds": 5.06,
+ "wall_seconds": 6.82,
+ "chars_per_sec": 627114,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and there was a little girl named Sue. Sue loved to play outside. One day, she saw a little girl named Lily. Sue was sad. She wanted to play with her home. She decided to play with her friend, Sue.\nLily felt dark. She picked up the polf and said. He wanted to slide him held. He did not know what it.\nAs the frog came and saw the sun. He was not hurt his mom.\nThe bird said, \"Wow, I can see what?\" His friend said, \"If you for your tory?\" Tom said.\nMax said, \"Okay, Ben, thank you. I will sing your pres.\" Tom and Tom cannic it. They hoped the peauggin with your mout food. It is a big, monstued on the toys!\" \n\" no, friend. You are very spotliane anymore. I have to go up and can make care to use yourself.\" The counted a big, pusho.\nBut then if he go inside and down the ground.\nSeke was scared of bed, but he did not find anyone. He saw the pips and said, \"We are you having be an umbor!\" Tim and Sue were surprised. But they",
+ "rule_init": {},
+ "ngram_init": {}
+}
