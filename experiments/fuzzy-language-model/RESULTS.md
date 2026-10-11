@@ -1299,3 +1299,9 @@ Same config as `v12-long512` (BPE1024 D d = 48, 32 rules per head, ctx 512 / bat
 Inter-rater agreement on totals r = 0.63 (lower than sets 1–2: 0.83), rater means 6.88 and 6.78. **Correction to my one-rater reading above:** with two raters the ordering A > D > B > C survives for the mean, but the gaps shrink
 (A − C = 1.5 with s.e. ≈ 0.85; A − D = 0.5) and rater 2 put D marginally *above* A (7.25 vs 7.00). So "the baseline sampler is best" is a ranking that is **not established**; what two raters do support is that none of the three alternatives is better than
 the baseline, and that the repetition penalty and the higher temperature are, if anything, worse (≈ 1.2–1.5 totals, ~2 s.e.). **DC1 stays refuted** (neither C nor D beats A by ≥ 1 in the mean); DC2 stays supported; DC3 stays refuted (plot A 1.88 vs 1.38–1.62).
+
+### Outcome `v12-seed1` (G32; BPE1024 D d = 48, 32 rules/head, ctx 512 / batch 16, lr 6e-2, 300M chars, seed 1; 96,416 params)
+
+Seed 1: **1.00528** (curve 25 / 50 / 75 / 100%: 1.1367 / 1.0850 / 1.0352 / 1.0053). **G32 supported** (≤ 1.010). Two seeds: 0.9976 and 1.0053, **mean 1.0015 ± 0.0039 (sd 0.0054)**.
+**Correction to the headline:** "below one bit per character" (0.9976) was the better of two seeds; the honest two-seed figure is **≈ 1.00 BPC (1.0015)**, i.e. "about one bit per character at 96,416 parameters". The earlier ctx-256 / 16-rule 300M run
+(1.0212, one seed, lr 3e-2) is 0.02 behind the mean, about 4 standard deviations of the seed spread of this configuration, so the improvement over it is probably real but is a two-vs-one-seed comparison.

@@ -556,3 +556,37 @@ for r in (32, 64, 128):
             )
         )
 register("v14-rule-seeds", jobs)
+
+
+# v12-long512 seed 1 (G32): second seed of the 300M ctx-512 / 32-rule run
+_s1 = cell(
+    "D-d48-bpe1024-ctx512-r32_300M_s1",
+    D,
+    d=48,
+    sc="8",
+    chars="300e6",
+    seed=1,
+    lr="6e-2",
+)
+register(
+    "v12-seed1",
+    [
+        (
+            _s1[0],
+            _s1[1]
+            + [
+                "--tok",
+                "bpe1024",
+                "--warmup",
+                "100",
+                "--ctx",
+                "512",
+                "--batch",
+                "16",
+                "--rules",
+                "32",
+                "--save-model",
+            ],
+        )
+    ],
+)
