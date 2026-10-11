@@ -1305,3 +1305,24 @@ the baseline, and that the repetition penalty and the higher temperature are, if
 Seed 1: **1.00528** (curve 25 / 50 / 75 / 100%: 1.1367 / 1.0850 / 1.0352 / 1.0053). **G32 supported** (≤ 1.010). Two seeds: 0.9976 and 1.0053, **mean 1.0015 ± 0.0039 (sd 0.0054)**.
 **Correction to the headline:** "below one bit per character" (0.9976) was the better of two seeds; the honest two-seed figure is **≈ 1.00 BPC (1.0015)**, i.e. "about one bit per character at 96,416 parameters". The earlier ctx-256 / 16-rule 300M run
 (1.0212, one seed, lr 3e-2) is 0.02 behind the mean, about 4 standard deviations of the seed spread of this configuration, so the improvement over it is probably real but is a two-vs-one-seed comparison.
+
+## Registered 2026-10-11, before `v15-share`: does weight-shared depth buy capability at a fixed parameter count?
+
+Same parameters, more compute: BPE1024 D d = 48, ctx 512 / batch 16, 32 rules per head, lr 6e-2, 30M chars, seeds 0–1, with **2 unique blocks applied 2× (baseline, the five-seed mean is 1.1095), 4× or 6×** (`--layers 4|6 --n-unique 2`). Parameter count stays 96,416
+(only the block weights are counted once). The CPU-phase result on the old zero-order FFN at d = 16 was that BPC improved monotonically with the number of applications.
+* **G33.** Four applications of 2 unique blocks beat the baseline by ≥ 0.01 BPC at 30M chars (the five-seed baseline sd is 0.011, so this means ≈ 2 s.e. of a two-seed mean). *(~40%.)* *Basis:* depth helps in-context mechanisms (a second recurrent
+  layer cost D 0.07 against a single layer), but at d = 48 the extra applications reuse weights tuned for the two-layer stack.
+* **G34.** Six applications are no better than four by more than 0.01 (returns flatten). *(~60%.)*
+* If G33 holds, a 300M run follows and the coherence set is regraded (blind, two raters), since this would be the first in-cap change with a plausible link to multi-step structure rather than just loss.
+
+### Outcome `v15-share` (G33 / G34; BPE1024 D d = 48, ctx 512 / batch 16, 32 rules, lr 6e-2, 30M chars, seeds 0–1; 96,416 params in every cell)
+
+| layer applications of 2 unique blocks | val BPC (seeds) | mean ± s.e. | chars/s |
+|---|---|---|---|
+| 2 (baseline, five seeds, `v14-rule-seeds`) | | 1.1095 ± 0.0048 | ~119K |
+| 4 | 1.121 / 1.122 | 1.1217 ± 0.0004 | ~60K |
+| 6 | 1.119 / 1.129 | 1.1241 ± 0.0052 | ~40K (est.) |
+
+**G33 refuted** (needed ≥ 0.01 better; weight-shared depth is 0.012 *worse* at 4 applications, ≈ 2.5 s.e. of the baseline mean; a modest effect). **G34 supported** (6 is not better than 4; it is 0.002 worse).
+Reusing two blocks more times does not buy capability for D at this size and costs 2–3× the compute; the CPU-phase observation that BPC improved with applications was for the old zero-order FFN at d = 16 and does not carry over.
+No 300M run and no coherence re-grade (registered condition not met).

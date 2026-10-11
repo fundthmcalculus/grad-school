@@ -590,3 +590,41 @@ register(
         )
     ],
 )
+
+
+# v15-share (G33/G34): weight-shared depth, 2 unique blocks applied 4x / 6x, ctx 512 / r32, 30M chars
+jobs = []
+for L in (4, 6):
+    for s in (0, 1):
+        c = cell(
+            f"D-ctx512-r32-share2x{L // 2}_30M_s{s}",
+            D,
+            d=48,
+            sc="8",
+            chars="30e6",
+            seed=s,
+            lr="6e-2",
+        )
+        jobs.append(
+            (
+                c[0],
+                c[1]
+                + [
+                    "--tok",
+                    "bpe1024",
+                    "--warmup",
+                    "100",
+                    "--ctx",
+                    "512",
+                    "--batch",
+                    "16",
+                    "--rules",
+                    "32",
+                    "--layers",
+                    str(L),
+                    "--n-unique",
+                    "2",
+                ],
+            )
+        )
+register("v15-share", jobs)
