@@ -1,6 +1,7 @@
 """GPU screen of the coverage hybrid init (PLAN_BACKWARD.md, `v27-cover`): 30M characters, seeds 0-4, one cell at a time.
 Arms: hyb18g1 (25% built consequent-first, rest random), cov25 (25% built, rest D^2-spread over the layer's inputs),
-cov0 (all rules D^2-spread, no clustering).  References at the same size/seeds: v22-tribble random and data."""
+cov0 (all rules D^2-spread, no clustering).  References at the same size/seeds: v22-tribble random and data.
+"""
 
 import subprocess
 import sys

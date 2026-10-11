@@ -96,7 +96,7 @@ The evidence says the remaining plausible levers are, in order:
 
 * **Parameter cap.** Lifted for the 1.32M x 1B run only (its user approved). Item 3 (the ladder, 0.25M to 7M) would need a further approval from that user.
 * **Human rater.** Who can read the blind sets (they are in `report/`; I can build a rating page in the demo if useful).
-* **Archive pass.** Move the dropped levers' code and plans out of the main tree (list in section 10). I did not do this now because the GPU session's sweeps import code from disk while they run; it is a safe 15-minute job once they finish.
+* **Archive pass:** done on 2026-10-11 for code (see section 10); the finished plans stay in place with banners.
 
 ## 9. What I scheduled
 
@@ -106,5 +106,5 @@ The 1.32M x 1B job is approved and queued on the GPU host behind `v28-emb`; an h
 
 * **Read:** this file; `RESULTS.md` (the record); `DECISIONS.md` (what I did overnight); `README.md` (older overview).
 * **Code kept:** `flm/models.py`, `train.py`, `data.py`, `bpe.py`, `sweep.py`, `compare.py`; explainability `rules.py`, `rule_dist.py`, `rule_reader.py`, `rule_ablation.py`, `rule_explain_eval.py`, `rule_story.py`; measurement `coherence_set.py`, `coherence_auto.py`; demo `demo/`.
-* **Dropped, to archive after the round ends (agreed with the GPU session, 2026-10-11):** the finished plans (`PLAN_CONTEXT.md`, `PLAN_FIBONACCI.md`, `PLAN_RFLM.md`, `PLAN_BACKWARD.md`, `PLAN_TUNE96K.md`) and standalone modules that nothing imports (`ngram.py`, `context_probe.py` if unused by a kept tool, `rep_share.py` after its outcome is cited). **Code the GPU session's sweeps import stays in place**: `flm/run_*.py`, `conseq_first.py`, `rflm_variants.py`, `grids_v*.py`. Their results stay in `RESULTS.md`; nothing is deleted.
+* **Archived (2026-10-11):** the dead levers' code now lives in `archive/` with a README that maps each file to its outcome and says how to restore it (`git mv`). Moved: consequent-first and association initialisation, the cover and hybrid sweeps, the repetition-loss code, the embedding screens, and the RFLM variants with their test. Kept in `flm/` because `train.py` or the grids still need them: `models.py`, `train.py`, `bpe.py`, `data.py`, `sweep.py`, `grids_v*.py`, `ngram.py`, `run_tribble*.py`. The finished plans (`PLAN_CONTEXT.md`, `PLAN_FIBONACCI.md`, `PLAN_RFLM.md`, `PLAN_BACKWARD.md`, `PLAN_TUNE96K.md`) stay in place with status banners because the GPU session cites them.
 * **Data and checkpoints:** `outputs/` (records and committed checkpoints under 5 MB; the 1.32M checkpoint is 5.3 MB and is not committed), `report/` (coherence sets), `data/tinystories/` (tokenizers; training streams are fetched or rebuilt).
