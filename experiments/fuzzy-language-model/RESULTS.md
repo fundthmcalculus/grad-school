@@ -1280,3 +1280,22 @@ Noise reminder: ±1.5 totals set to set; n = 8 per cell, so only differences of 
 Sanity check: S023 (A) and S029 (D) are character-identical texts (the 4-gram block never triggered) and received identical scores. The repetition penalty also produced a degenerate "deep deep deep …" story and artifacts (`???`),
 i.e. it damages grammar more than it removes loops. **Reading:** the baseline decoding is already the best of the four; coherence at this model size is not limited by the sampler. Noise ±1.5; n = 8 per arm, so only the
 C/B-versus-A gaps (≈ 2 totals) are readable; one rater; not independently graded (the CPU session may re-grade `coherence3_blind.json`; the key is withheld until then).
+
+## Registered 2026-10-11, before `v12-long512` seed 1: is the 0.9976-BPC headline a one-seed fluke?
+
+Same config as `v12-long512` (BPE1024 D d = 48, 32 rules per head, ctx 512 / batch 16, lr 6e-2, 300M chars), seed 1, saved. The seed-0 run scored 0.9976; the five-seed 30M-char spread of this configuration is sd 0.011.
+* **G32.** Seed 1 scores ≤ 1.010 (within about 1 sd of seed 0, as the 30M seed spread suggests), so "under 1.01 bits per character at 96K parameters" holds on two seeds. *(~70%.)* A score above 1.02 would mean the headline was a lucky seed and the honest figure
+  is the previous 1.0212 (ctx 256, 16 rules) plus noise.
+
+### `coherence3` with both raters (key published after rater 2 scored; rater 2 = CPU session, blind, `coherence3_scores_rater2.json`)
+
+| strategy | rater 1 | rater 2 | mean of raters ± s.e. (n = 8) | plot (mean of raters, /5) |
+|---|---|---|---|---|
+| A T 0.5 / top-k 10 (baseline) | 8.25 | 7.00 | **7.62 ± 0.65** | 1.88 |
+| D A + 4-gram block | 7.00 | 7.25 | 7.12 ± 0.56 | 1.62 |
+| B T 0.7 / top-p 0.9 | 6.25 | 6.62 | 6.44 ± 0.50 | 1.44 |
+| C A + repetition penalty 1.3 | 6.00 | 6.25 | 6.12 ± 0.55 | 1.38 |
+
+Inter-rater agreement on totals r = 0.63 (lower than sets 1–2: 0.83), rater means 6.88 and 6.78. **Correction to my one-rater reading above:** with two raters the ordering A > D > B > C survives for the mean, but the gaps shrink
+(A − C = 1.5 with s.e. ≈ 0.85; A − D = 0.5) and rater 2 put D marginally *above* A (7.25 vs 7.00). So "the baseline sampler is best" is a ranking that is **not established**; what two raters do support is that none of the three alternatives is better than
+the baseline, and that the repetition penalty and the higher temperature are, if anything, worse (≈ 1.2–1.5 totals, ~2 s.e.). **DC1 stays refuted** (neither C nor D beats A by ≥ 1 in the mean); DC2 stays supported; DC3 stays refuted (plot A 1.88 vs 1.38–1.62).
