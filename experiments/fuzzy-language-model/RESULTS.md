@@ -1197,3 +1197,18 @@ is the same test on the new best model. Layer 0: cited rules +0.387 bits per cha
 rules cost more than the random 95th percentile: the rulebook is causal for the model that gets 0.9976 BPC, as it was for the 100M model
 (+0.226 vs p95 +0.157; +0.096 vs +0.052). One checkpoint, one seed; silencing is not renormalised (this FFN is un-normalised, `--ffn-norm none`).
 Windows: the first 120 x 256 tokens from validation position 900,000, not the whole slice.
+
+### Coherence set 2 with both raters (key published after rater 2 scored; rater 2 = CPU session, blind, wrote `coherence2_scores_rater2.json` before seeing the key)
+
+Rater agreement on totals: r = 0.83 (rater 2 scores ~1.2 lower on average). Mean of the two raters per model (totals out of 15, n = 8 texts each, ± s.e. over texts):
+
+| model | val BPC | rater 1 | rater 2 | mean of raters | plot (mean of raters, /5) |
+|---|---|---|---|---|---|
+| BPE1024 D, ctx 512, 32 rules, 300M | 0.9976 | 7.62 | 6.25 | **6.94 ± 0.30** | 1.69 |
+| BPE1024 D, ctx 256, 300M | 1.0212 | 8.12 | 6.88 | 7.50 ± 0.57 | 1.81 |
+| BPE1024 D, ctx 256, 100M | 1.0548 | 8.12 | 7.12 | 7.62 ± 0.60 | 1.88 |
+
+**G31 refuted by both raters.** The 0.024-BPC gain from ctx 512 / 32 rules does not appear as a coherence gain (the sign is slightly negative, inside noise); plot sense is ≈ 1.7–1.9 / 5 for all three
+at 0.998–1.055 BPC. The CPU session's criterion for "coherent" (a blind total ≥ 12/15 **and** plot ≥ 3.5/5 from both raters, with set-to-set noise ≈ ±1.5) is **not met by any model here**; the best measured
+total across both rounds and both raters is ≈ 9 (rater 1, set 1, a sample that did not replicate on fresh seeds). Rule ablation (CPU session) says the FFN rules the model cites are causal, so the model is
+not "decorating"; it is simply not producing plot at this size.
