@@ -414,3 +414,34 @@ for lr in ("8e-2", "1e-1"):
         c = cell(f"D-lr{lr}_10M_s{s}", D, d=48, sc="8", chars="10e6", seed=s, lr=lr)
         _ed.append((c[0], c[1] + ["--tok", "bpe1024", "--warmup", "100"]))
 register("v6-d-lr-edge", _ed)
+
+
+# v7-vocab (H27): larger vocabularies under 100K at 10M chars, 2 seeds
+_V7 = {
+    "b1536-d40-h8": ("bpe1536", 40, "8"),
+    "b2048-d32-h8": ("bpe2048", 32, "8"),
+    "b1536-d36-h4": ("bpe1536", 36, "4"),
+}
+jobs = []
+for k, (tok, d, h) in _V7.items():
+    for s in (0, 1):
+        c = cell(f"{k}_10M_s{s}", D, d=d, sc="8", chars="10e6", seed=s)
+        jobs.append((c[0], c[1] + ["--heads", h, "--tok", tok, "--warmup", "100"]))
+register("v7-vocab", jobs)
+
+
+# v7-confirm (H28): the two larger-vocabulary winners at 30M chars, 2 seeds, saved
+jobs = []
+for k, (tok, d, h) in (
+    ("b1536-d40-h8", _V7["b1536-d40-h8"]),
+    ("b2048-d32-h8", _V7["b2048-d32-h8"]),
+):
+    for s in (0, 1):
+        c = cell(f"{k}_30M_s{s}", D, d=d, sc="8", chars="30e6", seed=s)
+        jobs.append(
+            (
+                c[0],
+                c[1] + ["--heads", h, "--tok", tok, "--warmup", "100", "--save-model"],
+            )
+        )
+register("v7-confirm", jobs)

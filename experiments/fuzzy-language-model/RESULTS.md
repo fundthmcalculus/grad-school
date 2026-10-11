@@ -925,3 +925,47 @@ at 30M chars the learning rate between 3e-2 and 6e-2 does not matter; the 10M-ch
 **Standing caveats:** one tokenizer (BPE1024), one size (93K), one data budget (30M chars), no 100M/300M ten-seed run, and D trains ≈ 1.5× slower
 per character. The comparison is at equal parameters and equal characters; at equal wall-clock the neural models would see 1.5× more text.
 The character-level claim is a separate, older comparison (2–3 seeds, `v3-final`/`v3-ref`).
+
+## Registered 2026-10-11, before `v7-vocab`: does a bigger vocabulary still help under 100K parameters?
+
+The vocabulary ladder at roughly constant parameters was monotone: 512 (d 56, 86K) 1.334 < 768 (d 48, 81K) 1.308 < 1024 (d 48, 93K) 1.260
+at 10M chars. Same recipe (D architecture, lr 3e-2, warm-up 100, 10M chars, seeds 0–1, 8 heads unless noted) for the sizes that fit:
+BPE1536 d = 40 (93,792), BPE2048 d = 32 (87,840), BPE1536 d = 36 with 4 heads (81,808). Baseline: BPE1024 d = 48, 1.2604.
+* **H27.** The best of the three beats 1.2604 by ≥ 0.02 BPC. *(~35%.)* *Basis:* each step up so far gained 0.03–0.07, but the width falls
+  from 48 to 40 / 32, where the mixer and FFN get thin (dh = 5 or 4 per head) and the embedding is 66–74% of the parameters, so the
+  trend is more likely to turn over here than to continue. A null or a loss would place the optimum at ≈ 1024 under this cap.
+
+### Outcome `v7-vocab` (10M chars, 2 seeds, lr 3e-2, warm-up 100)
+
+| arm | params | val BPC |
+|---|---|---|
+| BPE1536 d = 40, 8 heads | 93,792 | **1.2336 ± 0.0032** |
+| BPE2048 d = 32, 8 heads | 87,840 | 1.2378 ± 0.0012 |
+| BPE1536 d = 36, 4 heads | 81,808 | 1.2715 ± 0.0074 |
+| BPE1024 d = 48 (baseline) | 93,344 | 1.2604 ± 0.0050 |
+
+**H27 supported (predicted ~35%):** the best arm beats the 1024 baseline by 0.027. The trend continued to 1536 and 2048 even though the width fell
+to 40 and 32. 4 heads cost 0.038 (so heads, not just width, matter, as before). 2048 is within 0.004 of 1536 at 6K fewer params, so the optimum
+vocabulary under this cap is somewhere in 1536–2048+; not found.
+
+## Registered 2026-10-11, before `v7-confirm`: do the vocabulary gains hold at 30M chars?
+
+BPE1536 d = 40 and BPE2048 d = 32 (8 heads, lr 3e-2, warm-up 100), 30M chars, seeds 0–1. Reference: BPE1024 d = 48 at 30M, lr 3e-2:
+1.1292 (2 seeds); ten-seed lr 6e-2: 1.1291.
+* **H28.** The better of the two scores ≤ 1.115 at 30M (a gain ≥ 0.014; the 10M gain was 0.027 and gains usually shrink with training).
+  *(~50%.)* If it does, the best sub-100K model changes (and the neural control on the same tokenizer is no longer matched: a neural 1536 reference
+  would be owed before a fuzzy-vs-neural claim at that vocabulary).
+
+### Outcome `v7-confirm` (30M chars, 2 seeds, lr 3e-2, warm-up 100)
+
+| arm | params | val BPC | vs BPE1024 d = 48 (1.1291, ten seeds) |
+|---|---|---|---|
+| BPE1536 d = 40 | 93,792 | **1.1205 ± 0.0012** (1.122 / 1.119) | −0.0086 |
+| BPE2048 d = 32 | 87,840 | 1.1316 ± 0.0026 | +0.0025 |
+
+**H28 missed, narrowly (predicted ~50%):** 1.1205 is not ≤ 1.115. The gain from 1024 → 1536 shrank from 0.027 (10M chars) to 0.009 (30M), and
+2048 lost its 10M edge entirely. D's ten-seed std is 0.0039, so a two-seed 0.009 gap is only about 2 standard errors and is **not** a
+confirmed improvement. Reading: under a 100K cap the vocabulary optimum is ≈ 1024–1536 at 30M chars, and the 10M-char screens overstated
+larger vocabularies (short runs favour tokens that cover more text per step). **The ten-seed-validated headline stays BPE1024 d = 48
+(1.1291 ± 0.0039, beats tuned neural references by 0.027–0.030).** BPE1536 d = 40 is a candidate that would need ten seeds
+and its own neural control to replace it. 100M / 300M numbers for 1536 were not run.
