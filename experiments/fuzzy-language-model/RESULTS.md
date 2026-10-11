@@ -1188,3 +1188,12 @@ Verified from the records: v8-ctx ctx256 1.1324, ctx512 1.1232, ctx512 r32 1.112
   With two seeds per cell and r128's own spread 0.012 (seeds 1.104 / 1.092), the non-monotone shape could be seed noise on r64; a clean reading needs more seeds.
 * **H48 (rulebook concentration) not tested.**
 * **Cap:** r64 and r128 exceed the original 100K cap (102.6K / 114.8K); the user relaxed the cap to ≤ 165K for the bigger-model track. Under 100K the best remains r32 (96,416; 1.1125 at 30M, 0.9976 at 300M).
+### Rule-ablation of the best model (CPU session, 2026-10-12)
+
+`flm.rule_ablation` on `outputs/v12-long512/D-d48-bpe1024-ctx512-r32_300M_s0.pt` (0.9976 BPC on the full validation slice; 1.0484 on the
+120 x 256-token windows used here), 8 rules silenced per layer, 20 random draws. Registered earlier for the 100M model only; this
+is the same test on the new best model. Layer 0: cited rules +0.387 bits per character (they win 52.7% of positions), random 8 rules
++0.173 mean, 95th percentile +0.254. Layer 1: cited +0.167 (56% of positions), random mean +0.048, p95 +0.067. In both layers the cited
+rules cost more than the random 95th percentile: the rulebook is causal for the model that gets 0.9976 BPC, as it was for the 100M model
+(+0.226 vs p95 +0.157; +0.096 vs +0.052). One checkpoint, one seed; silencing is not renormalised (this FFN is un-normalised, `--ffn-norm none`).
+Windows: the first 120 x 256 tokens from validation position 900,000, not the whole slice.
