@@ -1173,3 +1173,13 @@ Verified from the records: v8-ctx ctx256 1.1324, ctx512 1.1232, ctx512 r32 1.112
 * **H47:** r128 beats r64 by less than r64 beats r32 (diminishing returns). ~65%.
 * **H48:** more rules make a rule's winning share more concentrated and the rulebook shorter to read, not longer: the
   number of rules needed to cover 80% of winning positions per head grows by less than 2x from r32 to r128. ~50%.
+
+### Rule-ablation of the best model (CPU session, 2026-10-12)
+
+`flm.rule_ablation` on `outputs/v12-long512/D-d48-bpe1024-ctx512-r32_300M_s0.pt` (0.9976 BPC on the full validation slice; 1.0484 on the
+120 x 256-token windows used here), 8 rules silenced per layer, 20 random draws. Registered earlier for the 100M model only; this
+is the same test on the new best model. Layer 0: cited rules +0.387 bits per character (they win 52.7% of positions), random 8 rules
++0.173 mean, 95th percentile +0.254. Layer 1: cited +0.167 (56% of positions), random mean +0.048, p95 +0.067. In both layers the cited
+rules cost more than the random 95th percentile: the rulebook is causal for the model that gets 0.9976 BPC, as it was for the 100M model
+(+0.226 vs p95 +0.157; +0.096 vs +0.052). One checkpoint, one seed; silencing is not renormalised (this FFN is un-normalised, `--ffn-norm none`).
+Windows: the first 120 x 256 tokens from validation position 900,000, not the whole slice.
