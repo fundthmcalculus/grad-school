@@ -37,7 +37,7 @@ if __name__ == "__main__":
         for v in VARIANTS:
             if (OUT / f"{v}_s{seed}.json").exists():
                 continue
-            mod = ["-m", "flm.train"] if v == "random" else ["-m", "flm.run_conseq", v]
+            mod = ["-m", "flm.train"] if v in ("random", "data") else ["-m", "flm.run_conseq", v]
             with open(OUT / "logs" / f"{v}_s{seed}.log", "w") as f:
                 r = subprocess.run(
                     [sys.executable] + mod + argv(v, seed),
