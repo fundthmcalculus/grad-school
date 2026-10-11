@@ -12,6 +12,8 @@ ARMS = {  # name: (head tokens, tail width, ffn mult)
     "t256e32m15": (256, 32, "1.5"),
     "t256e32m20": (256, 32, "2.0"),
     "t512e24m20": (512, 24, "2.0"),
+    "t512e24m25": (512, 24, "2.5"),
+    "t768e16m25": (768, 16, "2.5"),
 }
 if __name__ == "__main__":
     (OUT / "logs").mkdir(parents=True, exist_ok=True)
