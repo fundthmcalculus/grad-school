@@ -969,3 +969,32 @@ confirmed improvement. Reading: under a 100K cap the vocabulary optimum is ≈ 1
 larger vocabularies (short runs favour tokens that cover more text per step). **The ten-seed-validated headline stays BPE1024 d = 48
 (1.1291 ± 0.0039, beats tuned neural references by 0.027–0.030).** BPE1536 d = 40 is a candidate that would need ten seeds
 and its own neural control to replace it. 100M / 300M numbers for 1536 were not run.
+
+## Registered and run 2026-10-11: a model-graded coherence measure (`flm/coherence_set.py`, `report/coherence_*.json`)
+
+**Why:** every claim above is about bits per character; the user's goal is coherent text, and until now it was judged by reading. **Method:** 7 checkpoints ×
+8 (prompt, seed) pairs, all at T 0.5 / top-k 10, each cut to exactly 600 characters (so character and subword models are compared on equal
+text length), shuffled and anonymised (`coherence_blind.json`). **Grader: Claude, this session, one rater, blind** (scores written to
+`coherence_scores.json` *before* the key was opened). Rubric, 1–5 each: **G** grammar; **C** consistency of characters and objects (names kept, no
+swapping, no vanishing); **P** sense / plot (does it go anywhere). Total 3–15. A 600-character window can span the end of one story and the start of another;
+all of it was graded.
+* **GC1 (predicted before scoring).** The ranking of total score follows the ranking of validation BPC. *(~80%.)*
+* **GC2.** At matched BPC, a subword model scores no lower than a character model. *(~50%; I had no basis for a direction.)*
+
+| model | params | val BPC | G | C | P | total (3–15) ± s.e. |
+|---|---|---|---|---|---|---|
+| BPE1024 D, 300M chars | 93,344 | 1.021 | 4.00 | 3.38 | 2.50 | **9.88 ± 0.28** |
+| BPE1024 D, 100M chars | 93,344 | 1.055 | 3.38 | 2.38 | 1.88 | 7.62 ± 0.50 |
+| BPE1536 D d = 40, 30M | 93,792 | 1.119 | 3.50 | 2.12 | 1.75 | 7.38 ± 0.47 |
+| BPE512 D d = 80, 30M | 150,432 | 1.108 | 3.25 | 2.25 | 1.88 | 7.38 ± 0.39 |
+| neural delta-mlp d = 128, char, 60M | 280,480 | 1.115 | 2.62 | 2.00 | 1.38 | 6.00 ± 0.53 |
+| char D d = 96, 30M | 162,272 | 1.222 | 2.38 | 1.50 | 1.00 | 4.88 ± 0.28 |
+| char D d = 72, 30M | 97,520 | 1.282 | 1.75 | 1.12 | 1.00 | 3.88 ± 0.21 |
+
+**GC1 supported:** the order of total score is the order of BPC for 6 of 7 models (the exception: BPE512 150K, BPC 1.108, ties the 1536 model, 1.119, within error).
+**GC2 supported but weak:** the subword 1536 model (BPC 1.119) scores 7.4 against the character teacher (BPC 1.115) at 6.0, a gap of ~1.4 totals (~2 s.e.).
+**What it says:** the 300M-character model is the first to write mostly-grammatical, mostly-consistent short stories (G 4.0, C 3.4), and its P score
+(2.5/5) shows that plot sense is still the weak axis: stories stay on one topic and loop rather than develop. Rough slope: ~2.4 total points per 0.1 BPC
+between 1.28 and 1.02 (extrapolating it to a "good" score of 12–13 would need ≈ 0.9 BPC; a guess, not a measurement).
+**Caveats:** one rater, who is also the author's model (no inter-rater check, preference for repetition-free text); n = 8 per model, so differences below ~1.5
+totals are not established; one sampling setting; the 600-character window; BPC for the BPE1536 row is the 2-seed 30M mean (1.1205), for the graded seed-0 checkpoint 1.122.

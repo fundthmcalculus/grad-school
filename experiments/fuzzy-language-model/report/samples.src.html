@@ -93,6 +93,13 @@ code { font-family: var(--mono); font-size: .9em; }
   </section>
 
   <section>
+    <h2>Scored for coherence</h2>
+    <p>Reading samples is not a measurement, so I graded a blinded set: 56 stories (8 per model, all cut to 600 characters, shuffled, labels removed) on grammar, consistency of characters and objects, and sense or plot, each 1 to 5. One grader (Claude), scored before the key was opened.</p>
+    <div class="scroll"><table id="t-coh"></table></div>
+    <p class="note">Total is out of 15, mean ± standard error over 8 stories. Differences under about 1.5 points are not established. The ordering follows validation loss almost exactly, and plot sense (P) stays the weakest axis even for the best model.</p>
+  </section>
+
+  <section>
     <h2>Did post-training or size help?</h2>
     <div class="scroll"><table id="t-res"></table></div>
     <p class="note">Validation bits per character, first 1M characters of TinyStories V2 validation. 2 seeds for the 97K model. The only thing that helped is more training and more parameters.</p>
@@ -143,6 +150,10 @@ render();
 $("t-stats").innerHTML = `<tr><th>model</th><th class="n">params</th><th class="n">val BPC</th><th class="n">non-words, T 0.5 / k 10</th><th class="n">non-words, T 0.7 / k 20</th><th class="n">non-words, T 1.0</th></tr>` +
   D.map((m) => `<tr><td>${(label[m.name] || [m.name])[0]}</td><td class="n">${m.params.toLocaleString()}</td><td class="n">${m.val_bpc.toFixed(3)}</td><td class="n">${(m["nonword_0.5"] * 100).toFixed(1)}%</td><td class="n">${(m["nonword_0.7"] * 100).toFixed(1)}%</td><td class="n">${(m["nonword_1.0"] * 100).toFixed(1)}%</td></tr>`).join("");
 
+const COH = /*COH*/;
+const cname = (n) => ({ "D-d48-bpe1024_300M_lr3e-2_s0": "Fuzzy subword 1024, 300M chars", "D-d48-bpe1024_100M_s0": "Fuzzy subword 1024, 100M chars", "b1536-d40-h8_30M_s0": "Fuzzy subword 1536, 30M chars", "D-d80-bpe512_30M_s0": "Fuzzy subword 512, 150K", "teacher-delta-d128_60M_s0": "Neural teacher, characters", "D-d96_30M_s0": "Fuzzy characters, 162K", "D-d72_30M_s0": "Fuzzy characters, 97K" }[n] || n);
+$("t-coh").innerHTML = `<tr><th>model</th><th class="n">params</th><th class="n">grammar</th><th class="n">consistency</th><th class="n">plot</th><th class="n">total / 15</th></tr>` +
+  COH.sort((a, b) => b.total - a.total).map((r) => `<tr><td>${cname(r.model)}</td><td class="n">${r.params.toLocaleString()}</td><td class="n">${r.G.toFixed(2)}</td><td class="n">${r.C.toFixed(2)}</td><td class="n">${r.P.toFixed(2)}</td><td class="n"><b>${r.total.toFixed(2)}</b> ± ${r.se.toFixed(2)}</td></tr>`).join("");
 const R = [
   ["Fuzzy D, d 72", "97,520", "1.275", "1.249", "1.248", "1.250"],
   ["Fuzzy D, d 80", "117,312", "1.249", "–", "–", "–"],
