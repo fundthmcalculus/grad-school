@@ -1493,3 +1493,9 @@ Inter-rater agreement r = 0.75 (rater means 7.25 and 6.71). **Reading:** in this
 Set 6 (same 96K checkpoints, other seeds) had 300M ≥ 1B, so the 1B-over-300M ordering has now appeared in sets 5 and 7 and reversed in set 6; across seven sets and ≈ 20 models the **highest mean total of any model is ≈ 8.2 / 15 with plot ≈ 1.4–2.4 / 5**,
 including a model with 14× the parameters and 0.15–0.17 lower validation loss than the 96K model at the same data. **Nothing measured here approaches the 12 / 3.5 criterion**; a 14× increase in parameters bought ≈ 0.8 total points against set-to-set noise of ≈ 2.
 The 1.32M model saw only about 7 tokens per parameter, so size and data are not separated (the CPU session's caveat); the 1.32M configuration on the 1B-character stream was not run.
+
+## Registered 2026-10-11, before `v18-3b-size` and `v18-3b`: 3B characters on the 96K model (user-approved; nothing larger than 96K)
+
+User instruction: run the 3B-character training, size it with a 30M run first, and focus on truly tiny models; make nothing larger yet. Cell: the 96,416-parameter BPE1024 D (d 48, ctx 512 / batch 16, 32 rules, lr 6e-2, seed 0), `--save-model`.
+The corpus is 2.19B characters, so the stream `train_bpe1024_all.bin` (whole corpus, same tokenizer, identical prefix to the 1B stream; `FLM_TRAIN_SUFFIX=_all`) is sampled with random windows: **3B characters is about 1.4 passes, not 3B unique characters.**
+Sizing: `v18-3b-size` (30M chars on the `_all` stream) gives seconds per character; 3B is expected to take ~2.2 h (the 1B run was 2,638 s). Prediction: 30M-char BPC matches the earlier 1.1095 (the streams share a prefix, windows are random); 3B BPC 0.965-0.985 (the 300M→1B step was 0.018; the data-scaling gain is flattening); blind coherence not measurably changed (still 6-8 / 15).

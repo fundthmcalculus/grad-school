@@ -732,3 +732,35 @@ register(
         )
     ],
 )
+
+
+# v18-3b-size / v18-3b: the best 96K configuration on 3B characters, sized first at 30M on the same stream.
+# Needs FLM_TRAIN_SUFFIX=_all (the whole 2.19B-character corpus, so 3B characters is ~1.4 passes).
+def _v18(name: str, label: str, chars: str) -> None:
+    c = cell(label, D, d=48, sc="8", chars=chars, seed=0, lr="6e-2")
+    register(
+        name,
+        [
+            (
+                c[0],
+                c[1]
+                + [
+                    "--tok",
+                    "bpe1024",
+                    "--warmup",
+                    "100",
+                    "--ctx",
+                    "512",
+                    "--batch",
+                    "16",
+                    "--rules",
+                    "32",
+                    "--save-model",
+                ],
+            )
+        ],
+    )
+
+
+_v18("v18-3b-size", "D-d48-bpe1024-ctx512-r32_30M_all_s0", "30e6")
+_v18("v18-3b", "D-d48-bpe1024-ctx512-r32_3000M_s0", "3000e6")
