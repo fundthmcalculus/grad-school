@@ -1118,3 +1118,27 @@ was not rerun at ctx 512.** (Predictions H30–H32 for these grids are the CPU s
 
 H42 the best hybrid beats D by > 0.01 bpc (~35%); H43 its name-recall gain at k = 24 exceeds D's 0.47 by > 0.3 bits (~35%);
 H44 layer order matters, |hybDF - hybFD| > 0.01 (~55%); H45 the hybrid's cited FFN rules stay causal (~70%).
+
+## Outcome `v11-hybrid` (GPU session, 2026-10-11; BPE1024, 94,144 params, 10M chars, seed 0, one cell at a time; hybDF = D layer then Fibonacci-attention layer, hybFD = attention first)
+
+| cell | lr 3e-2 | lr 6e-2 | name-recall gain, bits, k = 0 / 3 / 12 / 24 (lr 6e-2) |
+|---|---|---|---|
+| hybFD (attention → D) | 1.2808 | 1.2811 | 1.13 / 0.74 / 0.32 / 0.11 |
+| hybDF (D → attention) | 1.2866 | 1.2857 | 0.12 / 0.05 / 0.003 / 0.00 |
+| pure D (`v10-fib`, lr 6e-2) | | 1.2534 | 2.10 / 1.36 / 0.85 / 0.47 |
+
+* **H42 refuted:** the best hybrid (1.2808) is 0.027 *worse* than D (needed > 0.01 better; predicted ~35%).
+* **H43 refuted:** hybFD's k = 24 recall gain is 0.106, far below D's 0.473 (needed > +0.3 above it).
+* **H44 refuted on loss** (|hybDF − hybFD| = 0.005 < 0.01) **but order matters hugely for retrieval:** with the attention layer second (hybDF) the name recall is ≈ 0 (0.12 bits at k = 0),
+  with D second (hybFD) it is 1.13 bits. D keeps the memory, and only when its state is read by the last layer; an attention layer after it destroys the memory path (my reading;
+  not tested directly).
+* **H45 not run** (`flm.rule_ablation` on the hybrid checkpoints was not run).
+* **Reading:** swapping one of D's two recurrent layers for Fibonacci attention costs 0.027 BPC and about half the name recall, at the same parameter budget; the hybrid is not a gain at
+  10M chars. One seed per cell, so differences < 0.01 are not established; the 0.027 loss is about 5× that.
+
+## Registered 2026-10-11, before `v12-long512`: does the best 30M configuration (ctx 512, 32 rules per head) improve long-run loss and coherence?
+
+BPE1024 D d = 48, 32 rules per head, ctx 512 / batch 16, lr 6e-2, warm-up 100, 300M chars, seed 0, saved (96,416 params). Reference: the same recipe at ctx 256 / 16 rules (lr 3e-2): 1.0212 at 300M.
+* **G30.** val BPC ≤ 1.00 (a gain ≥ 0.02 over 1.0212; the 30M gain from ctx 512 plus 32 rules was ≈ 0.02 over ctx 256 / 16 rules). *(~55%.)*
+* **G31.** Blind coherence total (same rubric, same 600-char protocol, new set mixing this model with the previous 300M model and the 100M model, labels removed) exceeds the previous 300M model's
+  9.88 by ≥ 1.0. *(~40%.)* The plot score (P) is the one to watch.

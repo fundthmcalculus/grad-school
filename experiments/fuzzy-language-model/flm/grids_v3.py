@@ -494,3 +494,37 @@ for s in (0, 1):
         )
     )
 register("v8-ctx-b16", jobs)
+
+
+# v12-long512 (G30/G31): ctx 512 / 32 rules per head at 300M chars, saved
+_c = cell(
+    "D-d48-bpe1024-ctx512-r32_300M_s0",
+    D,
+    d=48,
+    sc="8",
+    chars="300e6",
+    seed=0,
+    lr="6e-2",
+)
+register(
+    "v12-long512",
+    [
+        (
+            _c[0],
+            _c[1]
+            + [
+                "--tok",
+                "bpe1024",
+                "--warmup",
+                "100",
+                "--ctx",
+                "512",
+                "--batch",
+                "16",
+                "--rules",
+                "32",
+                "--save-model",
+            ],
+        )
+    ],
+)
