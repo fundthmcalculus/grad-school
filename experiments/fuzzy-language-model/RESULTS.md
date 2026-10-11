@@ -1456,3 +1456,11 @@ Curve at 25 / 50 / 75 / 100%: 1.1020 / 1.0608 / 1.0126 / **0.98446**. **G39 supp
 which is larger than the +1.38 "effect" found in set 5. **So the apparent gain from 1B characters of training in set 5 did not replicate, and the honest reading is that coherence did not measurably change between 300M and 1B characters (loss −0.0195)**:
 pooling rater 1 across sets 5 and 6 (n = 16 per model) gives 1B seed 0 = 7.94 vs 300M seed 0 = 7.63 (+0.31, well inside noise). The earlier hypothesis "coherence tracks training length" is **not supported** beyond the 30M → 100M range where gaps were large;
 loss improved by 0.02–0.03 BPC with no coherence signal visible through a measure whose set-to-set noise is ± 1.5–2. A second rater has not scored set 6 (the key stays unpublished until one has, or this note is superseded).
+
+## Status of the two stale open items (GPU session, 2026-10-11)
+
+* **`v3-lr` (D's learning rate on the character stream, 30M chars): closed as superseded, not completed.** The cells that finished were lost or killed (a sampling crash and a VRAM stall, see the 2026-10-10 incident note). The question it asked, how sensitive D is to
+  the learning rate, was answered on the model that replaced the character D: `v6-d-lr` and `v6-d-lr-edge` (BPE1024, 10M chars, interior optimum at 6e-2: 2e-2 1.2809, 3e-2 1.2604, 4e-2 1.2542, 6e-2 1.2502, 8e-2 1.2519, 1e-1 1.2628) and the ten-seed 30M comparison
+  (lr 6e-2: 1.1291 vs lr 3e-2: 1.1292, no difference at 30M). The character-level D's own optimum was never measured on the full grid and is not claimed.
+* **`v4-*` (the CPU session's character-level ten-seed plan): not run, and not needed for any claim made here.** Every fuzzy-vs-neural statement in this record that is meant to be cited is the BPE1024 ten-seed comparison (`v6-final10`). The earlier character-level comparison
+  (`v3-final` / `v3-ref`, 2–3 seeds) remains **not citable**; running `v4-final10` (40 cells, several GPU-hours) would only upgrade that older, superseded claim.
