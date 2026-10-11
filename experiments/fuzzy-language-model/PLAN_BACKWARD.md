@@ -65,3 +65,19 @@ GPU, one job at a time: 96K BPE1024 D, 30M characters, seeds 0-4, evaluated at s
 `succcf` (embedding set to the PPMI-SVD successor vectors, centroid consequents). 30 jobs, ~1 h.
 Predictions: (a) **the head start is gone by step 300**: every construction variant is within 0.02 BPC of `random` at step 300; (b) **final BPC at 30M is within 0.005 of `random` for every variant** (random's 5-seed mean was 1.1095 +/- 0.0048 at the 30M reference);
 (c) `succcf` reaches 1.5 BPC in at least 25% fewer steps than `random` (the init BPC advantage is the largest, 2.81 vs 3.29). (b) failing in the good direction would be the first sub-100K gain from structure-first; it would go to ten seeds.
+
+## Outcome `v22-tribble` (GPU, 96,416 params, 30M characters, seeds 0-4, 30 jobs; evaluated every 100 steps; paired by seed against `random`)
+| init | step 0 | step 100 | step 300 | step 600 | final BPC (mean +/- sd) | paired delta vs random | seeds worse |
+|---|---|---|---|---|---|---|---|
+| random (no rule init) | 3.267 | 1.5836 | 1.3571 | 1.2263 | **1.1095 +/- 0.0107** | 0 | - |
+| antecedent-first (`--rule-init data`, existing) | 3.267 | 1.5776 | 1.3531 | 1.2206 | 1.1029 +/- 0.0070 | **-0.0066** | 1 of 5 |
+| consequent-first, centroid (`cf`) | 3.170 | 1.6024 | 1.3857 | 1.2717 | 1.1626 +/- 0.0319 | **+0.0531** | **5 of 5** |
+| consequent-first, least squares (`cfls`) | 3.013 | 1.6181 | 1.3960 | 1.2753 | 1.1605 +/- 0.0156 | **+0.0510** | **5 of 5** |
+| association groups + least squares (`assocls`) | 2.991 | 1.6147 | 1.3948 | 1.2744 | 1.1572 +/- 0.0059 | **+0.0477** | **5 of 5** |
+| aligned PPMI embedding + centroid (`succcf`) | 2.865 | 1.6411 | 1.4078 | 1.2845 | 1.1737 +/- 0.0072 | **+0.0642** | **5 of 5** |
+
+**Registered predictions scored.** (a) head start gone by step 300: **gone by step 100, and it reverses**: every consequent-first variant is *behind* random from step 100 on (+0.02 to +0.06 at step 100). (b) final within 0.005 of random: **wrong**: all four consequent-first variants are worse by 0.048-0.064 in 5 of 5 seeds,
+far outside the seed spread (0.006-0.032); this is an actively harmful init, not a washed-out one. (c) `succcf` reaches 1.5 BPC in 25% fewer steps: **wrong** (evaluation grid is 100 steps; random, data and the cf variants all reach 1.5 at step 200, `succcf` at 200-300).
+The antecedent-first init is marginally *better* than random (-0.0066, 4 of 5 seeds), which is the opposite ordering to the TRIBBLE-order claim, but it is a small effect on five seeds and not claimed.
+**Reading.** In this model, committing to the answers first and building the antecedents backward from them is worse than random placement, by about 0.05 BPC at 30M characters, and the better the starting loss (2.87 for `succcf`), the worse the final one. Seen while building: the construction chose its largest gain (1,024) in every layer,
+i.e. it starts with a hot output scale that the RMSNorm then rescales. Whether the scale, the rule placement (collapse onto frequent-token groups) or the loss of rule diversity is the cause is what the diagnosis below tests (`cfg1`: gain capped at 1; `cfw300`: warm-up 300; rule usage after training).

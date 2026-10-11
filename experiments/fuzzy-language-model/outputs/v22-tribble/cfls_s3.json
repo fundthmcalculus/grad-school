@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v22-tribble\\cfls_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.17124,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.02992
+  ],
+  [
+   100,
+   1.6303
+  ],
+  [
+   200,
+   1.46642
+  ],
+  [
+   300,
+   1.39731
+  ],
+  [
+   400,
+   1.3546
+  ],
+  [
+   500,
+   1.31214
+  ],
+  [
+   600,
+   1.28108
+  ],
+  [
+   700,
+   1.25368
+  ],
+  [
+   800,
+   1.22346
+  ],
+  [
+   900,
+   1.20263
+  ],
+  [
+   1000,
+   1.18633
+  ],
+  [
+   1100,
+   1.17519
+  ],
+  [
+   1160,
+   1.17124
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.6147
+  ],
+  [
+   50,
+   7.7537
+  ],
+  [
+   100,
+   6.2117
+  ],
+  [
+   150,
+   5.3938
+  ],
+  [
+   200,
+   4.9731
+  ],
+  [
+   250,
+   4.7317
+  ],
+  [
+   300,
+   4.5513
+  ],
+  [
+   350,
+   4.4457
+  ],
+  [
+   400,
+   4.3591
+  ],
+  [
+   450,
+   4.2785
+  ],
+  [
+   500,
+   4.2095
+  ],
+  [
+   550,
+   4.1598
+  ],
+  [
+   600,
+   4.0956
+  ],
+  [
+   650,
+   4.0497
+  ],
+  [
+   700,
+   4.005
+  ],
+  [
+   750,
+   3.9699
+  ],
+  [
+   800,
+   3.9271
+  ],
+  [
+   850,
+   3.8889
+  ],
+  [
+   900,
+   3.8528
+  ],
+  [
+   950,
+   3.8309
+  ],
+  [
+   1000,
+   3.7932
+  ],
+  [
+   1050,
+   3.7667
+  ],
+  [
+   1100,
+   3.7513
+  ],
+  [
+   1150,
+   3.7269
+  ],
+  [
+   1159,
+   3.7186
+  ]
+ ],
+ "train_seconds": 79.09,
+ "wall_seconds": 93.74,
+ "chars_per_sec": 120148,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Mia. Mia loved to me and play with her new friend. One day, Mia found a big, shiny hill. She puts on the big tree and she would go outside. Kitty was very excited to go inside and soon.\nMia and her mom pointed a big tree. They slumped, and the tree was chair. They chair the tree and yell each. Mia was happy to have more in her house and envody cry.\nMolly and Sally laughed and found her money and found a big tree. She said, \"Okay, Sator!\" Mom said. She played all day, even for her friends.\nBut the forest thought that her hand was full of disapping. She put it back to the park and the monster were excited. She learned that reads and before her very headlses for her things.\n<|eot|>\nOnce upon a time, there was a bird. The bird was green, but it was soft. The bird was very happy. They liked to play with all day long.\nOne day, the bird wanted to bed the tree. It went to a tree and saw a big tree. The tree said, \"Hello, little gray, bird! That is my friend.\" The bird said, \"",
+ "rule_init": {
+  "variant": "cfls",
+  "L0.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.6288
+  },
+  "L1.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.6056
+  }
+ },
+ "ngram_init": {}
+}

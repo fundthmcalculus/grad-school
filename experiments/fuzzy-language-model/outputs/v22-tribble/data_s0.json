@@ -1,0 +1,259 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v22-tribble\\data_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.09927,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.27613
+  ],
+  [
+   100,
+   1.58586
+  ],
+  [
+   200,
+   1.41752
+  ],
+  [
+   300,
+   1.34409
+  ],
+  [
+   400,
+   1.3016
+  ],
+  [
+   500,
+   1.24974
+  ],
+  [
+   600,
+   1.21378
+  ],
+  [
+   700,
+   1.18746
+  ],
+  [
+   800,
+   1.15503
+  ],
+  [
+   900,
+   1.13239
+  ],
+  [
+   1000,
+   1.11491
+  ],
+  [
+   1100,
+   1.10316
+  ],
+  [
+   1160,
+   1.09927
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3395
+  ],
+  [
+   50,
+   8.0818
+  ],
+  [
+   100,
+   6.2358
+  ],
+  [
+   150,
+   5.324
+  ],
+  [
+   200,
+   4.86
+  ],
+  [
+   250,
+   4.6037
+  ],
+  [
+   300,
+   4.4289
+  ],
+  [
+   350,
+   4.3026
+  ],
+  [
+   400,
+   4.215
+  ],
+  [
+   450,
+   4.1316
+  ],
+  [
+   500,
+   4.0606
+  ],
+  [
+   550,
+   3.9795
+  ],
+  [
+   600,
+   3.9143
+  ],
+  [
+   650,
+   3.8541
+  ],
+  [
+   700,
+   3.8016
+  ],
+  [
+   750,
+   3.7702
+  ],
+  [
+   800,
+   3.7137
+  ],
+  [
+   850,
+   3.6638
+  ],
+  [
+   900,
+   3.6346
+  ],
+  [
+   950,
+   3.5875
+  ],
+  [
+   1000,
+   3.5563
+  ],
+  [
+   1050,
+   3.5292
+  ],
+  [
+   1100,
+   3.5131
+  ],
+  [
+   1150,
+   3.5142
+  ],
+  [
+   1159,
+   3.5114
+  ]
+ ],
+ "train_seconds": 79.56,
+ "wall_seconds": 93.43,
+ "chars_per_sec": 119448,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there lived a little girl who was ready to pull some new room. A little boy. They would always go to hop that day in the park would put it on the big birthdumblow.\nOne day, a little girl named Sue was playing with the cripper. She wanted to see how to slide, but it could not hear more rocks. So, the frog took it to the crib. Sue then ate the sandbaba. Sue was very happy.\nBut then, something unexpected happened. While they saw a big tree, it got the sandbababa. Tim was not a bit. They tried to snap the bit and took the bird to the bird. So, the bird caught Pawed it and it became good friends. Tim and Sue played together on the bit in the store and found the sandba. They had lots of fun again.\n<|eot|>\nOnce upon a time, there was a small house. The bunny lived in a big tree. The bunny loved to play with others. They played together all day long.\nOne day, the rabbit was very happy. It went to a puritch for Max to play. But then, something unexpected happened. The gray giant started to perfect the window.",
+ "rule_init": {
+  "L0.mix": 256,
+  "L0.ffn": 72,
+  "L1.mix": 256,
+  "L1.ffn": 72
+ },
+ "ngram_init": {}
+}

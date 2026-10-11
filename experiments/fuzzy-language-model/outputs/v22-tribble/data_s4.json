@@ -1,0 +1,259 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v22-tribble\\data_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10415,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.27453
+  ],
+  [
+   100,
+   1.57555
+  ],
+  [
+   200,
+   1.42682
+  ],
+  [
+   300,
+   1.35469
+  ],
+  [
+   400,
+   1.30399
+  ],
+  [
+   500,
+   1.26087
+  ],
+  [
+   600,
+   1.22159
+  ],
+  [
+   700,
+   1.18877
+  ],
+  [
+   800,
+   1.16253
+  ],
+  [
+   900,
+   1.13911
+  ],
+  [
+   1000,
+   1.12084
+  ],
+  [
+   1100,
+   1.10872
+  ],
+  [
+   1160,
+   1.10415
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3532
+  ],
+  [
+   50,
+   8.0925
+  ],
+  [
+   100,
+   6.2223
+  ],
+  [
+   150,
+   5.3258
+  ],
+  [
+   200,
+   4.8392
+  ],
+  [
+   250,
+   4.5932
+  ],
+  [
+   300,
+   4.4138
+  ],
+  [
+   350,
+   4.2983
+  ],
+  [
+   400,
+   4.1943
+  ],
+  [
+   450,
+   4.1324
+  ],
+  [
+   500,
+   4.0608
+  ],
+  [
+   550,
+   3.998
+  ],
+  [
+   600,
+   3.9222
+  ],
+  [
+   650,
+   3.8642
+  ],
+  [
+   700,
+   3.8198
+  ],
+  [
+   750,
+   3.7797
+  ],
+  [
+   800,
+   3.7244
+  ],
+  [
+   850,
+   3.6732
+  ],
+  [
+   900,
+   3.64
+  ],
+  [
+   950,
+   3.6101
+  ],
+  [
+   1000,
+   3.5822
+  ],
+  [
+   1050,
+   3.5463
+  ],
+  [
+   1100,
+   3.5364
+  ],
+  [
+   1150,
+   3.5136
+  ],
+  [
+   1159,
+   3.5137
+  ]
+ ],
+ "train_seconds": 79.79,
+ "wall_seconds": 94.15,
+ "chars_per_sec": 119100,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy.\nLucy saw the air of aeropom. She wanted to use that the moon. She put it on the big birthday and pulled it and saw a big, fair. The grandry was tired and hungry, and yelling, he decided to play with the chair.\nAs the elephant got a clever, she saw a big tree to a red hole. Lucy was a little bird and not had a friendly friend. She found the nest and said, \"I will we play!\" The bird said, \"Don't worry, you can take it home.\" Lucy was very happy and thanked the bird again.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. He had a big, red car. Tim had a big pool. He liked to play on it and play.\nTim loved to play outside on the table. But, he tried to jump on the ball. It was the best of playing, and Tim. Tim was happy to have a new toy came outside. Tim was happy.\nTim's mom said, \"Thank you, Tim!\". Tim was happy too. Tim said, \"I'm sorry for helping me.\" Nilly said, \"Thank you, Tim!\" They all played together all day.\n<|eot|>\nOnce upon a time",
+ "rule_init": {
+  "L0.mix": 256,
+  "L0.ffn": 72,
+  "L1.mix": 256,
+  "L1.ffn": 72
+ },
+ "ngram_init": {}
+}

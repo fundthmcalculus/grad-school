@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v22-tribble\\succcf_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.16248,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   2.96234
+  ],
+  [
+   100,
+   1.72192
+  ],
+  [
+   200,
+   1.50649
+  ],
+  [
+   300,
+   1.42522
+  ],
+  [
+   400,
+   1.36575
+  ],
+  [
+   500,
+   1.32464
+  ],
+  [
+   600,
+   1.28788
+  ],
+  [
+   700,
+   1.25324
+  ],
+  [
+   800,
+   1.22145
+  ],
+  [
+   900,
+   1.19798
+  ],
+  [
+   1000,
+   1.18048
+  ],
+  [
+   1100,
+   1.16855
+  ],
+  [
+   1160,
+   1.16248
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.3827
+  ],
+  [
+   50,
+   7.584
+  ],
+  [
+   100,
+   6.3287
+  ],
+  [
+   150,
+   5.6365
+  ],
+  [
+   200,
+   5.1707
+  ],
+  [
+   250,
+   4.8751
+  ],
+  [
+   300,
+   4.664
+  ],
+  [
+   350,
+   4.5413
+  ],
+  [
+   400,
+   4.4282
+  ],
+  [
+   450,
+   4.3302
+  ],
+  [
+   500,
+   4.2541
+  ],
+  [
+   550,
+   4.1938
+  ],
+  [
+   600,
+   4.1211
+  ],
+  [
+   650,
+   4.071
+  ],
+  [
+   700,
+   4.0132
+  ],
+  [
+   750,
+   3.9743
+  ],
+  [
+   800,
+   3.9282
+  ],
+  [
+   850,
+   3.8861
+  ],
+  [
+   900,
+   3.8456
+  ],
+  [
+   950,
+   3.8131
+  ],
+  [
+   1000,
+   3.7713
+  ],
+  [
+   1050,
+   3.7428
+  ],
+  [
+   1100,
+   3.7287
+  ],
+  [
+   1150,
+   3.7038
+  ],
+  [
+   1159,
+   3.6962
+  ]
+ ],
+ "train_seconds": 79.35,
+ "wall_seconds": 93.66,
+ "chars_per_sec": 119764,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a little girl who was time.\nAs she saw the big, green tree. Then, she walked to the tree and found a big tree. It was a loud sound. The magic wind became glow and bloomed back inside and started to mask, and the bird popped away. They played together all day and had lots of fun.\n<|eot|>\nOnce upon a time, there was a little girl named Amy. Amy loved to play with her friends, and the mom would seeth. One day, the little girl named Sue and her friend Tim. They decided to make your toys in the park.\nAnna said, \"I want to make a first.\" Mia said, \"Yes, but I are my friends. I can't help you. Thank you!\"\nSue was very happy. The sun was closed to the park. They missed the woods and the trees and yellow. When it was time to go outside and see a pretty park.\nAnna was very happy. She said, \"Look, that is not a big, big tree to your room. It is so many new animal!\" They played all day and had a great day.\n<|eot|>\nOnce upon a time, in a small vine, there lived a girl named Lily. She had a big tree and her having friends, and she would not paint. Lily loved to play with",
+ "rule_init": {
+  "variant": "succcf",
+  "L0.ffn": {
+   "gain": 1,
+   "ce_nats": 6.2843
+  },
+  "L1.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.4811
+  }
+ },
+ "ngram_init": {}
+}
