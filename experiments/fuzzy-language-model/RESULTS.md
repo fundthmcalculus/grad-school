@@ -1539,3 +1539,18 @@ Metrics: share of repeated word trigrams, share of out-of-vocabulary words, dist
 Registered: repeat3 correlates with the total at |r| >= 0.4 (**refuted**, +0.03); no metric reaches 0.7 (**supported**, the largest is -0.24); oov tracks grammar more than plot (supported but trivial, -0.16 vs -0.08).
 **Reading:** none of these simple proxies tracks the raters, so they cannot replace the blind two-rater protocol, and they do not explain what the raters are scoring. The raters' scores are dominated by something these metrics do not capture (or by rater noise, about +/-2 points per set).
 The measurement problem recorded in DECISIONS.md D7 stands: a human rater or a better-validated automatic measure is needed before small coherence differences can be resolved.
+
+## Where the 8-rule reading works (`flm/rule_explain_eval.py`; CPU session, 2026-10-12; 3B-character 96K checkpoint, 128 x 256-token windows, 8 rules per layer + embedding and mixer terms)
+
+Hit rate of the true next token in the top 10, model vs the reading, by token class and by the model's probability for the true token:
+| group | n | model | reading | gap |
+|---|---|---|---|---|
+| punctuation / newline | 4,511 | 0.954 | 0.930 | 0.024 |
+| capitalised piece | 3,093 | 0.853 | 0.836 | 0.017 |
+| frequent piece (top 50) | 9,661 | 0.909 | 0.860 | 0.048 |
+| other piece | 15,503 | 0.706 | 0.647 | 0.059 |
+| model p > 0.5 | 10,715 | 1.000 | 0.978 | 0.022 |
+| model p 0.05-0.5 | 11,953 | 1.000 | 0.949 | 0.051 |
+| model p < 0.05 | 10,100 | 0.396 | 0.326 | 0.070 |
+Registered: the gap smallest for punctuation and frequent pieces and largest for capitalised pieces (65%): **refuted** (capitalised pieces, names, have the smallest gap, 0.017; other content pieces the largest, 0.059); the reading far below the model when the model is unsure (70%): **refuted** (0.326 vs 0.396, a gap of 0.07).
+**Reading:** the 8-rule reading tracks the model within 0.07 in every class and probability band, so it is not failing on any particular kind of token; it loses most on rare content pieces and on positions where the model itself is unsure. This is next-token fidelity only; it says nothing about plot.
