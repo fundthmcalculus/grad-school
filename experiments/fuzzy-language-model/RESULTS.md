@@ -1526,3 +1526,16 @@ Registered predictions: P1 (m = 8 with context at least 0.70) **supported** (0.7
 **Reading:** the earlier "winner rule alone names the true token 15-19% of the time" result (rule_dist E) was a reading of one rule; a reading of the 8 strongest rules per layer *plus the non-rule context terms* recovers 94% of the model's top-10 hit rate and 70% of its top-10 set.
 The rules alone, even all 72, reach only 0.679 (BPC 1.45 on the direct path against 1.04), so the non-rule terms (embedding and the mixers) carry information the rulebook does not. An explanation therefore has to name those terms as well: the fuzzy rules are most of the prediction, not all of it.
 Direct path only (layer-0 rules' effect through layer 1 is not in this decomposition); one checkpoint; the true next token, not coherence, is what is read.
+
+## Automatic coherence proxies vs the raters (`flm/coherence_auto.py`; CPU session, 2026-10-12; 176 texts from sets 1, 2, 4, 5, 7, 8)
+
+Metrics: share of repeated word trigrams, share of out-of-vocabulary words, distinct names, share of repeated sentences (first story of each 600-character text). Correlation with the mean rater score per text:
+| metric | r total | r plot | r grammar |
+|---|---|---|---|
+| repeat3 | +0.03 | -0.10 | +0.09 |
+| oov | -0.14 | -0.08 | -0.16 |
+| names | -0.01 | +0.01 | -0.01 |
+| sent_rep | -0.20 | -0.24 | -0.15 |
+Registered: repeat3 correlates with the total at |r| >= 0.4 (**refuted**, +0.03); no metric reaches 0.7 (**supported**, the largest is -0.24); oov tracks grammar more than plot (supported but trivial, -0.16 vs -0.08).
+**Reading:** none of these simple proxies tracks the raters, so they cannot replace the blind two-rater protocol, and they do not explain what the raters are scoring. The raters' scores are dominated by something these metrics do not capture (or by rater noise, about +/-2 points per set).
+The measurement problem recorded in DECISIONS.md D7 stands: a human rater or a better-validated automatic measure is needed before small coherence differences can be resolved.
