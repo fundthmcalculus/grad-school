@@ -92,3 +92,30 @@ register(
         chars="30e6",
     ),
 )
+
+
+# v23-wu30: warm-up at 30M (1,160 steps, so a long warm-up is a large share of the run); seeds 0-4. base / 300 exist for seeds 0-2 in v19-optA30
+register(
+    "v23-wu30",
+    [
+        _cell(f"wu{w}", s, [], warmup=str(w), chars="30e6")
+        for w in (200, 450, 600)
+        for s in range(5)
+    ]
+    + [
+        _cell(f"wu{w}", s, [], warmup=str(w), chars="30e6")
+        for w in (100, 300)
+        for s in (3, 4)
+    ],
+)
+
+
+# v23-wu300m: warm-up at 300M characters (11.6K steps), seeds 0-1; the warm-up-100 reference is v12-long512 (0.9976 / 1.0053)
+register(
+    "v23-wu300m",
+    [
+        _cell(f"wu{w}", s, ["--save-model"], warmup=str(w), chars="300e6")
+        for w in (300, 1000)
+        for s in (0, 1)
+    ],
+)
