@@ -639,3 +639,32 @@ def test_v9_grid_parses_and_sizes_match():
     a.vocab_size = 1024
     assert (a.d, a.layers, a.ctx) == (96, 2, 512)
     assert TinyLM(train.make_config(a)).n_params() == 251_168
+
+
+def test_fibonacci_attention():
+    from flm.models import ModelConfig, TinyLM, fib_lags, fib_mask
+
+    assert fib_lags(8, 512) == list(range(8)) + [8, 13, 21, 34, 55, 89, 144, 233, 377]
+    m = fib_mask(40, 4)
+    assert (
+        m[39, 39] and m[39, 36] and not m[39, 35] and m[39, 34] and not m[39, 33]
+    )  # lags 0-3, 5
+    assert not m[5, 6]  # causal
+    torch.manual_seed(0)
+    c = dict(vocab_size=50, d_model=32, n_layers=2, n_heads=2, max_len=64, ffn="mlp")
+    x = torch.randint(0, 50, (2, 64))
+    for dense, fib in (("softmax", "fibsoftmax"), ("gauss", "fibgauss")):
+        a = TinyLM(ModelConfig(mixer=dense, **c))
+        full = TinyLM(ModelConfig(mixer=fib, fib_local=64, **c))
+        full.load_state_dict(a.state_dict())
+        assert torch.allclose(
+            a(x), full(x), atol=1e-5
+        )  # all lags visible = dense causal
+        sparse = TinyLM(ModelConfig(mixer=fib, fib_local=4, **c))
+        sparse.load_state_dict(a.state_dict())
+        assert (
+            a(x) - sparse(x)
+        ).abs().max() > 1e-3  # the knob bites (manipulation check)
+        assert torch.allclose(
+            a(x)[:, :4], sparse(x)[:, :4], atol=1e-5
+        )  # first 4 positions see everything

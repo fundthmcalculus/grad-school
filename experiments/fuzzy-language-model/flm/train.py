@@ -40,6 +40,12 @@ def get_args(argv=None):
     p.add_argument("--shortconv", type=int, default=0)
     p.add_argument("--decay", default="fixed", choices=["none", "fixed", "data"])
     p.add_argument("--ctx", type=int, default=256)
+    p.add_argument(
+        "--fib-local",
+        type=int,
+        default=8,
+        help="fibsoftmax/fibgauss: dense lags 0..N-1, then Fibonacci lags only",
+    )
     p.add_argument("--batch", type=int, default=32)
     p.add_argument(
         "--chars", type=float, default=20e6, help="training budget in characters"
@@ -153,6 +159,7 @@ def make_config(a) -> ModelConfig:
         ffn_width=a.ffn_width,
         ffn_norm=a.ffn_norm,
         ante_taps=a.ante_taps,
+        fib_local=a.fib_local,
     )
 
 

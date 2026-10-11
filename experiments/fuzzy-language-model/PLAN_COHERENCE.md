@@ -42,3 +42,5 @@ context question (PLAN_CONTEXT.md, `v8-*`) is its first stage.
 
 One seed per size; coherence is 8 prompts x 2 raters of one model family (a human check of the final model is
 owed); BPC is not coherence, so the ladder is judged by the graded text, not by validation loss alone.
+
+**Update (user, 2026-10-11):** keep to story size for now and look at Fibonacci attention (PLAN_FIBONACCI.md). Stage 2 (`v9-*`, the 0.25M-7M size ladder) is **on hold**: do not run it until the user releases it. The success criteria stand.

@@ -35,8 +35,8 @@ name and the signal decays smoothly rather than collapsing.
 
 | grid | cells | what | GPU-h (estimate; run one cell first) |
 |---|---|---|---|
-| `v8-ctx` | 8 | D, BPE1024, d 48, lr 6e-2, ctx 256 / 512 / 1024 / 2048, constant 8,192 tokens per step, 30M chars, seeds 0-1, checkpoints saved | ~1-2 (ctx 2048 is the unknown: the scan is sequential in time) |
-| `v8-rules` | 2 | ctx 1024 with 32 rules per head (more recurrent state) | ~0.3 |
+| `v8-ctx` | 8 | D, BPE1024, d 48, lr 6e-2, ctx 256 / 512 (story size), constant 8,192 tokens per step, 30M chars, seeds 0-1, checkpoints saved (4 cells) | ~0.5 |
+| `v8-rules` | 2 | ctx 512 with 32 rules per head (more recurrent state) | ~0.3 |
 
 The ctx-256 cells are the baseline. Command: `python -m flm.sweep v8-ctx --workers 2` (one cell first).
 
@@ -59,3 +59,5 @@ The ctx-256 cells are the baseline. Command: `python -m flm.sweep v8-ctx --worke
 * Two seeds per cell; differences under about 0.01 bits per character are within seed spread.
 * The name-recall probe is one template and one filler set; it measures reuse of a stated name, not
   plot coherence.
+
+**Update (user, 2026-10-11):** keep to story size for now. The 1024 and 2048 arms were removed from `v8-ctx`; `v8-rules` runs at ctx 512. The new main line is Fibonacci attention (PLAN_FIBONACCI.md, `v10-fib`).

@@ -1034,3 +1034,10 @@ Success criteria fixed in advance: blind total >= 12/15 and plot >= 3.5/5 from b
 requires a causal rulebook (rule-ablation of the most-cited FFN rules costs more than random rules).
 H33 plot > 3/5 by the 3.3M model (~40%); H34 nothing under 2M reaches 12/15 (~85%); H35 ablation of cited rules
 exceeds random at every size (~70%); H36 the best lr falls with size (~60%).
+
+## Registered 2026-10-11, before `v10-fib`: Fibonacci attention at story size (CPU session; PLAN_FIBONACCI.md)
+
+User direction: keep to story size, try local-plus-sparse-far memory. Predictions H37-H41 are in PLAN_FIBONACCI.md:
+fibgauss-L8 within 0.01 of dense (~55%); L4 worse / L16 no better (~50%); fibsoftmax-L8 within 0.01 of fibgauss-L8 (~55%);
+name recall at k = 12 close to dense but lower at non-Fibonacci lags (~40%); best attention arm does not beat D (~60%).
+v9 (size ladder) is on hold; v8-ctx trimmed to ctx 256/512.
