@@ -1,5 +1,7 @@
 # Experiment: how small can a CPU-trained language model be — and can it be a fuzzy system?
 
+**Start here: [`REVIEW.md`](REVIEW.md)** (clean summary: what works, what was dropped, the path to coherent results).
+
 **Status:** CPU phase stopped 2026-10-10 and written up in [`WRITEUP.md`](WRITEUP.md); to be repeated on a GPU host · **Started:** 2026-10-08
 
 ## Questions

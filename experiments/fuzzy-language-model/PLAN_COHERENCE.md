@@ -1,3 +1,5 @@
+> **Status (2026-10-11):** the size ladder in stage 2 is the open lever; see REVIEW.md section 7 and PLAN_BIG1B.md. Clean summary: [`REVIEW.md`](REVIEW.md).
+
 # Plan: a fuzzy language model that writes coherent stories and can still be read
 
 CPU session, 2026-10-11, for the GPU session. The user's goal: develop the FLM into a model capable of
