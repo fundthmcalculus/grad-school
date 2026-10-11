@@ -29,6 +29,10 @@ VARIANTS = {
     "hyb4": dict(groups="emb", mode="centroid", emb=False, keep=4),
     "hyb12": dict(groups="emb", mode="centroid", emb=False, keep=12),
     "hyb24": dict(groups="emb", mode="centroid", emb=False, keep=24),
+    "hyb4g1": dict(groups="emb", mode="centroid", emb=False, keep=4, gains=(0.25, 1.0)),
+    "hyb12g1": dict(
+        groups="emb", mode="centroid", emb=False, keep=12, gains=(0.25, 1.0)
+    ),
     "cfls": dict(groups="emb", mode="ls", emb=False),
     "assocls": dict(groups="assoc", mode="ls", emb=False),
     "succcf": dict(groups="emb", mode="centroid", emb=True),
