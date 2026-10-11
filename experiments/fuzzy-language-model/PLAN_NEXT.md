@@ -30,3 +30,14 @@ Add one control the 4M screen lacked: `cpboth` with the propagation matrix froze
 **Predictions.** (i) gate matching improves on output-KL-only by less than 0.01 at 30M characters, because the student already sees the same targets through the logits; (ii) the fewer-rule student is worse than the 72-rule baseline by 0.01-0.03 trained on data alone and recovers at most half of that with gate matching. The earlier null for KL distillation (teacher 0.97 vs student 1.11) is the prior: **expect small effects, and the value is mainly diagnostic** (does the teacher's *rule structure* transfer?), plus a rule-level check from the CPU session's reader: does the 8-rule reading of the student match the teacher's (its `rule_reader.py` hit rate is the metric).
 **Design cost.** The largest of the three: a teacher-forward hook in `train.py` (`--teacher` exists for KL; add the per-layer gate term), 1-2 days of careful work; the GPU cost is ~1 h for 30 runs. Do it last and only after items 3-4 and the diagnosis in `v24-diag`.
 **What would change my mind.** If gate matching lets the 36-rule student match the 72-rule model, then the 14-direction profile geometry (participation rank ~14 of 72) is exploitable and a much smaller rule bank is possible; that is the distillation result worth having.
+
+### Item 4 outcome (`v25-rep`, GPU, 30M chars, seeds 0-4; run on the user's "Run item 4")
+Code: `flm/run_rep.py` (loss patch; train.py untouched), `flm/run_rep_sweep.py`, `flm/rep_share.py`. lambda 0.5, K = 32.
+
+| arm | BPC mean ± sd (5 seeds) | paired vs random (v22 seeds) | repeated-trigram share, seed-0 model, 100 texts (T 0.5, top-k 10) |
+|---|---|---|---|
+| random (baseline) | 1.1095 ± 0.0107 | – | 0.147 ± 0.056 |
+| unlikelihood | 1.1147 ± 0.0067 | +0.0053 (worse on 4/5 seeds, one −0.0008) | 0.117 ± 0.040 (−20% relative) |
+| repeat-weighted CE | 1.1091 ± 0.0078 | −0.0004 (3/5 worse) | 0.162 ± 0.059 (+10%) |
+
+Predictions: BPC within +0.005 for both — weight right, unlikelihood marginally wrong (+0.0053, driven by seed 3 at +0.018); repeat share falls >=20% for unlikelihood — met only at the boundary (−20.4%), on ONE checkpoint, so a screen, not a claim; weighting does nothing for generated repeats (+10%, within noise). Blind coherence was NOT rated (needs raters): the question whether fewer repeats move the 6-8/15 score is open. Next if wanted: 3-4 checkpoints per arm for the share, then a blind set of unlikelihood vs baseline (the peer session offered rating).

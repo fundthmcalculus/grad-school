@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v25-rep\\weight_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10856,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.23998
+  ],
+  [
+   100,
+   1.60088
+  ],
+  [
+   200,
+   1.44418
+  ],
+  [
+   300,
+   1.35887
+  ],
+  [
+   400,
+   1.30662
+  ],
+  [
+   500,
+   1.26487
+  ],
+  [
+   600,
+   1.22365
+  ],
+  [
+   700,
+   1.19179
+  ],
+  [
+   800,
+   1.16509
+  ],
+  [
+   900,
+   1.14218
+  ],
+  [
+   1000,
+   1.12582
+  ],
+  [
+   1100,
+   1.1146
+  ],
+  [
+   1160,
+   1.10856
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.7904
+  ],
+  [
+   50,
+   8.6325
+  ],
+  [
+   100,
+   6.6645
+  ],
+  [
+   150,
+   5.6569
+  ],
+  [
+   200,
+   5.1512
+  ],
+  [
+   250,
+   4.8562
+  ],
+  [
+   300,
+   4.6419
+  ],
+  [
+   350,
+   4.5023
+  ],
+  [
+   400,
+   4.4079
+  ],
+  [
+   450,
+   4.2796
+  ],
+  [
+   500,
+   4.2159
+  ],
+  [
+   550,
+   4.1589
+  ],
+  [
+   600,
+   4.0898
+  ],
+  [
+   650,
+   4.0128
+  ],
+  [
+   700,
+   3.965
+  ],
+  [
+   750,
+   3.9155
+  ],
+  [
+   800,
+   3.8551
+  ],
+  [
+   850,
+   3.8127
+  ],
+  [
+   900,
+   3.7823
+  ],
+  [
+   950,
+   3.7392
+  ],
+  [
+   1000,
+   3.699
+  ],
+  [
+   1050,
+   3.6658
+  ],
+  [
+   1100,
+   3.6557
+  ],
+  [
+   1150,
+   3.6358
+  ],
+  [
+   1159,
+   3.633
+  ]
+ ],
+ "train_seconds": 80.94,
+ "wall_seconds": 99.53,
+ "chars_per_sec": 117406,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a little girl who was ready to pull. She took her mom back and gave her a few spining that the fat.\nSuddenly, she found a small balm. It was so closely to go inside. The little girl was scared, and she put the balance into the yet. It was a funny tree and changered.\nThe girl and the yellow bird flew away. They found the monkey together, a family came up. The little girl and the cat played together every day. They laughed and loved the baskin.\nThe little boy and the little girl decided to play outside. They played together all day, even notad. After playing, the little girl played in the park with the little girl. They had so much fun and had a fun day.\n<|eot|>\n\nOnce, a little girl called Jolly stucks, A little girl who was gone. She was not a while, she tried to throw the ugly her trip, but she was a soft streation. She replied her face and mad, and her friend, a boy named Tom, Tom, tried to get the road to make the streation. \nTom was so happy and enjoyed her toward with her unperporm.\n",
+ "rule_init": {},
+ "ngram_init": {}
+}
