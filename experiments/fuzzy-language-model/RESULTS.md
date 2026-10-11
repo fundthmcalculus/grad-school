@@ -1326,3 +1326,15 @@ Same parameters, more compute: BPE1024 D d = 48, ctx 512 / batch 16, 32 rules pe
 **G33 refuted** (needed ≥ 0.01 better; weight-shared depth is 0.012 *worse* at 4 applications, ≈ 2.5 s.e. of the baseline mean; a modest effect). **G34 supported** (6 is not better than 4; it is 0.002 worse).
 Reusing two blocks more times does not buy capability for D at this size and costs 2–3× the compute; the CPU-phase observation that BPC improved with applications was for the old zero-order FFN at d = 16 and does not carry over.
 No 300M run and no coherence re-grade (registered condition not met).
+
+## Conclusion of the sub-100K track (GPU session, 2026-10-11)
+
+**Declared finished by the GPU session; reopen on the user's instruction.** The goal was "make the fuzzy language model as capable as possible under 100K parameters". Where it ended:
+
+* **Best model under 100K:** BPE1024 delta-form fuzzy LM (D), d = 48, 2 layers, 8 heads, 32 rules per head, first-order raw-firing HTSK TSK FFN, ctx 512 / batch 16, lr 6e-2: **96,416 parameters**.
+  1.0015 ± 0.0039 BPC at 300M chars (two seeds: 0.9976, 1.0053); 1.1095 ± 0.0048 at 30M (five seeds). At 93,344 parameters (ctx 256, 16 rules) it beats the two best tuned neural references on the same tokenizer by 0.027–0.030 BPC over ten seeds at 30M chars.
+  From the original character-level fuzzy design (≈ 1.62 BPC at ≈ 97K, 30M chars) to 1.11 at the same budget and parameter count; the TSK feed-forward layer (not the mixer) was the whole original deficit, subword tokens were the largest later gain.
+* **What did not matter at this size (each moved loss by ≤ ~0.03 and none moved coherence):** longer context, more rules per head beyond 32, Fibonacci-lag attention (better than dense attention, far behind D), attention–recurrent hybrids (worse than D), distillation from a 280K teacher, weight averaging, continued training beyond the data curve, decoding strategy, and weight-shared depth.
+* **Coherence is not achieved.** Two blind raters score the best models' stories 6.9–7.6 / 15 (plot sense ≈ 1.7–1.9 / 5); the criterion the CPU session proposed (≥ 12/15 and plot ≥ 3.5 from both raters) is far away. The measure is noisy (≈ ±1.5 per set); the large separations (character vs subword models) are real, the fine ordering among the top models is not.
+* **The one untested lever is parameter count** (the CPU session's `v9` ladder, 251K–7M). It is outside the stated cap and was not run on the GPU host; the CPU session ran a 251K model on its own host under its user's approval and will report it separately.
+* **Open items not closed:** PR #272 was not merged (the permission classifier blocked it); the `v3-lr` study and the character-level ten-seed plan (`v4-*`) were not run to completion; D's learning-rate sensitivity was checked at 10M and 30M chars only.
