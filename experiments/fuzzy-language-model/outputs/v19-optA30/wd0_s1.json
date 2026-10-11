@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.0,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-optA30\\wd0_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11468,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.35692
+  ],
+  [
+   580,
+   1.23036
+  ],
+  [
+   870,
+   1.15157
+  ],
+  [
+   1160,
+   1.11468
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2386
+  ],
+  [
+   50,
+   8.2151
+  ],
+  [
+   100,
+   6.3443
+  ],
+  [
+   150,
+   5.3873
+  ],
+  [
+   200,
+   4.8973
+  ],
+  [
+   250,
+   4.6138
+  ],
+  [
+   300,
+   4.4273
+  ],
+  [
+   350,
+   4.3049
+  ],
+  [
+   400,
+   4.23
+  ],
+  [
+   450,
+   4.1175
+  ],
+  [
+   500,
+   4.0622
+  ],
+  [
+   550,
+   4.0017
+  ],
+  [
+   600,
+   3.9462
+  ],
+  [
+   650,
+   3.8743
+  ],
+  [
+   700,
+   3.8336
+  ],
+  [
+   750,
+   3.7944
+  ],
+  [
+   800,
+   3.7445
+  ],
+  [
+   850,
+   3.7034
+  ],
+  [
+   900,
+   3.6809
+  ],
+  [
+   950,
+   3.6389
+  ],
+  [
+   1000,
+   3.6022
+  ],
+  [
+   1050,
+   3.5753
+  ],
+  [
+   1100,
+   3.5705
+  ],
+  [
+   1150,
+   3.5551
+  ],
+  [
+   1159,
+   3.5512
+  ]
+ ],
+ "train_seconds": 85.55,
+ "wall_seconds": 99.93,
+ "chars_per_sec": 111077,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Spea. Suddenly, she found a little bird outside. Spea was very happy. She said, \"Look, Toe! You can be okay. But you can see a grown bench!\"\nSuddenly, Cpold box went into the windowing. Spoiledm was so curious. Spoppy sang a clear, but they couldn't wait to play anymore. Spo said, \"Thank you, Tone. If you like your new place.\"\nSo, Lize went outside and ran to Spondry. She did not know what was inside. She smiled and thanked Lized it. She hoped the quiet it before. It was now a good day.\n<|eot|>\n\nOnce,, there was a nice girl named Lily on a valn. She loved to play outside on her tire. One day, she found a small bus with a big dog. The dog was scared.\nLily thought she wanted to play with her friends. She tried to get the tire, but her friend, Kumpks. She was very happy. She wanted to help them. But then, something unexpected happened. The dog started to cook the leave away towards the univen.\nLily was scared",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.95,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-optA30\\b2-95_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10642,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.34774
+  ],
+  [
+   580,
+   1.22081
+  ],
+  [
+   870,
+   1.1468
+  ],
+  [
+   1160,
+   1.10642
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2981
+  ],
+  [
+   50,
+   8.0961
+  ],
+  [
+   100,
+   6.2478
+  ],
+  [
+   150,
+   5.3413
+  ],
+  [
+   200,
+   4.8547
+  ],
+  [
+   250,
+   4.5964
+  ],
+  [
+   300,
+   4.4265
+  ],
+  [
+   350,
+   4.2884
+  ],
+  [
+   400,
+   4.1753
+  ],
+  [
+   450,
+   4.0795
+  ],
+  [
+   500,
+   4.0272
+  ],
+  [
+   550,
+   3.9538
+  ],
+  [
+   600,
+   3.9148
+  ],
+  [
+   650,
+   3.8606
+  ],
+  [
+   700,
+   3.801
+  ],
+  [
+   750,
+   3.7638
+  ],
+  [
+   800,
+   3.7309
+  ],
+  [
+   850,
+   3.6904
+  ],
+  [
+   900,
+   3.6563
+  ],
+  [
+   950,
+   3.6158
+  ],
+  [
+   1000,
+   3.5926
+  ],
+  [
+   1050,
+   3.5694
+  ],
+  [
+   1100,
+   3.5537
+  ],
+  [
+   1150,
+   3.519
+  ],
+  [
+   1159,
+   3.5201
+  ]
+ ],
+ "train_seconds": 79.84,
+ "wall_seconds": 86.38,
+ "chars_per_sec": 119026,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big paper. \nThe measure was shiver. It would dreaming fast and like the fan. He put it on the big birthday and the beautiful flowers and loved to go inside. He felt mask and just wanted to poke his aen, but he slided he could not find his adventure.\nAs the elephant got home, Tom, he saw a big tree. He said, \"Hello, little bird!\" So the cat found a bench of the tree. It was very sad. The bird said, \"I want to make a fanet!\" The cat did not know what was inside to make a favorite place to go.\nThen, something unexpected happened. The cat was a beautiful dog named Lily. She put the mown, organized Wakeing on it! She thanked the dog and he played outside on the tire. From that day on, they played together in the park, all day, and all lived happily ever after.\n<|eot|>\nOnce upon a time, in a small town, there lived a big dog named Spot. Spot loved to play with. He would play with his mom and dad would jour.\nOne day, Sam saw a pink tree and wanted to grow the bird. Sam asked, \"What are you wearing",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 0.3,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-optA30\\clip03_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.09875,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.36366
+  ],
+  [
+   580,
+   1.22558
+  ],
+  [
+   870,
+   1.14124
+  ],
+  [
+   1160,
+   1.09875
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3706
+  ],
+  [
+   50,
+   8.0724
+  ],
+  [
+   100,
+   6.2064
+  ],
+  [
+   150,
+   5.3062
+  ],
+  [
+   200,
+   4.8475
+  ],
+  [
+   250,
+   4.59
+  ],
+  [
+   300,
+   4.429
+  ],
+  [
+   350,
+   4.3107
+  ],
+  [
+   400,
+   4.2294
+  ],
+  [
+   450,
+   4.133
+  ],
+  [
+   500,
+   4.069
+  ],
+  [
+   550,
+   3.9927
+  ],
+  [
+   600,
+   3.922
+  ],
+  [
+   650,
+   3.8555
+  ],
+  [
+   700,
+   3.8036
+  ],
+  [
+   750,
+   3.7719
+  ],
+  [
+   800,
+   3.7143
+  ],
+  [
+   850,
+   3.659
+  ],
+  [
+   900,
+   3.63
+  ],
+  [
+   950,
+   3.5868
+  ],
+  [
+   1000,
+   3.5466
+  ],
+  [
+   1050,
+   3.5226
+  ],
+  [
+   1100,
+   3.5088
+  ],
+  [
+   1150,
+   3.5103
+  ],
+  [
+   1159,
+   3.505
+  ]
+ ],
+ "train_seconds": 79.44,
+ "wall_seconds": 86.47,
+ "chars_per_sec": 119629,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and fast bird. \nThe mean was gone, and he was. Now, the bird went to the park to put the pizzy to the magic wind. It had so much fun together. Now, they always helped a new adventure about the oven to learn to slide.\n<|eot|>\nOne day, a little boy named Tim went for a walk with his mom. They were playing in the park. Tim saw a big tree with red boats. He was a little bit. Tim wanted to make a loud noise. He saw a big tree and wanted to play with the tree.\nTim's mom said, \"Wow, let's play and hurt!\" Tim thought for a moment and said, \"I should help you find something to be yummy Pite. It's now!\" The botted Tim's mad. He wanted to take the tree on the tree.\nTim barked and started to cry. He tried to go up and down. The bottom said, \"Wow, that is a big bottle!\" Tim came to the park and said, \"Hello, Tim! But you have to be boring for my wings.\" Tim smiled and said, \"I like to play with this pot. The bottan to use the pot anymore.\" The botte started",
+ "rule_init": {},
+ "ngram_init": {}
+}

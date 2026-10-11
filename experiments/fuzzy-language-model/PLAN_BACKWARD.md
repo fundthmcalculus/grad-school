@@ -58,3 +58,10 @@ Init validation BPC (uniform 3.16; **unigram 2.617**; random init 3.2928; antece
 token marginals, so the embedding carries no frequency direction and the bias-free tied readout cannot express a unigram prior. Next (not run): add a log-frequency dimension to the aligned embedding.
 (4) Init-only: the n-gram init (RESULTS.md) showed head starts like this wash out within ~100 steps. The test that matters is the training curve (stage 1b), which needs the GPU and the `--rule-init conseq` hook.
 A different reading of "clustered embeddings" would be to *share* embedding rows within frequency/association clusters (the embedding is 49K of the 96K parameters); that is a parameter-budget test, not built.
+
+## Registered 2026-10-11, before `v22-tribble` (stage 1b; user: "generate the results for the TRIBBLE-form FLM")
+GPU, one job at a time: 96K BPE1024 D, 30M characters, seeds 0-4, evaluated at step 0 and every 100 steps. Variants (`flm/run_tribble.py`, `flm/run_conseq.py`, `--rule-init data` is the switch, train.py untouched):
+`random` (no rule init), `data` (antecedent-first, existing), `cf` (answers = k-means of the model embedding, centroid consequents), `cfls` (least-squares consequents), `assocls` (answers by PPMI-SVD association, least squares),
+`succcf` (embedding set to the PPMI-SVD successor vectors, centroid consequents). 30 jobs, ~1 h.
+Predictions: (a) **the head start is gone by step 300**: every construction variant is within 0.02 BPC of `random` at step 300; (b) **final BPC at 30M is within 0.005 of `random` for every variant** (random's 5-seed mean was 1.1095 +/- 0.0048 at the 30M reference);
+(c) `succcf` reaches 1.5 BPC in at least 25% fewer steps than `random` (the init BPC advantage is the largest, 2.81 vs 3.29). (b) failing in the good direction would be the first sub-100K gain from structure-first; it would go to ten seeds.

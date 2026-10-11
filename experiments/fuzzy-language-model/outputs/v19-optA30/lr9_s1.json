@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.09,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-optA30\\lr9_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11759,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.37945
+  ],
+  [
+   580,
+   1.25532
+  ],
+  [
+   870,
+   1.16233
+  ],
+  [
+   1160,
+   1.11759
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2386
+  ],
+  [
+   50,
+   8.0679
+  ],
+  [
+   100,
+   6.2663
+  ],
+  [
+   150,
+   5.3598
+  ],
+  [
+   200,
+   4.9111
+  ],
+  [
+   250,
+   4.656
+  ],
+  [
+   300,
+   4.4859
+  ],
+  [
+   350,
+   4.3776
+  ],
+  [
+   400,
+   4.3056
+  ],
+  [
+   450,
+   4.204
+  ],
+  [
+   500,
+   4.1526
+  ],
+  [
+   550,
+   4.0953
+  ],
+  [
+   600,
+   4.0347
+  ],
+  [
+   650,
+   3.9642
+  ],
+  [
+   700,
+   3.9098
+  ],
+  [
+   750,
+   3.8587
+  ],
+  [
+   800,
+   3.7982
+  ],
+  [
+   850,
+   3.749
+  ],
+  [
+   900,
+   3.7165
+  ],
+  [
+   950,
+   3.6705
+  ],
+  [
+   1000,
+   3.6282
+  ],
+  [
+   1050,
+   3.596
+  ],
+  [
+   1100,
+   3.5803
+  ],
+  [
+   1150,
+   3.5607
+  ],
+  [
+   1159,
+   3.5574
+  ]
+ ],
+ "train_seconds": 85.5,
+ "wall_seconds": 98.96,
+ "chars_per_sec": 111140,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and little bird. The birdquurkey was a new friend. They would always go to the park with the moon.\nOne day, the big tree had a magic wind. It was so big and shiny. The tree was so small and strong. The tree was sad because it was a new friend.\nThe cat saw the tree. The tree was very curious. The tree did not know what it was. The tree was hurt, but it was not a red road. The tree saw some bike and fell down. The tree found the tree. It was very borted the tree. The tree said, \"Don't worry, you did not start.\" The tree was scared and thanked the tree again.\n<|eot|>\n\nOne day, while playing, a big tree stopped shiping. It was a big, monster. He wanted to stop some stops. He saw a big spray on the ground. He tried and tried, but it was too busy. He wanted to play with it.\n\"Hello, cat! I want to play with me,\" said the wings.\n\"What is my friend?\". The prince looked at the slide and saw the yellow road. It was a rabbit, but the splielder unperate.\n\"H",
+ "rule_init": {},
+ "ngram_init": {}
+}

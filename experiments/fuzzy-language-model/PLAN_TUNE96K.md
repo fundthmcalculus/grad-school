@@ -88,3 +88,21 @@ Paired differences (variant - base; negative = better), seed 0 / seed 1:
 
 **Reading.** At 4M characters a higher lr (9e-2) looks better and a lower floor looks worse; both are the usual short-budget behaviour (a short run is dominated by early progress, so the schedule tail matters less and a hotter lr pays),
 and neither is claimed for the 30M-1B regime where 6e-2 was the measured optimum. The two predictions that were wrong are recorded as wrong. `v19-optA30` (GPU, 30M characters, 3 seeds) is the test that counts.
+
+## Outcome `v19-optA30` (GPU, 30M characters, seeds 0-2, 39 jobs, ~95 s each; base = 1.1110 +/- 0.0026: 1.1120 / 1.1129 / 1.1080)
+Paired by seed against base (negative = better):
+
+| knob | mean BPC | paired deltas (s0 / s1 / s2) | mean delta | reading |
+|---|---|---|---|---|
+| **warm-up 300** | 1.0997 | -0.0172 / -0.0101 / -0.0065 | **-0.0113** | **better in all 3 seeds** |
+| warm-up 30 | 1.1315 | +0.0185 / +0.0248 / +0.0183 | **+0.0205** | worse in all 3 seeds |
+| lr floor 0.3 | 1.1325 | +0.0210 / +0.0237 / +0.0198 | **+0.0215** | worse in all 3 seeds |
+| lr floor 0.0 | 1.1110 | -0.0005 / -0.0003 / +0.0007 | 0.000 | no effect |
+| beta2 0.95 / 0.999 | 1.1124 / 1.1182 | mixed | +0.0014 / +0.0072 | no effect (0.999 hurts one seed by +0.020) |
+| grad clip 0.3 / off | 1.1087 / 1.1131 | mixed | -0.0023 / +0.0021 | no effect |
+| lr 4e-2 / 9e-2 | 1.1121 / 1.1120 | mixed | +0.0012 / +0.0010 | flat plateau from 4e-2 to 9e-2 |
+| weight decay 0 / 0.1 | 1.1139 / 1.1129 | +0.0024..+0.0045 / mixed | +0.0029 / +0.0019 | no effect, as predicted |
+
+**Predictions, scored:** weight decay no effect: **right**. lr floor 0.0 better: **wrong** (null). beta2 0.95 better: **wrong** (null). clip and warm-up no effect: clip **right**, **warm-up wrong** (it is the one knob that moves the result, monotonically: 30 steps +0.021, 100 = base, 300 -0.011).
+lr 9e-2 worse and 4e-2 worse: **wrong** (a flat plateau); the 4M-character CPU screen's "lr 9e-2 better" and "lr floor 0 worse" did not carry to 30M, as warned. So the optimiser settings of the 96K model are on a plateau except warm-up, and the floor should stay at 0.1 or below.
+**Next (registered):** warm-up {600, 1000, 2000} at 30M, seeds 0-4 (with 100 and 300 re-run on seeds 3-4), then the winner at 300M (2-seed) before it is claimed. One knob, so it is not a tuned-over-many claim; the five-seed 30M reference stays 1.1095 +/- 0.0048.
