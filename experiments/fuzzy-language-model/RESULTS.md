@@ -1464,3 +1464,19 @@ loss improved by 0.02–0.03 BPC with no coherence signal visible through a meas
   (lr 6e-2: 1.1291 vs lr 3e-2: 1.1292, no difference at 30M). The character-level D's own optimum was never measured on the full grid and is not claimed.
 * **`v4-*` (the CPU session's character-level ten-seed plan): not run, and not needed for any claim made here.** Every fuzzy-vs-neural statement in this record that is meant to be cited is the BPE1024 ten-seed comparison (`v6-final10`). The earlier character-level comparison
   (`v3-final` / `v3-ref`, 2–3 seeds) remains **not citable**; running `v4-final10` (40 cells, several GPU-hours) would only upgrade that older, superseded claim.
+
+## Outcome of the 1.32M CPU run (CPU session, 2026-10-11; decision D5 in DECISIONS.md)
+
+D at d 192, 4 layers (1,323,904 parameters), BPE1024, ctx 512, batch 16, lr 2e-2 (untuned), 30M characters, seed 0, CPU (8 threads, 100 minutes):
+**0.8300 BPC** (`outputs/v9-cpu/d192-L4_30M_s0.json`; the checkpoint is 5.3 MB and is kept out of git by the 5 MB rule). Same 30M characters: 93K 1.1232, 251K 0.9700, 1.32M 0.8300.
+Registered before it finished: BPC at most 0.93 (supported); blind plot 2.0 or above (not met); total 10/15 or above (not met).
+
+Blind coherence, set 7 (`report/coherence7_*`; fresh seeds 12-13; 3 models x 8; **one rater**, the CPU session, scores written before the key was opened):
+1.32M at 30M characters **7.50 +/- 0.65** (plot 1.75); 96K at 1B characters 6.88 +/- 0.48 (plot 1.38); 96K at 300M characters 5.75 +/- 0.25 (plot 1.00).
+The same 300M checkpoint scored 8.12 (two raters) in set 2 and 8.00-8.25 in other sets: set-to-set noise is about 2 points, larger than any difference here. The 1.32M model with 0.83 BPC
+is not distinguishable from the 96K models, whose BPC is 0.98-1.00. Across 93K-1.32M parameters and BPC 1.13-0.83, blind coherence has stayed at 6-8 /15, plot 1.0-2.4 /5.
+
+Rule-ablation of the 1.32M model (`outputs/v9-cpu/ablation_d192_k{8,32}.json`, 80 x 256-token windows, 288 FFN rules per layer, 4 layers): cited rules are causal in all four layers at k = 8 and k = 32
+(cited cost above the random 95th percentile every time), but the effects are tiny: silencing the 8 most-cited rules costs +0.029 BPC in layer 0 and +0.002 to +0.006 in layers 1-3 (random 95th percentile
++0.012, +0.001, +0.001, +0.001); 32 rules cost +0.064, +0.008, +0.007, +0.012. They win 22-60% of positions (k = 8) and 45-86% (k = 32). The rulebook is causal but the function is spread over many rules:
+a short rulebook explains little of a 1.3M model.

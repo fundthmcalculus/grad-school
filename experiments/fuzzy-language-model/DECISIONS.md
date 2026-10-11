@@ -51,3 +51,13 @@ would change the decision.
 * **Predictions (registered before it finishes):** val BPC at most 0.93 (60%); blind plot (single rater, same protocol, fresh seeds) 2.0 or above (35%); total 10/15 or above (25%).
 * **After it finishes:** grade a blind set (1.32M, 251K, 93K at 300M; seeds 8-9), run rule-ablation with 8 and with 32 cited rules, log D6. If plot is still under 2.0 the conclusion in D4 stands for this architecture at 30M characters.
 * **I am not changing anything else while it runs** (jobs import code from disk; I do no code merges until it ends).
+
+## D6 (2026-10-11): result of D5 and what I am recommending
+* **Result:** 1.32M parameters at 30M characters: 0.8300 BPC, blind coherence 7.50 /15 (plot 1.75), indistinguishable from the 96K models (5.75-8.25 /15). The registered plot prediction (2.0 or above) failed.
+  The conclusion in D4 stands, now out to 14x the headline parameters: **lower loss and more parameters have not produced coherent stories in this architecture at 30M characters**.
+* **What it does show:** explainability degrades with size. The rulebook stays causal, but 8 rules out of 288 explain only 0.2-3% of the loss in each layer.
+* **Decision:** no further CPU models. The 1.32M model was undertrained for its size (30M characters = 2.3 characters per parameter-equivalent... i.e. far from the data a 1M-parameter model needs), so the
+  size question is still not cleanly closed: a 1.3M model on 1B characters is the test, and it takes GPU hours. That is for you and the GPU session's user (see D3), not me.
+* **Recommended morning decision:** (a) accept that, inside the current cap and this architecture, coherence is not reachable and stop; (b) approve one GPU run of the 1.32M configuration (v9 `d192-L4`) on the 1B-character stream
+  (about 5 GPU-hours at the GPU session's speeds; the measured cost is the open number) to close the size-times-data question; or (c) change the mechanism (an explicit story state).
+  I would do (b) once, then (c). I have not asked the GPU session to start (b).
