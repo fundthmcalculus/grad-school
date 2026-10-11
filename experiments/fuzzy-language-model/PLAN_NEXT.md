@@ -100,3 +100,11 @@ Predictions: both new arms beat `t512e24m25` by 0.003-0.015 — `t768e16m225` ye
 | 0 | 0.98099 | 0.9976 | **−0.0166** |
 | 1 | 0.98209 | 1.0053 | **−0.0232** |
 Confirmed under the registered rule (>= 0.003 better on both seeds). Prediction (the 30M gain of −0.013 shrinks to −0.003…−0.010 at 300M): **wrong in the good direction** — the gain grew (−0.017/−0.023). The 98,280-parameter model at 300M characters (0.981) matches the 96K baseline at 1B characters (0.982) with a third of the data. Caveat: 2 seeds; baseline seeds are the v12-long512 pair, trained before several code changes (the 30M cells at the same commit were re-run, so the 30M comparison is clean; the 300M reference is the archived run). Checkpoints `outputs/v31-tiered300m/*.pt` load only through `flm.run_tiered` / `flm.coherence_tiered` (the state dict has `emb_h`/`emb_t`/`tier_up`, not `emb`): any tool that rebuilds a stock `TinyLM` (the demo, `rule_dist`) will fail on them. Recipe candidate: tiered 768/16 + FFN mult 2.25 replaces the 96K recipe if a 1B/3B run keeps the gap.
+
+### Blind coherence, set 11 (`report/coherence11_*`; fresh seeds 22-23; 8 texts per model; two Claude sub-agent raters, scores written before the key was opened)
+| model | rater A total (G/C/P) | rater B total (G/C/P) |
+|---|---|---|
+| 96K, 3B chars (0.978) | 5.62 (2.38/1.75/1.50) | 5.75 (2.38/1.88/1.50) |
+| 96K, 300M chars (0.998) | 5.62 (2.50/1.62/1.50) | 5.50 (2.50/1.62/1.38) |
+| tiered 98,280 params, 300M chars (0.981) | 5.50 (2.38/1.75/1.38) | 5.12 (2.12/1.62/1.38) |
+The tiered model's 0.017-0.023 BPC gain at 300M does not show up as coherence: all three models are within 0.6 points (noise 1.5-2), plot ~1.4 for all. Same finding as the data-scaling and the lever screens: BPC at this size moves without moving blind coherence; only the 1.32M x 1B run did (set 10: ~10/15, plot ~3). Predictions were not registered for this set (I expected, unregistered, a small lift; there was none).
