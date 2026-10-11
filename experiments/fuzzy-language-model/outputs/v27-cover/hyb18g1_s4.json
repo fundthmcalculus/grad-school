@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v27-cover\\hyb18g1_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.15379,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.20092
+  ],
+  [
+   100,
+   1.59851
+  ],
+  [
+   200,
+   1.44908
+  ],
+  [
+   300,
+   1.37715
+  ],
+  [
+   400,
+   1.33689
+  ],
+  [
+   500,
+   1.29543
+  ],
+  [
+   600,
+   1.26408
+  ],
+  [
+   700,
+   1.23308
+  ],
+  [
+   800,
+   1.21302
+  ],
+  [
+   900,
+   1.18731
+  ],
+  [
+   1000,
+   1.1695
+  ],
+  [
+   1100,
+   1.15836
+  ],
+  [
+   1160,
+   1.15379
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.112
+  ],
+  [
+   50,
+   8.1501
+  ],
+  [
+   100,
+   6.3109
+  ],
+  [
+   150,
+   5.4055
+  ],
+  [
+   200,
+   4.9229
+  ],
+  [
+   250,
+   4.671
+  ],
+  [
+   300,
+   4.4913
+  ],
+  [
+   350,
+   4.385
+  ],
+  [
+   400,
+   4.2867
+  ],
+  [
+   450,
+   4.2306
+  ],
+  [
+   500,
+   4.1676
+  ],
+  [
+   550,
+   4.1162
+  ],
+  [
+   600,
+   4.0506
+  ],
+  [
+   650,
+   4.0019
+  ],
+  [
+   700,
+   3.9633
+  ],
+  [
+   750,
+   3.9231
+  ],
+  [
+   800,
+   3.8744
+  ],
+  [
+   850,
+   3.824
+  ],
+  [
+   900,
+   3.7935
+  ],
+  [
+   950,
+   3.766
+  ],
+  [
+   1000,
+   3.7351
+  ],
+  [
+   1050,
+   3.7028
+  ],
+  [
+   1100,
+   3.6933
+  ],
+  [
+   1150,
+   3.6653
+  ],
+  [
+   1159,
+   3.6673
+  ]
+ ],
+ "train_seconds": 79.57,
+ "wall_seconds": 93.98,
+ "chars_per_sec": 119420,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy. Mia loved to play with her special shoes. One day, Mia found a big, red fat. She put it on the big birper. Lily was beautiful and arm is first, so she put it in the water. Lucy tried to reach it, but he couldn't find it.\nSue was curious and started to cry. She wanted to show it to herself, but it was too big and scared. She said, \"I am up and full of jeep's paste. Don't wake up!\"\nSue said, \"Don't worry, you can sing your hat together.\"\nLily and Kitty felt sad. She said, \"Thank you, Lucy.\" Her mom hugged her and said, \"Thank you, Mia, you are sad. You are nice and happy. That is bad. You can have more elses anymore. You have to share the monster and share with your family.\n<|eot|>\nOnce upon a time, a little girl named Lily went to the park. She liked to play with water every day. One day, she found a big tree. It was a smelly pile of cares. But it was too small and sad. Tom said, \"I am sorry, bird! I will help you behave. We can learn",
+ "rule_init": {
+  "variant": "hyb18g1",
+  "L0.ffn": {
+   "gain": 1.0,
+   "ce_nats": 7.0844
+  },
+  "L1.ffn": {
+   "gain": 1.0,
+   "ce_nats": 7.0158
+  }
+ },
+ "ngram_init": {}
+}

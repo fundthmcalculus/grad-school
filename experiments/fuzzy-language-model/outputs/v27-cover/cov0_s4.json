@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v27-cover\\cov0_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.15819,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.25001
+  ],
+  [
+   100,
+   1.60207
+  ],
+  [
+   200,
+   1.45676
+  ],
+  [
+   300,
+   1.39297
+  ],
+  [
+   400,
+   1.34761
+  ],
+  [
+   500,
+   1.30779
+  ],
+  [
+   600,
+   1.27863
+  ],
+  [
+   700,
+   1.24351
+  ],
+  [
+   800,
+   1.21839
+  ],
+  [
+   900,
+   1.19336
+  ],
+  [
+   1000,
+   1.17591
+  ],
+  [
+   1100,
+   1.16226
+  ],
+  [
+   1160,
+   1.15819
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2657
+  ],
+  [
+   50,
+   8.1673
+  ],
+  [
+   100,
+   6.3207
+  ],
+  [
+   150,
+   5.4203
+  ],
+  [
+   200,
+   4.9419
+  ],
+  [
+   250,
+   4.6989
+  ],
+  [
+   300,
+   4.5247
+  ],
+  [
+   350,
+   4.4174
+  ],
+  [
+   400,
+   4.3206
+  ],
+  [
+   450,
+   4.2657
+  ],
+  [
+   500,
+   4.2055
+  ],
+  [
+   550,
+   4.1532
+  ],
+  [
+   600,
+   4.0823
+  ],
+  [
+   650,
+   4.0348
+  ],
+  [
+   700,
+   3.9925
+  ],
+  [
+   750,
+   3.954
+  ],
+  [
+   800,
+   3.8994
+  ],
+  [
+   850,
+   3.8451
+  ],
+  [
+   900,
+   3.8129
+  ],
+  [
+   950,
+   3.7808
+  ],
+  [
+   1000,
+   3.7551
+  ],
+  [
+   1050,
+   3.7191
+  ],
+  [
+   1100,
+   3.7075
+  ],
+  [
+   1150,
+   3.6788
+  ],
+  [
+   1159,
+   3.6806
+  ]
+ ],
+ "train_seconds": 79.28,
+ "wall_seconds": 93.87,
+ "chars_per_sec": 119866,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and little bird. The bird was not good to visit at her friends. They were very careful and promised to help others.\n<|eot|>\nOnce upon a time, there was a small Kitty named Munny. Biny loved to play with his ball. So, she had a big box. The box was slumby, and people lived on to play with. They always signed to yell each other. They would run fast and see her mom and they were happy.\nAs they walked, they had a big book. They decided to make a new place to play. They got the red box, a lot of fun. The thing saw a bit sing and was evenrown. The bit the box and the box were scared.\nSo, they were very surprised. It thought it was a big box, so she was sad. He wanted to help the door on the box.\nAfter the box came outside, Tom and Max played with the box. He found a small busht man in the box green, but it was so happy. They all ran back to each other if they played with the box of things, and her friends became best friends.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She lived in a small house with her mom and her hairp, fun towards her toys. She was making her wa",
+ "rule_init": {
+  "variant": "cov0",
+  "L0.ffn": {
+   "gain": 0.25,
+   "ce_nats": 7.1954
+  },
+  "L1.ffn": {
+   "gain": 0.25,
+   "ce_nats": 7.1209
+  }
+ },
+ "ngram_init": {}
+}

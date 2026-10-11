@@ -130,3 +130,15 @@ Registered before running (5 seeds each, so these can support a ranking and, wit
 
 ### `v26-hybrid` follow-up, gain capped at 1 (CPU, 4M chars, seeds 0-1; base 1.4220 / 1.4399)
 hyb4g1 1.4573 / 1.4556 (+0.035 / +0.016); hyb12g1 1.4423 / 1.4462 (+0.020 / +0.006). Prediction right: the seed-1 blow-up is gone (it was the gain pegging at 1024) and neither hybrid beats base. The gain-1 seed-0 values equal the first-pass seed-0 values because seed 0 had already chosen gain <= 1. At this size every consequent-first variant, hybrid or full, is worse than random by 0.006-0.035, so the hybrid-by-fraction idea did not rescue the construction at 4M; the 30M coverage screen (`v27-cover`) is the remaining test of the user's cover variant.
+
+### `v27-cover` outcome (GPU, 30M chars, seeds 0-4)
+
+| arm | BPC mean ± sd | vs random (1.1095) | vs antecedent-first `data` (1.1029), paired |
+|---|---|---|---|
+| random | 1.1095 ± 0.0107 | – | +0.0066 |
+| `data` | 1.1029 ± 0.0070 | −0.0066 | – |
+| `hyb18g1` (25% built, rest random, gain <= 1) | 1.1345 ± 0.0125 | +0.025 | +0.032 (5/5 worse) |
+| `cov25` (25% built, rest D^2-covered) | 1.1437 ± 0.0076 | +0.034 | +0.041 (5/5 worse) |
+| `cov0` (all D^2-covered, no clustering) | 1.1510 ± 0.0089 | +0.042 | +0.048 (5/5 worse) |
+
+Predictions: (1) hyb18g1 within +0.02 of random — wrong, narrowly (+0.025); (2) cov0 within 0.01 of `data` — **wrong** (+0.048); (3) cov25 no better than cov0 by >0.005 — wrong, narrowly (0.0073 better); (4) nothing beats `data` — right. Ordering: random-placed rest < covered rest < all covered, so the "intelligent" D^2 placement is *worse* than random placement, and every 25% hybrid is worse than random init. The only non-negative arm in the whole backward line is plain antecedent-first `data` (−0.0066, within noise on 2/5 seeds). Untested mechanism for the cover's harm: D^2 sampling favours outliers of the input distribution, and a raw-firing Gaussian rule centred on an outlier barely fires, so it gets almost no gradient (the same dying-rule route as the dead layer-1 FFN); layer-1 rule usage was not measured here. Decision: the hot-start / construction line is closed for this model; `data` remains an optional -0.007 (n=5, not a claim).
