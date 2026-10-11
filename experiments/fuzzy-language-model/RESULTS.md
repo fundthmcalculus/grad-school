@@ -1426,3 +1426,15 @@ If rater 2 agrees, this is the first in-cap lever that moved coherence beyond no
 Same cell as `v17-1b` (BPE1024 D d = 48, ctx 512 / batch 16, 32 rules, lr 6e-2, 1,000M chars, `FLM_TRAIN_SUFFIX=_1b`), seed 1, saved; ~45 min. Seed 0 scored 0.9796; the 300M seed spread was 0.0054 (0.9976, 1.0053).
 * **G39.** Seed 1 scores ≤ 0.995 (within ~3 sd of the 300M-run spread of seed 0, so a replication of "about 0.98–0.99"), giving a two-seed mean ≤ 0.99 and beating the 300M two-seed mean (1.0015) by ≥ 0.01. *(~75%.)*
 * **G40.** A blind coherence set mixing the two 1B seeds against the 300M model (the CPU session grades alongside me) shows both 1B models above the 300M model by ≥ 0.8 totals each. *(~45%.)* Run only if rater 2 agrees on set 5.
+
+### Coherence set 5 with both raters (G38; key published after rater 2 scored; rater 2 = CPU session, blind, `coherence5_scores_rater2.json`)
+
+| model | val BPC | rater 1 | rater 2 | mean of raters ± s.e. (n = 8) | plot (r1 / r2) |
+|---|---|---|---|---|---|
+| BPE1024 D, ctx 512, 32 rules, **1B chars** | 0.9796 | 8.88 | 7.50 | **8.19 ± 0.40** | 2.38 / 1.62 |
+| BPE1024 D, ctx 256, 100M chars | 1.0548 | 7.50 | 6.88 | 7.19 ± 0.23 | 2.00 / 1.38 |
+| BPE1024 D, ctx 512, 32 rules, 300M chars | 0.9976 | 7.25 | 6.38 | 6.81 ± 0.44 | 1.75 / 1.38 |
+
+Inter-rater agreement on totals r = 0.60 (rater means 7.88 and 6.92; the weakest of the five sets). **G38 supported, marginally:** 1B − 300M = **+1.38** (rater 1 +1.63, rater 2 +1.12), above the registered +1.0 and just above 2 s.e. of the difference (1.28);
+1B − 100M = +1.00. Both raters rank the 1B model first on totals and on plot (but plot is only 1.6–2.4 / 5). **Cautions:** the 300M model scored 6.81 here and 8.12 (two raters) in set 2, a 1.3-point swing from different seeds, so the
+set-to-set noise is as large as the effect; one seed of the 1B model (a second seed is running, G39/G40); n = 8 per model. The result is consistent with "coherence tracks training length", it is not an established effect, and the level (8.2 / 15, plot ≈ 2 / 5) is far from the 12 / 3.5 criterion.
