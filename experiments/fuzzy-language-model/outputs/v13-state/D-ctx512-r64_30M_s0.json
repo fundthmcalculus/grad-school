@@ -1,0 +1,213 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 64,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v13-state\\D-ctx512-r64_30M_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 64,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 102560,
+ "params_nonemb": 53408,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10827,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.37064
+  ],
+  [
+   580,
+   1.24153
+  ],
+  [
+   870,
+   1.15335
+  ],
+  [
+   1160,
+   1.10827
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3823
+  ],
+  [
+   50,
+   8.1233
+  ],
+  [
+   100,
+   6.261
+  ],
+  [
+   150,
+   5.354
+  ],
+  [
+   200,
+   4.8823
+  ],
+  [
+   250,
+   4.6195
+  ],
+  [
+   300,
+   4.4571
+  ],
+  [
+   350,
+   4.341
+  ],
+  [
+   400,
+   4.2593
+  ],
+  [
+   450,
+   4.1696
+  ],
+  [
+   500,
+   4.109
+  ],
+  [
+   550,
+   4.0344
+  ],
+  [
+   600,
+   3.9704
+  ],
+  [
+   650,
+   3.9044
+  ],
+  [
+   700,
+   3.8538
+  ],
+  [
+   750,
+   3.8203
+  ],
+  [
+   800,
+   3.7573
+  ],
+  [
+   850,
+   3.7006
+  ],
+  [
+   900,
+   3.6701
+  ],
+  [
+   950,
+   3.6224
+  ],
+  [
+   1000,
+   3.5809
+  ],
+  [
+   1050,
+   3.558
+  ],
+  [
+   1100,
+   3.5392
+  ],
+  [
+   1150,
+   3.5417
+  ],
+  [
+   1159,
+   3.5363
+  ]
+ ],
+ "train_seconds": 82.28,
+ "wall_seconds": 89.93,
+ "chars_per_sec": 115498,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Sparing. She had a special shier. She would drove her room that they fell.\nSam was scared because they had a magic window. Kitty and her mom were very happy and probed to make the shires. They knew they can not talk to the snow. And they all played origer and chairs.\n<|eot|>\nOne day, a little girl named Mia found a big truck with her pillars. She liked to play and jump on it. She decided to say, \"My pick it, we can clean it.\"\nMax went inside her bite and said, \"Don't worry, Mia. I can help you help you. You know what can make a good yase with your mouth,\" she said.\nMax and her mom were excited. They learned that if you can try the best of friends, can you help me cry. They were very happy. And that was careful because they were her best word.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. Tim loved to play with his mouse, and her friends loved to play with. He always enjoyed the other toys and make fun.\nOne day, Tim went to play. The mouse went to the town with his friend, Tim. The small mouse was playing",
+ "rule_init": {},
+ "ngram_init": {}
+}

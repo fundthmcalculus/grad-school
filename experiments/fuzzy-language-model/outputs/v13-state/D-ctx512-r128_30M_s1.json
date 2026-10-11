@@ -1,0 +1,213 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 128,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v13-state\\D-ctx512-r128_30M_s1.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 128,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 114848,
+ "params_nonemb": 65696,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.09168,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.35261
+  ],
+  [
+   580,
+   1.21596
+  ],
+  [
+   870,
+   1.13212
+  ],
+  [
+   1160,
+   1.09168
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2888
+  ],
+  [
+   50,
+   8.0898
+  ],
+  [
+   100,
+   6.2793
+  ],
+  [
+   150,
+   5.3464
+  ],
+  [
+   200,
+   4.8745
+  ],
+  [
+   250,
+   4.5951
+  ],
+  [
+   300,
+   4.4114
+  ],
+  [
+   350,
+   4.281
+  ],
+  [
+   400,
+   4.1944
+  ],
+  [
+   450,
+   4.0863
+  ],
+  [
+   500,
+   4.0291
+  ],
+  [
+   550,
+   3.9688
+  ],
+  [
+   600,
+   3.9057
+  ],
+  [
+   650,
+   3.8292
+  ],
+  [
+   700,
+   3.7836
+  ],
+  [
+   750,
+   3.739
+  ],
+  [
+   800,
+   3.6828
+  ],
+  [
+   850,
+   3.6396
+  ],
+  [
+   900,
+   3.6146
+  ],
+  [
+   950,
+   3.5742
+  ],
+  [
+   1000,
+   3.5326
+  ],
+  [
+   1050,
+   3.5052
+  ],
+  [
+   1100,
+   3.4946
+  ],
+  [
+   1150,
+   3.4765
+  ],
+  [
+   1159,
+   3.473
+  ]
+ ],
+ "train_seconds": 91.24,
+ "wall_seconds": 102.97,
+ "chars_per_sec": 104156,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Ben. Ben loved to meet a special one day at her house.\nOne day, Ben and Ben was playing with their toys. They laughed and jumped until the magic wind became good friends. They had a good friend, and they played together every day playing.\n<|eot|>\nOne day, a little boy named Tim went to the park to play. He saw a big rock. She was an organized that he was clear, but they could not see her. Tim saw something shiny and strong. He wanted to play and seemies. He ran to the park to sit.\nAs Tim went to the park, his friend, a small thing. The bunny was scared and hurt. He picked up the spot with his poporn. But then, a big dog came out. Tim was sad. He did not like the dog.\nTim was surprised. He learned that mad can't be better. He loved to generous anymore. He had a loud noisy friend.\nThe bird said, \"Look, Tim! I am soft for helping it. I real if you should not have a good day for you. And you have to help. You can play with you. You will be a new friend for help.\"\n<|eot|>\nOnce upon a time, there was a little girl named Mia. They liked to play outside and play. They were many toys",
+ "rule_init": {},
+ "ngram_init": {}
+}

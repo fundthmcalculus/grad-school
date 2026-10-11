@@ -1173,3 +1173,18 @@ Verified from the records: v8-ctx ctx256 1.1324, ctx512 1.1232, ctx512 r32 1.112
 * **H47:** r128 beats r64 by less than r64 beats r32 (diminishing returns). ~65%.
 * **H48:** more rules make a rule's winning share more concentrated and the rulebook shorter to read, not longer: the
   number of rules needed to cover 80% of winning positions per head grows by less than 2x from r32 to r128. ~50%.
+
+## Outcome `v13-state` (GPU session, 2026-10-11; BPE1024 D d = 48, ctx 512 / batch 16, lr 6e-2, 30M chars, seeds 0–1; one cell at a time, ~100 s each)
+
+| rules per head | params | val BPC | Δ vs previous row |
+|---|---|---|---|
+| 16 (`v8-ctx`) | 93,344 | 1.1232 ± 0.0019 | |
+| 32 (`v8-rules`) | 96,416 | 1.1125 ± 0.0004 | −0.0107 |
+| 64 | 102,560 | 1.1113 ± 0.0030 (1.108 / 1.114) | −0.0012 |
+| 128 | 114,848 | **1.0979 ± 0.0062** (1.104 / 1.092) | −0.0134 |
+
+* **H46 refuted:** r64 beats r32 by 0.0012, not > 0.005.
+* **H47 refuted:** the r64 → r128 step (−0.0134) is *larger* than the r32 → r64 step (−0.0012), so there is no diminishing return across this range; the curve is not smooth (16 → 32 and 64 → 128 gain, 32 → 64 does not).
+  With two seeds per cell and r128's own spread 0.012 (seeds 1.104 / 1.092), the non-monotone shape could be seed noise on r64; a clean reading needs more seeds.
+* **H48 (rulebook concentration) not tested.**
+* **Cap:** r64 and r128 exceed the original 100K cap (102.6K / 114.8K); the user relaxed the cap to ≤ 165K for the bigger-model track. Under 100K the best remains r32 (96,416; 1.1125 at 30M, 0.9976 at 300M).
