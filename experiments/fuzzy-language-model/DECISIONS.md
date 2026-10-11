@@ -91,3 +91,8 @@ You asked me to take every decision, so these are decided rather than left open.
 * **New from the GPU session, bearing on explainability** (`PLAN_RULEDIST.md`, `flm/rule_dist.py`): the output distribution is an exact sum of per-rule terms, but it is a superposition: it takes about 32 of 72 active rules per position and layer to stay
   within 0.03 BPC, a dominant rule's stated top-10 tokens contain the true next token only 15-19% of the time, and low-rank or sparse students degrade fast. So the single-winner rulebook I used to claim explainability is not a faithful reading of the model.
   My ablation result (cited rules are causal) stands but is weaker than "the rulebook explains the model". I am recording that the explainability half of the goal is **less established than I reported**, not more.
+
+## D11 (2026-10-12): a partial rehabilitation of explainability
+The GPU session's `rule_dist` showed a single winning rule is an unfaithful reading. I built the calibrated reader it listed as unrun: 8 rules per position and layer plus the embedding and mixer terms recover 94% of the model's top-10 hit rate (0.767 vs 0.814) and 70% of its top-10 set;
+16 rules recover 98%. Rules alone do not (0.679 even with all 72). So the honest explainability claim is: **the fuzzy rules supply most of the prediction, a readable 8-16 rules per position and layer plus named non-rule terms reproduce it; the rule book alone does not.** Two of my three predictions were wrong.
+This is still a reading of next-token prediction, not an explanation of why the stories are not coherent.

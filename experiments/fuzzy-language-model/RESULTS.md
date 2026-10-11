@@ -1510,3 +1510,19 @@ The gain from 1B to 3B is ~0.002-0.007, within the 1B seed spread (0.005): **ext
 3B-character model (0.9777 BPC) **6.88 +/- 0.67** (plot 1.38); 1B-character (0.9796) 7.50 +/- 0.57 (plot 1.50); 300M (0.9976) 5.75 +/- 0.25 (plot 1.00). Registered by the GPU session: coherence not measurably changed (6-8 /15): **met**.
 The 3B model is not distinguishable from the 1B model (-0.6, within one standard error), and the ordering 1B > 3B > 300M again follows noise, not data. Together with sets 5-7, nothing in 300M-3B characters moves blind coherence at 96K parameters.
 Files: `report/coherence8_{blind,key}.json`, `report/coherence8_scores_rater_cpu.json`. A second rater would tighten this; none has rated it.
+
+## Outcome of the calibrated rule reader (`flm/rule_reader.py`; CPU session, 2026-10-12; 3B-character 96K checkpoint, 128 x 256-token windows, direct path)
+
+The model's own top-10 contains the true next token 0.814 of the time. Keeping the m rules per position and layer with the largest |gate| x ||profile||:
+| m | rules only: hit@10 / overlap with the model's top-10 | rules + embedding and mixer terms: hit@10 / overlap |
+|---|---|---|
+| 1 | 0.299 / 0.22 | 0.511 / 0.37 |
+| 4 | 0.536 / 0.40 | 0.708 / 0.59 |
+| 8 | 0.618 / 0.48 | 0.767 / 0.70 |
+| 16 | 0.662 / 0.54 | 0.798 / 0.81 |
+| 32 | 0.678 / 0.58 | 0.811 / 0.92 |
+| 72 (all) | 0.679 / 0.59 | 0.814 / 1.00 |
+Registered predictions: P1 (m = 8 with context at least 0.70) **supported** (0.767); P2 (rules only, m = 8 below 0.50) **refuted** (0.618); P3 (m >= 32 needed to come within 0.03 of the model) **refuted** (m = 16 is within 0.016).
+**Reading:** the earlier "winner rule alone names the true token 15-19% of the time" result (rule_dist E) was a reading of one rule; a reading of the 8 strongest rules per layer *plus the non-rule context terms* recovers 94% of the model's top-10 hit rate and 70% of its top-10 set.
+The rules alone, even all 72, reach only 0.679 (BPC 1.45 on the direct path against 1.04), so the non-rule terms (embedding and the mixers) carry information the rulebook does not. An explanation therefore has to name those terms as well: the fuzzy rules are most of the prediction, not all of it.
+Direct path only (layer-0 rules' effect through layer 1 is not in this decomposition); one checkpoint; the true next token, not coherence, is what is read.
