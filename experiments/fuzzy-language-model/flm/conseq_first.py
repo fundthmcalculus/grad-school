@@ -62,6 +62,7 @@ def init_conseq_first(
     groups: str = "emb",
     widths: str = "group",
     token_stats: dict | None = None,
+    keep: int | None = None,
 ) -> dict:
     """Build every TSK FFN rule consequent-first from the windows ``idx`` (B, T+1). Returns diagnostics."""
     assert mode in ("centroid", "ls")
@@ -81,6 +82,10 @@ def init_conseq_first(
         n = blk.n2(x).reshape(-1, x.shape[-1])
         u = ffn.ante(blk.n2(x)).reshape(-1, ffn.da)
         R = ffn.R
+        # hybrid: only the first ``keep`` rules are built consequent-first, the rest keep their random init
+        rand = {
+            n: getattr(ffn, n).data.clone() for n in ("centers", "log_width", "conseq")
+        }
         # 1. answers first: group the next-token embeddings
         if groups == "emb":
             grp_tok = _spherical_kmeans(E, freq + 1e-6 * (freq == 0), R, generator)
@@ -127,15 +132,24 @@ def init_conseq_first(
             A = W.T @ W + ridge * torch.eye(R) * W.pow(2).sum() / R
             cons = torch.linalg.solve(A, W.T @ F.normalize(Et, dim=-1))
         base_conseq = cons
+        if keep is not None:
+            for r in range(keep, R):
+                ffn.centers.data[r] = rand["centers"][r]
+                if ffn.log_width.shape[0] == R:
+                    ffn.log_width.data[r] = rand["log_width"][r]
         if ffn.order == 1:
             ffn.slope.bias.fill_(1.0)
             ffn.slope.weight.mul_(0.1)
         best = (float("inf"), 1.0)
         for g in gains:
             ffn.conseq.copy_(base_conseq * g)
+            if keep is not None:
+                ffn.conseq[keep:] = rand["conseq"][keep:]
             ce = _ce(model, idx)
             if ce < best[0]:
                 best = (ce, g)
         ffn.conseq.copy_(base_conseq * best[1])
+        if keep is not None:
+            ffn.conseq[keep:] = rand["conseq"][keep:]
         info[f"L{li}.ffn"] = {"gain": best[1], "ce_nats": round(best[0], 4)}
     return info

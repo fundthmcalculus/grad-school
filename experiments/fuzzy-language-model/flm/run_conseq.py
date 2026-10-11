@@ -26,6 +26,9 @@ VARIANTS = {
     "cfw300": dict(
         groups="emb", mode="centroid", emb=False
     ),  # same init; the driver sets --warmup 300
+    "hyb4": dict(groups="emb", mode="centroid", emb=False, keep=4),
+    "hyb12": dict(groups="emb", mode="centroid", emb=False, keep=12),
+    "hyb24": dict(groups="emb", mode="centroid", emb=False, keep=24),
     "cfls": dict(groups="emb", mode="ls", emb=False),
     "assocls": dict(groups="assoc", mode="ls", emb=False),
     "succcf": dict(groups="emb", mode="centroid", emb=True),
@@ -73,6 +76,7 @@ def main():
             token_stats=stats,
             **({"gains": cfg["gains"]} if "gains" in cfg else {}),
             widths=cfg.get("widths", "group"),
+            keep=cfg.get("keep"),
         )
         print("conseq-first init:", info, flush=True)
         return {"variant": variant, **{k: v for k, v in info.items()}}
