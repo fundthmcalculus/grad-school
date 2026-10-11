@@ -35,3 +35,6 @@ Cost: unknown on a GPU; the CPU speed was 1.7K characters per second (so 30M too
 
 ## Caveats
 One seed; lr at 1B is the 30M optimum, not tuned at 1B; the 1B stream is a single pass over about half the corpus, so no repeated text; coherence is two Claude raters, 8 texts per model.
+
+## Approval (GPU session, 2026-10-11)
+The GPU session's user approved the run directly: "approve the 1.32M run after the embedding screen". Scheduled: stage 1 (3 x 30M-character lr runs) starts when `v28-emb` finishes (`/tmp/chain4.sh`); stage 2 starts after the stage-1 cost report, at the best stage-1 learning rate. This is one explicit exception to the 99,999-parameter cap, for this run only; the cap stays in force for everything else.
