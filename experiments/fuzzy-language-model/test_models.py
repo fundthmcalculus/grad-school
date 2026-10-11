@@ -684,3 +684,16 @@ def test_hybrid_layers_and_attn_heads():
     assert m(torch.randint(0, 50, (2, 32))).shape == (2, 32, 50)
     plain = TinyLM(ModelConfig(mixer="softmax", **c))
     assert plain.blocks[0].mix.H == 4  # attn_heads = 0 follows n_heads
+
+
+def test_factorized_embedding_is_default_off_and_saves_parameters():
+    base = TinyLM(ModelConfig(vocab_size=64, d_model=32, n_layers=1))
+    fac = TinyLM(ModelConfig(vocab_size=64, d_model=32, n_layers=1, emb_dim=8))
+    assert base.up is None and fac.up is not None
+    assert base.emb.weight.shape == (64, 32) and fac.emb.weight.shape == (64, 8)
+    # 64*32 -> 64*8 + 8*32: fewer parameters in the embedding path
+    assert fac.n_params() < base.n_params()
+    idx = torch.randint(0, 64, (2, 10))
+    assert fac(idx).shape == (2, 10, 64) and base(idx).shape == (2, 10, 64)
+    # excluding the embedding path removes emb + up from the count
+    assert fac.n_params(exclude_embedding=True) == base.n_params(exclude_embedding=True)
