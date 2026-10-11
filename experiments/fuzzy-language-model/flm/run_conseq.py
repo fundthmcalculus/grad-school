@@ -33,6 +33,15 @@ VARIANTS = {
     "hyb12g1": dict(
         groups="emb", mode="centroid", emb=False, keep=12, gains=(0.25, 1.0)
     ),
+    "hyb18g1": dict(
+        groups="emb", mode="centroid", emb=False, keep=18, gains=(0.25, 1.0)
+    ),
+    "cov25": dict(
+        groups="emb", mode="centroid", emb=False, keep=18, gains=(0.25, 1.0), cover=True
+    ),
+    "cov0": dict(
+        groups="emb", mode="centroid", emb=False, keep=0, gains=(0.25, 1.0), cover=True
+    ),
     "cfls": dict(groups="emb", mode="ls", emb=False),
     "assocls": dict(groups="assoc", mode="ls", emb=False),
     "succcf": dict(groups="emb", mode="centroid", emb=True),
@@ -81,6 +90,7 @@ def main():
             **({"gains": cfg["gains"]} if "gains" in cfg else {}),
             widths=cfg.get("widths", "group"),
             keep=cfg.get("keep"),
+            cover=cfg.get("cover", False),
         )
         print("conseq-first init:", info, flush=True)
         return {"variant": variant, **{k: v for k, v in info.items()}}

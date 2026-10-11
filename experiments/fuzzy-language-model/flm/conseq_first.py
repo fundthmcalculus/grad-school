@@ -63,6 +63,7 @@ def init_conseq_first(
     widths: str = "group",
     token_stats: dict | None = None,
     keep: int | None = None,
+    cover: bool = False,
 ) -> dict:
     """Build every TSK FFN rule consequent-first from the windows ``idx`` (B, T+1). Returns diagnostics."""
     assert mode in ("centroid", "ls")
@@ -102,6 +103,8 @@ def init_conseq_first(
         centers = ffn.centers.data.clone()
         stds = torch.empty(R, ffn.da)
         for r in range(R):
+            if cover and keep is not None and r >= keep:
+                continue  # placed below by the coverage rule
             m = grp == used[r % len(used)]
             if int(m.sum()) >= 4:
                 centers[r] = u[m].mean(0)
@@ -111,6 +114,22 @@ def init_conseq_first(
             else:
                 centers[r] = u[torch.randint(0, len(u), (1,), generator=generator)][0]
                 stds[r] = gstd
+        if cover and keep is not None and keep < R:
+            # coverage: D^2 (k-means++) sampling of the remaining centres over the whitened FFN inputs, so they land
+            # where the built rules do not reach; width = the global spread; consequents stay at their random init
+            sub = torch.randperm(len(u), generator=generator)[:8192]
+            z = (u[sub] - u.mean(0)) / gstd.clamp(min=1e-6)
+            zc = (centers[:keep] - u.mean(0)) / gstd.clamp(min=1e-6)
+            d2 = (
+                torch.cdist(z, zc).pow(2).min(1).values
+                if keep > 0
+                else torch.ones(len(z))
+            )
+            for r in range(keep, R):
+                pick = int(torch.multinomial(d2 / d2.sum(), 1, generator=generator))
+                centers[r] = u[sub[pick]]
+                stds[r] = gstd
+                d2 = torch.minimum(d2, (z - z[pick]).pow(2).sum(1))
         ffn.centers.copy_(centers)
         if ffn.log_width.shape[0] == R:  # per-rule widths
             for r in range(R):
@@ -132,7 +151,7 @@ def init_conseq_first(
             A = W.T @ W + ridge * torch.eye(R) * W.pow(2).sum() / R
             cons = torch.linalg.solve(A, W.T @ F.normalize(Et, dim=-1))
         base_conseq = cons
-        if keep is not None:
+        if keep is not None and not cover:
             for r in range(keep, R):
                 ffn.centers.data[r] = rand["centers"][r]
                 if ffn.log_width.shape[0] == R:
