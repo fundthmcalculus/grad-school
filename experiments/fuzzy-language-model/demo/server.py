@@ -185,12 +185,16 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
+    global MODELS
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8765)
     a = ap.parse_args()
+    MODELS = (
+        models()
+    )  # scanned once: reading every checkpoint header takes a few seconds
     srv = ThreadingHTTPServer(("127.0.0.1", a.port), Handler)
     print(
-        f"FLM demo on http://127.0.0.1:{a.port}  ({len(models())} checkpoints found)",
+        f"FLM demo on http://127.0.0.1:{a.port}  ({len(MODELS)} checkpoints found)",
         flush=True,
     )
     srv.serve_forever()
