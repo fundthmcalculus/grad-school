@@ -111,3 +111,16 @@ lr 9e-2 worse and 4e-2 worse: **wrong** (a flat plateau); the 4M-character CPU s
 `v19-optA30` found warm-up 300 better than 100 by 0.011 BPC in 3/3 seeds at 30M characters. **Caveat:** 30M characters is only 1,160 steps, so a 300-step warm-up is 26% of the run; at 300M (11.6K steps) it is 2.6%, at 1B 0.8%, and the cited runs used 100.
 Stage 1 (`v23-wu30`, 30M, seeds 0-4; 19 jobs): warm-up 200, 450, 600 (seeds 0-4) and 100, 300 (seeds 3-4, to complete five seeds with v19-optA30's seeds 0-2). Prediction: monotone improvement through 300 and a plateau or reversal by 600 (at 600 the lr barely reaches its peak before decaying): 200 about -0.005, 450 about -0.011, 600 no better than 450.
 Stage 2 (`v23-wu300m`, 300M characters, seeds 0-1, saved checkpoints): warm-up 300 and 1000 against the warm-up-100 reference in `v12-long512` (0.9976 / 1.0053). Prediction: **at 300M the effect shrinks to within 0.005** (the benefit at 30M is mostly the short-run share), so the cited recipe is unchanged; if 300 still wins by more than 0.01 in both seeds it replaces warm-up 100 and a checkpoint goes to the demo.
+
+## v23-wu30 outcome (30M chars, 5 seeds each, GPU)
+
+| warm-up | mean ± sd | Δ vs 100 | seeds better |
+|---|---|---|---|
+| 100 (ref) | 1.1095 ± 0.0107 | 0 | – |
+| 200 | 1.1015 ± 0.0093 | −0.0080 | 5/5 |
+| 300 | 1.0984 ± 0.0072 | −0.0111 | 5/5 |
+| 450 | 1.0994 ± 0.0066 | −0.0101 | 5/5 |
+| 600 | 1.1025 ± 0.0050 | −0.0070 | 4/5 |
+
+Predictions: monotone through 300 — right; plateau/reversal by 600 — right (mild reversal); 200 ≈ −0.005 — wrong (−0.008, better than predicted); 450 ≈ −0.011 — right (−0.010).
+Caveat stands: at 30M (1,160 steps) a 300-step warm-up is 26% of the run; v23-wu300m tests whether it survives at 300M.

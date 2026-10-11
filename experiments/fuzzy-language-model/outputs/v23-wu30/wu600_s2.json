@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 600,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v23-wu30\\wu600_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.09579,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.38807
+  ],
+  [
+   580,
+   1.30211
+  ],
+  [
+   870,
+   1.18255
+  ],
+  [
+   1160,
+   1.09579
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2981
+  ],
+  [
+   50,
+   9.0411
+  ],
+  [
+   100,
+   7.0196
+  ],
+  [
+   150,
+   5.757
+  ],
+  [
+   200,
+   5.0946
+  ],
+  [
+   250,
+   4.7592
+  ],
+  [
+   300,
+   4.5661
+  ],
+  [
+   350,
+   4.4323
+  ],
+  [
+   400,
+   4.3321
+  ],
+  [
+   450,
+   4.2615
+  ],
+  [
+   500,
+   4.2212
+  ],
+  [
+   550,
+   4.1665
+  ],
+  [
+   600,
+   4.1455
+  ],
+  [
+   650,
+   4.104
+  ],
+  [
+   700,
+   4.0345
+  ],
+  [
+   750,
+   3.9798
+  ],
+  [
+   800,
+   3.9264
+  ],
+  [
+   850,
+   3.8589
+  ],
+  [
+   900,
+   3.7949
+  ],
+  [
+   950,
+   3.7247
+  ],
+  [
+   1000,
+   3.6634
+  ],
+  [
+   1050,
+   3.6021
+  ],
+  [
+   1100,
+   3.5602
+  ],
+  [
+   1150,
+   3.506
+  ],
+  [
+   1159,
+   3.5044
+  ]
+ ],
+ "train_seconds": 79.48,
+ "wall_seconds": 86.09,
+ "chars_per_sec": 119557,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy.\nAs Lucy saw her room, she wanted to play outside. She walked around and walked, and saw something special. She looked for any day, so she flew out from the beautiful tree. It was a big, fair. The box was playing and tired.\nThe bird said, \"Thank you, Lucy, that will have a chair. I will succear sand and show you to me.\" Lucy learned that it's okay, but they don't know.\nLola and her friend, Whister to learn new things were it. But they could not get the table. They threw a bit sick and hurt their exars.\nBut the table was too hooble. It was not work. She put it back to the park and the monble. Lells they could not stop and said, \"Stop, mom. I will not get it.\" Lucy and her mom were sad. They did not know what to do. The bedrove thanked her. The bed came and ran away. Dovere had encoupeing out.\nThe next day, Lucy found a big, red bit. She said, \"Thank you, please. I will be grow fast!\" They cried and stopped playing. They were happy.",
+ "rule_init": {},
+ "ngram_init": {}
+}
