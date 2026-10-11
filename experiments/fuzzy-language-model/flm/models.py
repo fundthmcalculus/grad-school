@@ -66,6 +66,9 @@ class ModelConfig:
         1  # layer-0 TSK FFN antecedent reads the last `ante_taps` positions
     )
     max_len: int = 256
+    # Fibonacci-lag attention (fibsoftmax / fibgauss): every lag 0..fib_local-1 is visible, beyond that
+    # only the Fibonacci lags (13, 21, 34, ...); fib_local >= max_len makes it dense causal attention
+    fib_local: int = 8
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -536,9 +539,74 @@ class TSKFFN(nn.Module):
         return w @ self.conseq
 
 
+def fib_lags(local: int, max_len: int) -> list[int]:
+    """Visible lags: 0..local-1 densely, then the Fibonacci numbers >= local up to max_len - 1."""
+    lags = set(range(min(local, max_len)))
+    a, b = 1, 2
+    while a < max_len:
+        if a >= local:
+            lags.add(a)
+        a, b = b, a + b
+    return sorted(lags)
+
+
+def fib_mask(T: int, local: int) -> torch.Tensor:
+    """(T, T) bool, True where query t may attend key s: lag t - s is visible."""
+    lags = torch.tensor(fib_lags(local, T), dtype=torch.long)
+    lag = torch.arange(T)[:, None] - torch.arange(T)[None, :]
+    ok = torch.zeros(T, T, dtype=torch.bool)
+    for lg in lags.tolist():
+        ok |= lag == lg
+    return ok
+
+
+class FibSoftmaxAttention(SoftmaxAttention):
+    """Softmax attention that sees the last ``fib_local`` tokens and then only tokens at Fibonacci lags:
+    remembers mostly locally, a few tokens far back (cost O(T log T) in a gather implementation; this is the
+    masked-dense form, exact and readable, not yet fast)."""
+
+    def __init__(self, cfg: ModelConfig):
+        super().__init__(cfg)
+        self.local = cfg.fib_local
+        self.register_buffer(
+            "vis", fib_mask(cfg.max_len, cfg.fib_local), persistent=False
+        )
+
+    def forward(self, x):
+        B, T, d = x.shape
+        q, k, v = self.qkv_heads(x)
+        q, k = apply_rope(q, self.cos, self.sin), apply_rope(k, self.cos, self.sin)
+        y = F.scaled_dot_product_attention(q, k, v, attn_mask=self.vis[:T, :T])
+        return self.out(y.transpose(1, 2).reshape(B, T, d))
+
+
+class FibGaussianAttention(GaussianTSKAttention):
+    """The same lag set for the Gaussian TSK attention: one fuzzy rule per visible past token."""
+
+    def __init__(self, cfg: ModelConfig):
+        super().__init__(cfg)
+        self.local = cfg.fib_local
+        self.register_buffer(
+            "vis", fib_mask(cfg.max_len, cfg.fib_local), persistent=False
+        )
+
+    def forward(self, x):
+        B, T, d = x.shape
+        qs, ks, v = self.logits_parts(x)
+        ones = torch.ones_like(qs[..., :1])
+        qa = torch.cat([qs, ones], dim=-1)
+        ka = torch.cat([ks, -0.5 * (ks * ks).sum(-1, keepdim=True)], dim=-1)
+        y = F.scaled_dot_product_attention(
+            qa, ka, v, attn_mask=self.vis[:T, :T], scale=1.0
+        )
+        return self.out(y.transpose(1, 2).reshape(B, T, d))
+
+
 # ----------------------------------------------------------------------------- model
 
 MIXERS = {
+    "fibsoftmax": FibSoftmaxAttention,
+    "fibgauss": FibGaussianAttention,
     "softmax": SoftmaxAttention,
     "gauss": GaussianTSKAttention,
     "linear": LinearAttention,

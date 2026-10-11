@@ -101,6 +101,9 @@ def main():
     import flm.grids_v3  # noqa: F401
     import flm.grids_v4  # noqa: F401
     import flm.grids_v6  # noqa: F401
+    import flm.grids_v8  # noqa: F401
+    import flm.grids_v9  # noqa: F401
+    import flm.grids_v10  # noqa: F401
     from flm.sweep import GRIDS
 
     p = argparse.ArgumentParser()

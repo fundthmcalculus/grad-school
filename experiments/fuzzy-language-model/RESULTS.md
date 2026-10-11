@@ -1034,3 +1034,45 @@ at this size; the validation windows also lengthen with ctx, which flatters the 
 **Operational finding (2026-10-11):** two concurrent `ctx 512 / batch 16` jobs ran > 40 min with no first eval and ~11 GB VRAM, while the same cell alone takes
 **86 s**. On this laptop GPU, running heavy cells concurrently can stall everything (VRAM spill); run long-context or large-batch cells **one at a time**.
 (Earlier 4-way concurrent batch-32 ctx-512 jobs did finish, so the failure is not deterministic.)
+### Second rater for the blinded coherence set (CPU session, 2026-10-11)
+
+A second Claude instance (the CPU session, which had not seen the key or the first rater's scores) scored all 56 texts in `report/coherence_blind.json` on grammar, consistency and plot, 1-5 each, before opening `coherence_key.json`; the scores are in `report/coherence_scores_rater2.json`. Both raters are the same model family, so this checks rater noise, not rater bias.
+
+- Agreement: total-score correlation 0.83 (G 0.79, C 0.75, P 0.59); 42 of 56 totals within 1 point. Rater 2 is harsher by 0.75 points on average (5.96 against 6.71), mostly on plot.
+- Rater 2 per-model totals (/15, mean ± se, n = 8): BPE1024 300M 8.62 ± 0.37; BPE1024 100M 7.25 ± 0.53; BPE1536 d40 30M 7.12 ± 0.40; BPE512 30M 6.62 ± 0.37; neural char teacher 4.38 ± 0.26; char D d96 3.88 ± 0.12; char D d72 3.88 ± 0.12.
+- The ranking by bits per character is reproduced (the two lowest character-D models tie). The subword-vs-character-teacher gap at similar BPC is larger under rater 2 (BPE1024 100M against the teacher: 2.9 points, against 1.6 for rater 1), so the weak-evidence reading holds in direction and is not smaller than first reported. Plot is the weakest axis for both raters (rater 2: 1.88/5 at 300M).
+- Caveats unchanged: same model family, n = 8 per model, one sampling setting. Neither rater is a human.
+
+## Registered 2026-10-11, before `v8-ctx`: does more context help D? (CPU session; plan in PLAN_CONTEXT.md)
+
+D is the fuzzy recurrent mixer (`fuzzydelta`), so context scaling is the recurrent-model question.
+Probes: `flm/context_probe.py` (bits by position, bits by distance from story start, name recall).
+
+* **H29 (baseline, 100M BPE1024 D checkpoint, ctx 256), registered before running the probe:** name-recall gain
+  above 2 bits at k = 0 and near 0 by k = 24; bits drop from the 0-255 bucket to the 256-511 bucket and do
+  not improve past 256. **Outcome (24 windows of 1,024 tokens, CPU):** gain 2.01 bits at k = 0 (borderline), 1.75 (k=1),
+  1.26 (k=3), 1.35 (k=6), 1.07 (k=12), 0.79 (k=24, 280 tokens): decays smoothly, not to 0, so "near 0 by 24" is
+  **refuted**. Bits by position 1.072 / 1.080 / 1.061 for 0-255 / 256-511 / 512-1023: no drop at the second
+  bucket (**refuted**) and a small improvement past 256 (**refuted**, but 24 windows, so within noise);
+  the model run at 4x its training length does not break down. Bits by story distance: 0.900 (0-63 tokens),
+  1.11-1.12 afterwards: the story opening is cheap, the body is flat. The prior margin is 1.4-2.3 bits, so the
+  gain is measured against a name preference of similar size; treat k >= 12 as weak. Not yet seen at ten seeds
+  or on other checkpoints.
+* **H30:** name-recall gain at k = 24 (280 tokens) rises with training ctx (256 < 512 < 1024) by more than 0.3 bits. ~50%.
+* **H31:** `val_bpc` at fixed position buckets improves by less than 0.01 from ctx 256 to 1024 (stories are about one
+  window long). ~65%.
+* **H32:** 32 rules per head at ctx 1024 beats 16 rules by more than 0.01 bits per character. ~30%.
+
+## Registered 2026-10-11, before `v9-lr`/`v9-size`: where does coherence appear? (CPU session; PLAN_COHERENCE.md)
+
+Success criteria fixed in advance: blind total >= 12/15 and plot >= 3.5/5 from both raters; explainability
+requires a causal rulebook (rule-ablation of the most-cited FFN rules costs more than random rules).
+H33 plot > 3/5 by the 3.3M model (~40%); H34 nothing under 2M reaches 12/15 (~85%); H35 ablation of cited rules
+exceeds random at every size (~70%); H36 the best lr falls with size (~60%).
+
+## Registered 2026-10-11, before `v10-fib`: Fibonacci attention at story size (CPU session; PLAN_FIBONACCI.md)
+
+User direction: keep to story size, try local-plus-sparse-far memory. Predictions H37-H41 are in PLAN_FIBONACCI.md:
+fibgauss-L8 within 0.01 of dense (~55%); L4 worse / L16 no better (~50%); fibsoftmax-L8 within 0.01 of fibgauss-L8 (~55%);
+name recall at k = 12 close to dense but lower at non-Fibonacci lags (~40%); best attention arm does not beat D (~60%).
+v9 (size ladder) is on hold; v8-ctx trimmed to ctx 256/512.
