@@ -1,0 +1,213 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 4,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v15-share\\D-ctx512-r32-share2x2_30M_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 2,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 4,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 2,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.12134,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.3746
+  ],
+  [
+   580,
+   1.24432
+  ],
+  [
+   870,
+   1.16319
+  ],
+  [
+   1160,
+   1.12134
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3609
+  ],
+  [
+   50,
+   8.1623
+  ],
+  [
+   100,
+   6.2924
+  ],
+  [
+   150,
+   5.3746
+  ],
+  [
+   200,
+   4.9024
+  ],
+  [
+   250,
+   4.6408
+  ],
+  [
+   300,
+   4.472
+  ],
+  [
+   350,
+   4.3629
+  ],
+  [
+   400,
+   4.2771
+  ],
+  [
+   450,
+   4.1864
+  ],
+  [
+   500,
+   4.1233
+  ],
+  [
+   550,
+   4.052
+  ],
+  [
+   600,
+   3.9859
+  ],
+  [
+   650,
+   3.9215
+  ],
+  [
+   700,
+   3.8702
+  ],
+  [
+   750,
+   3.8399
+  ],
+  [
+   800,
+   3.7857
+  ],
+  [
+   850,
+   3.7293
+  ],
+  [
+   900,
+   3.7005
+  ],
+  [
+   950,
+   3.6542
+  ],
+  [
+   1000,
+   3.6214
+  ],
+  [
+   1050,
+   3.5921
+  ],
+  [
+   1100,
+   3.577
+  ],
+  [
+   1150,
+   3.5811
+  ],
+  [
+   1159,
+   3.5781
+  ]
+ ],
+ "train_seconds": 158.41,
+ "wall_seconds": 170.98,
+ "chars_per_sec": 59988,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy. Lucy loved to help her family playing with her toy. One day, she found a big, red ball with her friend, a dog named Max. Max wanted to play outside, so she picked it up to Sue.\nLati saw a big tree with lots of balloons. The bird said, \"Don't worry, Max. Fin't be careful or dance. I will help you. Let's play with your ball.\"\nMax's friend Sue said, \"Can I play with Trow?\" Sue said, \"I don't know If we can help you. Can you make a car throw?\" Sue smiled and said, \"Yes, that is not unormable.\"\nLucy and Max laughed and hugged each other. Pilar, they played together every day. They learned that even careless and had lots of fun on the yard.\n<|eot|>\nOnce upon a time, there was a shiny music. The music lived in the park. One day, green board. It was a big tree. The bee realbedy was very happy to see the hole.\nThe thing baby was very happy. He wanted to help the thing. He said, ???Let's help the bug with the travel too!\" They both stopped playing and played together.\n",
+ "rule_init": {},
+ "ngram_init": {}
+}

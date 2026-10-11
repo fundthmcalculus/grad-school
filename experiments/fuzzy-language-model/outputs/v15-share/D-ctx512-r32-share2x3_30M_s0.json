@@ -1,0 +1,213 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 6,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v15-share\\D-ctx512-r32-share2x3_30M_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 2,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 6,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 2,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11895,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.37622
+  ],
+  [
+   580,
+   1.249
+  ],
+  [
+   870,
+   1.16421
+  ],
+  [
+   1160,
+   1.11895
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3621
+  ],
+  [
+   50,
+   8.2185
+  ],
+  [
+   100,
+   6.3713
+  ],
+  [
+   150,
+   5.4431
+  ],
+  [
+   200,
+   4.963
+  ],
+  [
+   250,
+   4.6862
+  ],
+  [
+   300,
+   4.5099
+  ],
+  [
+   350,
+   4.3913
+  ],
+  [
+   400,
+   4.3043
+  ],
+  [
+   450,
+   4.2073
+  ],
+  [
+   500,
+   4.142
+  ],
+  [
+   550,
+   4.0693
+  ],
+  [
+   600,
+   4.0071
+  ],
+  [
+   650,
+   3.9382
+  ],
+  [
+   700,
+   3.891
+  ],
+  [
+   750,
+   3.8558
+  ],
+  [
+   800,
+   3.8011
+  ],
+  [
+   850,
+   3.7428
+  ],
+  [
+   900,
+   3.7085
+  ],
+  [
+   950,
+   3.6635
+  ],
+  [
+   1000,
+   3.6226
+  ],
+  [
+   1050,
+   3.5975
+  ],
+  [
+   1100,
+   3.5782
+  ],
+  [
+   1150,
+   3.581
+  ],
+  [
+   1159,
+   3.5772
+  ]
+ ],
+ "train_seconds": 237.77,
+ "wall_seconds": 257.23,
+ "chars_per_sec": 39966,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Spea. She had a special way to stop outside. \nAmy was playing with her friend. He puts the right on the ground, but Lily was beautiful. But then he saw a little girl named Sue's friend. Kitty asked her helping her ant, \"Hi, bird!\"\nSue went to the cup. She opened the way to see the yellow star was not hurt. She was very happy. She saw something hit up and said, \"Don't worry, I will help you your new place.\"\nSue got the same a lot of anxious bite. She did not know what was inside. She said, \"I'm sorry, that's hoose can make it.\" But Lily said, \"Yes, you can help you find the monster.\"\nSue learned that if you can't do anything it.\" She learned that even tiubye. She learned that carefully can't take her green gun. And she thanked her new friends for behan to play with the small girl and mark, and her best friends.\n<|eot|>\nOne day, Tom and Sue became best friends. They were very happy. Max played with the sun, person and her hat had another tower with the person. They were curi",
+ "rule_init": {},
+ "ngram_init": {}
+}

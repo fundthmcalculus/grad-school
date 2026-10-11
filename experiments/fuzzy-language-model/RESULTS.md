@@ -1295,3 +1295,61 @@ of the control (supported: +0.13), BPC at least 0.04 lower (supported: 0.153). T
 Rule-ablation (`outputs/v9-cpu/ablation.json`): cited rules are still causal in both layers (layer 0: +0.099 cited vs random p95 +0.028; layer 1: +0.014 vs +0.008), but with 144
 FFN rules per layer the 8 most-cited rules win only 23% and 35% of positions (72 rules: 53% and 56%) and removing them costs far less (+0.099 vs +0.387 in layer 0).
 So the rulebook stays causal but a short rulebook explains less of the model as the rule count grows.
+
+## Registered 2026-10-11, before `v12-long512` seed 1: is the 0.9976-BPC headline a one-seed fluke?
+
+Same config as `v12-long512` (BPE1024 D d = 48, 32 rules per head, ctx 512 / batch 16, lr 6e-2, 300M chars), seed 1, saved. The seed-0 run scored 0.9976; the five-seed 30M-char spread of this configuration is sd 0.011.
+* **G32.** Seed 1 scores ≤ 1.010 (within about 1 sd of seed 0, as the 30M seed spread suggests), so "under 1.01 bits per character at 96K parameters" holds on two seeds. *(~70%.)* A score above 1.02 would mean the headline was a lucky seed and the honest figure
+  is the previous 1.0212 (ctx 256, 16 rules) plus noise.
+
+### `coherence3` with both raters (key published after rater 2 scored; rater 2 = CPU session, blind, `coherence3_scores_rater2.json`)
+
+| strategy | rater 1 | rater 2 | mean of raters ± s.e. (n = 8) | plot (mean of raters, /5) |
+|---|---|---|---|---|
+| A T 0.5 / top-k 10 (baseline) | 8.25 | 7.00 | **7.62 ± 0.65** | 1.88 |
+| D A + 4-gram block | 7.00 | 7.25 | 7.12 ± 0.56 | 1.62 |
+| B T 0.7 / top-p 0.9 | 6.25 | 6.62 | 6.44 ± 0.50 | 1.44 |
+| C A + repetition penalty 1.3 | 6.00 | 6.25 | 6.12 ± 0.55 | 1.38 |
+
+Inter-rater agreement on totals r = 0.63 (lower than sets 1–2: 0.83), rater means 6.88 and 6.78. **Correction to my one-rater reading above:** with two raters the ordering A > D > B > C survives for the mean, but the gaps shrink
+(A − C = 1.5 with s.e. ≈ 0.85; A − D = 0.5) and rater 2 put D marginally *above* A (7.25 vs 7.00). So "the baseline sampler is best" is a ranking that is **not established**; what two raters do support is that none of the three alternatives is better than
+the baseline, and that the repetition penalty and the higher temperature are, if anything, worse (≈ 1.2–1.5 totals, ~2 s.e.). **DC1 stays refuted** (neither C nor D beats A by ≥ 1 in the mean); DC2 stays supported; DC3 stays refuted (plot A 1.88 vs 1.38–1.62).
+
+### Outcome `v12-seed1` (G32; BPE1024 D d = 48, 32 rules/head, ctx 512 / batch 16, lr 6e-2, 300M chars, seed 1; 96,416 params)
+
+Seed 1: **1.00528** (curve 25 / 50 / 75 / 100%: 1.1367 / 1.0850 / 1.0352 / 1.0053). **G32 supported** (≤ 1.010). Two seeds: 0.9976 and 1.0053, **mean 1.0015 ± 0.0039 (sd 0.0054)**.
+**Correction to the headline:** "below one bit per character" (0.9976) was the better of two seeds; the honest two-seed figure is **≈ 1.00 BPC (1.0015)**, i.e. "about one bit per character at 96,416 parameters". The earlier ctx-256 / 16-rule 300M run
+(1.0212, one seed, lr 3e-2) is 0.02 behind the mean, about 4 standard deviations of the seed spread of this configuration, so the improvement over it is probably real but is a two-vs-one-seed comparison.
+
+## Registered 2026-10-11, before `v15-share`: does weight-shared depth buy capability at a fixed parameter count?
+
+Same parameters, more compute: BPE1024 D d = 48, ctx 512 / batch 16, 32 rules per head, lr 6e-2, 30M chars, seeds 0–1, with **2 unique blocks applied 2× (baseline, the five-seed mean is 1.1095), 4× or 6×** (`--layers 4|6 --n-unique 2`). Parameter count stays 96,416
+(only the block weights are counted once). The CPU-phase result on the old zero-order FFN at d = 16 was that BPC improved monotonically with the number of applications.
+* **G33.** Four applications of 2 unique blocks beat the baseline by ≥ 0.01 BPC at 30M chars (the five-seed baseline sd is 0.011, so this means ≈ 2 s.e. of a two-seed mean). *(~40%.)* *Basis:* depth helps in-context mechanisms (a second recurrent
+  layer cost D 0.07 against a single layer), but at d = 48 the extra applications reuse weights tuned for the two-layer stack.
+* **G34.** Six applications are no better than four by more than 0.01 (returns flatten). *(~60%.)*
+* If G33 holds, a 300M run follows and the coherence set is regraded (blind, two raters), since this would be the first in-cap change with a plausible link to multi-step structure rather than just loss.
+
+### Outcome `v15-share` (G33 / G34; BPE1024 D d = 48, ctx 512 / batch 16, 32 rules, lr 6e-2, 30M chars, seeds 0–1; 96,416 params in every cell)
+
+| layer applications of 2 unique blocks | val BPC (seeds) | mean ± s.e. | chars/s |
+|---|---|---|---|
+| 2 (baseline, five seeds, `v14-rule-seeds`) | | 1.1095 ± 0.0048 | ~119K |
+| 4 | 1.121 / 1.122 | 1.1217 ± 0.0004 | ~60K |
+| 6 | 1.119 / 1.129 | 1.1241 ± 0.0052 | ~40K (est.) |
+
+**G33 refuted** (needed ≥ 0.01 better; weight-shared depth is 0.012 *worse* at 4 applications, ≈ 2.5 s.e. of the baseline mean; a modest effect). **G34 supported** (6 is not better than 4; it is 0.002 worse).
+Reusing two blocks more times does not buy capability for D at this size and costs 2–3× the compute; the CPU-phase observation that BPC improved with applications was for the old zero-order FFN at d = 16 and does not carry over.
+No 300M run and no coherence re-grade (registered condition not met).
+
+## Conclusion of the sub-100K track (GPU session, 2026-10-11)
+
+**Declared finished by the GPU session; reopen on the user's instruction.** The goal was "make the fuzzy language model as capable as possible under 100K parameters". Where it ended:
+
+* **Best model under 100K:** BPE1024 delta-form fuzzy LM (D), d = 48, 2 layers, 8 heads, 32 rules per head, first-order raw-firing HTSK TSK FFN, ctx 512 / batch 16, lr 6e-2: **96,416 parameters**.
+  1.0015 ± 0.0039 BPC at 300M chars (two seeds: 0.9976, 1.0053); 1.1095 ± 0.0048 at 30M (five seeds). At 93,344 parameters (ctx 256, 16 rules) it beats the two best tuned neural references on the same tokenizer by 0.027–0.030 BPC over ten seeds at 30M chars.
+  From the original character-level fuzzy design (≈ 1.62 BPC at ≈ 97K, 30M chars) to 1.11 at the same budget and parameter count; the TSK feed-forward layer (not the mixer) was the whole original deficit, subword tokens were the largest later gain.
+* **What did not matter at this size (each moved loss by ≤ ~0.03 and none moved coherence):** longer context, more rules per head beyond 32, Fibonacci-lag attention (better than dense attention, far behind D), attention–recurrent hybrids (worse than D), distillation from a 280K teacher, weight averaging, continued training beyond the data curve, decoding strategy, and weight-shared depth.
+* **Coherence is not achieved.** Two blind raters score the best models' stories 6.9–7.6 / 15 (plot sense ≈ 1.7–1.9 / 5); the criterion the CPU session proposed (≥ 12/15 and plot ≥ 3.5 from both raters) is far away. The measure is noisy (≈ ±1.5 per set); the large separations (character vs subword models) are real, the fine ordering among the top models is not.
+* **The one untested lever is parameter count** (the CPU session's `v9` ladder, 251K–7M). It is outside the stated cap and was not run on the GPU host; the CPU session ran a 251K model on its own host under its user's approval and will report it separately.
+* **Open items not closed:** PR #272 was not merged (the permission classifier blocked it); the `v3-lr` study and the character-level ten-seed plan (`v4-*`) were not run to completion; D's learning-rate sensitivity was checked at 10M and 30M chars only.

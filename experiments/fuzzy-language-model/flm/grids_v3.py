@@ -556,3 +556,75 @@ for r in (32, 64, 128):
             )
         )
 register("v14-rule-seeds", jobs)
+
+
+# v12-long512 seed 1 (G32): second seed of the 300M ctx-512 / 32-rule run
+_s1 = cell(
+    "D-d48-bpe1024-ctx512-r32_300M_s1",
+    D,
+    d=48,
+    sc="8",
+    chars="300e6",
+    seed=1,
+    lr="6e-2",
+)
+register(
+    "v12-seed1",
+    [
+        (
+            _s1[0],
+            _s1[1]
+            + [
+                "--tok",
+                "bpe1024",
+                "--warmup",
+                "100",
+                "--ctx",
+                "512",
+                "--batch",
+                "16",
+                "--rules",
+                "32",
+                "--save-model",
+            ],
+        )
+    ],
+)
+
+
+# v15-share (G33/G34): weight-shared depth, 2 unique blocks applied 4x / 6x, ctx 512 / r32, 30M chars
+jobs = []
+for L in (4, 6):
+    for s in (0, 1):
+        c = cell(
+            f"D-ctx512-r32-share2x{L // 2}_30M_s{s}",
+            D,
+            d=48,
+            sc="8",
+            chars="30e6",
+            seed=s,
+            lr="6e-2",
+        )
+        jobs.append(
+            (
+                c[0],
+                c[1]
+                + [
+                    "--tok",
+                    "bpe1024",
+                    "--warmup",
+                    "100",
+                    "--ctx",
+                    "512",
+                    "--batch",
+                    "16",
+                    "--rules",
+                    "32",
+                    "--layers",
+                    str(L),
+                    "--n-unique",
+                    "2",
+                ],
+            )
+        )
+register("v15-share", jobs)
