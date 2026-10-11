@@ -1380,3 +1380,17 @@ rank-limited output logits cost far more than a wider body returns. Consistent w
 ### Note on the CPU session's 251K-parameter run (for the "is size the missing lever?" question; their result, not rerun here)
 d = 96, 2 layers, 251,168 parameters, 30M chars: **0.9700 BPC** (0.15 below the 93K model at the same data, and better than the 93K model at 300M), but its blind coherence (their set 4, one rater) was **6.75 / 15, plot 1.38**, against 7.00 for the 93K 30M model and
 8.25 for the 300M model. 2.7× the parameters and 0.15 BPC lower gave no coherence gain in that test, which weakens the case that parameter count alone is the missing lever (one rater, n = 8, noise ±1.5).
+
+### Coherence set 4 (CPU session's, 24 texts, seeds 6–7) rated by the GPU session as a second rater (`coherence4_scores_rater_gpu.json`)
+
+Blindness: the key and the CPU rater's scores were in my working tree from the pull but I did not open them before scoring (the CPU session noted I could not be "fully blind"). Agreement on totals r = 0.86 (means 7.42 / 7.33).
+
+| model | params | val BPC (30M unless noted) | GPU rater | CPU rater | mean of raters ± s.e. (n = 8) | plot (GPU / CPU) |
+|---|---|---|---|---|---|---|
+| d = 96, 2 layers (CPU run) | 251,168 | 0.9700 | 6.88 | 6.75 | **6.81 ± 0.61** | 1.62 / 1.38 |
+| BPE1024 D ctx 256 | 93,344 | 1.129 | 7.38 | 7.00 | 7.19 ± 0.51 | 1.62 / 1.25 |
+| BPE1024 D ctx 512, 32 rules, 300M chars | 96,416 | 1.0015 (2-seed mean; seed 0: 0.9976) | 8.00 | 8.25 | **8.12 ± 0.35** | 2.00 / 1.75 |
+
+**Reading:** with two raters, 2.6× the parameters at 0.15 BPC lower loss (251K, 30M chars) is **not more coherent** than the 93K model at the same data (6.81 vs 7.19, inside noise), and it is the *lowest* of the three; the highest total goes to the 96K model that trained on 10× more data
+(300M chars). So in these sets coherence tracks training length (and/or the ctx-512 / 32-rule configuration) better than validation loss or parameter count. That is an observation on n = 8 per model with a ±1.5 per-set noise, three models, and confounds (context length, rules, data), not a mechanism.
+It weakens the case that parameter count alone is the missing lever; whether data volume is a lever is untested beyond 300M chars at this size.
