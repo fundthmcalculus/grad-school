@@ -41,6 +41,7 @@ button:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2p
 #out .p { color: var(--muted); }
 #out .t { cursor: pointer; border-radius: 2px; border-bottom: 2px solid transparent; }
 #out .t:hover, #out .t.sel { background: var(--tok-hi); }
+#out .t.rep { text-decoration: underline dotted var(--warn); text-underline-offset: 4px; }
 #info { color: var(--muted); font-size: 0.8rem; font-family: var(--mono); }
 .detail { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 16px; }
 h2 { font-size: 0.95rem; margin: 0 0 8px; font-weight: 600; }
@@ -136,7 +137,7 @@ $('go').onclick = async () => {
     const d = await r.json();
     if (d.error) throw new Error(d.error);
     current = d; render(d);
-    $('info').textContent = `${d.steps.length} word pieces in ${((performance.now() - t0) / 1000).toFixed(1)} s` + (d.explained ? '' : ' (rule view is off for this model)');
+    $('info').textContent = `${d.steps.length} word pieces in ${((performance.now() - t0) / 1000).toFixed(1)} s` + (d.explained ? '' : ' (rule view is off for this model)') + `, ${Math.round(100 * d.steps.filter((x) => x.rep).length / d.steps.length)}% of pieces repeat an earlier three-piece run (dotted underline)`;
   } catch (e) { $('err').textContent = 'Generation failed: ' + e.message; }
   $('go').disabled = false; $('go').textContent = 'Generate';
 };
@@ -147,7 +148,8 @@ function render(d) {
   d.steps.forEach((s, i) => {
     const sp = document.createElement('span'); sp.className = 't'; sp.textContent = s.text; sp.tabIndex = 0;
     sp.style.borderBottomColor = `color-mix(in srgb, var(--warn) ${Math.round((1 - s.p) * 100)}%, transparent)`;
-    sp.title = `probability ${(s.p * 100).toFixed(1)}%`;
+    if (s.rep) sp.classList.add('rep');
+    sp.title = `probability ${(s.p * 100).toFixed(1)}%` + (s.rep ? ', repeats a three-piece run already in the text' : '');
     const pick = () => select(i, sp);
     sp.onclick = pick; sp.onfocus = pick; sp.onmouseenter = pick;
     out.appendChild(sp);

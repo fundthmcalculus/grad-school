@@ -11,4 +11,5 @@ cd experiments/fuzzy-language-model
 * Hover or click any word piece: the five most likely alternatives at that point, and the strongest fuzzy FFN rules that pushed that piece (gate, signed effect on the piece's score, and what the rule raises most overall).
   The rule view uses the exact direct-path decomposition in `flm/rule_dist.py`; turn it off for speed, or it switches itself off for models whose FFN is not the first-order TSK form.
 * CPU only, localhost only (binds 127.0.0.1), standard library HTTP server plus torch. Generation is serialised by a lock; the first request for a model loads it.
+* Pieces that repeat a three-piece run already in the text get a dotted underline, and the line under the story gives the share. In the rated stories, repetition (of rule sets and of token runs) tracked lower coherence scores at r of about -0.3 (RESULTS.md, rule-view analysis).
 * The rule view explains how a piece's score is assembled, not why the story has or lacks a plot; a rule's listed pushes are not necessarily the piece it helped produce (the output is a sum of many rules).

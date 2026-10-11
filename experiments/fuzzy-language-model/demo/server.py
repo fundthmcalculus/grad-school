@@ -115,6 +115,8 @@ def generate(req: dict) -> dict:
     g = torch.Generator().manual_seed(int(req.get("seed", 0)))
     ids = torch.from_numpy(codec.bpe.encode(prompt).astype(np.int64))[None]
     steps = []
+    hist = ids[0].tolist()
+    seen = {tuple(hist[i : i + 3]) for i in range(len(hist) - 2)}
     with torch.no_grad():
         for _ in range(n_new):
             window = ids[:, -ctx:]
@@ -140,6 +142,10 @@ def generate(req: dict) -> dict:
                 except AssertionError:
                     want_explain = False
                     step["rules"] = []
+            tri = tuple(hist[-2:] + [tok])
+            step["rep"] = len(tri) == 3 and tri in seen
+            seen.add(tri)
+            hist.append(tok)
             steps.append(step)
             ids = torch.cat([ids, torch.tensor([[tok]])], dim=1)
     return {"prompt": prompt, "steps": steps, "explained": want_explain}
