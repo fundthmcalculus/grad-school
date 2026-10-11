@@ -85,3 +85,9 @@ You asked me to take every decision, so these are decided rather than left open.
   my progress page said so and is corrected. The 1.32M x 1B request to the GPU session is moot.
 * **User instruction relayed by the GPU session:** focus on truly tiny models and make nothing larger yet. I am following it: no further CPU runs above 96K parameters, and the 251K and 1.32M CPU results stay on record as evidence only.
 * **Next, inside that scope:** when `v18-3b` finishes, rate its coherence set blind as second rater, refresh the progress page (https://claude.ai/artifact/SEDQDg6ZPvBeHZZth515kP), and record whether 3B characters moves blind coherence.
+
+## D10 (2026-10-12): the 3B run finished; I graded it
+* `v18-3b` finished at 0.9777 BPC (flattened: 1B to 3B is inside seed noise). I generated and rated a blind set myself (set 8, one rater): 3B 6.88 /15 (plot 1.38), 1B 7.50, 300M 5.75. No coherence gain from 3B characters.
+* **New from the GPU session, bearing on explainability** (`PLAN_RULEDIST.md`, `flm/rule_dist.py`): the output distribution is an exact sum of per-rule terms, but it is a superposition: it takes about 32 of 72 active rules per position and layer to stay
+  within 0.03 BPC, a dominant rule's stated top-10 tokens contain the true next token only 15-19% of the time, and low-rank or sparse students degrade fast. So the single-winner rulebook I used to claim explainability is not a faithful reading of the model.
+  My ablation result (cited rules are causal) stands but is weaker than "the rulebook explains the model". I am recording that the explainability half of the goal is **less established than I reported**, not more.

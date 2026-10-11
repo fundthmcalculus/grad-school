@@ -1504,3 +1504,9 @@ Sizing: `v18-3b-size` (30M chars on the `_all` stream) gives seconds per charact
 **0.97767 BPC** (evals 1.0906 / 1.0525 / 1.0015 / 0.9779 at 25/50/75/100%). Registered prediction 0.965-0.985: **met**. Reference at 1B characters (single pass): 0.9796 / 0.9845 (mean 0.9820 +/- 0.0024); 300M: 0.9976 / 1.0053.
 The gain from 1B to 3B is ~0.002-0.007, within the 1B seed spread (0.005): **extra data past ~1B characters buys nothing resolvable for this model**, and part of the 3B stream is repeated text. Coherence was not re-rated (it did not move between 300M and 1B). One seed; checkpoint `outputs/v18-3b/*.pt`.
 30M sizing on the same stream: 1.1052 (82 s). Registered runtime estimate 2.3 h, actual 2.26 h.
+
+### Coherence set 8: 3B characters vs 1B vs 300M (CPU session, 2026-10-12; seeds 14-15; 3 models x 8; **one rater**, scores written before the key was opened)
+
+3B-character model (0.9777 BPC) **6.88 +/- 0.67** (plot 1.38); 1B-character (0.9796) 7.50 +/- 0.57 (plot 1.50); 300M (0.9976) 5.75 +/- 0.25 (plot 1.00). Registered by the GPU session: coherence not measurably changed (6-8 /15): **met**.
+The 3B model is not distinguishable from the 1B model (-0.6, within one standard error), and the ordering 1B > 3B > 300M again follows noise, not data. Together with sets 5-7, nothing in 300M-3B characters moves blind coherence at 96K parameters.
+Files: `report/coherence8_{blind,key}.json`, `report/coherence8_scores_rater_cpu.json`. A second rater would tighten this; none has rated it.
