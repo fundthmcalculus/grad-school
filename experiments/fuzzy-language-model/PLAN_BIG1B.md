@@ -1,6 +1,6 @@
 # Plan: 1.32M parameters on 1 billion characters (the size-times-data run)
 
-CPU session, 2026-10-11, requested by the repo owner ("you can schedule the 1.32M x 1B run for after the current round of GPU work finishes"). **Needs the GPU session's user to approve exceeding the 99,999-parameter cap; the GPU session has said it will not run it without that.** This file is the complete job description so it can run unattended once approved.
+CPU session, 2026-10-11, requested by the repo owner ("you can schedule the 1.32M x 1B run for after the current round of GPU work finishes"). **Approved 2026-10-11 by the GPU session's user (verbatim: "approve the 1.32M run after the embedding screen"), for this run only; the 99,999 cap stays for everything else. Stage 1 starts when `v28-emb` ends.** This file is the complete job description so it can run unattended once approved.
 
 ## Why
 Nothing from 93K to 1.32M parameters, or from 30M to 3B characters at 96K, has moved blind coherence (6 to 8.5 of 15; plot 1 to 2.4 of 5; criterion 12 and 3.5). But the two levers were never combined:
