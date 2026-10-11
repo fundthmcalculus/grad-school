@@ -44,7 +44,12 @@
     <div class="fl-tile">
       <span class="fl-tile-label">Subword fuzzy model, 100M characters</span>
       <span class="fl-tile-value dash-skeleton" data-source="lead" data-field="sub100_txt" data-row="0">—</span>
-      <span class="fl-tile-note"><span data-source="lead" data-field="sub_params_txt" data-row="0">—</span> params, one seed, run at a learning rate below D's optimum</span>
+      <span class="fl-tile-note"><span data-source="lead" data-field="sub_params_txt" data-row="0">—</span> params, one seed</span>
+    </div>
+    <div class="fl-tile">
+      <span class="fl-tile-label">Subword fuzzy model over tuned neural models</span>
+      <span class="fl-tile-value dash-skeleton" data-source="lead" data-field="ctl_lead_txt" data-row="0">—</span>
+      <span class="fl-tile-note">bits/char, <span data-source="lead" data-field="ctl_n_txt" data-row="0">—</span> seeds each, same tokenizer; supported</span>
     </div>
   </section>
   <section class="fl-card" id="overview-ladder">
@@ -159,13 +164,18 @@
       <div class="fl-chart fl-short" id="chart-subcurves" data-source="gpu_curves"></div>
     </section>
   </div>
-  <p class="fl-note">Caveats: few seeds. The 30M, 100M and 300M runs used a learning rate of 3e-2, below D's optimum at 10M characters (see Subword control), so they understate D. A tuned neural control exists at 10M characters only. Bits per character is not coherence.</p>
+  <p class="fl-note">Caveats: the 100M and 300M runs are single seeds. The 30M and longer runs used a learning rate of 3e-2; at 30M that makes no difference to D (see Subword control), and it was not checked at 100M and 300M. A tuned neural control with ten seeds exists at 30M characters only. One tokenizer, one size. Bits per character is not coherence.</p>
 </template>
 
 <template id="tpl-control">
+  <section class="fl-card" id="control-ten">
+    <h2>Ten seeds at 30M characters: fuzzy D against the two best tuned neural models</h2>
+    <p class="fl-note">BPE1024, about 93K parameters each (the neural MLP is padded to match). Each model is tuned: the neural references are the two best of a 24-cell search at 10M characters; fuzzy D runs at its own best learning rate. Mean over ten seeds, whiskers one standard deviation. Bars start at 1.1. Tuned fuzzy D beats both by more than twice the standard error of the difference, and its worst seed beats the references' best. Caveats: one tokenizer, one size, one budget; the references were chosen at 10M characters and seed 0, which favours them; D runs about 1.5 times slower per character.</p>
+    <div class="fl-chart fl-short" id="chart-ten" data-source="arm_stats"></div>
+  </section>
   <section class="fl-card" id="control-result">
     <h2>Fuzzy D against a tuned neural model on the same tokenizer</h2>
-    <p class="fl-note">BPE1024, about 93K parameters each (the neural MLP is padded to match), 10M characters, both sides tuned over learning rate. Fuzzy D: six learning rates, two seeds each, best shown. Neural: the best of 24 configurations (mixer, heads, short convolution, learning rate), one seed each. Bars start at 1.2. Not citable yet: one reference seed and a short run.</p>
+    <p class="fl-note">BPE1024, about 93K parameters each (the neural MLP is padded to match), 10M characters, both sides tuned over learning rate. Fuzzy D: six learning rates, two seeds each, best shown. Neural: the best of 24 configurations (mixer, heads, short convolution, learning rate), one seed each. Bars start at 1.2. This is the tuning screen that chose the references above.</p>
     <div class="fl-chart fl-short" id="chart-control" data-source="arm_stats"></div>
   </section>
   <div class="fl-grid">
@@ -258,7 +268,7 @@
   dash.calc('lead', {
     inputs: ['gpu_runs'],
     title: 'The fuzzy lead, in words',
-    description: 'Fuzzy D against the size-near neural reference at 30M characters: means, lead, standard error of the difference, parameter gap, speed range; plus the subword headline.',
+    description: 'Fuzzy D against the size-near neural reference at 30M characters: means, lead, standard error of the difference, parameter gap, speed range; the subword headline; and the ten-seed subword control (tuned D against the two best tuned neural references).',
     fn: (gpu_runs) => {
       const pick = (grid, arm) => gpu_runs.filter((r) => r.grid === grid && r.arm === arm);
       const vals = (a) => a.map((r) => Number(r.val_bpc));
@@ -273,6 +283,13 @@
       const S30 = pick('v5-final100k', 'D-d48-bpe1024_30M');
       const S100 = pick('v5-final100k', 'D-d48-bpe1024_100M');
       const f3 = (x) => x.toFixed(3);
+      const SD = pick('v6-final10', 'D-lr0.06_30M');
+      const refs = ['ref1-delta-h8-sc4-lr4e-2_30M', 'ref2-delta-h4-sc4-lr6e-2_30M'].map((a) => pick('v6-final10', a));
+      const cl = refs.map((rv_) => {
+        const a = vals(rv_), b = vals(SD);
+        const se_ = Math.sqrt(sd(a) ** 2 / a.length + sd(b) ** 2 / b.length);
+        return { lead: mean(a) - mean(b), ratio: (mean(a) - mean(b)) / se_ };
+      });
       const pd = Number(D[0].params), pr = Number(R[0].params);
       return [{
         d_txt: f3(mean(dv)) + ' ± ' + f3(sd(dv)), r_txt: f3(mean(rv)) + ' ± ' + f3(sd(rv)),
@@ -283,6 +300,8 @@
         thr_txt: Math.round(cps(D) / 1000) + 'K vs ' + Math.round(Math.min(...R.map((r) => Number(r.cps))) / 1000) + 'K–' + Math.round(Math.max(...R.map((r) => Number(r.cps))) / 1000) + 'K',
         sub30_txt: f3(mean(vals(S30))) + ' (' + Number(S30[0].params).toLocaleString('en') + ' params, 30M characters)',
         sub100_txt: f3(mean(vals(S100))), sub_params_txt: Number(S100[0].params).toLocaleString('en'),
+        ctl_lead_txt: f3(Math.min(...cl.map((c) => c.lead))) + '–' + f3(Math.max(...cl.map((c) => c.lead))),
+        ctl_ratio_txt: String(Math.floor(Math.min(...cl.map((c) => c.ratio)))), ctl_n_txt: String(vals(SD).length),
       }];
     },
   });
@@ -324,6 +343,9 @@
         ['Fuzzy D, characters', 'v3-final', 'D_100M', C[0], '100M characters'],
         ['Fuzzy D, BPE1024', 'v5-final100k', 'D-d48-bpe1024_100M', C[2], '100M characters'],
         ['Fuzzy D, BPE1024', 'v5-long', 'D-d48-bpe1024_300M_lr3e-2', C[2], '300M characters'],
+        ['Neural delta, 4 heads (tuned), BPE1024', 'v6-final10', 'ref2-delta-h4-sc4-lr6e-2_30M', C[7], '30M characters, ten seeds, same tokenizer, both tuned'],
+        ['Neural delta, 8 heads (tuned), BPE1024', 'v6-final10', 'ref1-delta-h8-sc4-lr4e-2_30M', C[7], '30M characters, ten seeds, same tokenizer, both tuned'],
+        ['Fuzzy D (tuned), BPE1024', 'v6-final10', 'D-lr0.06_30M', C[2], '30M characters, ten seeds, same tokenizer, both tuned'],
         ['Neural, BPE1024, best of 24 tuned cells', 'v6-ref-tune', 'delta-h8-sc4-lr4e-2', C[7], '10M characters, same tokenizer, both tuned'],
         ['Fuzzy D, BPE1024, lr 6e-2', 'v6-d-lr', 'D-lr6e-2_10M', C[2], '10M characters, same tokenizer, both tuned'],
       ].map(([l, g, a, c, grp]) => item(l, arm(g, a), { color: c, group: grp })).filter(Boolean);
@@ -499,6 +521,12 @@
 
     control(root) {
       const st = dash.data('arm_stats');
+      const ten = root.querySelector('#chart-ten');
+      if (!F.pending(ten, st.status)) {
+        const spec = [['Fuzzy D (tuned, lr 6e-2)', 'D-lr0.06_30M', C[2]], ['Neural delta, 4 heads (tuned)', 'ref2-delta-h4-sc4-lr6e-2_30M', C[7]], ['Neural delta, 8 heads (tuned)', 'ref1-delta-h8-sc4-lr4e-2_30M', C[7]]];
+        const items = spec.map(([l, a, c]) => item(l, arm('v6-final10', a), { color: c, note: '10 seeds' })).filter(Boolean);
+        F.bars(ten, items, { xDomain: [1.1, 1.18], xFmt: F.f2, valueFmt: F.f4, rowH: 32 });
+      }
       let el = root.querySelector('#chart-control');
       const rows = st.status === 'ok' ? st.data : [];
       const neural = rows.filter((r) => r.grid === 'v6-ref-tune').sort((a, b) => a.mean - b.mean);

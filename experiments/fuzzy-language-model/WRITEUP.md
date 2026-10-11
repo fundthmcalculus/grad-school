@@ -11,10 +11,12 @@ number** (the open fairness gaps are in §12). The laboratory record behind it i
 hypothesis as registered before its run, every protocol amendment, every correction. Where
 this document and `RESULTS.md` differ, `RESULTS.md` is the record.
 
-> **Citability.** Every cell here is 3 seeds or fewer. AGENTS.md non-negotiable 2 makes ten
-> seeds the protocol for quotable numbers, and the ten-seed `headline10` grids were offloaded
-> to the GPU host and have not run. **Nothing below may be quoted in the proposal** until
-> it is repeated at ten seeds.
+> **Citability.** AGENTS.md non-negotiable 2 makes ten seeds the protocol for quotable numbers.
+> The subword comparison of §11 (`v6-final10`: fuzzy D against two tuned neural references, ten
+> seeds each, 30M characters) has them and may be quoted with its caveats: one tokenizer, one
+> size, one budget; the references were chosen at 10M characters on seed 0; D runs about 1.5
+> times slower per character. Every other cell here is 3 seeds or fewer and **may not be quoted
+> in the proposal** until repeated at ten seeds (the character-level `v4-final10` grid has not run).
 
 ## 1. Summary
 
@@ -45,7 +47,7 @@ this document and `RESULTS.md` differ, `RESULTS.md` is the record.
    characters (3 seeds; a 2.85-standard-error lead that is **not yet citable**: the reference
    is 4.6% smaller and less tuned). A BPE1024 version (93K params) reaches **1.129** at 30M
    (2 seeds), **1.055** at 100M and **1.021** at 300M (1 seed each), and, at 10M characters on the same
-   tokenizer, a tuned neural model trails the tuned fuzzy one by **0.016** (§11; one reference seed, so not citable).
+   tokenizer, tuned fuzzy D beats both tuned neural references by **0.027 and 0.030** bits per character at ten seeds, 30M characters (§11, `v6-final10`).
    Post-training adds nothing beyond compute. The open fairness gaps are listed in §12.
 
 ## 2. Questions
@@ -417,7 +419,7 @@ the text's probability, so the reported BPC is, if anything, conservative for th
 | `v5-long` (300M, 1 seed) | BPE1024 D d = 48, lr 3e-2 / lr 2e-2 | 93,344 | **1.0212** / 1.0227 |
 
 * **Caveats the GPU session asked to be stated:** the subword result is **2 seeds at 30M and 1 seed at 100M**;
-  the neural control on the same tokenizer exists **at 10M characters only** (below); the 30M, 100M and 300M runs used
+  the neural control on the same tokenizer is at **ten seeds and 30M characters** (below), one tokenizer and size; the 30M, 100M and 300M runs used
   lr 3e-2, which is **below D's optimum of 6e-2 at 10M**, so they understate D; and the 150K-vs-162K comparisons are at equal
   *characters*, not equal steps (BPE sees ≈ 2.4× more characters per step, so it takes fewer optimizer steps and
   its warm-up is a larger share of training).
@@ -430,9 +432,10 @@ the text's probability, so the reported BPC is, if anything, conservative for th
   2e-2 → 1.2809, 3e-2 → 1.2604, 4e-2 → 1.2542, **6e-2 → 1.2502 ± 0.0018**, 8e-2 → 1.2519, 1e-1 → 1.2628, so the
   optimum is interior. The neural reference (delta rule or gated linear attention, MLP padded to 93,376–93,392
   parameters; 24 cells over heads, short convolution and lr, one seed each): best **1.2666** (delta, 8 heads, short-conv 4,
-  lr 4e-2), then 1.2694 and 1.2710. **Tuned fuzzy D leads the best tuned neural cell by 0.016 bits per character**,
-  against D's own seed spread of 0.002; the reference is one seed. Not citable (one reference seed, 10M characters);
-  `v6-final10` (ten seeds at 30M characters) is the test.
+  lr 4e-2), then 1.2694 and 1.2710. **Tuned fuzzy D leads the best tuned neural cell by 0.016 bits per character**
+  at 10M characters (one reference seed). `v6-final10` then tested it at ten seeds and 30M characters:
+  D 1.1291 ± 0.0039 against 1.1564 ± 0.0044 and 1.1593 ± 0.0038, leads of 0.027 and 0.030 (2 se 0.0037
+  and 0.0034); D's worst seed beats the references' best. Citable with the caveats in the banner.
 * **Text is better but not coherent.** At T 0.7 / top-k 20 the BPE1024 model invents more non-words (2.2%) than
   the character models (0.4–0.9%); sampling at T 0.5 / top-k 10 drops that to 0.65% at the price of looping
   ("They did not like the box. They did not like the box.", repeated-sentence share 2.9%). Samples show
@@ -444,14 +447,14 @@ the text's probability, so the reported BPC is, if anything, conservative for th
 | gap | why it matters | how it closes |
 |---|---|---|
 | **Char-level D vs the reference at equal effort** | 4.6% parameter mismatch; D searched far more than the reference; 3 seeds | `v4-ref-tune`, `v3-lr`, `v4-final10` (`PLAN_GPU.md`) |
-| **Neural control on the same tokenizer**: *partly closed* | at 10M characters the best of 24 tuned neural cells (1 seed each) trails tuned D by 0.016; ten seeds at 30M (`v6-final10`, ~1 GPU-h) is not started and needs the GPU session's user's go-ahead | `v6-final10` |
-| **D's lr on subwords**: tuned at 10M characters (optimum 6e-2, interior), **not at 30M and beyond** | the 30M, 100M and 300M subword runs used 3e-2, which understates D; at 300M, 3e-2 and 2e-2 tie | an lr study at 30M characters |
-| **Ten seeds** | every cell is 1–3 seeds; AGENTS.md makes ten the protocol | `v4-final10`, `v6-final10` |
+| **Neural control on the same tokenizer**: *closed at ten seeds, 30M characters* | D beats both tuned references by 0.027 and 0.030 (`v6-final10`); other tokenizers, sizes and budgets, each with its own tuned reference, are untested | the generality grids |
+| **D's lr on subwords**: *closed at 30M* | D at 6e-2 (ten seeds) 1.1291 vs 3e-2 (two seeds) 1.1292; not checked at 100M and 300M, so quote those only as lower bounds | an lr check at 100M, 300M |
+| **Ten seeds** | done for the subword comparison (`v6-final10`); the character-level comparison has 3 | `v4-final10` |
 | **LR transfer (H10a) and `v3-lr`** | incomplete: the 1e-2 cells were lost to a crash from a stale `train.py`, the 2e-2 cells were killed for VRAM contention | resume `v3-lr`, `lrwidth` |
 | **Coherence** | BPC is not coherence; text loops at low temperature | a coherence grader, or longer context and larger models |
 | **One GPU, one tokenizer family** | unreplicated | `COORDINATION.md` |
 
-Nothing in §10–§11 may be quoted in the proposal until the first three rows have closed.
+Only the `v6-final10` comparison of §11 may be quoted in the proposal, with its caveats; the character-level claims wait for the first row of this table.
 
 ## References
 
