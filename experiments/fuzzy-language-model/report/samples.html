@@ -112,6 +112,22 @@ code { font-family: var(--mono); font-size: .9em; }
   </section>
 
   <section>
+    <h2>Latest rounds, and why none of it reached coherence</h2>
+    <p>Since the first grading I generated fresh stories for the best models and graded them blind with two raters, then tried four ways of sampling from the same model. Totals are out of 15.</p>
+    <div class="scroll"><table>
+      <tr><th>test</th><th>result</th><th>reading</th></tr>
+      <tr><td>Best model, 0.998 bits/char vs older 1.02 and 1.05</td><td>6.9 vs 7.5 and 7.6 (two raters)</td><td>The lower loss did not show up as better stories. Plot sense 1.7–1.9 out of 5.</td></tr>
+      <tr><td>Same checkpoint, different seeds</td><td>9.9 on one set, 8.1 on another</td><td>The score is noisy by about ±1.5 per set; only big gaps count.</td></tr>
+      <tr><td>Sampling: baseline (T 0.5, top-k 10)</td><td>8.3</td><td>Best of the four.</td></tr>
+      <tr><td>Sampling: 4-gram block</td><td>7.0</td><td>Worse.</td></tr>
+      <tr><td>Sampling: T 0.7, top-p 0.9</td><td>6.3</td><td>Worse.</td></tr>
+      <tr><td>Sampling: repetition penalty</td><td>6.0</td><td>Worst; it broke grammar and one story degenerated into "deep deep deep".</td></tr>
+      <tr><td>More rules per head (32 to 256), 5 seeds</td><td>1.110 to 1.100 bits/char</td><td>Flat within noise.</td></tr>
+    </table></div>
+    <p class="note">The bar the other session set for "coherent" is at least 12/15 with plot at least 3.5/5 from both raters. Nothing here is close. Within roughly 165K parameters, changing vocabulary, context, rules, attention type, post-training and decoding all moved loss by 0.03 or less and none moved coherence. The one lever left untested is model size.</p>
+  </section>
+
+  <section>
     <h2>Getting to coherent text</h2>
     <p>Coherence is about holding a story together across a few hundred characters: who is in it, what they own, what happens next. A character-level model spends most of its capacity on spelling and word boundaries. Here is what I would try, in order of expected value per hour of GPU.</p>
     <ol class="steps">

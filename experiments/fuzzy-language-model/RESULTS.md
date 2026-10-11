@@ -1256,3 +1256,27 @@ The rule count from 32 to 128 is a trend of about −0.009 that five seeds canno
 r192 and r256 are **not better than r128**: both means sit inside r128's five-seed noise (seed sd ≈ 0.007–0.011; r192's two seeds differ by 0.021). **The rule-count curve from 32 to 256 is flat within noise** (1.1095, 1.1082, 1.1002, 1.1050, 1.1072);
 the one trend the five-seed r32/r64/r128 comparison could not confirm (−0.009) is not continued by r192/r256. At 30M chars, adding rules beyond ~32 per head within the ≤ 165K cap does not reliably help. Throughput falls with rules
 (119K → 91K → 84K chars/s for r32 → r192 → r256). This closes the "more recurrent state" lever for loss at this budget; coherence was not re-graded (the loss gain was < 0.02, the registered condition for re-grading).
+
+## Registered 2026-10-11, before `coherence3` (decoding): does the decoding strategy move coherence at fixed weights?
+
+Weights fixed: the 0.9976-BPC checkpoint (BPE1024 D, ctx 512, 32 rules, 300M chars). Four strategies, each 4 prompts × seeds 4 and 5 (fresh texts; 8 per strategy; 600 chars; same rubric, blind, shuffled, key withheld until scored):
+**A** T 0.5 / top-k 10 (the baseline used in sets 1–2); **B** T 0.7 / top-p 0.9; **C** A plus a repetition penalty (logits of tokens seen in the last 64 tokens divided by 1.3 when positive, multiplied when negative);
+**D** A plus a 4-gram block (a token is forbidden if it would complete a 4-token sequence already in the text). Rater 1 = Claude (GPU session).
+* **DC1.** C and D each beat A on the total score by ≥ 1.0 (repetition is the visible failure; the earlier samples loop). *(~55% for each.)*
+* **DC2.** B is no better than A (higher temperature costs grammar more than it gives variety). *(~65%.)*
+* **DC3.** Plot sense (P) rises by ≥ 0.5 for the best of C / D. *(~30%: loop removal could make stories wander instead of go anywhere.)*
+Noise reminder: ±1.5 totals set to set; n = 8 per cell, so only differences of ≥ ~2 are readable.
+
+### Outcome `coherence3` (decoding at fixed weights; rater 1 = Claude GPU session, blind, scores `coherence3_scores_rater1.json` written before the key was opened; the 0.9976-BPC checkpoint; 8 texts per strategy, seeds 4–5)
+
+| strategy | G | C | P | total (3–15) ± s.e. |
+|---|---|---|---|---|
+| **A** T 0.5 / top-k 10 (baseline) | 3.50 | 2.62 | 2.12 | **8.25 ± 0.77** |
+| D = A + 4-gram block | 3.12 | 2.12 | 1.75 | 7.00 ± 0.53 |
+| B T 0.7 / top-p 0.9 | 2.88 | 1.88 | 1.50 | 6.25 ± 0.34 |
+| C = A + repetition penalty 1.3 | 2.75 | 1.75 | 1.50 | 6.00 ± 0.61 |
+
+**DC1 refuted:** neither C (−2.25) nor D (−1.25) beats A; C is the worst arm. **DC2 supported:** B is worse than A (−2.0). **DC3 refuted:** plot sense falls, not rises (2.12 → 1.50–1.75).
+Sanity check: S023 (A) and S029 (D) are character-identical texts (the 4-gram block never triggered) and received identical scores. The repetition penalty also produced a degenerate "deep deep deep …" story and artifacts (`???`),
+i.e. it damages grammar more than it removes loops. **Reading:** the baseline decoding is already the best of the four; coherence at this model size is not limited by the sampler. Noise ±1.5; n = 8 per arm, so only the
+C/B-versus-A gaps (≈ 2 totals) are readable; one rater; not independently graded (the CPU session may re-grade `coherence3_blind.json`; the key is withheld until then).
