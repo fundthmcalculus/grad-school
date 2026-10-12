@@ -1,0 +1,286 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v36-cosmo\\ref_30M_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1414,
+ "chars_seen": 30016616,
+ "chars_per_token": 2.591328,
+ "val_bpc": 1.86804,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   4.01587
+  ],
+  [
+   100,
+   2.4167
+  ],
+  [
+   200,
+   2.23238
+  ],
+  [
+   300,
+   2.16015
+  ],
+  [
+   400,
+   2.10277
+  ],
+  [
+   500,
+   2.06719
+  ],
+  [
+   600,
+   2.03078
+  ],
+  [
+   700,
+   2.00517
+  ],
+  [
+   800,
+   1.97512
+  ],
+  [
+   900,
+   1.94778
+  ],
+  [
+   1000,
+   1.92635
+  ],
+  [
+   1100,
+   1.90676
+  ],
+  [
+   1200,
+   1.88956
+  ],
+  [
+   1300,
+   1.87647
+  ],
+  [
+   1400,
+   1.86926
+  ],
+  [
+   1414,
+   1.86804
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3625
+  ],
+  [
+   50,
+   8.7457
+  ],
+  [
+   100,
+   7.246
+  ],
+  [
+   150,
+   6.4767
+  ],
+  [
+   200,
+   6.0538
+  ],
+  [
+   250,
+   5.8656
+  ],
+  [
+   300,
+   5.69
+  ],
+  [
+   350,
+   5.5763
+  ],
+  [
+   400,
+   5.4993
+  ],
+  [
+   450,
+   5.4228
+  ],
+  [
+   500,
+   5.3767
+  ],
+  [
+   550,
+   5.3166
+  ],
+  [
+   600,
+   5.2644
+  ],
+  [
+   650,
+   5.2266
+  ],
+  [
+   700,
+   5.2064
+  ],
+  [
+   750,
+   5.1511
+  ],
+  [
+   800,
+   5.1072
+  ],
+  [
+   850,
+   5.083
+  ],
+  [
+   900,
+   5.0335
+  ],
+  [
+   950,
+   5.0071
+  ],
+  [
+   1000,
+   5.0072
+  ],
+  [
+   1050,
+   4.9715
+  ],
+  [
+   1100,
+   4.9437
+  ],
+  [
+   1150,
+   4.9087
+  ],
+  [
+   1200,
+   4.8947
+  ],
+  [
+   1250,
+   4.8741
+  ],
+  [
+   1300,
+   4.847
+  ],
+  [
+   1350,
+   4.8338
+  ],
+  [
+   1400,
+   4.8218
+  ],
+  [
+   1413,
+   4.8258
+  ]
+ ],
+ "train_seconds": 96.66,
+ "wall_seconds": 117.28,
+ "chars_per_sec": 119835,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time.\n\nArtle business time from the wellbeing. Read lessons about your benefits. Imagine if you're thought about share feelings, were had inside people feel ways to manage what stand good story to understand why things in a best day. Should you have was like we made your own. Indy you who made a land of your bloss of your journey. Seagyk, things were truly made ablying life? Well, want to come to their women, marketing seen their fighbeer.\n\n\"When learning! \"What would some bond, just like,\" is a sound under acceptance ways. But does there is first about the flow of behind bikeing! Wond different times perspectives. This would feel to tried a common plancular scrat ask, who discussed about the world. Let's explore today!\n\nLesson 6: What olded.\n\nFinally, you're want to be a patternral",
+ "rule_init": {},
+ "ngram_init": {}
+}

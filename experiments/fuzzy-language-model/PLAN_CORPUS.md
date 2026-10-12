@@ -49,3 +49,15 @@ BPE1024 was trained on TinyStories; on a general corpus it is a different object
 **Baselines before any training** (`flm/corpus_baselines.py`, 300M training tokens, BPC on the first 1M validation characters): unigram 3.409, bigram 2.242, **trigram 1.622**. Registered prediction 2 (96K at 30M within 0.15 of the n-gram baseline) therefore reads: 96K BPC at 30M between 1.47 and 1.77 (50%).
 Runs: `python -m flm.run_cosmo_sweep` (`v36-cosmo`): ref and tiered arms, seeds 0-4, same recipe (lr 6e-2, warm-up 100) as TinyStories (a transfer of the recipe, not a re-tune: lr might differ), tiered head frequencies from the corpus tokens (`TIER_FREQ`).
 Additional predictions: tiered beats ref at 30M on >= 4/5 seeds (55%) (head 768 of 1024 tokens covers 98%, a smaller saving here than on TinyStories); ref BPC at 30M is between 1.3 and 1.8 (70%).
+
+## C1/C2 outcome (`v36-cosmo`, 30M chars, seeds 0-4, BPE1024 retrained on Cosmopedia; paired within seed)
+| arm | params | BPC (seeds 0-4) | mean |
+|---|---|---|---|
+| ref | 96,416 | 1.8716 / 1.8810 / 1.8748 / 1.8698 / 1.8680 | **1.873** |
+| tiered t768e16m225 | 98,280 | 1.8619 / 1.8582 / 1.8518 / 1.8577 / 1.8503 | **1.856** |
+Paired tiered - ref **-0.017, 5/5 seeds better**. Baselines on the same validation text: unigram 3.409, bigram 2.242, trigram 1.622 (fit on 300M tokens, ten times the 30M-char model's data).
+Predictions: ref BPC between 1.3 and 1.8 (70%): **wrong** (1.873); within 0.15 of the n-gram baseline, i.e. 1.47-1.77 (50%): **wrong**: at 30M chars the 96K model is *0.25 above* a trigram table fit on more data, so on broad text the model is still data-starved, not saturated (TinyStories at 30M: 1.11). Tiered beats ref on >= 4/5 seeds (55%): **right**, 5/5. BPC well above TinyStories (>= 1.6, 85%): right.
+Reading: Cosmopedia is far harder per character for this size (1.87 vs 1.11 at the same budget); the recipe lever (tiered) transfers. Whether 96K ever beats the trigram baseline on this corpus is the 300M/3B question; the decision rule says to compare against the baseline before reading anything into architecture.
+
+### C3 registered before running (300M chars, seed 0, ref then tiered; `COSMO_CHARS=300e6 COSMO_SEEDS=0 python -m flm.run_cosmo_sweep`, ~30 min per arm)
+Predictions: ref BPC between 1.45 and 1.65 (55%), i.e. it passes the 300M-token trigram (1.622) only just if at all (beats it: 45%); tiered beats ref by 0.01-0.03 (60%); no model reaches 1.40 (85%). Coherence is not rated until BPC is read.

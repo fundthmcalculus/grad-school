@@ -1,0 +1,286 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v36-cosmo\\ref_30M_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1414,
+ "chars_seen": 30016616,
+ "chars_per_token": 2.591328,
+ "val_bpc": 1.86979,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   4.00918
+  ],
+  [
+   100,
+   2.43201
+  ],
+  [
+   200,
+   2.25019
+  ],
+  [
+   300,
+   2.16369
+  ],
+  [
+   400,
+   2.10874
+  ],
+  [
+   500,
+   2.06421
+  ],
+  [
+   600,
+   2.03019
+  ],
+  [
+   700,
+   1.99988
+  ],
+  [
+   800,
+   1.97692
+  ],
+  [
+   900,
+   1.95104
+  ],
+  [
+   1000,
+   1.92903
+  ],
+  [
+   1100,
+   1.90687
+  ],
+  [
+   1200,
+   1.89182
+  ],
+  [
+   1300,
+   1.8801
+  ],
+  [
+   1400,
+   1.87161
+  ],
+  [
+   1414,
+   1.86979
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3319
+  ],
+  [
+   50,
+   8.7286
+  ],
+  [
+   100,
+   7.2752
+  ],
+  [
+   150,
+   6.5277
+  ],
+  [
+   200,
+   6.1076
+  ],
+  [
+   250,
+   5.8599
+  ],
+  [
+   300,
+   5.6691
+  ],
+  [
+   350,
+   5.5822
+  ],
+  [
+   400,
+   5.4983
+  ],
+  [
+   450,
+   5.4487
+  ],
+  [
+   500,
+   5.3747
+  ],
+  [
+   550,
+   5.3253
+  ],
+  [
+   600,
+   5.2741
+  ],
+  [
+   650,
+   5.2228
+  ],
+  [
+   700,
+   5.1876
+  ],
+  [
+   750,
+   5.1596
+  ],
+  [
+   800,
+   5.1169
+  ],
+  [
+   850,
+   5.1105
+  ],
+  [
+   900,
+   5.0677
+  ],
+  [
+   950,
+   5.0309
+  ],
+  [
+   1000,
+   5.0064
+  ],
+  [
+   1050,
+   4.9624
+  ],
+  [
+   1100,
+   4.9208
+  ],
+  [
+   1150,
+   4.9051
+  ],
+  [
+   1200,
+   4.883
+  ],
+  [
+   1250,
+   4.8598
+  ],
+  [
+   1300,
+   4.8386
+  ],
+  [
+   1350,
+   4.818
+  ],
+  [
+   1400,
+   4.8323
+  ],
+  [
+   1413,
+   4.825
+  ]
+ ],
+ "train_seconds": 96.59,
+ "wall_seconds": 117.47,
+ "chars_per_sec": 119923,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time.\n\nAs this course unit time, let us explore their fair ogred? Well, it's essential to create mindfully and know that yourself share feelings!\n<|eot|>\n Chapter 1: Cleani Back, Indigenous Typess\n\nHave you ever wondered what have it before. She were today! That's about how both two data lies and cells. This test might still spirited into the collection of minds like his story, a since specific course of the planning, or third.\n\nIn this chapter, we will be only the lesson in the must. We will also appreciate this, we will explore the world of activity and understanding into one to the body that first states a human behavior toward the political conveficial, which then requirremented the commitment that can challenge different aspects of the nagerva. We will examine the significance of such tranging animals towards the value among the urban enturies, and regional empathy such",
+ "rule_init": {},
+ "ngram_init": {}
+}
