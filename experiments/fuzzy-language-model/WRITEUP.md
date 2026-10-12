@@ -484,6 +484,8 @@ Set 10 gave the 1.32M model 9.6 / 10.4 against 5.3-5.5 for the 96K models at 1B 
 
 **Cap status.** The 99,999-parameter cap was exceeded for the 1.32M run (explicit user approval) and for the 251K / 653K ladder rungs (user: "raise the cap and keep moving", understood as covering up to 1.32M). Larger rungs (2.2M-7M) were not run.
 
+**Larger general corpus (Cosmopedia v2, 3.0B characters, BPE1024 retrained, `PLAN_CORPUS.md`).** Same-size models are far weaker per character on broad synthetic text: 96K reference 1.873 BPC at 30M (five seeds) and 1.761 at 300M (one seed), against a 300M-token trigram table at 1.622; the tiered embedding helps by -0.017 at both scales (5/5 seeds at 30M). The TinyStories result that 96K saturates by ~1B characters does not transfer: on this corpus the model is capacity-bound. No 3B-char run and no coherence rating yet.
+
 **Next (planned, not run):** a larger general-text corpus at the same sizes (`PLAN_CORPUS.md`) and a Matryoshka-trained embedding for a smaller interpretable embedding space (`PLAN_MATRYOSHKA.md`).
 
 ## References

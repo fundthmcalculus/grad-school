@@ -61,3 +61,7 @@ Reading: Cosmopedia is far harder per character for this size (1.87 vs 1.11 at t
 
 ### C3 registered before running (300M chars, seed 0, ref then tiered; `COSMO_CHARS=300e6 COSMO_SEEDS=0 python -m flm.run_cosmo_sweep`, ~30 min per arm)
 Predictions: ref BPC between 1.45 and 1.65 (55%), i.e. it passes the 300M-token trigram (1.622) only just if at all (beats it: 45%); tiered beats ref by 0.01-0.03 (60%); no model reaches 1.40 (85%). Coherence is not rated until BPC is read.
+
+### C3 outcome (300M chars, seed 0; Cosmopedia valid, first 1M chars)
+ref (96,416) **1.7611** (965 s); tiered (98,280) **1.7437** (981 s), -0.0174. Predictions: ref between 1.45 and 1.65 (55%): **wrong**; beats the 300M-token trigram 1.622 (45%): **wrong** (+0.139 above it); tiered beats ref by 0.01-0.03 (60%): **right**; no model below 1.40 (85%): **right**.
+Reading: 30M -> 300M moves the 96K reference 1.873 -> 1.761 (-0.11), against 1.11 -> 1.00 on TinyStories; at 300M characters of Cosmopedia (about 115M tokens) the model still trails a token trigram table fit on 300M tokens. On this corpus a 96K model is capacity-bound well before it is data-bound (the TinyStories picture of saturation at ~1B does not transfer), and the tiered embedding's -0.017 is consistent across scales (30M five seeds, 300M one seed). Not run: the 3B-char run (about 3.2 h at 2.59 chars/token; goes back to the user), a coherence set on this corpus (not comparable to the story-prompt sets and BPC does not predict it), mixed TinyStories + Cosmopedia (C4).
