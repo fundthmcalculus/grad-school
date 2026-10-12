@@ -12,7 +12,10 @@ from flm.run_tribble import argv
 OUT = Path("outputs/v36-cosmo")
 CHARS = os.environ.get("COSMO_CHARS", "30e6")
 DATA = str(Path("../../data/cosmopedia").resolve())
-ARMS = ("ref", "tiered")
+ARMS = (
+    "ref",
+    "tiered",
+)  # "mixed": ref architecture on data/mixed (flm.prep_mixed), saved for flm.eval_other
 if __name__ == "__main__":
     (OUT / "logs").mkdir(parents=True, exist_ok=True)
     seeds = [int(s) for s in os.environ.get("COSMO_SEEDS", "0,1,2,3,4").split(",")]
@@ -27,6 +30,9 @@ if __name__ == "__main__":
             a[a.index("--out") + 1] = str(out)
             a[a.index("--chars") + 1] = CHARS
             env = dict(os.environ, GRAD_SCHOOL_DATA=DATA, PYTHONPATH=".")
+            if name == "mixed":
+                env["GRAD_SCHOOL_DATA"] = str(Path("../../data/mixed").resolve())
+                a += ["--save-model"]
             if name == "tiered":
                 a[a.index("--ffn-mult") + 1] = "2.25"
                 env.update(
