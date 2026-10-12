@@ -8,6 +8,7 @@ PLAN_MATRYOSHKA.md M1/M2.  train.py / models.py are untouched: the final state i
 
 import os
 
+import torch
 import torch.nn.functional as F
 
 import flm.train as T
@@ -16,7 +17,10 @@ from flm.models import TinyLM
 KS = [int(x) for x in os.environ.get("MRL_KS", "8,16,32,48").split(",")]
 W = [float(x) for x in os.environ.get("MRL_W", "1,1,1,1").split(",")]
 assert len(KS) == len(W)
-_logits = TinyLM.logits
+IN = int(
+    os.environ.get("MRL_IN", "0")
+)  # 1: nested-dropout on the input embedding (random prefix k per step, k = d half the time)
+_embed = TinyLM.embed
 _state = {}
 
 
@@ -25,6 +29,14 @@ def _new_logits(self, h):
     if self.training:
         _state["h"], _state["emb"] = h, self.emb.weight
     return h @ self.emb.weight.T
+
+
+def _new_embed(self, idx):
+    e = _embed(self, idx)
+    if not self.training:
+        return e
+    k = e.shape[-1] if torch.rand(()) < 0.5 else KS[int(torch.randint(len(KS), ()))]
+    return torch.cat([e[..., :k], torch.zeros_like(e[..., k:])], -1)
 
 
 class _F:
@@ -45,5 +57,7 @@ class _F:
 
 if __name__ == "__main__":
     TinyLM.logits = _new_logits
+    if IN:
+        TinyLM.embed = _new_embed
     T.F = _F()
     T.main()
