@@ -30,3 +30,8 @@ beth/
 # character stream (train.bin / valid.bin) by:
 #   cd experiments/fuzzy-language-model && .venv/bin/python -m flm.data
 tinystories/
+
+# Cosmopedia v2 character stream for experiments/fuzzy-language-model (PLAN_CORPUS.md), ~3 GB train.bin + raw parquet shards.
+# Recover: cd experiments/fuzzy-language-model && PYTHONPATH=. python -m flm.prep_cosmopedia 3e9
+# (pinned revision of HuggingFaceTB/smollm-corpus; licence ODC-By)
+cosmopedia/

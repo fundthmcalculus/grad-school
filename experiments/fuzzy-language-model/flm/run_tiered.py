@@ -22,7 +22,9 @@ _init = TinyLM.__init__
 def _new_init(self, cfg, *a, **k):
     _init(self, cfg, *a, **k)
     V, d = cfg.vocab_size, cfg.d_model
-    freq = np.load("outputs/v22-tribble/ppmi_k48_v1024.npz")["freq"]
+    freq = np.load(
+        os.environ.get("TIER_FREQ", "outputs/v22-tribble/ppmi_k48_v1024.npz")
+    )["freq"]
     order = np.argsort(-freq, kind="stable")
     head, tail = order[:NH], order[NH:]
     pos = np.zeros(V, dtype=np.int64)
