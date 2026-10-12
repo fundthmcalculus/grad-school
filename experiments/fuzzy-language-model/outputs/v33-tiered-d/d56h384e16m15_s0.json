@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 56,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v33-tiered-d\\d56h384e16m15_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 56,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 94048,
+ "params_nonemb": 61408,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.109,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.2437
+  ],
+  [
+   100,
+   1.61325
+  ],
+  [
+   200,
+   1.45494
+  ],
+  [
+   300,
+   1.38344
+  ],
+  [
+   400,
+   1.32642
+  ],
+  [
+   500,
+   1.27604
+  ],
+  [
+   600,
+   1.24002
+  ],
+  [
+   700,
+   1.20958
+  ],
+  [
+   800,
+   1.17335
+  ],
+  [
+   900,
+   1.14764
+  ],
+  [
+   1000,
+   1.12899
+  ],
+  [
+   1100,
+   1.11389
+  ],
+  [
+   1160,
+   1.109
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2473
+  ],
+  [
+   50,
+   8.1046
+  ],
+  [
+   100,
+   6.3005
+  ],
+  [
+   150,
+   5.4116
+  ],
+  [
+   200,
+   4.9651
+  ],
+  [
+   250,
+   4.7001
+  ],
+  [
+   300,
+   4.5284
+  ],
+  [
+   350,
+   4.4039
+  ],
+  [
+   400,
+   4.3126
+  ],
+  [
+   450,
+   4.2071
+  ],
+  [
+   500,
+   4.1367
+  ],
+  [
+   550,
+   4.0536
+  ],
+  [
+   600,
+   3.9895
+  ],
+  [
+   650,
+   3.9203
+  ],
+  [
+   700,
+   3.8717
+  ],
+  [
+   750,
+   3.8348
+  ],
+  [
+   800,
+   3.7682
+  ],
+  [
+   850,
+   3.7138
+  ],
+  [
+   900,
+   3.6829
+  ],
+  [
+   950,
+   3.6329
+  ],
+  [
+   1000,
+   3.5909
+  ],
+  [
+   1050,
+   3.5633
+  ],
+  [
+   1100,
+   3.547
+  ],
+  [
+   1150,
+   3.5492
+  ],
+  [
+   1159,
+   3.5458
+  ]
+ ],
+ "train_seconds": 80.93,
+ "wall_seconds": 95.01,
+ "chars_per_sec": 117414,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Ben.\nBut then, a big vaches. It was a big splash and first. Ben said, \"Don't worry, Lily. Kitty! It is a big, fair!\"\nThe wind started to tired. It was a beautiful game sling over he could. The pet chaches and chaced. Mom, a plain flew away. But he was not avy friend.\nHe saw some barit and said, \"Good, let's go to a door. If you like to tirow.\"\nThe end.\n<|eot|>\n\nOnce upon a time there lived a little girl. She had a big boy who loved to go in her room. She didn't want to be Parrie.\nOne day, a little girl named Sue wanted to play with her car. But only she found. She bucketed outside her car and jumped out of her room. She opened her room and grabbed her hair green gun. Sue was excited to see her hair and then in her room. But she had an idea!\nSue opened her hair. Her mom was very surprised. She wanted to help her shelad her sidek. Sue was so excited to go home with the store. Sue was happy and thanked the store.\n",
+ "rule_init": {},
+ "ngram_init": {}
+}
