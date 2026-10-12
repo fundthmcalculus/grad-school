@@ -1,6 +1,6 @@
 # Tiny fuzzy language models: linear vs quadratic attention, and a recurrent TSK language model
 
-**Status:** CPU phase stopped 2026-10-10; GPU phase in progress (§10–§12, transcribed from the GPU session's records) ·
+**Status:** CPU phase stopped 2026-10-10; GPU phase summarised in §10–§13 (§10–§12 transcribed from the GPU session's records; §13 is the final state, 2026-10-12) ·
 **Experiment:** `experiments/fuzzy-language-model/` · **PR:** #272 · **Dashboard:**
 https://claude.ai/artifact/XGJzPWz5T5i2wQvVE6C3Y4 (private until shared)
 
@@ -457,6 +457,34 @@ the text's probability, so the reported BPC is, if anything, conservative for th
 Vocabulary ladder (`v7-vocab`, `v7-confirm`, two seeds each, lr 3e-2): at 10M characters BPE1536 d40 (93,792 parameters) scored 1.2336 and BPE2048 d32 1.2378 against 1.2604 for BPE1024 d48, but at 30M characters the 1536 gain shrank from 0.027 to 0.009 (1.1205 against 1.1291) and 2048 lost its edge (1.1316), so the 10M screens overstated larger vocabularies. The headline stays BPE1024 d48; BPE1536 d40 needs ten seeds and its own neural control before any fuzzy-vs-neural claim at that vocabulary.
 
 Only the `v6-final10` comparison of §11 may be quoted in the proposal, with its caveats; the character-level claims wait for the first row of this table.
+
+## 13. GPU phase, final state (2026-10-12): sub-100K is capped, coherence is a size lever
+
+Measured by the GPU session; every row is in `RESULTS.md` / `PLAN_*.md` with the prediction registered first. Seeds are stated; only the 30M five-seed screens and the 300M two-seed confirmations below carry more than one seed, so **none of this is a ten-seed claim**.
+
+**Best sub-100K recipes (val BPC, 96K reference = BPE1024, d48, 2 layers, 32 rules/head):**
+| recipe | params | 30M chars | 300M | 1B | 3B |
+|---|---|---|---|---|---|
+| reference (warm-up 100) | 96,416 | 1.1095 +- 0.0107 (5 seeds) | 0.9976 / 1.0053 | 0.982 | 0.97767 |
+| warm-up 300 | 96,416 | 1.0984 (-0.0111, 5/5) | ~0 gain (2 seeds) | | |
+| frequency-tiered tied embedding (head 768 x d48, tail 16-dim, FFN mult 2.25) | 98,280 | 1.0965 (-0.0130, 4/5) | **0.981 / 0.982** (-0.017 / -0.023) | not run | not run |
+
+The tiered embedding reaches the 96K model's 1B-char BPC with a third of the data. Warm-up 300 helps at 30M and vanishes at 300M, so the cited recipe keeps warm-up 100.
+
+**Closed levers (all at 30M, five seeds unless noted, null or worse than the random-init reference):** consequent-first / backwards rule construction (+0.045); data-driven, clustered, hybrid and D^2-cover rule placement (+0.025 to +0.042); PPMI-initialised and re-scaled embeddings (-0.006 to +0.006); repetition-weighted loss (-0.0004) and unlikelihood loss (+0.005, rated *less* coherent blind); tiered embedding with the saved parameters spent on width d56 (-0.007 / +0.001, worse than spending them on the FFN).
+
+**Coherence is a size lever, not a data or recipe lever.** Blind sets (two same-family Claude raters, text only, scores before the key; rubric G/C/P 1-5, total 3-15; one seed per model, 8 texts per model, rater scale shifts between sets so compare within a set):
+| model | params | 1B-char BPC | set 12 total (plot) A / B |
+|---|---|---|---|
+| 96K | 96,416 | 0.982 | 4.75 (1.25) / 4.62 (1.12) |
+| 251K | 251,168 | 0.817 | 6.38 (1.88) / 6.25 (1.62) |
+| 653K | 653,248 | 0.694 | 8.88 (2.38) / 9.00 (2.38) |
+| 1.32M | 1,323,904 | 0.636 | 10.00 (3.12) / 10.12 (2.88) |
+Set 10 gave the 1.32M model 9.6 / 10.4 against 5.3-5.5 for the 96K models at 1B and 3B chars; set 11 gave the tiered 98K model at 300M the same ~5.5 as the 96K models despite 0.017-0.023 lower BPC. The 10/15 bar (total >= 10, plot >= 2.5) is reached at about 1.3M parameters x 1B chars and not below ~650K. The 12/15 bar is not reached by any model. Rule readability of the 1.32M checkpoint (`rule_ablation`, `rule_reader`, `rule_story`) has not been run.
+
+**Cap status.** The 99,999-parameter cap was exceeded for the 1.32M run (explicit user approval) and for the 251K / 653K ladder rungs (user: "raise the cap and keep moving", understood as covering up to 1.32M). Larger rungs (2.2M-7M) were not run.
+
+**Next (planned, not run):** a larger general-text corpus at the same sizes (`PLAN_CORPUS.md`) and a Matryoshka-trained embedding for a smaller interpretable embedding space (`PLAN_MATRYOSHKA.md`).
 
 ## References
 

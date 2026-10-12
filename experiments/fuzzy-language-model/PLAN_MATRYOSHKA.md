@@ -1,0 +1,39 @@
+# PLAN_MATRYOSHKA: a Matryoshka-trained embedding for a smaller, interpretable embedding space (registered 2026-10-12; plan only, nothing run)
+
+**Terms.** Matryoshka Representation Learning (MRL, Kusupati et al., NeurIPS 2022, arXiv:2205.13147): train one embedding so every *prefix* of its dimensions (8, 16, 32, 48) is itself a usable representation, by summing the loss over several prefix lengths. Prefix k is the coarse version; later dimensions add detail.
+
+**Why here.** The model width is d = 48 and each rule antecedent is a Gaussian over d dimensions, so reading a rule means reading 48-dim centres. The tied embedding is also over half the 96K budget (BPE1024 x 48 = 49K parameters), and the tiered embedding (`flm/run_tiered.py`) already showed most tokens need only 16 dimensions. An MRL embedding gives an ordered, nested space where the first 8-16 dimensions carry coarse distinctions, so (a) rules can be inspected in a low-dimensional space, (b) there is a principled place to cut width, and (c) it unifies with the tiered embedding (the tail's 16 dims become the *prefix* of the head's 48).
+
+**The interpretability claim is to be tested, not assumed.** If no readability measure below moves, the claim is dropped.
+
+## Scope
+- The embedding is tied input/output (`flm/models.py`). MRL changes the *output* loss: logits from each prefix, h[:k] . E[:, :k], with cross-entropy summed over k in K. Inference uses the full vector, so the deployed model is unchanged in size (96,416 params, no additions in plain MRL).
+- New module `flm/run_matryoshka.py` that monkeypatches the loss (same pattern as `run_tiered.py`); `flm/models.py` and `flm/train.py` are not edited while a sweep runs.
+
+## Experiments (30M chars, seeds 0-4; baseline = v22-tribble random, 1.1095 +- 0.0107)
+- **M0 (no training, minutes):** post-hoc truncation curve of the existing 96K checkpoint: zero the dimensions beyond k and score val BPC for k in {8, 16, 24, 32, 48}. This is the null MRL must beat.
+- **M1 (plain MRL, equal weights):** K = {8, 16, 32, 48}. Report full-width BPC (must stay within +0.01 of baseline to count as "free") and the truncation curve at each k.
+- **M2 (full-width heavy):** weights 0.25 / 0.25 / 0.25 / 1.0, to see whether a full-width penalty is the price of nesting.
+- **M3 (MRL + tiered):** t768e16m225 with MRL on the head's first {16, 32}; tests unification with the best recipe.
+- **M4 (rules in prefix space):** on the M1 checkpoint, restrict each rule's antecedent distance to the first k dims (k = 8, 16) at inference and measure BPC loss. A rule base that survives is readable as a low-dimensional rulebook.
+- **M5 (readability, CPU session's tools):** `flm.rule_reader` / `flm.rule_explain_eval` on M1 vs baseline: variance of rule centres by dimension; nearest-token labels of rule centres at k = 8 vs 48; whether explanations from the 8-dim prefix score as well as from the full vector. Rater-style scoring is blind, key withheld until scores are written.
+
+## Registered predictions
+1. M0: truncating the baseline to 16 dims raises val BPC by more than 0.5 (85%); to 32 dims by more than 0.1 (80%).
+2. M1: full-width BPC within +0.01 of baseline on a paired five-seed comparison (55%); worse by more than 0.02 (25%); better by more than 0.01 (10%). A 16-dim prefix within 0.25 BPC of baseline (45%) would be the headline.
+3. M2: the heavier full-width weight recovers the full-width gap but gives up about half of the prefix quality (60%).
+4. M3: no BPC gain over t768e16m225 at full width (65%).
+5. M4: restricting to 16 dims costs M1 less than 0.15 BPC while the baseline loses more than 0.5 (50%).
+6. M5: variance concentration is higher in the early dims for M1 than the baseline, but nearest-token labels at k = 8 are no more interpretable to a blind rater (60%). A nesting that is real in the loss and not in the semantics is the likely failure.
+7. Coherence stays at ~5/15 (90%): this is an interpretability test, not a capability lever.
+
+## Decision rules
+- If M1 full-width BPC is worse by more than 0.02, nesting costs capability: stop and report the truncation curve as a pure trade-off.
+- If M1 passes (within 0.01) and M4 survives, run M3 and a ten-seed round, and add the prefix-space rulebook to the explainability track (`REVIEW.md`).
+- Readability is a claim only for the blind test, not for variance statistics.
+
+## Compute and ownership
+M0 takes minutes. Each 30M cell is ~3 min on the GPU (MRL adds K output projections, estimated +25-35% per step); M1-M3 over five seeds ~ 45 min total. M4-M5 are CPU-session jobs on `--save-model` checkpoints. Any 300M confirmation goes back to the user first.
+
+## Relation to other work
+`PLAN_NEXT.md` §6-7 (embedding null results, tiered embedding), `flm/rule_reader.py`, `PLAN_RULEDIST.md`. The earlier embedding screens (PPMI, scale, weight decay) tested *initialisation*; MRL changes the *objective*, the untested axis.
