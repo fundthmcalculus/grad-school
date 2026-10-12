@@ -37,3 +37,14 @@ M0 takes minutes. Each 30M cell is ~3 min on the GPU (MRL adds K output projecti
 
 ## Relation to other work
 `PLAN_NEXT.md` §6-7 (embedding null results, tiered embedding), `flm/rule_reader.py`, `PLAN_RULEDIST.md`. The earlier embedding screens (PPMI, scale, weight decay) tested *initialisation*; MRL changes the *objective*, the untested axis.
+
+## M0 outcome (2026-10-12; `flm/matryoshka_m0.py`, 96K 3B-char checkpoint, val BPC on the first 1M chars; manipulation check: k = 48 reproduces 0.9777)
+| k | output-side truncation only | embedding and output truncated |
+|---|---|---|
+| 8 | 2.7595 | 3.7066 |
+| 16 | 2.3963 | 3.7749 |
+| 24 | 1.7032 | 3.2787 |
+| 32 | 1.4223 | 2.6720 |
+| 40 | 1.1835 | 1.7120 |
+| 48 | 0.9777 | 0.9777 |
+Prediction 1: truncating to 16 dims raises BPC by more than 0.5 (**right**, +1.42 output-only, +2.80 both); to 32 dims by more than 0.1 (**right**, +0.44 / +1.69). The plainly trained model has no usable prefix structure, so M1 (the MRL objective) has a real null to beat. Truncation was applied to the final state and tied embedding, not inside the rule layers (that is M4).
