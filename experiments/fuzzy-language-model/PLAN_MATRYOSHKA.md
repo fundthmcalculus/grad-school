@@ -48,3 +48,12 @@ M0 takes minutes. Each 30M cell is ~3 min on the GPU (MRL adds K output projecti
 | 40 | 1.1835 | 1.7120 |
 | 48 | 0.9777 | 0.9777 |
 Prediction 1: truncating to 16 dims raises BPC by more than 0.5 (**right**, +1.42 output-only, +2.80 both); to 32 dims by more than 0.1 (**right**, +0.44 / +1.69). The plainly trained model has no usable prefix structure, so M1 (the MRL objective) has a real null to beat. Truncation was applied to the final state and tied embedding, not inside the rule layers (that is M4).
+
+## M1/M2 outcome (`v34-mrl`, 30M chars, seeds 0-4, paired vs v22-tribble baseline 1.1095; `flm/run_matryoshka.py`, driver `flm/run_matryoshka_sweep.py`)
+| arm | loss weights on k = 8/16/32/48 | full-width BPC | paired | seeds better |
+|---|---|---|---|---|
+| M1 | 1/1/1/1 | 1.1952 | +0.0857 | 0/5 |
+| M2 | 0.25/0.25/0.25/1 | 1.1529 | +0.0434 | 0/5 |
+Truncation check, seed 0 (`flm/matryoshka_m0.py`; manipulation check passed: the output-side prefixes now work). Output-side truncation, val BPC at k = 8/16/32/48: M1 1.385 / 1.217 / 1.193 / 1.193; M2 1.449 / 1.244 / 1.165 / 1.160; plain baseline (96K 3B checkpoint, different budget) 2.760 / 2.396 / 1.422 / 0.978. With the *input* embedding also truncated both MRL models still collapse (M1 k = 16: 3.54; k = 32: 2.39), because the objective nests only the output side; the rule layers and input embedding are unconstrained.
+Predictions: M1 within +0.01 of baseline (55%): **wrong**; worse by > 0.02 (25%): **right** (+0.086). M2 recovers the full-width gap and gives up about half of the prefix quality (60%): **partly wrong**: the gap shrank by half (+0.043), not to zero, and the prefix quality at k = 16 barely moved (1.22 vs 1.24). 16-dim output prefix within 0.25 of baseline (45%): **right on the output side** (M1 1.217 vs 1.1095, +0.107).
+Decision rule fires: full-width BPC worse by more than 0.02 in both arms, so nesting costs capability under the plain output-side loss. M3 (with the tiered recipe) and M4/M5 are not run. Reading: a 16-dim output readout is almost free (+0.02 over its own full width), which is the useful finding; reducing the whole model to 16 dims (input embedding, rule layers) would need the nesting imposed on the input side too (a different experiment: tie the loss to prefix-masked input embeddings), not registered here. Seeds: 5, a ranking screen, not citable.
