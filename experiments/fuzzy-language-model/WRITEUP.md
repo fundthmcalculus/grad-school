@@ -467,7 +467,7 @@ Measured by the GPU session; every row is in `RESULTS.md` / `PLAN_*.md` with the
 |---|---|---|---|---|---|
 | reference (warm-up 100) | 96,416 | 1.1095 +- 0.0107 (5 seeds) | 0.9976 / 1.0053 | 0.982 | 0.97767 |
 | warm-up 300 | 96,416 | 1.0984 (-0.0111, 5/5) | ~0 gain (2 seeds) | | |
-| frequency-tiered tied embedding (head 768 x d48, tail 16-dim, FFN mult 2.25) | 98,280 | 1.0965 (-0.0130, 4/5) | **0.981 / 0.982** (-0.017 / -0.023) | **0.96796** (seed 0; new sub-100K best) | not run |
+| frequency-tiered tied embedding (head 768 x d48, tail 16-dim, FFN mult 2.25) | 98,280 | 1.0965 (-0.0130, 4/5) | **0.981 / 0.982** (-0.017 / -0.023) | **0.96796 / 0.96129** (seeds 0 / 1, mean 0.9646 vs 0.9820 for the reference; new sub-100K best) | not run |
 
 The tiered embedding reaches the 96K model's 1B-char BPC with a third of the data. Warm-up 300 helps at 30M and vanishes at 300M, so the cited recipe keeps warm-up 100.
 

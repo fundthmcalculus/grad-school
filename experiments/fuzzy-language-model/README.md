@@ -2,7 +2,7 @@
 
 **Start here: [`REVIEW.md`](REVIEW.md)** (clean summary: what works, what was dropped, the path to coherent results).
 
-**Status:** CPU phase stopped 2026-10-10; GPU phase final state in [`WRITEUP.md` §13](WRITEUP.md) (2026-10-12): sub-100K BPC best 0.968 (tiered 98K, 1B chars; 96K at 3B 0.978); coherence ~5/15 under the cap, ~10/15 only at 1.3M params. Next: [`PLAN_CORPUS.md`](PLAN_CORPUS.md), [`PLAN_MATRYOSHKA.md`](PLAN_MATRYOSHKA.md) Â· **Started:** 2026-10-08
+**Status:** CPU phase stopped 2026-10-10; GPU phase final state in [`WRITEUP.md` §13](WRITEUP.md) (2026-10-12): sub-100K BPC best 0.961-0.968 (tiered 98K, 1B chars, two seeds; 96K at 3B 0.978); coherence ~5/15 under the cap, ~10/15 only at 1.3M params. Next: [`PLAN_CORPUS.md`](PLAN_CORPUS.md), [`PLAN_MATRYOSHKA.md`](PLAN_MATRYOSHKA.md) Â· **Started:** 2026-10-08
 
 ## Questions
 

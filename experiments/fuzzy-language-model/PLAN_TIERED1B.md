@@ -5,3 +5,6 @@ Predictions: val BPC 0.958-0.972 (60%); beats the 96K 3B-char best 0.97767 with 
 
 ## Result
 Seed 0, 98,280 params, 1B chars, 2,698 s: **val BPC 0.96796** (log: 1.114 at 5k steps, 0.9716 at 35k). Prediction 0.958-0.972 (60%): **right**; beats the 96K 3B-char best 0.97767 with a third of the data (80%): **right** (-0.0097); below 0.955 (10%) and above 0.975 (10%): neither. Against the 96K reference at the same 1B chars: 0.97958 / 0.98446 (seeds 0/1), so -0.0116 / -0.0165 at one seed. **New sub-100K best.** One seed; not a ten-seed claim. Checkpoint `outputs/v35-tiered1b/t768e16m225_1000M_s0.pt` loads only via `flm.run_tiered`.
+
+### Seed 1 (2,682 s)
+Seed 1: **0.96129** vs the 96K reference's 0.98446 at the same seed and budget (**-0.0232**); seed 0 was 0.96796 vs 0.97958 (-0.0116). Mean over the two seeds **0.9646** vs reference mean **0.9820** (-0.0174), both seeds better, and both better than the 96K 3B-char best 0.97767. Prediction 0.958-0.972 held for both seeds. Two seeds is a confirmation, not a ten-seed claim. The tiered recipe now stands at 30M (five seeds, -0.013), 300M (two seeds, -0.017/-0.023) and 1B (two seeds, -0.012/-0.023).
