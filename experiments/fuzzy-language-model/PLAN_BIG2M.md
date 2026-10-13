@@ -17,3 +17,16 @@ User: "Let's raise the model size a bit, say 2M or so, try that, then try the se
 | 30M | **1.4727** (209 s) | 1.873 (5 seeds) | 1.856 |
 | 300M | **1.2007** (2,089 s) | 1.761 | 1.744 |
 Trigram baseline (300M tokens) 1.622: beaten at both budgets (prediction 85%: **right**). 30M prediction 1.45-1.65 (50%): **right** (1.473). 300M prediction 1.25-1.45 (50%): **wrong**, better than predicted (1.201). The 96K model was capacity-bound on this corpus (it never reached the trigram); 23x the parameters gains 0.40 BPC at 30M and 0.56 at 300M, so on broad text size, not data, is the lever. 1B-char cell running.
+
+## Outcome 3: Cosmopedia 1B chars at 2.22M: val BPC **1.13354** (6,961 s; 47,108 steps). Prediction below 1.30 (50%): **right**. 30M/300M/1B: 1.473 / 1.201 / 1.134 (still falling, diminishing: -0.27 then -0.07).
+
+## Coherence set 14 registered before rating (`report/coherence14_*`; fresh seeds 50-51; TinyStories 1B models: 2.22M (0.599), 1.32M (0.636), 96K (0.980); 3 models x 8 texts; two Claude sub-agent raters reading only the blind file; rubric G grammar / C within-text consistency / P plot, each 1-5, total 3-15; scores before the key)
+Predictions: 2.22M total above 1.32M on both raters (60%); 2.22M >= 12 (25%); 96K between 4 and 7.5 (80%).
+
+### Set 14 scores (two raters; both score files written before the key was read; total of G+C+P means, 8 texts per model; plot in parentheses)
+| model | rater A | rater B |
+|---|---|---|
+| 2.22M, 1B (0.599) | 9.50 (2.75) | 9.88 (3.00) |
+| 1.32M, 1B (0.636) | 9.88 (2.88) | 10.50 (3.12) |
+| 96K, 1B (0.980) | 4.75 (1.25) | 5.25 (1.50) |
+Predictions: 2.22M above 1.32M on both raters (60%): **wrong** (0.4-0.6 lower, within rater/seed noise); 2.22M >= 12 (25%): **wrong**; 96K between 4 and 7.5 (80%): right. Reading: the 96K-to-1.3M jump (~+5) is large and the 1.32M-to-2.2M step is zero within noise, even though BPC fell 0.037. Coherence on this rubric saturates near 10/15 for these models; the 12/15 bar was not reached at any size tried (one seed per size, 8 texts per model).
