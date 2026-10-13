@@ -488,6 +488,16 @@ Set 10 gave the 1.32M model 9.6 / 10.4 against 5.3-5.5 for the 96K models at 1B 
 
 **Next (planned, not run):** a larger general-text corpus at the same sizes (`PLAN_CORPUS.md`) and a Matryoshka-trained embedding for a smaller interpretable embedding space (`PLAN_MATRYOSHKA.md`).
 
+## 14. What the size ladder and the Cosmopedia runs taught us (2026-10-13; one seed per size unless stated)
+
+**Option 4 noted (a BPC-only sub-100K target).** The goal "as capable as possible under 100K" has two measurable halves, and they separate:
+
+* **Likelihood (BPC) at sub-100K is nearly saturated on TinyStories.** The tiered 98K recipe reached 0.9646 (two seeds, 1B chars) against 0.9820 for the 96K reference; each remaining lever (data 1B -> 3B, width/head variants, tiered widths, Matryoshka training) moved it by < 0.02 or made it worse.
+* **Readable coherence is a size lever, and it saturates too.** Blind totals (G+C+P, 3-15; two raters; compare within a set only): 96K ~5, 251K ~6.3, 653K ~8.9, 1.32M ~10, 2.22M ~9.7 (set 14: 9.5/9.9 vs 9.9/10.5 for the 1.32M model). BPC fell 0.980 -> 0.817 -> 0.694 -> 0.636 -> 0.599 along the ladder, but the last step bought no rated coherence. The 12/15 bar was reached by no model of any size; no sub-100K model passes ~8 on any rater, and the best sub-100K BPC (tiered 1B) did not raise coherence beyond seed noise (set 13).
+* **Broad text is capacity-bound, not data-bound, at 96K** (Cosmopedia, `PLAN_CORPUS.md`): 96K at 300M chars 1.761 vs a 300M-token trigram 1.622; the 2.22M model gets 1.473 / 1.201 / 1.134 at 30M / 300M / 1B chars (`PLAN_BIG2M.md`), beating the trigram everywhere. A mixed TinyStories + Cosmopedia corpus is worse than either specialist at 96K. So a sub-100K model should be judged on its narrow-domain BPC and with a narrow-domain coherence bar.
+
+**Proposed amended target, for the user to accept or reject:** report sub-100K capability as BPC on TinyStories (0.9646, two seeds) and rated coherence ~5-8/15, and state that ~10/15 needs >= ~1.3M parameters at 1B chars. That is a finding about this architecture and corpus, not a claim about all tiny LMs. Pending at the time of writing: the Cosmopedia 3B-char tiered run and the expository coherence set 15 (`PLAN_CORPUS.md`).
+
 ## References
 
 Full verified bibliographies are in [`literature/`](literature/README.md) (three reviews, 86
