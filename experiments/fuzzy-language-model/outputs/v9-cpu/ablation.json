@@ -1,0 +1,49 @@
+{
+ "ckpt": "outputs/v9-cpu/d96-L2_30M_s0.pt",
+ "window_tokens": 256,
+ "base_bpc": 1.0245,
+ "layers": [
+  {
+   "layer": 0,
+   "rules": 144,
+   "k": 8,
+   "cited_rules": [
+    63,
+    41,
+    4,
+    100,
+    75,
+    136,
+    43,
+    25
+   ],
+   "coverage_of_cited": 0.2303,
+   "cited_cost": 0.0987,
+   "random_cost_mean": 0.0233,
+   "random_cost_p95": 0.028,
+   "random_cost_max": 0.0315,
+   "causal": true
+  },
+  {
+   "layer": 1,
+   "rules": 144,
+   "k": 8,
+   "cited_rules": [
+    61,
+    28,
+    102,
+    15,
+    48,
+    56,
+    64,
+    68
+   ],
+   "coverage_of_cited": 0.3454,
+   "cited_cost": 0.0136,
+   "random_cost_mean": 0.0049,
+   "random_cost_p95": 0.0079,
+   "random_cost_max": 0.008,
+   "causal": true
+  }
+ ]
+}

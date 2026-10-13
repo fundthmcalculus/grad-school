@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v34-mrl\\m6_s1.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.22202,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.23998
+  ],
+  [
+   100,
+   1.75244
+  ],
+  [
+   200,
+   1.55567
+  ],
+  [
+   300,
+   1.47192
+  ],
+  [
+   400,
+   1.43319
+  ],
+  [
+   500,
+   1.38696
+  ],
+  [
+   600,
+   1.345
+  ],
+  [
+   700,
+   1.30559
+  ],
+  [
+   800,
+   1.28083
+  ],
+  [
+   900,
+   1.25468
+  ],
+  [
+   1000,
+   1.237
+  ],
+  [
+   1100,
+   1.22571
+  ],
+  [
+   1160,
+   1.22202
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.1778
+  ],
+  [
+   50,
+   8.6366
+  ],
+  [
+   100,
+   6.9381
+  ],
+  [
+   150,
+   6.0279
+  ],
+  [
+   200,
+   5.5753
+  ],
+  [
+   250,
+   5.2832
+  ],
+  [
+   300,
+   5.1385
+  ],
+  [
+   350,
+   5.015
+  ],
+  [
+   400,
+   4.989
+  ],
+  [
+   450,
+   4.8207
+  ],
+  [
+   500,
+   4.7404
+  ],
+  [
+   550,
+   4.7507
+  ],
+  [
+   600,
+   4.6943
+  ],
+  [
+   650,
+   4.6179
+  ],
+  [
+   700,
+   4.5262
+  ],
+  [
+   750,
+   4.5252
+  ],
+  [
+   800,
+   4.4724
+  ],
+  [
+   850,
+   4.4158
+  ],
+  [
+   900,
+   4.3964
+  ],
+  [
+   950,
+   4.3344
+  ],
+  [
+   1000,
+   4.3252
+  ],
+  [
+   1050,
+   4.2855
+  ],
+  [
+   1100,
+   4.2955
+  ],
+  [
+   1150,
+   4.2864
+  ],
+  [
+   1159,
+   4.3326
+  ]
+ ],
+ "train_seconds": 81.93,
+ "wall_seconds": 96.34,
+ "chars_per_sec": 115991,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Se.\nThe little girl took the girl a little girl walking outside. She saw a big, hill. The little girl was scared because they had a magic window.\nThe girl and the boy heard a good problech. The boy was sad because she resticed the rugn, and the girl became friends. She was happy and happy. She thanked the little girl, and the little girl, and they became best friends. They played together and played together until the next day, they had a great time.\n<|eot|>\nOnce upon a time, there was a bite named Lila. Suddenly, Moll threw, bake was a pecele. It was a big cannoty that it should know what was only. Can Pase with something pretty. It was a big, mycele. Lella learned to read it and found a long bucket.\nOne sunny day, while, a little boy found a small bag with a big, red green bag. It was a big tree to the park came outside. A little boy found a big mail, and her friend, a big tree. The bird was very happy.\nThis little cat saw the tree to his friend, Sam, who was digger. Now, the bird saw the bird. They were curi",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 450,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v23-wu30\\wu450_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10489,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.39527
+  ],
+  [
+   580,
+   1.27892
+  ],
+  [
+   870,
+   1.16785
+  ],
+  [
+   1160,
+   1.10489
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2386
+  ],
+  [
+   50,
+   8.9225
+  ],
+  [
+   100,
+   6.8828
+  ],
+  [
+   150,
+   5.6725
+  ],
+  [
+   200,
+   5.0708
+  ],
+  [
+   250,
+   4.7462
+  ],
+  [
+   300,
+   4.5482
+  ],
+  [
+   350,
+   4.4369
+  ],
+  [
+   400,
+   4.3764
+  ],
+  [
+   450,
+   4.2929
+  ],
+  [
+   500,
+   4.2468
+  ],
+  [
+   550,
+   4.1872
+  ],
+  [
+   600,
+   4.1192
+  ],
+  [
+   650,
+   4.0396
+  ],
+  [
+   700,
+   3.9801
+  ],
+  [
+   750,
+   3.9204
+  ],
+  [
+   800,
+   3.8516
+  ],
+  [
+   850,
+   3.7951
+  ],
+  [
+   900,
+   3.7465
+  ],
+  [
+   950,
+   3.6844
+  ],
+  [
+   1000,
+   3.6273
+  ],
+  [
+   1050,
+   3.5798
+  ],
+  [
+   1100,
+   3.5574
+  ],
+  [
+   1150,
+   3.5284
+  ],
+  [
+   1159,
+   3.5238
+  ]
+ ],
+ "train_seconds": 79.48,
+ "wall_seconds": 86.12,
+ "chars_per_sec": 119563,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big warm bird. \nThe mean took the cold and gave them a feet spive to each other. \nThen, the bird flew to the most tree and pushed it too. It was not a benching. The most of the most box went into the yard and made it tight. \"Let's organize the coster!\"\nThen, the little bird saw the moster. The bird said, \"You were not like you. Youre to make a other girl's zesty life. It's okay. It is the dull, three friends. We can take it and hurt you. It is not a good best place to go. You know fell on the most world come with you. You are the world, mess, ornge. I learned that mad can be bad. You should have to always buy cool. I love you. I shouldn't care to yourself.\"\nThe green coolel was so thanked the bird to help. They realised to play with the animals who could not have her best. They thanks to the forest. They went home and gave the muston. And sometimes, you can. The other animals gray, and even you have to be grateful.\n<|eot|>\nOne day",
+ "rule_init": {},
+ "ngram_init": {}
+}

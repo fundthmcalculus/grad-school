@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v28-emb\\ppmi_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10368,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.44153
+  ],
+  [
+   100,
+   1.5574
+  ],
+  [
+   200,
+   1.42108
+  ],
+  [
+   300,
+   1.34687
+  ],
+  [
+   400,
+   1.29419
+  ],
+  [
+   500,
+   1.25522
+  ],
+  [
+   600,
+   1.21738
+  ],
+  [
+   700,
+   1.18441
+  ],
+  [
+   800,
+   1.16002
+  ],
+  [
+   900,
+   1.13773
+  ],
+  [
+   1000,
+   1.1203
+  ],
+  [
+   1100,
+   1.10798
+  ],
+  [
+   1160,
+   1.10368
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.8789
+  ],
+  [
+   50,
+   7.9863
+  ],
+  [
+   100,
+   6.1316
+  ],
+  [
+   150,
+   5.2563
+  ],
+  [
+   200,
+   4.7942
+  ],
+  [
+   250,
+   4.5621
+  ],
+  [
+   300,
+   4.409
+  ],
+  [
+   350,
+   4.2838
+  ],
+  [
+   400,
+   4.1798
+  ],
+  [
+   450,
+   4.0914
+  ],
+  [
+   500,
+   4.0346
+  ],
+  [
+   550,
+   3.9551
+  ],
+  [
+   600,
+   3.9155
+  ],
+  [
+   650,
+   3.8645
+  ],
+  [
+   700,
+   3.8026
+  ],
+  [
+   750,
+   3.7649
+  ],
+  [
+   800,
+   3.731
+  ],
+  [
+   850,
+   3.6901
+  ],
+  [
+   900,
+   3.6538
+  ],
+  [
+   950,
+   3.6134
+  ],
+  [
+   1000,
+   3.5894
+  ],
+  [
+   1050,
+   3.5602
+  ],
+  [
+   1100,
+   3.5451
+  ],
+  [
+   1150,
+   3.5127
+  ],
+  [
+   1159,
+   3.5132
+  ]
+ ],
+ "train_seconds": 79.58,
+ "wall_seconds": 93.57,
+ "chars_per_sec": 119416,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big paper. \nThe little boy was a good friend and forgot him. He liked to play with his new friend, the cat, and he was so happy. The dog was beautiful and always relieved at the store.\n<|eot|>\nOnce upon a time, there was a brave boy named Tim. Tim had a timpropt dan cup. He liked to run and jump and run to the chair.\nOne day, Tim went to the park. He saw a little bike and wanted to make a big, couch. It was a bike and shiny timbage. Tim went inside, but Tim was very scared. But the bike was nothing, so he felt sad.\nTim saw a big huge kister with a shake. Inside the park,, a big, green friendly man came in. Tim and Sam found the little bike. They had a big hug and pretty paper on the score. Tim and Sam didn't know green, but it was about the paper. They came to the park and played with the paper, and it was more fun.\n<|eot|>\n\nOnce there was a young boy named Jie. John had an idea. He would dig enjoy the fun towers with his piece. John",
+ "rule_init": {},
+ "ngram_init": {}
+}

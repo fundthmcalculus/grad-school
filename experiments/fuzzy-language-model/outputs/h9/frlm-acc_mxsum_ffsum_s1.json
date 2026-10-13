@@ -1,0 +1,185 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 1,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/h9/frlm-acc_mxsum_ffsum_s1.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "sum",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "sum",
+  "max_len": 256
+ },
+ "params_total": 28260,
+ "params_nonemb": 25124,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.8527,
+ "evals": [
+  [
+   305,
+   2.23268
+  ],
+  [
+   610,
+   2.03489
+  ],
+  [
+   915,
+   1.91602
+  ],
+  [
+   1220,
+   1.85295
+  ],
+  [
+   1221,
+   1.8527
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8214
+  ],
+  [
+   50,
+   5.3458
+  ],
+  [
+   100,
+   3.8837
+  ],
+  [
+   150,
+   3.1022
+  ],
+  [
+   200,
+   2.6893
+  ],
+  [
+   250,
+   2.4866
+  ],
+  [
+   300,
+   2.3483
+  ],
+  [
+   350,
+   2.2638
+  ],
+  [
+   400,
+   2.2136
+  ],
+  [
+   450,
+   2.16
+  ],
+  [
+   500,
+   2.1191
+  ],
+  [
+   550,
+   2.0826
+  ],
+  [
+   600,
+   2.0609
+  ],
+  [
+   650,
+   2.0445
+  ],
+  [
+   700,
+   2.0199
+  ],
+  [
+   750,
+   1.9999
+  ],
+  [
+   800,
+   1.9874
+  ],
+  [
+   850,
+   1.9623
+  ],
+  [
+   900,
+   1.9391
+  ],
+  [
+   950,
+   1.9202
+  ],
+  [
+   1000,
+   1.9054
+  ],
+  [
+   1050,
+   1.8881
+  ],
+  [
+   1100,
+   1.8832
+  ],
+  [
+   1150,
+   1.8721
+  ],
+  [
+   1200,
+   1.8727
+  ],
+  [
+   1220,
+   1.8673
+  ]
+ ],
+ "train_seconds": 932.46,
+ "wall_seconds": 1144.95,
+ "chars_per_sec": 10727,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was they pot the seed to make and her friends. Mia lived her face. They saw a girl named Sue some his better sad.\nOnlelly and clouside in tream and red saw her played hungry and Mia many. The leads and to the tirm to play twitty plack. The made and their the scared.\n<|eot|>\n\n\nMaad and loved. He was ",
+ "rule_init": {}
+}

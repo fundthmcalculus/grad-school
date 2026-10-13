@@ -1,0 +1,387 @@
+<link rel="stylesheet" href="app.css">
+<div class="fl">
+  <header class="fl-head">
+    <h1 class="fl-title" id="top">Tiny fuzzy language models on TinyStories</h1>
+    <p class="fl-takeaway">Character-level models trained on a laptop CPU. Softmax attention needs about as many parameters as linear-cost attention for the same quality; a language model whose every sublayer is a fuzzy (TSK) system trains, and its recurrent version scales smoothly. Everything here is three seeds or fewer, so none of it is citable yet.</p>
+  </header>
+
+  <nav class="fl-tabs" role="tablist" aria-label="Pages">
+    <button class="fl-tab" id="tab-overview" data-page="overview" role="tab" aria-selected="true">Overview</button>
+    <button class="fl-tab" id="tab-size" data-page="size" role="tab" aria-selected="false">Size and quality</button>
+    <button class="fl-tab" id="tab-components" data-page="components" role="tab" aria-selected="false">Fuzzy components</button>
+    <button class="fl-tab" id="tab-tuning" data-page="tuning" role="tab" aria-selected="false">Tuning and memory</button>
+    <button class="fl-tab" id="tab-ngram" data-page="ngram" role="tab" aria-selected="false">n-gram initialisation</button>
+  </nav>
+
+  <main id="fl-main"></main>
+</div>
+
+<template id="tpl-overview">
+  <section class="fl-tiles" id="overview-tiles" aria-label="Headline numbers">
+    <div class="fl-tile">
+      <span class="fl-tile-label">Parameters to reach 1.6 bits/char, softmax attention</span>
+      <span class="fl-tile-value dash-skeleton" data-source="smallest_wide" data-field="t1_6" data-where="arm=softmax-mlp">—</span>
+      <span class="fl-tile-note">linear attention: <span data-source="smallest_wide" data-field="t1_6" data-where="arm=linear-mlp">—</span></span>
+    </div>
+    <div class="fl-tile">
+      <span class="fl-tile-label">Fuzzy recurrent model, same level</span>
+      <span class="fl-tile-value dash-skeleton" data-source="smallest_wide" data-field="t1_6" data-where="arm=frlm-delta-htsk">—</span>
+      <span class="fl-tile-note"><span data-source="ratio16" data-field="ratio" data-row="0">—</span> the parameters of DeltaNet; added after extra tuning</span>
+    </div>
+    <div class="fl-tile">
+      <span class="fl-tile-label">Fuzzy attention vs softmax, width 32</span>
+      <span class="fl-tile-value dash-skeleton" data-source="comp_txt" data-field="gauss32" data-row="0">—</span>
+      <span class="fl-tile-note">bits/char, three seeds; negative is better</span>
+    </div>
+    <div class="fl-tile">
+      <span class="fl-tile-label">n-gram rule initialisation vs baseline</span>
+      <span class="fl-tile-value dash-skeleton" data-source="screen_txt" data-field="delta_txt" data-row="0">—</span>
+      <span class="fl-tile-note"><span data-source="screen_txt" data-field="verdict_txt" data-row="0">—</span>; a null</span>
+    </div>
+  </section>
+  <section class="fl-card" id="overview-claims">
+    <h2>What is established</h2>
+    <div class="fl-tablewrap">
+      <table class="fl-table fl-text" id="table-claims" data-source="claims" data-row-key="key">
+        <thead><tr>
+          <th data-field="claim">Claim</th><th data-field="status">Status</th><th data-field="evidence">Evidence</th><th data-field="source">Where</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</template>
+
+<template id="tpl-size">
+  <section class="fl-card" id="size-scaling">
+    <h2>Validation bits per character against model size</h2>
+    <p class="fl-note">Lower is better. Shaded band is ±1 std over 3 seeds. Each model uses the learning rate tuned at width 32; the GRU, FLM and classic FRLM get worse at large widths, which points to that rate not transferring, not to capacity.</p>
+    <div class="fl-chips" id="chips-scaling" role="group" aria-label="Models shown"></div>
+    <div class="fl-chart" id="chart-scaling" data-source="scaling"></div>
+  </section>
+  <div class="fl-grid">
+    <section class="fl-card" id="size-gap">
+      <h2>Fuzzy recurrent model against the best neural model</h2>
+      <p class="fl-note">Bits per character above the best of linear, gated, DeltaNet and GRU at the same parameter count (interpolated in log-params, no extrapolation). Dashed line is the registered 0.10 margin.</p>
+      <div class="fl-chips" id="chips-gap" role="group" aria-label="Models shown"></div>
+      <div class="fl-chart fl-short" id="chart-gap" data-source="gap"></div>
+    </section>
+    <section class="fl-card" id="size-smallest">
+      <h2>Smallest model reaching each quality level</h2>
+      <p class="fl-note">Total parameters, log-interpolated at the first crossing. "≤" means the smallest size trained already reached it.</p>
+      <div class="fl-tablewrap">
+        <table class="fl-table" id="table-smallest" data-source="smallest_wide" data-row-key="arm">
+          <thead><tr>
+            <th data-field="model">Model</th><th data-field="t2_0">≤ 2.0</th><th data-field="t1_8">≤ 1.8</th><th data-field="t1_6">≤ 1.6</th><th data-field="t1_4">≤ 1.4</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<template id="tpl-components">
+  <section class="fl-card" id="components-ablate">
+    <h2>Swapping one fuzzy part into the softmax model</h2>
+    <p class="fl-note">Difference in validation bits per character against softmax attention with an MLP, three seeds, same width. Negative is better. Fuzzy attention is free; the classic fuzzy feed-forward layer is the cost, and it grows with width.</p>
+    <div class="fl-chart fl-short" id="chart-ablate" data-source="ablate_stats"></div>
+  </section>
+  <section class="fl-card" id="components-htsk">
+    <h2>Where the HTSK gain lives</h2>
+    <p class="fl-note">Width 32, 10M characters. HTSK averages each rule's Gaussian exponent over dimensions instead of summing it. Applying it in the feed-forward layer carries the whole gain; in the recurrent mixer it does nothing. Whiskers are one std over three seeds (the delta row is one seed). Bars start at 1.7.</p>
+    <div class="fl-chart" id="chart-htsk" data-source="h9"></div>
+  </section>
+</template>
+
+<template id="tpl-tuning">
+  <div class="fl-grid">
+    <section class="fl-card" id="tuning-lr">
+      <h2>Learning-rate search, identical for every model</h2>
+      <p class="fl-note">Width 32, seed 0, 10M characters, short convolution on (a no-op for the GRU). The best setting per model fixes its learning rate everywhere else; the grid was extended twice for all models when optima hit its edge.</p>
+      <div class="fl-chart" id="chart-tune" data-source="tune"></div>
+    </section>
+    <section class="fl-card" id="tuning-memory">
+      <h2>Memory carried between generated characters</h2>
+      <p class="fl-note">Width 16, two layers. Softmax attention keeps a cache that grows with context; the recurrent models keep a fixed state. Dashed line is the softmax model's own parameter count.</p>
+      <div class="fl-chart" id="chart-memory" data-source="state scaling"></div>
+    </section>
+  </div>
+</template>
+
+<template id="tpl-ngram">
+  <section class="fl-card" id="ngram-ref">
+    <h2>How good is a pure count model on this text?</h2>
+    <p class="fl-note">Validation bits per character. A count-based n-gram model is a crisp fuzzy rule base ("if the last characters are g then the next-character distribution is p"), so the fuzzy rules can start from one. The 8.6K-parameter fuzzy recurrent model sits between the trigram and four-gram counts, with about 130 rules instead of tens of millions of table entries.</p>
+    <div class="fl-chart fl-short" id="chart-ngram" data-source="ngram_ref scaling"></div>
+  </section>
+  <section class="fl-card" id="ngram-screen">
+    <h2>The screen: it does not survive training</h2>
+    <p class="fl-note">Width 16 (8.6K parameters), 10M characters. The baseline has four seeds; "real" means the difference of means exceeds two standard errors, using the baseline's own seed-to-seed spread. Everything is within noise except three variants that are reliably worse: one block applied three times and shared widths (both remove parameters), and a control that places trigram rules but leaves their outputs random.</p>
+    <div class="fl-tablewrap">
+      <table class="fl-table" id="table-screen" data-source="screen_stats" data-row-key="key">
+        <thead><tr>
+          <th data-field="variant">Variant</th><th data-field="params">Parameters</th><th data-field="n">Seeds</th>
+          <th data-field="start">Start</th><th data-field="mean">Final</th><th data-field="std">Std</th><th data-field="delta">Δ vs baseline</th><th data-field="verdict">Verdict</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+  <section class="fl-card" id="ngram-curves">
+    <h2>The initialisation's head start is gone within about 100 steps</h2>
+    <p class="fl-note">Mean validation curve per variant, evaluated every 100 steps (the first point is before any training). The bigram initialisation starts far ahead and is caught up almost at once.</p>
+    <div class="fl-chips" id="chips-ngram" role="group" aria-label="Variants shown"></div>
+    <div class="fl-chart" id="chart-ngcurves" data-source="screen_curves"></div>
+  </section>
+</template>
+
+<script src="lib.js"></script>
+<script>
+  dash.calc('smallest_wide', {
+    inputs: ['smallest'],
+    title: 'Smallest model per quality level',
+    description: "One row per model; '≤' marks an upper bound, where the smallest size trained already reached the level.",
+    fn: (smallest) => {
+      const cell = (r) => r.bound === 'not reached' ? 'not reached' : (r.bound === 'upper bound' ? '≤ ' : '') + Number(r.params).toLocaleString('en');
+      const out = {};
+      for (const r of smallest) {
+        out[r.arm] = out[r.arm] || { arm: r.arm, model: r.model };
+        out[r.arm]['t' + String(Number(r.threshold).toFixed(1)).replace('.', '_')] = cell(r);
+      }
+      return Object.values(out);
+    },
+  });
+  dash.calc('ratio16', {
+    inputs: ['smallest'],
+    title: 'FRLM vs DeltaNet parameters at 1.6',
+    description: 'Parameters FRLM delta + HTSK needs to reach 1.6 bits/char divided by DeltaNet’s, to one decimal, with a times sign.',
+    fn: (smallest) => {
+      const p = (arm) => Number(smallest.find((r) => r.arm === arm && Number(r.threshold) === 1.6).params);
+      return [{ ratio: (Math.round((p('frlm-delta-htsk') / p('delta-mlp')) * 10) / 10).toFixed(1) + '×' }];
+    },
+  });
+  dash.calc('ablate_stats', {
+    inputs: ['ablate_runs', 'scaling'],
+    title: 'Ablations against softmax',
+    description: 'Mean and standard deviation of each ablation arm per width, and its difference from the softmax-attention-with-MLP mean at the same width in the scaling sweep.',
+    fn: (ablate_runs, scaling) => {
+      const g = new Map();
+      for (const r of ablate_runs) { const k = r.arm + '|' + r.width; if (!g.has(k)) g.set(k, []); g.get(k).push(Number(r.bpc)); }
+      const mean = (a) => a.reduce((s, x) => s + x, 0) / a.length;
+      const sd = (a) => (a.length < 2 ? NaN : Math.sqrt(a.reduce((s, x) => s + (x - mean(a)) ** 2, 0) / (a.length - 1)));
+      const out = [];
+      for (const [k, v] of g) {
+        const [arm, width] = k.split('|');
+        const b = scaling.find((r) => r.arm === 'softmax-mlp' && r.width === width);
+        out.push({ key: k, arm, width: Number(width), n: v.length, mean: mean(v), std: sd(v), base: b ? Number(b.bpc_mean) : NaN, delta: b ? mean(v) - Number(b.bpc_mean) : NaN });
+      }
+      return out;
+    },
+  });
+  dash.calc('comp_txt', {
+    inputs: ['ablate_stats'],
+    title: 'Ablation deltas in words',
+    description: 'Signed differences from softmax attention at widths 32 and 64 for the Gaussian-TSK mixer and the classic TSK feed-forward layer.',
+    fn: (ablate_stats) => {
+      const t = (a, w) => { const r = ablate_stats.find((x) => x.arm === a && x.width === w); return r ? (r.delta >= 0 ? '+' : '') + r.delta.toFixed(3) : '—'; };
+      return [{ gauss32: t('gauss-mlp', 32), gauss64: t('gauss-mlp', 64), tsk32: t('softmax-tsk', 32), tsk64: t('softmax-tsk', 64) }];
+    },
+  });
+  dash.calc('screen_stats', {
+    inputs: ['screen_runs'],
+    title: 'n-gram screen with noise-aware verdict',
+    description: 'Per variant: seeds, mean and standard deviation of final bits per character, starting score, and the difference of means from the baseline with a 2-standard-error verdict (baseline spread as the noise).',
+    fn: (screen_runs) => {
+      const g = new Map();
+      for (const r of screen_runs) { if (!g.has(r.variant)) g.set(r.variant, []); g.get(r.variant).push(r); }
+      const mean = (a) => a.reduce((s, x) => s + x, 0) / a.length;
+      const sd = (a) => (a.length < 2 ? NaN : Math.sqrt(a.reduce((s, x) => s + (x - mean(a)) ** 2, 0) / (a.length - 1)));
+      const base = (g.get('A-base') || []).map((r) => Number(r.final_bpc));
+      const out = [];
+      for (const [v, rs] of g) {
+        const f = rs.map((r) => Number(r.final_bpc));
+        let delta = NaN, verdict = '';
+        if (v !== 'A-base' && base.length > 1) {
+          delta = mean(f) - mean(base);
+          const se = sd(base) * Math.sqrt(1 / f.length + 1 / base.length);
+          verdict = Math.abs(delta) > 2 * se ? (delta < 0 ? 'real, better' : 'real, worse') : 'within noise';
+        }
+        out.push({ key: v, variant: v, params: Number(rs[0].params), n: f.length, start: Number(rs[0].start_bpc), mean: mean(f), std: sd(f), delta, verdict });
+      }
+      return out.sort((a, b) => a.variant.localeCompare(b.variant));
+    },
+  });
+  dash.calc('screen_txt', {
+    inputs: ['screen_stats'],
+    title: 'n-gram initialisation in words',
+    description: 'The bigram n-gram initialisation’s signed difference from the baseline and its verdict.',
+    fn: (screen_stats) => {
+      const r = screen_stats.find((x) => x.variant === 'D-bifull');
+      return [{ delta_txt: (r.delta >= 0 ? '+' : '') + r.delta.toFixed(3), verdict_txt: r.verdict }];
+    },
+  });
+
+  const C = dash.colors;
+  const F = window.FL;
+  const ARMS = ['softmax-mlp', 'linear-mlp', 'gla-mlp', 'delta-mlp', 'gru', 'flm', 'frlm-delta', 'frlm-delta-htsk'];
+  const NAMES = {
+    'softmax-mlp': 'Softmax attention', 'linear-mlp': 'Linear attention', 'gla-mlp': 'Gated linear attention', 'delta-mlp': 'DeltaNet', gru: 'GRU',
+    flm: 'FLM (Gaussian-TSK attention)', 'frlm-delta': 'FRLM delta (classic rules)', 'frlm-delta-htsk': 'FRLM delta + HTSK',
+  };
+  const FOCUS = 'frlm-delta-htsk';
+  const color = (a) => C[ARMS.indexOf(a)];
+  const shown = { scaling: new Set(['softmax-mlp', 'linear-mlp', 'delta-mlp', 'gru', 'flm', 'frlm-delta', 'frlm-delta-htsk']), gap: new Set(['frlm-delta', 'frlm-delta-htsk']), ngram: new Set(['A-base', 'B-embonly', 'D-bifull', 'E-taps2', 'H-ffnonly']) };
+
+  function chips(root, id, keys, labels, colorOf, set, redraw) {
+    const box = root.querySelector(id);
+    if (!box || box.childElementCount) return;
+    for (const a of keys) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'fl-chip'; b.setAttribute('aria-pressed', String(set.has(a)));
+      const sw = document.createElement('span'); sw.className = 'fl-sw'; sw.style.background = colorOf(a);
+      b.append(sw, document.createTextNode(labels[a]));
+      b.addEventListener('click', () => { set.has(a) ? set.delete(a) : set.add(a); b.setAttribute('aria-pressed', String(set.has(a))); redraw(); });
+      box.append(b);
+    }
+  }
+
+  const pagesSpec = {
+    overview(root) {
+      const st = dash.data('claims');
+      const tb = root.querySelector('#table-claims tbody');
+      tb.textContent = '';
+      if (st.status !== 'ok') return;
+      for (const r of st.data) {
+        const tr = document.createElement('tr'); tr.dataset.key = r.key;
+        for (const c of ['claim', 'status', 'evidence', 'source']) {
+          const td = document.createElement('td');
+          if (c === 'status') { const s = document.createElement('span'); s.className = 'fl-pill'; s.dataset.status = r.status; s.textContent = r.status; td.append(s); }
+          else td.textContent = r[c];
+          tr.append(td);
+        }
+        tb.append(tr);
+      }
+    },
+
+    size(root) {
+      const redraw = () => pagesSpec.size(root);
+      // scaling
+      let el = root.querySelector('#chart-scaling');
+      const sc = dash.data('scaling');
+      chips(root, '#chips-scaling', ARMS, NAMES, color, shown.scaling, redraw);
+      if (!F.pending(el, sc.status)) {
+        const rows = sc.data.map((r) => ({ ...r, p: Number(r.params), b: Number(r.bpc_mean), sd: Number(r.bpc_std) }));
+        const series = ARMS.filter((a) => shown.scaling.has(a)).map((a) => ({
+          name: NAMES[a], color: color(a), width: a === FOCUS ? 3 : 2,
+          points: rows.filter((r) => r.arm === a).sort((u, v) => u.p - v.p).map((r) => ({ x: r.p, y: r.b, lo: r.b - r.sd, hi: r.b + r.sd, label: `${F.fmtInt(r.p)} params · width ${r.width} · ${F.f3(r.b)} ± ${F.f3(r.sd)} bits/char` })),
+        }));
+        F.lines(el, { series, xLog: true, height: 340, xLabel: 'total parameters', yFmt: F.f2, xFmt: d3.format('~s'), xTickValues: [5e3, 1e4, 2e4, 5e4, 1e5, 2e5], refs: [{ y: 2.0, label: '2.0 bits/char' }] });
+      }
+      // gap
+      el = root.querySelector('#chart-gap');
+      const gp = dash.data('gap');
+      chips(root, '#chips-gap', ['frlm-delta', 'frlm-delta-htsk'], NAMES, color, shown.gap, redraw);
+      if (!F.pending(el, gp.status)) {
+        const series = ['frlm-delta', 'frlm-delta-htsk'].filter((a) => shown.gap.has(a)).map((a) => ({
+          name: NAMES[a], color: color(a), width: a === FOCUS ? 3 : 2,
+          points: gp.data.filter((r) => r.arm === a).map((r) => ({ x: Number(r.params), y: Number(r.gap), label: `${F.fmtInt(Number(r.params))} params · ${F.f3(Number(r.bpc))} vs ${r.best_neural} ${F.f3(Number(r.best_neural_bpc))} · gap +${F.f3(Number(r.gap))}` })).sort((u, v) => u.x - v.x),
+        }));
+        F.lines(el, { series, xLog: true, height: 260, xLabel: 'total parameters', yFmt: (v) => '+' + F.f2(v), xFmt: d3.format('~s'), xTickValues: [1e4, 2e4, 5e4, 1e5], refs: [{ y: 0.1, label: '0.10 margin' }] });
+      }
+      // smallest table
+      const sm = dash.data('smallest_wide');
+      const tb = root.querySelector('#table-smallest tbody');
+      tb.textContent = '';
+      if (sm.status === 'ok') {
+        const rows = ARMS.map((a) => sm.data.find((r) => r.arm === a)).filter(Boolean).map((r) => ({ ...r, _key: r.arm, _focus: r.arm === FOCUS }));
+        F.table(tb, rows, ['model', 't2_0', 't1_8', 't1_6', 't1_4']);
+      }
+    },
+
+    components(root) {
+      let el = root.querySelector('#chart-ablate');
+      const ab = dash.data('ablate_stats');
+      if (!F.pending(el, ab.status)) {
+        const spec = [['gauss-mlp', 'Gaussian-TSK attention + MLP', C[2]], ['softmax-tsk', 'Softmax attention + classic fuzzy feed-forward', C[7]]];
+        const items = [];
+        for (const w of [32, 64]) {
+          for (const [a, l, c] of spec) {
+            const r = ab.data.find((x) => x.arm === a && x.width === w);
+            if (r) items.push({ group: `Width ${w}`, label: l, value: r.delta, err: 0, color: c, note: `${r.n} seeds`, tip: `${F.f3(r.mean)} ± ${F.f3(r.std)} vs ${F.f3(r.base)} for softmax` });
+          }
+        }
+        F.bars(el, items, { xDomain: [-0.05, 0.35], base: 0, refs: [{ x: 0 }], xFmt: F.f2, valueFmt: (v) => (v >= 0 ? '+' : '') + F.f3(v), rowH: 28 });
+      }
+      el = root.querySelector('#chart-htsk');
+      const h9 = dash.data('h9');
+      if (F.pending(el, h9.status)) return;
+      const order = ['Classic everywhere', 'HTSK on recurrent mixer only', 'HTSK on feed-forward only', 'HTSK on both'];
+      const items = [];
+      for (const m of [...new Set(h9.data.map((r) => r.model))]) {
+        for (const v of order) {
+          const r = h9.data.find((x) => x.model === m && x.variant === v);
+          if (r) items.push({ group: `${m} (${r.seeds === '1' ? '1 seed' : r.seeds + ' seeds'})`, label: v, value: Number(r.bpc_mean), err: Number(r.bpc_std) || 0, color: v === 'HTSK on feed-forward only' ? C[2] : 'var(--cds-chart-muted)' });
+        }
+      }
+      F.bars(el, items, { xDomain: [1.7, 1.9], xFmt: F.f2, valueFmt: F.f3, rowH: 26 });
+    },
+
+    tuning(root) {
+      let el = root.querySelector('#chart-tune');
+      const tu = dash.data('tune');
+      if (!F.pending(el, tu.status)) {
+        const series = ARMS.map((a) => ({
+          name: NAMES[a], color: color(a), width: a === FOCUS ? 3 : 2,
+          points: tu.data.filter((r) => r.arm === a && r.shortconv === (a === 'gru' ? '0' : '4')).map((r) => ({ x: Number(r.lr), y: Number(r.bpc), label: `learning rate ${r.lr} · ${F.f3(Number(r.bpc))} bits/char` })).sort((u, v) => u.x - v.x),
+        }));
+        F.lines(el, { series, xLog: true, height: 280, xLabel: 'learning rate', yFmt: F.f2, xFmt: d3.format('~e'), xTickValues: [1e-3, 3e-3, 1e-2, 3e-2, 1e-1], yDomain: [1.6, 2.7] });
+      }
+      el = root.querySelector('#chart-memory');
+      const stt = dash.data('state'), sc = dash.data('scaling');
+      if (F.pending(el, stt.status === 'ok' ? sc.status : stt.status)) return;
+      const arms = ['softmax-mlp', 'delta-mlp', 'gru', 'frlm-delta-htsk'];
+      const series = arms.map((a) => ({
+        name: NAMES[a], color: color(a), width: a === FOCUS ? 3 : 2,
+        points: stt.data.filter((r) => r.arm === a).map((r) => ({ x: Number(r.context), y: Number(r.state_floats), label: `${F.fmtInt(Number(r.context))} characters of context · ${F.fmtInt(Number(r.state_floats))} floats` })).sort((u, v) => u.x - v.x),
+      }));
+      const size = Number(sc.data.find((r) => r.arm === 'softmax-mlp' && r.width === '16').params);
+      F.lines(el, { series, xLog: true, yLog: true, height: 280, xLabel: 'characters of context', yFmt: d3.format('~s'), yTicks: 5, xFmt: d3.format('~s'), refs: [{ y: size, label: `softmax model size, ${F.fmtInt(size)} params` }] });
+    },
+
+    ngram(root) {
+      const redraw = () => pagesSpec.ngram(root);
+      let el = root.querySelector('#chart-ngram');
+      const ref = dash.data('ngram_ref'), sc = dash.data('scaling');
+      if (!F.pending(el, ref.status === 'ok' ? sc.status : ref.status)) {
+        const f = sc.data.find((r) => r.arm === 'frlm-delta-htsk' && r.width === '16');
+        const items = ref.data.map((r) => ({ label: r.model, value: Number(r.bpc), color: r.kind === 'start of training' ? 'var(--cds-chart-muted)' : C[0], note: Number(r.table_entries) ? `${F.fmtInt(Number(r.table_entries))} table entries` : '' }));
+        if (f) items.push({ label: 'Fuzzy recurrent model (the 8.6K-parameter one)', value: Number(f.bpc_mean), err: Number(f.bpc_std), color: C[2], note: `${F.fmtInt(Number(f.params))} params` });
+        F.bars(el, items, { xDomain: [0, 7], xFmt: F.f2, valueFmt: F.f2, rowH: 30 });
+      }
+      const labels = { 'A-base': 'Baseline (4 seeds)', 'B-embonly': 'Aligned embedding only', 'C-biplace': '+ bigram rule placement', 'D-bifull': 'Bigram n-gram init', 'E-taps2': '2-tap antecedent', 'F-trifull': 'Trigram init, 2 taps', 'G-triplace': 'Trigram placement only', 'H-ffnonly': 'HTSK on the FFN only', 'I-share3': 'One block applied 3×', 'J-wdim': 'Shared widths' };
+      const cols = { 'A-base': C[0], 'B-embonly': C[3], 'C-biplace': C[4], 'D-bifull': C[1], 'E-taps2': C[2], 'F-trifull': C[5], 'G-triplace': C[6], 'H-ffnonly': C[7], 'I-share3': C[3], 'J-wdim': C[4] };
+      const ss = dash.data('screen_stats');
+      const tb = root.querySelector('#table-screen tbody');
+      tb.textContent = '';
+      if (ss.status === 'ok') {
+        const rows = ss.data.map((r) => ({ ...r, _key: r.key, _focus: r.variant === 'A-base' }));
+        F.table(tb, rows, ['variant', 'params', 'n', 'start', 'mean', 'std', 'delta', 'verdict'], {
+          variant: (r) => labels[r.variant] || r.variant, params: (r) => F.fmtInt(r.params), start: (r) => F.f2(r.start), mean: (r) => F.f4(r.mean), std: (r) => (Number.isFinite(r.std) ? F.f3(r.std) : 'n/a'),
+          delta: (r) => (Number.isFinite(r.delta) ? (r.delta >= 0 ? '+' : '') + F.f3(r.delta) : ''),
+        });
+      }
+      el = root.querySelector('#chart-ngcurves');
+      const cv = dash.data('screen_curves');
+      chips(root, '#chips-ngram', Object.keys(labels), labels, (a) => cols[a], shown.ngram, redraw);
+      if (F.pending(el, cv.status)) return;
+      const series = Object.keys(labels).filter((v) => shown.ngram.has(v)).map((v) => {
+        const by = d3.group(cv.data.filter((r) => r.variant === v), (r) => r.step);
+        return { name: labels[v], color: cols[v], width: v === 'D-bifull' ? 3 : 2, points: [...by].map(([x, rs]) => ({ x: Number(x), y: d3.mean(rs.map((r) => Number(r.bpc))), label: `step ${x} · ${F.f3(d3.mean(rs.map((r) => Number(r.bpc))))} bits/char · ${rs.length} seed${rs.length > 1 ? 's' : ''}` })).sort((p, q) => p.x - q.x) };
+      });
+      F.lines(el, { series, yLog: true, height: 300, xLabel: 'optimizer step', yFmt: F.f2, xFmt: d3.format('d'), yDomain: [1.9, 7.2], yTicks: 6 });
+    },
+  };
+
+  F.pages(pagesSpec);
+</script>

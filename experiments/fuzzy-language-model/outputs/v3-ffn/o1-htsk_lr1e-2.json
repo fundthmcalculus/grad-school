@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn\\o1-htsk_lr1e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "max_len": 256
+ },
+ "params_total": 102084,
+ "params_nonemb": 95812,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.6253,
+ "evals": [
+  [
+   305,
+   2.09605
+  ],
+  [
+   610,
+   1.81803
+  ],
+  [
+   915,
+   1.68429
+  ],
+  [
+   1220,
+   1.62555
+  ],
+  [
+   1221,
+   1.6253
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.3604
+  ],
+  [
+   50,
+   5.6277
+  ],
+  [
+   100,
+   4.0299
+  ],
+  [
+   150,
+   3.1638
+  ],
+  [
+   200,
+   2.6934
+  ],
+  [
+   250,
+   2.4145
+  ],
+  [
+   300,
+   2.2444
+  ],
+  [
+   350,
+   2.1404
+  ],
+  [
+   400,
+   2.0508
+  ],
+  [
+   450,
+   1.9941
+  ],
+  [
+   500,
+   1.9427
+  ],
+  [
+   550,
+   1.8879
+  ],
+  [
+   600,
+   1.8485
+  ],
+  [
+   650,
+   1.8235
+  ],
+  [
+   700,
+   1.7987
+  ],
+  [
+   750,
+   1.7806
+  ],
+  [
+   800,
+   1.7548
+  ],
+  [
+   850,
+   1.7355
+  ],
+  [
+   900,
+   1.7177
+  ],
+  [
+   950,
+   1.7001
+  ],
+  [
+   1000,
+   1.6711
+  ],
+  [
+   1050,
+   1.6646
+  ],
+  [
+   1100,
+   1.6518
+  ],
+  [
+   1150,
+   1.6428
+  ],
+  [
+   1200,
+   1.6451
+  ],
+  [
+   1220,
+   1.6438
+  ]
+ ],
+ "train_seconds": 60.75,
+ "wall_seconds": 72.8,
+ "chars_per_sec": 164651,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog party sorry, and shiny, and they had here very happy. He did not wanted to see you did not dog enown? The zoo, let's of the kitchen when expeed so play on, \"Yes, Ben saw toys.\n\"Hi, Tom and Dad. So, Mana, and the effuroli. They eat with the mark, she saw a bitter.\n<|eot|>\nOnce upon a",
+ "rule_init": {}
+}

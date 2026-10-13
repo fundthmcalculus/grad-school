@@ -1,0 +1,183 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/fuzzyfix/frlm-delta_ensqrt_rirandom.json",
+  "save_model": false,
+  "exp_norm": "sqrt",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sqrt",
+  "max_len": 256
+ },
+ "params_total": 28392,
+ "params_nonemb": 25256,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.76798,
+ "evals": [
+  [
+   305,
+   2.16566
+  ],
+  [
+   610,
+   1.94731
+  ],
+  [
+   915,
+   1.8337
+  ],
+  [
+   1220,
+   1.76884
+  ],
+  [
+   1221,
+   1.76798
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9658
+  ],
+  [
+   50,
+   5.5658
+  ],
+  [
+   100,
+   4.0585
+  ],
+  [
+   150,
+   3.1853
+  ],
+  [
+   200,
+   2.7032
+  ],
+  [
+   250,
+   2.4455
+  ],
+  [
+   300,
+   2.289
+  ],
+  [
+   350,
+   2.2055
+  ],
+  [
+   400,
+   2.1284
+  ],
+  [
+   450,
+   2.0888
+  ],
+  [
+   500,
+   2.0485
+  ],
+  [
+   550,
+   2.0002
+  ],
+  [
+   600,
+   1.971
+  ],
+  [
+   650,
+   1.9499
+  ],
+  [
+   700,
+   1.9331
+  ],
+  [
+   750,
+   1.9204
+  ],
+  [
+   800,
+   1.8923
+  ],
+  [
+   850,
+   1.8746
+  ],
+  [
+   900,
+   1.8591
+  ],
+  [
+   950,
+   1.8417
+  ],
+  [
+   1000,
+   1.8129
+  ],
+  [
+   1050,
+   1.8046
+  ],
+  [
+   1100,
+   1.7929
+  ],
+  [
+   1150,
+   1.7835
+  ],
+  [
+   1200,
+   1.7854
+  ],
+  [
+   1220,
+   1.7851
+  ]
+ ],
+ "train_seconds": 1085.66,
+ "wall_seconds": 1459.05,
+ "chars_per_sec": 9213,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time. He was son help her, but I puddenly, \"Okay, a so well be speciant to fies was so excited and Ben friends. They came inss all gonast cheeside the reame. We the palies.\n\"Bia shiny, Max that learned to the red. Tom said, \"That go start a big said. \ufffd\ufffd\ufffdThe win said, \"Yes, Peoman had and played. Max and",
+ "rule_init": {}
+}

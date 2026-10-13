@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.25,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t768e16m225_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.25,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98280,
+ "params_nonemb": 56552,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.09564,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.24635
+  ],
+  [
+   100,
+   1.57574
+  ],
+  [
+   200,
+   1.41945
+  ],
+  [
+   300,
+   1.35128
+  ],
+  [
+   400,
+   1.30333
+  ],
+  [
+   500,
+   1.26295
+  ],
+  [
+   600,
+   1.22111
+  ],
+  [
+   700,
+   1.18778
+  ],
+  [
+   800,
+   1.15773
+  ],
+  [
+   900,
+   1.13207
+  ],
+  [
+   1000,
+   1.11148
+  ],
+  [
+   1100,
+   1.09955
+  ],
+  [
+   1160,
+   1.09564
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2585
+  ],
+  [
+   50,
+   8.0565
+  ],
+  [
+   100,
+   6.219
+  ],
+  [
+   150,
+   5.3274
+  ],
+  [
+   200,
+   4.8312
+  ],
+  [
+   250,
+   4.5823
+  ],
+  [
+   300,
+   4.4112
+  ],
+  [
+   350,
+   4.2953
+  ],
+  [
+   400,
+   4.1829
+  ],
+  [
+   450,
+   4.1254
+  ],
+  [
+   500,
+   4.0551
+  ],
+  [
+   550,
+   3.997
+  ],
+  [
+   600,
+   3.9188
+  ],
+  [
+   650,
+   3.8581
+  ],
+  [
+   700,
+   3.8167
+  ],
+  [
+   750,
+   3.767
+  ],
+  [
+   800,
+   3.7137
+  ],
+  [
+   850,
+   3.6622
+  ],
+  [
+   900,
+   3.6204
+  ],
+  [
+   950,
+   3.6005
+  ],
+  [
+   1000,
+   3.5618
+  ],
+  [
+   1050,
+   3.5232
+  ],
+  [
+   1100,
+   3.5098
+  ],
+  [
+   1150,
+   3.4891
+  ],
+  [
+   1159,
+   3.4894
+  ]
+ ],
+ "train_seconds": 80.51,
+ "wall_seconds": 95.21,
+ "chars_per_sec": 118025,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy. Lucy loved to play with her special pian. One day, she found a toy that they found something special. Lucy was very excited to play with the magic toy.\n Kitty and her friend were very happy. They put the toy box on the table. They both wanted to see how to slide, but they could not find the chair. They chaired and saved a plang that then they found the pianan. The avidion said, \"Thank you, Lucy!\" Lucy laughed and found her toy box in the pase. The toy kept trying and the anxation. Lucy was very happy. They all played even more fun together.\n<|eot|>\nOnce upon a time, in a small town, there lived a little boy named Tim. He had a big, red ball. Tim had a big tree with many toys. He liked to play outside and explore it.\nOne day, Tim's mom saw a big, big window. The squirrel said, \"I want to stop a big, big tree!\" Tim smiled and said, \"Yes, I am had. Can you help me find my tree?\" The bird said, \"Yes, we can help.\" Tim and Max played with the sun, and they all played together.\n<|eot|>\nOnce upon a time, there was a grown who loved to play.",
+ "rule_init": {},
+ "ngram_init": {}
+}

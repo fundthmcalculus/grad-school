@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/softmax-mlp_lr1e-2_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 19680,
+ "params_nonemb": 16544,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.8837,
+ "evals": [
+  [
+   305,
+   2.24993
+  ],
+  [
+   610,
+   2.03287
+  ],
+  [
+   915,
+   1.92898
+  ],
+  [
+   1220,
+   1.88381
+  ],
+  [
+   1221,
+   1.8837
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.7136
+  ],
+  [
+   50,
+   5.6267
+  ],
+  [
+   100,
+   4.2403
+  ],
+  [
+   150,
+   3.4093
+  ],
+  [
+   200,
+   2.9012
+  ],
+  [
+   250,
+   2.5896
+  ],
+  [
+   300,
+   2.4055
+  ],
+  [
+   350,
+   2.2988
+  ],
+  [
+   400,
+   2.2188
+  ],
+  [
+   450,
+   2.1687
+  ],
+  [
+   500,
+   2.1285
+  ],
+  [
+   550,
+   2.0806
+  ],
+  [
+   600,
+   2.0506
+  ],
+  [
+   650,
+   2.0378
+  ],
+  [
+   700,
+   2.0206
+  ],
+  [
+   750,
+   2.0067
+  ],
+  [
+   800,
+   1.9838
+  ],
+  [
+   850,
+   1.9697
+  ],
+  [
+   900,
+   1.9548
+  ],
+  [
+   950,
+   1.9422
+  ],
+  [
+   1000,
+   1.9152
+  ],
+  [
+   1050,
+   1.911
+  ],
+  [
+   1100,
+   1.9025
+  ],
+  [
+   1150,
+   1.8975
+  ],
+  [
+   1200,
+   1.8989
+  ],
+  [
+   1220,
+   1.8973
+  ]
+ ],
+ "train_seconds": 307.81,
+ "wall_seconds": 339.79,
+ "chars_per_sec": 32495,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was new from the seem down a big time his and said, do said, \"Do they dogged and not said, \"His friend, they saw sad help and car sit with read away together apple to hungry to her flew fun smiled to gets to play, the go on the red as many. The bird said,\" Tim's play what it. They decided to",
+ "rule_init": {}
+}

@@ -1,0 +1,1 @@
+--mixer fuzzydelta --decay data --exp-norm mean --ffn-exp-norm mean --heads 8 --ffn-mult 1.5 --ffn tsk --ffn-order 1 --ffn-norm none --ffn-exp-norm mean --tsk-dim 16 --d 24 --layers 2 --shortconv 8 --seed 0 --chars 3e6 --lr 3e-2 --warmup 100 --eval-chars 100000 --eval-every 500 --save-model --out outputs/rules-smoke/D-d24-char.json --threads 2

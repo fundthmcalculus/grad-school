@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t512e24m20_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 91472,
+ "params_nonemb": 53456,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10005,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.22917
+  ],
+  [
+   100,
+   1.59699
+  ],
+  [
+   200,
+   1.43873
+  ],
+  [
+   300,
+   1.36399
+  ],
+  [
+   400,
+   1.31086
+  ],
+  [
+   500,
+   1.26651
+  ],
+  [
+   600,
+   1.2218
+  ],
+  [
+   700,
+   1.18792
+  ],
+  [
+   800,
+   1.16014
+  ],
+  [
+   900,
+   1.13655
+  ],
+  [
+   1000,
+   1.11724
+  ],
+  [
+   1100,
+   1.10395
+  ],
+  [
+   1160,
+   1.10005
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2309
+  ],
+  [
+   50,
+   8.0841
+  ],
+  [
+   100,
+   6.2691
+  ],
+  [
+   150,
+   5.377
+  ],
+  [
+   200,
+   4.88
+  ],
+  [
+   250,
+   4.6321
+  ],
+  [
+   300,
+   4.4561
+  ],
+  [
+   350,
+   4.3411
+  ],
+  [
+   400,
+   4.2197
+  ],
+  [
+   450,
+   4.1542
+  ],
+  [
+   500,
+   4.0793
+  ],
+  [
+   550,
+   4.0153
+  ],
+  [
+   600,
+   3.9327
+  ],
+  [
+   650,
+   3.8737
+  ],
+  [
+   700,
+   3.8288
+  ],
+  [
+   750,
+   3.7785
+  ],
+  [
+   800,
+   3.7292
+  ],
+  [
+   850,
+   3.6751
+  ],
+  [
+   900,
+   3.6384
+  ],
+  [
+   950,
+   3.6137
+  ],
+  [
+   1000,
+   3.5742
+  ],
+  [
+   1050,
+   3.5357
+  ],
+  [
+   1100,
+   3.5239
+  ],
+  [
+   1150,
+   3.5009
+  ],
+  [
+   1159,
+   3.4998
+  ]
+ ],
+ "train_seconds": 81.69,
+ "wall_seconds": 96.02,
+ "chars_per_sec": 116326,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Mia. Mia loved to play with her special beak and make her.\nOne day, Max saw something first of the rock. He wanted to play with the rock. So, the girl saw a big, red ball. The ball was a big, beautiful ball. Mia loved the ball and the ball sling. Mia started to play with the ball. They played with the ball all day.\nMax was so excited, then they found the ball. The red ball was a big box. Mia and the dog were sad. They were happy, but they did not finish anymore. The big red ball is a lot of fun.\nMax saw a bigger in the water. He picked up the ballch and showed it to the hot finish. The dog said, \"I can help you. I will help you melt, but I wish you!\" The dog stucks the wonderful spot and had lots of fun.\n<|eot|>\nOnce upon a time, in a small town, there was a little green bird named Jack. Jack wanted to play with one, but if he was not fun anymore.\nOne day, Jack was playing with his mom. He saw a little bird in the tree. He ran to the bird and said, \"Hello, little bird! This has many perfect mightray",
+ "rule_init": {},
+ "ngram_init": {}
+}

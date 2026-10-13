@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v34-mrl\\m2_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.1595,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.28517
+  ],
+  [
+   100,
+   1.60749
+  ],
+  [
+   200,
+   1.46613
+  ],
+  [
+   300,
+   1.39259
+  ],
+  [
+   400,
+   1.34832
+  ],
+  [
+   500,
+   1.30383
+  ],
+  [
+   600,
+   1.27654
+  ],
+  [
+   700,
+   1.24383
+  ],
+  [
+   800,
+   1.21509
+  ],
+  [
+   900,
+   1.19399
+  ],
+  [
+   1000,
+   1.17723
+  ],
+  [
+   1100,
+   1.16383
+  ],
+  [
+   1160,
+   1.1595
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2673
+  ],
+  [
+   50,
+   8.2747
+  ],
+  [
+   100,
+   6.4468
+  ],
+  [
+   150,
+   5.5506
+  ],
+  [
+   200,
+   5.1015
+  ],
+  [
+   250,
+   4.8508
+  ],
+  [
+   300,
+   4.6909
+  ],
+  [
+   350,
+   4.5838
+  ],
+  [
+   400,
+   4.5082
+  ],
+  [
+   450,
+   4.4207
+  ],
+  [
+   500,
+   4.3683
+  ],
+  [
+   550,
+   4.306
+  ],
+  [
+   600,
+   4.2514
+  ],
+  [
+   650,
+   4.192
+  ],
+  [
+   700,
+   4.1462
+  ],
+  [
+   750,
+   4.1186
+  ],
+  [
+   800,
+   4.0647
+  ],
+  [
+   850,
+   4.0154
+  ],
+  [
+   900,
+   3.9864
+  ],
+  [
+   950,
+   3.9464
+  ],
+  [
+   1000,
+   3.9072
+  ],
+  [
+   1050,
+   3.8869
+  ],
+  [
+   1100,
+   3.8713
+  ],
+  [
+   1150,
+   3.8725
+  ],
+  [
+   1159,
+   3.8706
+  ]
+ ],
+ "train_seconds": 82.03,
+ "wall_seconds": 95.86,
+ "chars_per_sec": 115846,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there lived a little girl who was a tricquet of a special shoes. She would drove the droveut on him and put it on the ground.\nOne day, Lily's mom saw a big tree in her yard. She was scared. She picked up the pond and said, \"Hello, bird!\"\nLily said, \"I lost Mr. the frogs. I will help you. Let's play with your friends.\"\nLucy's friend, Molly, Sue and Sue found a big tree. It was a very fill. Sue and Sue were so happy. They said, \"Don't worry, you can take it and hurt you toce. You have to do a special bord.\"\nLucy and Sue were worked together. They thought how to fix the pop the monster. They learned that remember can explore it here and have fun. All the end of the day, they were happy to have a good friend to play together.\n<|eot|>\nOne day, a big tree named Tim went to the park. It was small and bigger for her. Tim was very scared because he was very excited.\nTim said, \"I want to cry, but it are not person. I can grow an use to have fun.\" Tim showed the mighter playing",
+ "rule_init": {},
+ "ngram_init": {}
+}

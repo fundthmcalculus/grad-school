@@ -1,0 +1,152 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 4000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 4,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "outputs\\v26-hybrid\\hyb4g1_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 155,
+ "chars_seen": 4010100,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.45734,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   38,
+   2.02374
+  ],
+  [
+   76,
+   1.68902
+  ],
+  [
+   114,
+   1.57513
+  ],
+  [
+   152,
+   1.46134
+  ],
+  [
+   155,
+   1.45734
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.1105
+  ],
+  [
+   50,
+   8.252
+  ],
+  [
+   100,
+   6.3916
+  ],
+  [
+   150,
+   5.3944
+  ],
+  [
+   154,
+   5.3363
+  ]
+ ],
+ "train_seconds": 353.53,
+ "wall_seconds": 541.84,
+ "chars_per_sec": 3592,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 4,
+ "device": "cpu",
+ "device_name": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, in a small house.\nThe trivequit is a special one day at her house. She says he needed that the fat. He puts it home to the park. Anna, Lily's mom told him about her friend, \"Thank you, making better, just table. You are a store! You are so happy!\"\nLily said, \"Can I need it to sigs. I will help each other.\" \nMayer, her mom said, \"This is a little like me. Youre you make a wep too. You can not find it.\"\nAnna said, \"I want to make a firse.\" The berfanut was even explace.\nBut the bird saw that it could help her bowly behind Pinnie. Inside the park, the mess, the bird was very nice. She thanked the treelly and never buck in the tree. Tom was sad and had angry. He opened it and smiled.\nThe animals all day playing,, the little boy. The cat wanted to play with his baltchen. They had another, and her friend, they wanted to bed the plate.\nTom and Ben were happy. They all played with Sam and Sam pink together every day.\n<|eot|>\nOnce upon a time, there was a little boy who loved to play.",
+ "rule_init": {
+  "variant": "hyb4g1",
+  "L0.ffn": {
+   "gain": 0.25,
+   "ce_nats": 7.0118
+  },
+  "L1.ffn": {
+   "gain": 1.0,
+   "ce_nats": 7.0087
+  }
+ },
+ "ngram_init": {}
+}

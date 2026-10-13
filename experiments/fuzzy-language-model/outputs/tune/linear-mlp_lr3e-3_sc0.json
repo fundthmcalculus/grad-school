@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "linear",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.003,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/linear-mlp_lr3e-3_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "linear",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 19684,
+ "params_nonemb": 16548,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.97312,
+ "evals": [
+  [
+   305,
+   2.38272
+  ],
+  [
+   610,
+   2.09573
+  ],
+  [
+   915,
+   2.00879
+  ],
+  [
+   1220,
+   1.97365
+  ],
+  [
+   1221,
+   1.97312
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.7711
+  ],
+  [
+   50,
+   6.0917
+  ],
+  [
+   100,
+   4.8502
+  ],
+  [
+   150,
+   3.8708
+  ],
+  [
+   200,
+   3.2511
+  ],
+  [
+   250,
+   2.8487
+  ],
+  [
+   300,
+   2.599
+  ],
+  [
+   350,
+   2.4447
+  ],
+  [
+   400,
+   2.3322
+  ],
+  [
+   450,
+   2.2637
+  ],
+  [
+   500,
+   2.2114
+  ],
+  [
+   550,
+   2.1568
+  ],
+  [
+   600,
+   2.1211
+  ],
+  [
+   650,
+   2.1026
+  ],
+  [
+   700,
+   2.0879
+  ],
+  [
+   750,
+   2.073
+  ],
+  [
+   800,
+   2.052
+  ],
+  [
+   850,
+   2.0392
+  ],
+  [
+   900,
+   2.0285
+  ],
+  [
+   950,
+   2.0189
+  ],
+  [
+   1000,
+   1.9956
+  ],
+  [
+   1050,
+   1.9958
+  ],
+  [
+   1100,
+   1.9869
+  ],
+  [
+   1150,
+   1.983
+  ],
+  [
+   1200,
+   1.9895
+  ],
+  [
+   1220,
+   1.9899
+  ]
+ ],
+ "train_seconds": 485.21,
+ "wall_seconds": 540.49,
+ "chars_per_sec": 20615,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was not from and see pudden see wanted to play!\nOne day, he big were together, it was sill friend. When them sadys all goode to she girl flowank. The didn't ride girl have day, he found a big lever eigans to play leagh them started as. The lady and that with his pokend and the little. \"Look ",
+ "rule_init": {}
+}

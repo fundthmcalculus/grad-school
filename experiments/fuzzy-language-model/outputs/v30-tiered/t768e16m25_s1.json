@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t768e16m25_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 101376,
+ "params_nonemb": 59648,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.08513,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.25346
+  ],
+  [
+   100,
+   1.57851
+  ],
+  [
+   200,
+   1.43009
+  ],
+  [
+   300,
+   1.35168
+  ],
+  [
+   400,
+   1.29581
+  ],
+  [
+   500,
+   1.25129
+  ],
+  [
+   600,
+   1.21033
+  ],
+  [
+   700,
+   1.17187
+  ],
+  [
+   800,
+   1.14375
+  ],
+  [
+   900,
+   1.12161
+  ],
+  [
+   1000,
+   1.10099
+  ],
+  [
+   1100,
+   1.09096
+  ],
+  [
+   1160,
+   1.08513
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2697
+  ],
+  [
+   50,
+   8.0488
+  ],
+  [
+   100,
+   6.22
+  ],
+  [
+   150,
+   5.3133
+  ],
+  [
+   200,
+   4.8559
+  ],
+  [
+   250,
+   4.5878
+  ],
+  [
+   300,
+   4.4091
+  ],
+  [
+   350,
+   4.2891
+  ],
+  [
+   400,
+   4.2092
+  ],
+  [
+   450,
+   4.0956
+  ],
+  [
+   500,
+   4.0344
+  ],
+  [
+   550,
+   3.9709
+  ],
+  [
+   600,
+   3.9064
+  ],
+  [
+   650,
+   3.8288
+  ],
+  [
+   700,
+   3.775
+  ],
+  [
+   750,
+   3.7326
+  ],
+  [
+   800,
+   3.674
+  ],
+  [
+   850,
+   3.6323
+  ],
+  [
+   900,
+   3.6023
+  ],
+  [
+   950,
+   3.5587
+  ],
+  [
+   1000,
+   3.5175
+  ],
+  [
+   1050,
+   3.488
+  ],
+  [
+   1100,
+   3.4761
+  ],
+  [
+   1150,
+   3.4583
+  ],
+  [
+   1159,
+   3.456
+  ]
+ ],
+ "train_seconds": 81.43,
+ "wall_seconds": 95.74,
+ "chars_per_sec": 116702,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there were two friends and daddy.\nOne day, a big, green dog. They were blue, and people in the cookies. They put the dog and have to play with the dog. They were so happy and loved to play together. They were even happy.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She would pretend she would be dance and Mr. She would always behind a plan. One day, she found a big rock on her pillars. She walked and walked and jumped on the bee. It was a very first!\nAt the bee, Lily came to Sally, she saw a biggued. She asked her mom for help, \"Mom, can I play with my fings on the beak.\" Pon said, \"Yes, I like the bee, but you wish I learned that it is fun and bad. You are very unkliver and not a pretty bug. It's a new friend to useful animals and fun playing, and the bee. You have to be brave and realize a small teebo, and it was the best thing. Now, you can be a good journey to his dad and have fun who. And that having before we can have the beese. And werise",
+ "rule_init": {},
+ "ngram_init": {}
+}

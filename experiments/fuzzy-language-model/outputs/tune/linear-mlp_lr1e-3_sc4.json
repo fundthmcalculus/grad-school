@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "linear",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.001,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/linear-mlp_lr1e-3_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "linear",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 19940,
+ "params_nonemb": 16804,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.24032,
+ "evals": [
+  [
+   305,
+   2.88083
+  ],
+  [
+   610,
+   2.41092
+  ],
+  [
+   915,
+   2.27792
+  ],
+  [
+   1220,
+   2.24052
+  ],
+  [
+   1221,
+   2.24032
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.0401
+  ],
+  [
+   50,
+   6.6391
+  ],
+  [
+   100,
+   5.6758
+  ],
+  [
+   150,
+   4.7317
+  ],
+  [
+   200,
+   3.9928
+  ],
+  [
+   250,
+   3.4888
+  ],
+  [
+   300,
+   3.1645
+  ],
+  [
+   350,
+   2.9451
+  ],
+  [
+   400,
+   2.7821
+  ],
+  [
+   450,
+   2.6724
+  ],
+  [
+   500,
+   2.588
+  ],
+  [
+   550,
+   2.5118
+  ],
+  [
+   600,
+   2.4564
+  ],
+  [
+   650,
+   2.4192
+  ],
+  [
+   700,
+   2.389
+  ],
+  [
+   750,
+   2.3623
+  ],
+  [
+   800,
+   2.3318
+  ],
+  [
+   850,
+   2.3154
+  ],
+  [
+   900,
+   2.2994
+  ],
+  [
+   950,
+   2.2875
+  ],
+  [
+   1000,
+   2.2626
+  ],
+  [
+   1050,
+   2.259
+  ],
+  [
+   1100,
+   2.2507
+  ],
+  [
+   1150,
+   2.2468
+  ],
+  [
+   1200,
+   2.2526
+  ],
+  [
+   1220,
+   2.2508
+  ]
+ ],
+ "train_seconds": 434.66,
+ "wall_seconds": 563.36,
+ "chars_per_sec": 23012,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there besh her very, bet her bee smireed beally andly be specide. Tim were togeg to git. He sid not on the save was ands all the svered side dou reamed, \"Ben sy lirrefug, there was a big, mung. The leed toise shing. They was too. At a plays. The mall and theit the scee on't had mom to dad. Max a s",
+ "rule_init": {}
+}

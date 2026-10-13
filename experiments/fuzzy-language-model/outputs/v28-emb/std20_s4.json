@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v28-emb\\std20_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.12935,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.63823
+  ],
+  [
+   100,
+   1.59457
+  ],
+  [
+   200,
+   1.43086
+  ],
+  [
+   300,
+   1.35869
+  ],
+  [
+   400,
+   1.31948
+  ],
+  [
+   500,
+   1.27647
+  ],
+  [
+   600,
+   1.24244
+  ],
+  [
+   700,
+   1.21094
+  ],
+  [
+   800,
+   1.18616
+  ],
+  [
+   900,
+   1.16589
+  ],
+  [
+   1000,
+   1.14582
+  ],
+  [
+   1100,
+   1.13442
+  ],
+  [
+   1160,
+   1.12935
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.452
+  ],
+  [
+   50,
+   8.7665
+  ],
+  [
+   100,
+   6.5297
+  ],
+  [
+   150,
+   5.4721
+  ],
+  [
+   200,
+   4.9131
+  ],
+  [
+   250,
+   4.6353
+  ],
+  [
+   300,
+   4.4458
+  ],
+  [
+   350,
+   4.3386
+  ],
+  [
+   400,
+   4.2318
+  ],
+  [
+   450,
+   4.1768
+  ],
+  [
+   500,
+   4.1109
+  ],
+  [
+   550,
+   4.0579
+  ],
+  [
+   600,
+   3.9871
+  ],
+  [
+   650,
+   3.9345
+  ],
+  [
+   700,
+   3.8946
+  ],
+  [
+   750,
+   3.8536
+  ],
+  [
+   800,
+   3.8075
+  ],
+  [
+   850,
+   3.7574
+  ],
+  [
+   900,
+   3.7263
+  ],
+  [
+   950,
+   3.7011
+  ],
+  [
+   1000,
+   3.6651
+  ],
+  [
+   1050,
+   3.6268
+  ],
+  [
+   1100,
+   3.6138
+  ],
+  [
+   1150,
+   3.5947
+  ],
+  [
+   1159,
+   3.5955
+  ]
+ ],
+ "train_seconds": 79.34,
+ "wall_seconds": 93.57,
+ "chars_per_sec": 119765,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and strong bird. \nThe little boy took the pia. He wanted to go to the packet. He said, \"I need to have an idea!\"\nThe cack showed the toy and hugged the packet. \"I'm a new friend.\"\nThe little girl said, \"Let's slide, please. Now you origising chairs. That's a clever, Bello. We can play together together.\"\nAndo said, \"But I'm TV. If you make your new place.\"\nJack got the cackal and said, \"Don't worry, you can take it home, I excecomed can do again.\"\nThe old man and the little girl became best friends. Theircy now was happy to have the mixle. He lived happily ever after.\n<|eot|>\nOnce upon a time, there was a gift named Mike. Mimi was very scary. Dolly wanted to play with her friends. One day, she wanted to play with her friends.\nThe little girl asked her mom, \"Can we build the tree. Now you you are young to play. But can you like Sam?\" Her pale said, \"I will help you get me with us.\"\nAmy decided to play with",
+ "rule_init": {},
+ "ngram_init": {}
+}

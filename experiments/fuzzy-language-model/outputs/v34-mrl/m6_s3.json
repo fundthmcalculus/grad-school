@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v34-mrl\\m6_s3.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.24156,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.27134
+  ],
+  [
+   100,
+   1.71346
+  ],
+  [
+   200,
+   1.58974
+  ],
+  [
+   300,
+   1.49057
+  ],
+  [
+   400,
+   1.43479
+  ],
+  [
+   500,
+   1.38961
+  ],
+  [
+   600,
+   1.35094
+  ],
+  [
+   700,
+   1.32365
+  ],
+  [
+   800,
+   1.29805
+  ],
+  [
+   900,
+   1.27904
+  ],
+  [
+   1000,
+   1.25923
+  ],
+  [
+   1100,
+   1.24227
+  ],
+  [
+   1160,
+   1.24156
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2757
+  ],
+  [
+   50,
+   8.4731
+  ],
+  [
+   100,
+   6.7571
+  ],
+  [
+   150,
+   6.0173
+  ],
+  [
+   200,
+   5.5932
+  ],
+  [
+   250,
+   5.3103
+  ],
+  [
+   300,
+   5.1172
+  ],
+  [
+   350,
+   5.0705
+  ],
+  [
+   400,
+   4.9355
+  ],
+  [
+   450,
+   4.8523
+  ],
+  [
+   500,
+   4.7709
+  ],
+  [
+   550,
+   4.7048
+  ],
+  [
+   600,
+   4.6827
+  ],
+  [
+   650,
+   4.6503
+  ],
+  [
+   700,
+   4.6059
+  ],
+  [
+   750,
+   4.5535
+  ],
+  [
+   800,
+   4.5085
+  ],
+  [
+   850,
+   4.454
+  ],
+  [
+   900,
+   4.445
+  ],
+  [
+   950,
+   4.425
+  ],
+  [
+   1000,
+   4.3597
+  ],
+  [
+   1050,
+   4.3273
+  ],
+  [
+   1100,
+   4.2793
+  ],
+  [
+   1150,
+   4.3379
+  ],
+  [
+   1159,
+   4.307
+  ]
+ ],
+ "train_seconds": 82.48,
+ "wall_seconds": 96.27,
+ "chars_per_sec": 115207,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy. Mia loved to meet a special one day at her house.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. He lived in a walk with a big tree. Tim liked to walk to his toys and play. One day, he saw a big poches near his tree. It was a bott. The cat was very curious. He asked his mom how sand.\nTim's mom went to find the tree to play with her friend. He said, \"Can I play with you.\" So, Tim's mom said, \"Sue, help help me!\"\nTim and Spot ran to the car thit and tried to go. They tried to snap her friends and have fun. They played with the hoop and started to kiss with it. It was now a big boat. They mar, but they were very nice.\n<|eot|>\nOne day, a big, red buckal dog named Fina. He had a small, anal bird. He liked to fly and play with his friends. They saw a big tree in the town. They wanted to play with the tree and play with the ball.\nTim's friend, Tim. He promised the ball with a snow. Tim was not sad anymore. Now, his mom and dad went to the bird and said, \"Wow, I found a cup",
+ "rule_init": {},
+ "ngram_init": {}
+}

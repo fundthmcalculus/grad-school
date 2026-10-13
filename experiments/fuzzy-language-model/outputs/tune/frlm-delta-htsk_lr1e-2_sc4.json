@@ -1,0 +1,183 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-delta-htsk_lr1e-2_sc4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "mean",
+  "max_len": 256
+ },
+ "params_total": 28392,
+ "params_nonemb": 25256,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.88044,
+ "evals": [
+  [
+   305,
+   2.32082
+  ],
+  [
+   610,
+   2.02974
+  ],
+  [
+   915,
+   1.92384
+  ],
+  [
+   1220,
+   1.8802
+  ],
+  [
+   1221,
+   1.88044
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9668
+  ],
+  [
+   50,
+   5.9244
+  ],
+  [
+   100,
+   4.7587
+  ],
+  [
+   150,
+   3.7758
+  ],
+  [
+   200,
+   3.1822
+  ],
+  [
+   250,
+   2.7989
+  ],
+  [
+   300,
+   2.5473
+  ],
+  [
+   350,
+   2.3879
+  ],
+  [
+   400,
+   2.2724
+  ],
+  [
+   450,
+   2.2023
+  ],
+  [
+   500,
+   2.1477
+  ],
+  [
+   550,
+   2.0933
+  ],
+  [
+   600,
+   2.0564
+  ],
+  [
+   650,
+   2.0374
+  ],
+  [
+   700,
+   2.0148
+  ],
+  [
+   750,
+   2.0021
+  ],
+  [
+   800,
+   1.9791
+  ],
+  [
+   850,
+   1.9655
+  ],
+  [
+   900,
+   1.9509
+  ],
+  [
+   950,
+   1.9369
+  ],
+  [
+   1000,
+   1.9126
+  ],
+  [
+   1050,
+   1.9073
+  ],
+  [
+   1100,
+   1.8975
+  ],
+  [
+   1150,
+   1.8912
+  ],
+  [
+   1200,
+   1.8971
+  ],
+  [
+   1220,
+   1.8961
+  ]
+ ],
+ "train_seconds": 1318.59,
+ "wall_seconds": 1681.56,
+ "chars_per_sec": 7586,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was not for to be something stare in her day looke and said, \"Mome fore again! It want in the go a plant untir sast liked and clockite she reame. The bird lired, and the for a stark. The could the red. Tom was so her anymore. He plays. The gave an a said, \"Yes, excited to string and the was ",
+ "rule_init": {}
+}

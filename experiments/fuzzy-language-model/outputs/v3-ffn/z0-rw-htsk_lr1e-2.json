@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn\\z0-rw-htsk_lr1e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 0,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 0,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "max_len": 256
+ },
+ "params_total": 85444,
+ "params_nonemb": 79172,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.72882,
+ "evals": [
+  [
+   305,
+   2.18108
+  ],
+  [
+   610,
+   1.91481
+  ],
+  [
+   915,
+   1.78919
+  ],
+  [
+   1220,
+   1.72906
+  ],
+  [
+   1221,
+   1.72882
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.0155
+  ],
+  [
+   50,
+   5.4649
+  ],
+  [
+   100,
+   3.9615
+  ],
+  [
+   150,
+   3.1509
+  ],
+  [
+   200,
+   2.7201
+  ],
+  [
+   250,
+   2.4671
+  ],
+  [
+   300,
+   2.3104
+  ],
+  [
+   350,
+   2.2135
+  ],
+  [
+   400,
+   2.1302
+  ],
+  [
+   450,
+   2.0773
+  ],
+  [
+   500,
+   2.0329
+  ],
+  [
+   550,
+   1.9777
+  ],
+  [
+   600,
+   1.9443
+  ],
+  [
+   650,
+   1.9201
+  ],
+  [
+   700,
+   1.8982
+  ],
+  [
+   750,
+   1.8797
+  ],
+  [
+   800,
+   1.8536
+  ],
+  [
+   850,
+   1.8356
+  ],
+  [
+   900,
+   1.8173
+  ],
+  [
+   950,
+   1.8007
+  ],
+  [
+   1000,
+   1.7704
+  ],
+  [
+   1050,
+   1.765
+  ],
+  [
+   1100,
+   1.7526
+  ],
+  [
+   1150,
+   1.7441
+  ],
+  [
+   1200,
+   1.7485
+  ],
+  [
+   1220,
+   1.7478
+  ]
+ ],
+ "train_seconds": 61.04,
+ "wall_seconds": 71.29,
+ "chars_per_sec": 163857,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog big tree. She was sincament. They said, \"Bevery did cheedy. One day, the climb yans were the by, songer that solm to of her and dog new began and playing the toy wasking toy spart. They were have they like to help Tim. She wanted told knimp. They sad dog is the would look to",
+ "rule_init": {}
+}

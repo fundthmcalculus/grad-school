@@ -1,0 +1,189 @@
+{
+ "args": {
+  "mixer": "linear",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-attrib\\linear-tsk_lr1e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "linear",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "max_len": 256
+ },
+ "params_total": 97220,
+ "params_nonemb": 90948,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.76687,
+ "evals": [
+  [
+   305,
+   2.22122
+  ],
+  [
+   610,
+   1.94582
+  ],
+  [
+   915,
+   1.81674
+  ],
+  [
+   1220,
+   1.7669
+  ],
+  [
+   1221,
+   1.76687
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.3989
+  ],
+  [
+   50,
+   5.7897
+  ],
+  [
+   100,
+   4.1868
+  ],
+  [
+   150,
+   3.2566
+  ],
+  [
+   200,
+   2.7786
+  ],
+  [
+   250,
+   2.5119
+  ],
+  [
+   300,
+   2.3539
+  ],
+  [
+   350,
+   2.2523
+  ],
+  [
+   400,
+   2.16
+  ],
+  [
+   450,
+   2.1059
+  ],
+  [
+   500,
+   2.0558
+  ],
+  [
+   550,
+   2.0035
+  ],
+  [
+   600,
+   1.9711
+  ],
+  [
+   650,
+   1.9485
+  ],
+  [
+   700,
+   1.929
+  ],
+  [
+   750,
+   1.9092
+  ],
+  [
+   800,
+   1.8817
+  ],
+  [
+   850,
+   1.8627
+  ],
+  [
+   900,
+   1.8473
+  ],
+  [
+   950,
+   1.8339
+  ],
+  [
+   1000,
+   1.8052
+  ],
+  [
+   1050,
+   1.7974
+  ],
+  [
+   1100,
+   1.7874
+  ],
+  [
+   1150,
+   1.7799
+  ],
+  [
+   1200,
+   1.7824
+  ],
+  [
+   1220,
+   1.7813
+  ]
+ ],
+ "train_seconds": 40.45,
+ "wall_seconds": 48.36,
+ "chars_per_sec": 247291,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a girl gadbed and looked at nose, Lily. I dad As my peoples. He said, \"Of chous to the says.\nOne day, Sam told gnew to play with his mom and did not deg and said, \"I could not be in a small told of his looked to ball happy and all learned. They learned that he stad and day on, she saw a ",
+ "rule_init": {}
+}

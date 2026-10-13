@@ -1,0 +1,984 @@
+{
+ "q3": {
+  "n": 144,
+  "models": [
+   "D-d48-bpe1024-ctx512-r32_1000M_s0",
+   "D-d48-bpe1024-ctx512-r32_3000M_s0",
+   "D-d48-bpe1024-ctx512-r32_300M_s0",
+   "D-d48-bpe1024_100M_s0",
+   "D-d48-bpe1024_300M_lr3e-2_s0",
+   "D-d48-bpe1024_30M_s0",
+   "b1536-d40-h8_30M_s0",
+   "d192-L4_30M_s0",
+   "d96-L2_30M_s0"
+  ],
+  "corr": {
+   "m80": {
+    "total": 0.067,
+    "plot": 0.08,
+    "shuffled_total": 0.003,
+    "null_sd": 0.08
+   },
+   "entropy": {
+    "total": 0.057,
+    "plot": 0.065,
+    "shuffled_total": -0.001,
+    "null_sd": 0.086
+   },
+   "similarity": {
+    "total": -0.267,
+    "plot": -0.319,
+    "shuffled_total": -0.138,
+    "null_sd": 0.084
+   },
+   "agree": {
+    "total": 0.103,
+    "plot": 0.032,
+    "shuffled_total": -0.206,
+    "null_sd": 0.086
+   },
+   "rep_share": {
+    "total": -0.267,
+    "plot": -0.336,
+    "shuffled_total": -0.09,
+    "null_sd": 0.079
+   }
+  },
+  "agree_early": 0.7348,
+  "agree_late": 0.7226,
+  "agree_rep": 0.8023,
+  "agree_norep": 0.7111
+ },
+ "q2": {
+  "layer0": {
+   "stable_share": 0.95,
+   "rules": [
+    {
+     "rule": 63,
+     "wins": 2884,
+     "raises": [
+      "my",
+      "'s",
+      " loved",
+      " liked",
+      " and",
+      " named"
+     ],
+     "favours": [
+      ",",
+      ".",
+      " and",
+      " was",
+      " said",
+      "'s",
+      " named"
+     ],
+     "jaccard": 0.538,
+     "stable": true
+    },
+    {
+     "rule": 68,
+     "wins": 2806,
+     "raises": [
+      "ing",
+      "ed",
+      "e",
+      "or",
+      "le",
+      "re"
+     ],
+     "favours": [
+      ",",
+      ".",
+      "a",
+      "e",
+      "\n",
+      "ed",
+      " and",
+      "ing"
+     ],
+     "jaccard": 0.818,
+     "stable": true
+    },
+    {
+     "rule": 39,
+     "wins": 1219,
+     "raises": [
+      " an",
+      " bird",
+      " who",
+      " o",
+      " best",
+      " girl"
+     ],
+     "favours": [
+      " c",
+      " p",
+      " m",
+      " park"
+     ],
+     "jaccard": 0.25,
+     "stable": false
+    },
+    {
+     "rule": 31,
+     "wins": 1024,
+     "raises": [
+      "t",
+      "l",
+      "lf",
+      "ret",
+      "round",
+      " wor"
+     ],
+     "favours": [
+      ".",
+      "t",
+      " to",
+      " d",
+      " c",
+      " play",
+      " wanted",
+      " played"
+     ],
+     "jaccard": 0.818,
+     "stable": true
+    },
+    {
+     "rule": 26,
+     "wins": 998,
+     "raises": [
+      "nd",
+      " like",
+      " rain",
+      "lf",
+      " small",
+      " better"
+     ],
+     "favours": [
+      ".",
+      " a",
+      " to",
+      "ing",
+      " in",
+      " very",
+      " so",
+      " at"
+     ],
+     "jaccard": 0.667,
+     "stable": true
+    },
+    {
+     "rule": 51,
+     "wins": 844,
+     "raises": [
+      " frog",
+      "n",
+      " ground",
+      " cat",
+      " b",
+      " little"
+     ],
+     "favours": [
+      ".",
+      " day",
+      " little",
+      " time",
+      " girl",
+      " boy"
+     ],
+     "jaccard": 0.429,
+     "stable": true
+    },
+    {
+     "rule": 62,
+     "wins": 803,
+     "raises": [
+      "ad",
+      "s",
+      "ar",
+      "ll",
+      " should",
+      "dy"
+     ],
+     "favours": [
+      "a",
+      "s",
+      " was",
+      "ar",
+      " \"",
+      "st",
+      "ad"
+     ],
+     "jaccard": 0.538,
+     "stable": true
+    },
+    {
+     "rule": 16,
+     "wins": 794,
+     "raises": [
+      " share",
+      " hug",
+      " have",
+      "'t",
+      " play",
+      " help"
+     ],
+     "favours": [
+      " be",
+      " play",
+      " help",
+      " go",
+      " have",
+      " make",
+      " see"
+     ],
+     "jaccard": 0.538,
+     "stable": true
+    },
+    {
+     "rule": 66,
+     "wins": 786,
+     "raises": [
+      "iz",
+      "er",
+      "ive",
+      "i",
+      "z",
+      " stor"
+     ],
+     "favours": [
+      ".",
+      " a",
+      " the",
+      " and",
+      "er",
+      "One",
+      " upon"
+     ],
+     "jaccard": 0.538,
+     "stable": true
+    },
+    {
+     "rule": 35,
+     "wins": 775,
+     "raises": [
+      " are",
+      " and",
+      " were",
+      " for",
+      " in",
+      " under"
+     ],
+     "favours": [
+      ",",
+      ".",
+      " to",
+      " and",
+      " was",
+      " in",
+      "ite"
+     ],
+     "jaccard": 0.538,
+     "stable": true
+    },
+    {
+     "rule": 24,
+     "wins": 768,
+     "raises": [
+      " Her",
+      " His",
+      "round",
+      "ty",
+      "ucy",
+      "'s"
+     ],
+     "favours": [
+      ",",
+      "\n",
+      " The",
+      "ing",
+      " They",
+      " He",
+      " She",
+      " Tim"
+     ],
+     "jaccard": 0.818,
+     "stable": true
+    },
+    {
+     "rule": 8,
+     "wins": 681,
+     "raises": [
+      "s",
+      " at",
+      " friends",
+      " people",
+      "y",
+      "ies"
+     ],
+     "favours": [
+      ",",
+      ".",
+      "s",
+      "y",
+      " a",
+      " the",
+      " to",
+      " and"
+     ],
+     "jaccard": 0.667,
+     "stable": true
+    },
+    {
+     "rule": 1,
+     "wins": 648,
+     "raises": [
+      "s",
+      "se",
+      " nam",
+      "es",
+      "ful",
+      " kne"
+     ],
+     "favours": [
+      "o",
+      "s",
+      "en",
+      "an",
+      " \"",
+      " mom",
+      " friends",
+      " toys"
+     ],
+     "jaccard": 0.667,
+     "stable": true
+    },
+    {
+     "rule": 12,
+     "wins": 647,
+     "raises": [
+      " out",
+      " after",
+      " time",
+      " away",
+      " pic",
+      " walk"
+     ],
+     "favours": [
+      " a",
+      " the",
+      " to",
+      " and",
+      " on"
+     ],
+     "jaccard": 0.333,
+     "stable": true
+    },
+    {
+     "rule": 43,
+     "wins": 643,
+     "raises": [
+      " the",
+      "?\"",
+      "es",
+      "??",
+      "oy",
+      " li"
+     ],
+     "favours": [
+      ",",
+      ".",
+      " a",
+      " the",
+      " and",
+      " play",
+      " her",
+      " his"
+     ],
+     "jaccard": 0.818,
+     "stable": true
+    },
+    {
+     "rule": 17,
+     "wins": 636,
+     "raises": [
+      "e",
+      "fter",
+      " he",
+      "N",
+      " she",
+      " He"
+     ],
+     "favours": [
+      " a",
+      " the",
+      " The",
+      " he",
+      " He",
+      " She",
+      " Tim",
+      " they"
+     ],
+     "jaccard": 0.818,
+     "stable": true
+    },
+    {
+     "rule": 71,
+     "wins": 619,
+     "raises": [
+      "ady",
+      "ad",
+      "op",
+      "ore",
+      "one",
+      "out"
+     ],
+     "favours": [
+      "a",
+      "o",
+      " to",
+      "in",
+      "ar",
+      " with",
+      "ch",
+      " time"
+     ],
+     "jaccard": 0.667,
+     "stable": true
+    },
+    {
+     "rule": 32,
+     "wins": 601,
+     "raises": [
+      "h",
+      "g",
+      "ro",
+      "ink",
+      "'t",
+      "e"
+     ],
+     "favours": [
+      ".",
+      "a",
+      "e",
+      "g",
+      "h",
+      "st"
+     ],
+     "jaccard": 0.429,
+     "stable": true
+    },
+    {
+     "rule": 10,
+     "wins": 543,
+     "raises": [
+      "ful",
+      "ited",
+      "ened",
+      "ite",
+      "ings",
+      "ought"
+     ],
+     "favours": [
+      ",",
+      ".",
+      " was",
+      "ing",
+      "The",
+      " upon"
+     ],
+     "jaccard": 0.429,
+     "stable": true
+    },
+    {
+     "rule": 15,
+     "wins": 526,
+     "raises": [
+      "hen",
+      "omet",
+      " But",
+      " beautiful",
+      " fun",
+      " Then"
+     ],
+     "favours": [
+      "\n<|eot|>\n",
+      "b",
+      "\n",
+      " The",
+      " They",
+      " He",
+      " She",
+      "Once"
+     ],
+     "jaccard": 0.667,
+     "stable": true
+    }
+   ]
+  },
+  "layer1": {
+   "stable_share": 0.9,
+   "rules": [
+    {
+     "rule": 3,
+     "wins": 9105,
+     "raises": [
+      " the",
+      " his",
+      " her",
+      " to",
+      " him",
+      " a"
+     ],
+     "favours": [
+      ",",
+      ".",
+      " a",
+      " the",
+      " to",
+      " and",
+      " was",
+      " it"
+     ],
+     "jaccard": 0.818,
+     "stable": true
+    },
+    {
+     "rule": 5,
+     "wins": 2872,
+     "raises": [
+      " Tom",
+      " Tim",
+      " She",
+      " ",
+      " The",
+      " He"
+     ],
+     "favours": [
+      "\n<|eot|>\n",
+      "\n",
+      " ",
+      " The",
+      " They",
+      " He",
+      " \"",
+      " She"
+     ],
+     "jaccard": 0.818,
+     "stable": true
+    },
+    {
+     "rule": 40,
+     "wins": 1904,
+     "raises": [
+      " g",
+      " gra",
+      " p",
+      " k",
+      " care",
+      " st"
+     ],
+     "favours": [
+      " and",
+      " was",
+      " had",
+      " saw",
+      " went",
+      " played"
+     ],
+     "jaccard": 0.429,
+     "stable": true
+    },
+    {
+     "rule": 28,
+     "wins": 1071,
+     "raises": [
+      " unexpected",
+      " smile",
+      " idea",
+      " play",
+      " family",
+      " hug"
+     ],
+     "favours": [
+      "a",
+      " c",
+      "ing",
+      " big"
+     ],
+     "jaccard": 0.25,
+     "stable": false
+    },
+    {
+     "rule": 10,
+     "wins": 812,
+     "raises": [
+      "nt",
+      "oy",
+      "ile",
+      "x",
+      "ch",
+      "ed"
+     ],
+     "favours": [
+      ".",
+      "e",
+      "o",
+      "re",
+      "et"
+     ],
+     "jaccard": 0.333,
+     "stable": true
+    },
+    {
+     "rule": 1,
+     "wins": 753,
+     "raises": [
+      "Wh",
+      " for",
+      " girl",
+      " while",
+      " mom",
+      " a"
+     ],
+     "favours": [
+      " a",
+      " c",
+      " m",
+      " day",
+      " big",
+      " mom",
+      " friends"
+     ],
+     "jaccard": 0.538,
+     "stable": true
+    },
+    {
+     "rule": 53,
+     "wins": 630,
+     "raises": [
+      " animals",
+      " happened",
+      " other",
+      "ted",
+      " kids",
+      "one"
+     ],
+     "favours": [
+      " a",
+      " the",
+      " to",
+      " her",
+      " his",
+      " you",
+      " him",
+      " them"
+     ],
+     "jaccard": 0.667,
+     "stable": true
+    },
+    {
+     "rule": 41,
+     "wins": 624,
+     "raises": [
+      " play",
+      "omet",
+      " still",
+      "ust",
+      " fly",
+      " have"
+     ],
+     "favours": [
+      ".",
+      "ed",
+      " be",
+      " play",
+      " do",
+      " help",
+      " go",
+      " have"
+     ],
+     "jaccard": 0.818,
+     "stable": true
+    },
+    {
+     "rule": 52,
+     "wins": 613,
+     "raises": [
+      " time",
+      " go",
+      " sorry",
+      " careful",
+      " still",
+      " very"
+     ],
+     "favours": [
+      " a",
+      " the",
+      " not",
+      " happy",
+      " very",
+      " so",
+      " sad",
+      " good"
+     ],
+     "jaccard": 0.667,
+     "stable": true
+    },
+    {
+     "rule": 49,
+     "wins": 497,
+     "raises": [
+      " loved",
+      " from",
+      " and",
+      " liked",
+      " always",
+      " was"
+     ],
+     "favours": [
+      "\n",
+      " a",
+      " the",
+      " and",
+      " was",
+      " but",
+      "Once"
+     ],
+     "jaccard": 0.538,
+     "stable": true
+    },
+    {
+     "rule": 39,
+     "wins": 496,
+     "raises": [
+      " ever",
+      " playing",
+      "f",
+      " that",
+      " wal",
+      " played"
+     ],
+     "favours": [
+      ",",
+      ".",
+      "s",
+      " and",
+      " in",
+      " with",
+      " named"
+     ],
+     "jaccard": 0.538,
+     "stable": true
+    },
+    {
+     "rule": 54,
+     "wins": 490,
+     "raises": [
+      "W",
+      "But",
+      "It",
+      "Th",
+      "I",
+      "ad"
+     ],
+     "favours": [
+      "H",
+      "I",
+      "S",
+      "W",
+      " a",
+      "The",
+      "Yes"
+     ],
+     "jaccard": 0.538,
+     "stable": true
+    },
+    {
+     "rule": 51,
+     "wins": 480,
+     "raises": [
+      "lf",
+      " kids",
+      "s",
+      " ever",
+      "les",
+      " Spot"
+     ],
+     "favours": [
+      ".",
+      "a",
+      "o",
+      "s",
+      "y",
+      " a",
+      " and",
+      " with"
+     ],
+     "jaccard": 0.667,
+     "stable": true
+    },
+    {
+     "rule": 55,
+     "wins": 476,
+     "raises": [
+      "ause",
+      "ry",
+      "able",
+      "ous",
+      "age",
+      "aut"
+     ],
+     "favours": [
+      "a",
+      " the",
+      " was",
+      " want"
+     ],
+     "jaccard": 0.25,
+     "stable": false
+    },
+    {
+     "rule": 9,
+     "wins": 461,
+     "raises": [
+      " take",
+      " say",
+      " saw",
+      " hug",
+      " find",
+      " hugged"
+     ],
+     "favours": [
+      " the",
+      " was",
+      " he",
+      " said",
+      " had",
+      " saw"
+     ],
+     "jaccard": 0.429,
+     "stable": true
+    },
+    {
+     "rule": 71,
+     "wins": 452,
+     "raises": [
+      " way",
+      " l",
+      " things",
+      " kn",
+      "Let",
+      " lot"
+     ],
+     "favours": [
+      "e",
+      "t",
+      " to",
+      "le",
+      " day",
+      " mom",
+      " time"
+     ],
+     "jaccard": 0.538,
+     "stable": true
+    },
+    {
+     "rule": 46,
+     "wins": 435,
+     "raises": [
+      " C",
+      " W",
+      " D",
+      " L",
+      " H",
+      " P"
+     ],
+     "favours": [
+      " The",
+      " They",
+      " He",
+      " I",
+      " She",
+      " It",
+      " You"
+     ],
+     "jaccard": 0.538,
+     "stable": true
+    },
+    {
+     "rule": 61,
+     "wins": 413,
+     "raises": [
+      "ic",
+      " mu",
+      "r",
+      " should",
+      " have",
+      " know"
+     ],
+     "favours": [
+      " was",
+      " had",
+      " want",
+      " wanted",
+      " can",
+      " are",
+      " have"
+     ],
+     "jaccard": 0.538,
+     "stable": true
+    },
+    {
+     "rule": 29,
+     "wins": 398,
+     "raises": [
+      " One",
+      " Then",
+      " so",
+      " very",
+      " but",
+      " But"
+     ],
+     "favours": [
+      ",",
+      "\n",
+      " The",
+      " They",
+      " He",
+      " \"",
+      " there",
+      " but"
+     ],
+     "jaccard": 0.667,
+     "stable": true
+    },
+    {
+     "rule": 8,
+     "wins": 380,
+     "raises": [
+      " help",
+      " girl",
+      " boy",
+      " listen",
+      " kind",
+      " idea"
+     ],
+     "favours": [
+      ",",
+      " a",
+      " he",
+      " \"",
+      " mom",
+      " there",
+      " girl",
+      " boy"
+     ],
+     "jaccard": 0.667,
+     "stable": true
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.1,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/delta-mlp_lr1e-1_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 19944,
+ "params_nonemb": 16808,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.80096,
+ "evals": [
+  [
+   305,
+   2.21638
+  ],
+  [
+   610,
+   2.01421
+  ],
+  [
+   915,
+   1.87485
+  ],
+  [
+   1220,
+   1.8004
+  ],
+  [
+   1221,
+   1.80096
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9499
+  ],
+  [
+   50,
+   4.9254
+  ],
+  [
+   100,
+   3.5855
+  ],
+  [
+   150,
+   2.9109
+  ],
+  [
+   200,
+   2.6021
+  ],
+  [
+   250,
+   2.4323
+  ],
+  [
+   300,
+   2.3207
+  ],
+  [
+   350,
+   2.2565
+  ],
+  [
+   400,
+   2.1945
+  ],
+  [
+   450,
+   2.1539
+  ],
+  [
+   500,
+   2.1252
+  ],
+  [
+   550,
+   2.0766
+  ],
+  [
+   600,
+   2.0427
+  ],
+  [
+   650,
+   2.02
+  ],
+  [
+   700,
+   2.0003
+  ],
+  [
+   750,
+   1.9827
+  ],
+  [
+   800,
+   1.9537
+  ],
+  [
+   850,
+   1.9355
+  ],
+  [
+   900,
+   1.9139
+  ],
+  [
+   950,
+   1.8945
+  ],
+  [
+   1000,
+   1.8594
+  ],
+  [
+   1050,
+   1.8475
+  ],
+  [
+   1100,
+   1.8308
+  ],
+  [
+   1150,
+   1.8166
+  ],
+  [
+   1200,
+   1.8156
+  ],
+  [
+   1220,
+   1.8154
+  ]
+ ],
+ "train_seconds": 974.36,
+ "wall_seconds": 1262.78,
+ "chars_per_sec": 10266,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time. He was son her very the sky with a big try watch will be sad said, \"Mom, Tim's great it. And in the on day and clared asked him and cheesive in tream away together and girl hungly and Mia learned to the reachesst. They like to started to each would not bager. And thite on the bird. They decided to",
+ "rule_init": {}
+}

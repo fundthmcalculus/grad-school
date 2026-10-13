@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t768e16m25_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 101376,
+ "params_nonemb": 59648,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.09407,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.24783
+  ],
+  [
+   100,
+   1.58906
+  ],
+  [
+   200,
+   1.42717
+  ],
+  [
+   300,
+   1.35472
+  ],
+  [
+   400,
+   1.30029
+  ],
+  [
+   500,
+   1.25708
+  ],
+  [
+   600,
+   1.21963
+  ],
+  [
+   700,
+   1.18212
+  ],
+  [
+   800,
+   1.15498
+  ],
+  [
+   900,
+   1.13066
+  ],
+  [
+   1000,
+   1.1117
+  ],
+  [
+   1100,
+   1.09845
+  ],
+  [
+   1160,
+   1.09407
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2471
+  ],
+  [
+   50,
+   8.0825
+  ],
+  [
+   100,
+   6.266
+  ],
+  [
+   150,
+   5.3417
+  ],
+  [
+   200,
+   4.8488
+  ],
+  [
+   250,
+   4.5966
+  ],
+  [
+   300,
+   4.4392
+  ],
+  [
+   350,
+   4.3065
+  ],
+  [
+   400,
+   4.1975
+  ],
+  [
+   450,
+   4.1074
+  ],
+  [
+   500,
+   4.0483
+  ],
+  [
+   550,
+   3.9652
+  ],
+  [
+   600,
+   3.9244
+  ],
+  [
+   650,
+   3.8653
+  ],
+  [
+   700,
+   3.798
+  ],
+  [
+   750,
+   3.7527
+  ],
+  [
+   800,
+   3.7123
+  ],
+  [
+   850,
+   3.6681
+  ],
+  [
+   900,
+   3.6317
+  ],
+  [
+   950,
+   3.5899
+  ],
+  [
+   1000,
+   3.561
+  ],
+  [
+   1050,
+   3.5316
+  ],
+  [
+   1100,
+   3.5146
+  ],
+  [
+   1150,
+   3.4795
+  ],
+  [
+   1159,
+   3.4818
+  ]
+ ],
+ "train_seconds": 80.74,
+ "wall_seconds": 95.09,
+ "chars_per_sec": 117691,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy. She loved to play with her special stories at her house. She had a big smile that her first sharing pizzy.\nOne day, Lucy found a toy car in her garden. She was very excited to find her. Lucy was very happy and said, \"Let's slide, please. Gremmman. Don't worry, but you can help you, but you have to play with my car.\"\nSue and her dad walked and walked and walked to the park. With her toy car, she found a big red boat. Lucy picked up her and put it inside her burn. She looked at all the toy car, but she was too small. She thought that she should have to know something special. But the car was too much. Lucy was happy to find the toy car, but she was very nice. She thanked Lucy and said, \"I lost my toy outside, Tom. I can help you you. I can make care better.\" Kent didn't work, and they both played together.\n<|eot|>\nOnce upon a time, in a small town, there lived a markle named Mear. Mamar was very pretty. Bear was a big toy. Bears were all sad because he could not help. Bear was very sad because he had been write.\n",
+ "rule_init": {},
+ "ngram_init": {}
+}

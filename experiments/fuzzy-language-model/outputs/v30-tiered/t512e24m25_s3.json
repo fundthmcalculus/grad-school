@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t512e24m25_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 97664,
+ "params_nonemb": 59648,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11032,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.25057
+  ],
+  [
+   100,
+   1.60026
+  ],
+  [
+   200,
+   1.43714
+  ],
+  [
+   300,
+   1.36876
+  ],
+  [
+   400,
+   1.31338
+  ],
+  [
+   500,
+   1.273
+  ],
+  [
+   600,
+   1.23516
+  ],
+  [
+   700,
+   1.20344
+  ],
+  [
+   800,
+   1.17016
+  ],
+  [
+   900,
+   1.14678
+  ],
+  [
+   1000,
+   1.12718
+  ],
+  [
+   1100,
+   1.11352
+  ],
+  [
+   1160,
+   1.11032
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2908
+  ],
+  [
+   50,
+   8.0926
+  ],
+  [
+   100,
+   6.2564
+  ],
+  [
+   150,
+   5.3579
+  ],
+  [
+   200,
+   4.9034
+  ],
+  [
+   250,
+   4.6516
+  ],
+  [
+   300,
+   4.4682
+  ],
+  [
+   350,
+   4.3646
+  ],
+  [
+   400,
+   4.2606
+  ],
+  [
+   450,
+   4.1785
+  ],
+  [
+   500,
+   4.1007
+  ],
+  [
+   550,
+   4.0364
+  ],
+  [
+   600,
+   3.9611
+  ],
+  [
+   650,
+   3.9173
+  ],
+  [
+   700,
+   3.8556
+  ],
+  [
+   750,
+   3.8084
+  ],
+  [
+   800,
+   3.7626
+  ],
+  [
+   850,
+   3.7273
+  ],
+  [
+   900,
+   3.6873
+  ],
+  [
+   950,
+   3.6525
+  ],
+  [
+   1000,
+   3.6056
+  ],
+  [
+   1050,
+   3.5727
+  ],
+  [
+   1100,
+   3.557
+  ],
+  [
+   1150,
+   3.5418
+  ],
+  [
+   1159,
+   3.533
+  ]
+ ],
+ "train_seconds": 80.4,
+ "wall_seconds": 94.8,
+ "chars_per_sec": 118188,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Sear. See loved to play outside and make fun. One day, See went to the park to play.\nShe took the tall window and Kitty saw her friend, Sue. \"Help!\" said Sue. \"I am trying a bird,\" said Sue.\nLei said, \"Let's origin the chairs. That was a clear, but they are not a great idea.\"\nShe walked up and said, \"Yes, I found a bed, too!\" said Sue, the girl. \"Were, what did, I make a foolish!\" \nLee and Sue were not happy. They thanked Tom and said, \"You should know that can make a big yummy Pink. It's not a nice pile of mine. I can be the best cheese on your yard. You are very unkenny, Lily. I love you to share and help you eat the lesson.\"\nLea said, \"Yes, I have to be nice to be real if you go inside.\"\nMom and Ben smiled and hugged Lily and said, \"Thank you for being kind. You're a magic sheep. We're andy who I am a hanger!\" They all played together all day long.\n<|eot|>\nOne day,",
+ "rule_init": {},
+ "ngram_init": {}
+}

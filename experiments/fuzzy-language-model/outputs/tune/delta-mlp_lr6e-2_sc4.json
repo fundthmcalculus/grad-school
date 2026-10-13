@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/delta-mlp_lr6e-2_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 20200,
+ "params_nonemb": 17064,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.69943,
+ "evals": [
+  [
+   305,
+   2.04293
+  ],
+  [
+   610,
+   1.8773
+  ],
+  [
+   915,
+   1.75925
+  ],
+  [
+   1220,
+   1.70032
+  ],
+  [
+   1221,
+   1.69943
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8728
+  ],
+  [
+   50,
+   5.0037
+  ],
+  [
+   100,
+   3.5379
+  ],
+  [
+   150,
+   2.7772
+  ],
+  [
+   200,
+   2.4315
+  ],
+  [
+   250,
+   2.2501
+  ],
+  [
+   300,
+   2.1456
+  ],
+  [
+   350,
+   2.0884
+  ],
+  [
+   400,
+   2.0337
+  ],
+  [
+   450,
+   1.9962
+  ],
+  [
+   500,
+   1.9687
+  ],
+  [
+   550,
+   1.9261
+  ],
+  [
+   600,
+   1.8999
+  ],
+  [
+   650,
+   1.8827
+  ],
+  [
+   700,
+   1.8661
+  ],
+  [
+   750,
+   1.8517
+  ],
+  [
+   800,
+   1.8284
+  ],
+  [
+   850,
+   1.8099
+  ],
+  [
+   900,
+   1.7946
+  ],
+  [
+   950,
+   1.7775
+  ],
+  [
+   1000,
+   1.7466
+  ],
+  [
+   1050,
+   1.7399
+  ],
+  [
+   1100,
+   1.7256
+  ],
+  [
+   1150,
+   1.7176
+  ],
+  [
+   1200,
+   1.7192
+  ],
+  [
+   1220,
+   1.7172
+  ]
+ ],
+ "train_seconds": 1100.13,
+ "wall_seconds": 1321.96,
+ "chars_per_sec": 9092,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was a smiled and see pude in the time, there lived and said, \"Mom, Tim's great it. He saw a big back and climb. As his good stress, the hugged was share you race got the flower had fun what something fels to play, the ground. He played away and swings and said, \"Yes, what work.\nWhen they pla",
+ "rule_init": {}
+}

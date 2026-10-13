@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.1,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/softmax-mlp_lr1e-1_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 19936,
+ "params_nonemb": 16800,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.79133,
+ "evals": [
+  [
+   305,
+   2.19649
+  ],
+  [
+   610,
+   2.01789
+  ],
+  [
+   915,
+   1.8585
+  ],
+  [
+   1220,
+   1.79209
+  ],
+  [
+   1221,
+   1.79133
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.021
+  ],
+  [
+   50,
+   5.0816
+  ],
+  [
+   100,
+   3.7304
+  ],
+  [
+   150,
+   3.001
+  ],
+  [
+   200,
+   2.6355
+  ],
+  [
+   250,
+   2.4231
+  ],
+  [
+   300,
+   2.3105
+  ],
+  [
+   350,
+   2.243
+  ],
+  [
+   400,
+   2.1789
+  ],
+  [
+   450,
+   2.1432
+  ],
+  [
+   500,
+   2.1084
+  ],
+  [
+   550,
+   2.0582
+  ],
+  [
+   600,
+   2.0286
+  ],
+  [
+   650,
+   2.009
+  ],
+  [
+   700,
+   1.9892
+  ],
+  [
+   750,
+   1.9705
+  ],
+  [
+   800,
+   1.9432
+  ],
+  [
+   850,
+   1.9256
+  ],
+  [
+   900,
+   1.9035
+  ],
+  [
+   950,
+   1.8824
+  ],
+  [
+   1000,
+   1.8484
+  ],
+  [
+   1050,
+   1.8382
+  ],
+  [
+   1100,
+   1.8192
+  ],
+  [
+   1150,
+   1.8104
+  ],
+  [
+   1200,
+   1.8104
+  ],
+  [
+   1220,
+   1.8077
+  ]
+ ],
+ "train_seconds": 185.06,
+ "wall_seconds": 206.89,
+ "chars_per_sec": 54050,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was a smiled to she liked to please. He said, \"Mi'ry can heavy with made good for in think to get his better his smiled and saw Lily. He fly and would feellired, got and Ben and Mia look. The leant time, started breat the ball a big said. Bob share as at the scare. They bird saw a detlet and",
+ "rule_init": {}
+}

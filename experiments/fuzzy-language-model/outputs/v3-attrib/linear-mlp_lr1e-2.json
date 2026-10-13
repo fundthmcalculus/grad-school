@@ -1,0 +1,189 @@
+{
+ "args": {
+  "mixer": "linear",
+  "ffn": "mlp",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-attrib\\linear-mlp_lr1e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "linear",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "max_len": 256
+ },
+ "params_total": 72644,
+ "params_nonemb": 66372,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.5038,
+ "evals": [
+  [
+   305,
+   1.8862
+  ],
+  [
+   610,
+   1.68016
+  ],
+  [
+   915,
+   1.56192
+  ],
+  [
+   1220,
+   1.50387
+  ],
+  [
+   1221,
+   1.5038
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9663
+  ],
+  [
+   50,
+   5.2964
+  ],
+  [
+   100,
+   3.7106
+  ],
+  [
+   150,
+   2.8347
+  ],
+  [
+   200,
+   2.3934
+  ],
+  [
+   250,
+   2.1492
+  ],
+  [
+   300,
+   2.0142
+  ],
+  [
+   350,
+   1.9296
+  ],
+  [
+   400,
+   1.8565
+  ],
+  [
+   450,
+   1.8145
+  ],
+  [
+   500,
+   1.7769
+  ],
+  [
+   550,
+   1.7297
+  ],
+  [
+   600,
+   1.7011
+  ],
+  [
+   650,
+   1.6831
+  ],
+  [
+   700,
+   1.6634
+  ],
+  [
+   750,
+   1.649
+  ],
+  [
+   800,
+   1.6248
+  ],
+  [
+   850,
+   1.6078
+  ],
+  [
+   900,
+   1.5935
+  ],
+  [
+   950,
+   1.575
+  ],
+  [
+   1000,
+   1.5479
+  ],
+  [
+   1050,
+   1.5393
+  ],
+  [
+   1100,
+   1.5273
+  ],
+  [
+   1150,
+   1.5187
+  ],
+  [
+   1200,
+   1.5204
+  ],
+  [
+   1220,
+   1.52
+  ]
+ ],
+ "train_seconds": 32.66,
+ "wall_seconds": 40.77,
+ "chars_per_sec": 306295,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Tom. He was so happy and promiser. But only to help very happy. They looked each other their new right. They looked in the park with the train and had a big, red bad. The cat would like the butter. He is got are learned. He walked and drawers dady and the words. The tr",
+ "rule_init": {}
+}

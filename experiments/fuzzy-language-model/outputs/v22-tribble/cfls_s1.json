@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v22-tribble\\cfls_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.15186,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.00812
+  ],
+  [
+   100,
+   1.62333
+  ],
+  [
+   200,
+   1.46626
+  ],
+  [
+   300,
+   1.39948
+  ],
+  [
+   400,
+   1.34068
+  ],
+  [
+   500,
+   1.30661
+  ],
+  [
+   600,
+   1.27042
+  ],
+  [
+   700,
+   1.23824
+  ],
+  [
+   800,
+   1.21056
+  ],
+  [
+   900,
+   1.18759
+  ],
+  [
+   1000,
+   1.16755
+  ],
+  [
+   1100,
+   1.15634
+  ],
+  [
+   1160,
+   1.15186
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.5151
+  ],
+  [
+   50,
+   7.6671
+  ],
+  [
+   100,
+   6.1689
+  ],
+  [
+   150,
+   5.3685
+  ],
+  [
+   200,
+   4.956
+  ],
+  [
+   250,
+   4.7155
+  ],
+  [
+   300,
+   4.5453
+  ],
+  [
+   350,
+   4.431
+  ],
+  [
+   400,
+   4.3522
+  ],
+  [
+   450,
+   4.2536
+  ],
+  [
+   500,
+   4.2019
+  ],
+  [
+   550,
+   4.1497
+  ],
+  [
+   600,
+   4.0992
+  ],
+  [
+   650,
+   4.034
+  ],
+  [
+   700,
+   3.9862
+  ],
+  [
+   750,
+   3.9406
+  ],
+  [
+   800,
+   3.875
+  ],
+  [
+   850,
+   3.8411
+  ],
+  [
+   900,
+   3.8062
+  ],
+  [
+   950,
+   3.77
+  ],
+  [
+   1000,
+   3.7376
+  ],
+  [
+   1050,
+   3.6964
+  ],
+  [
+   1100,
+   3.6871
+  ],
+  [
+   1150,
+   3.6632
+  ],
+  [
+   1159,
+   3.6676
+  ]
+ ],
+ "train_seconds": 79.27,
+ "wall_seconds": 93.83,
+ "chars_per_sec": 119881,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and big bird. \nThe meal took the beach and had a fun time. The people were not good. They would play outside and play.\nOne day, the wind saw a beautiful flower and wanted to go inside. The va was scared, and the flower was hungry. After a while, he decided to watch the chair. The chairs was so happy and the chairy's hearsate. The chair was strong and said, \"Thank you, Tack. I will help you your new place.\" The va got the soft water and said, \"Do you want to play with me?\"\nLilly smiled, and they could not play again. They played in the flexible so he saw a beautiful bug. The bug was not the mon, but it was too nice. It made on aelly obsoring. The bug was tiving and helped him. The bug was very happy! It was her new fun playing, and the bug was so happy.\n<|eot|>\nOnce upon a time, in a small town, there was a little girl named Mead. She loved to run to her mom. One day, she found a big, red plane in the park. The little girl looked having so she was tower.\nThe little boy did not want to take",
+ "rule_init": {
+  "variant": "cfls",
+  "L0.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.5718
+  },
+  "L1.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.5647
+  }
+ },
+ "ngram_init": {}
+}

@@ -1,0 +1,149 @@
+{
+ "args": {
+  "mixer": "fibgauss",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 4,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "fixed",
+  "ctx": 512,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 10000000.0,
+  "lr": 0.02,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v10-fib\\fibgauss-L8-lr2e-2_10M_s0.json",
+  "save_model": true,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 4,
+  "mixer": "fibgauss",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 8,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8
+ },
+ "params_total": 94944,
+ "params_nonemb": 45792,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.34057,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.6753
+  ],
+  [
+   192,
+   1.48205
+  ],
+  [
+   288,
+   1.39067
+  ],
+  [
+   384,
+   1.34119
+  ],
+  [
+   387,
+   1.34057
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3862
+  ],
+  [
+   50,
+   8.8389
+  ],
+  [
+   100,
+   6.7842
+  ],
+  [
+   150,
+   5.6537
+  ],
+  [
+   200,
+   5.0822
+  ],
+  [
+   250,
+   4.7579
+  ],
+  [
+   300,
+   4.5498
+  ],
+  [
+   350,
+   4.4064
+  ],
+  [
+   386,
+   4.3373
+  ]
+ ],
+ "train_seconds": 5.11,
+ "wall_seconds": 7.0,
+ "chars_per_sec": 620017,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big andoth bird. The bug was not small. The dog wanted to play outside. The bird looked fast and thought they was playing.\nTim and Tom were playing on the terribletin. They loved to go to fly together. They were better and they were best friends.\n<|eot|>\nOne day, a little boy named Tim found a big, little girl named Sue. She was walking at the bardle. He was not looking for the mistery. The hit was a little baring and curious. He was not like his mom. He thought it was a toy car.\nLily said, \"Don't know what do you like to play and hurt!\" Lily said.\nThey can play again. They played in the park, happy, and they were very happy.\n<|eot|>\nOnce upon a time, in the mon, there were a little girl named Sue. She loved to play. She loved to sprop on Tom and make a pretty poup on the scanding. It was her faired, but she said to her homem. One day, she realized a small box with marking her friend, the family.\nThe next day, Tim found a big, red car. Tim was so happy. Sam said, \"We are you having my ice towards forgan.\n<|eot|>\nOnce upon a time",
+ "rule_init": {},
+ "ngram_init": {}
+}

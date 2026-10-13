@@ -1,0 +1,199 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 40,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v7-confirm\\b1536-d40-h8_30M_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1536",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1536
+ },
+ "config": {
+  "vocab_size": 1536,
+  "d_model": 40,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93792,
+ "params_nonemb": 32352,
+ "steps": 1052,
+ "chars_seen": 30013285,
+ "chars_per_token": 3.4826342,
+ "val_bpc": 1.12163,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   263,
+   1.30708
+  ],
+  [
+   526,
+   1.20586
+  ],
+  [
+   789,
+   1.14889
+  ],
+  [
+   1052,
+   1.12163
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.868
+  ],
+  [
+   50,
+   9.0706
+  ],
+  [
+   100,
+   6.8623
+  ],
+  [
+   150,
+   5.7019
+  ],
+  [
+   200,
+   5.1023
+  ],
+  [
+   250,
+   4.8114
+  ],
+  [
+   300,
+   4.634
+  ],
+  [
+   350,
+   4.5243
+  ],
+  [
+   400,
+   4.4322
+  ],
+  [
+   450,
+   4.3707
+  ],
+  [
+   500,
+   4.316
+  ],
+  [
+   550,
+   4.2571
+  ],
+  [
+   600,
+   4.2143
+  ],
+  [
+   650,
+   4.171
+  ],
+  [
+   700,
+   4.1233
+  ],
+  [
+   750,
+   4.096
+  ],
+  [
+   800,
+   4.0538
+  ],
+  [
+   850,
+   4.0143
+  ],
+  [
+   900,
+   3.9996
+  ],
+  [
+   950,
+   3.9611
+  ],
+  [
+   1000,
+   3.9504
+  ],
+  [
+   1050,
+   3.9377
+  ],
+  [
+   1051,
+   3.9414
+  ]
+ ],
+ "train_seconds": 212.01,
+ "wall_seconds": 222.7,
+ "chars_per_sec": 40649,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little boy named Tom. Tom liked to play with.\nOne day, Tom saw a big tree. The tree was very pretty. The tree was very happy. The tree in the tree was nice and fun. The tree had a high tree. Tom went to the tree and put the tree in its warm rock. Tom was very happy. He said, \"Look first, you can make a place to see it.\"\nTom and Sue felt sorry and thought for her friend. They gave them a big black ball and a trade. They said they had a great time. They all had the fun day ever.\nThen, they saw a big tree with lots of fruit. It was a beautiful tree. Tom was very glad. He had never seen it do not. It was a big, strong fruit, and a bark. The tree was a big tree. Tim did not like Tom. He knew he was too happy too. The tree was happy.\n<|eot|>\nOnce upon a time, in a small house, there was a little girl named Sue. Sue loved to help her mommy, so she would always play with her music. One day, she touched her pink jeep and the jeep tree. Sue asked her mom, \"Can I see the clock?\"\nTom said, \"Yes, you are a very very ignor. I will get a toy. Can I talk to my mape",
+ "rule_init": {},
+ "ngram_init": {}
+}

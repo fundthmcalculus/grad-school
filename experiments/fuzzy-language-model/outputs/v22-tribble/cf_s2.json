@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v22-tribble\\cf_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.14803,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.14848
+  ],
+  [
+   100,
+   1.5722
+  ],
+  [
+   200,
+   1.42496
+  ],
+  [
+   300,
+   1.36704
+  ],
+  [
+   400,
+   1.32083
+  ],
+  [
+   500,
+   1.28494
+  ],
+  [
+   600,
+   1.25565
+  ],
+  [
+   700,
+   1.22195
+  ],
+  [
+   800,
+   1.1997
+  ],
+  [
+   900,
+   1.17992
+  ],
+  [
+   1000,
+   1.16209
+  ],
+  [
+   1100,
+   1.15098
+  ],
+  [
+   1160,
+   1.14803
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.9565
+  ],
+  [
+   50,
+   7.8514
+  ],
+  [
+   100,
+   6.1379
+  ],
+  [
+   150,
+   5.2908
+  ],
+  [
+   200,
+   4.8392
+  ],
+  [
+   250,
+   4.6125
+  ],
+  [
+   300,
+   4.4605
+  ],
+  [
+   350,
+   4.3454
+  ],
+  [
+   400,
+   4.2545
+  ],
+  [
+   450,
+   4.1764
+  ],
+  [
+   500,
+   4.1209
+  ],
+  [
+   550,
+   4.0627
+  ],
+  [
+   600,
+   4.0288
+  ],
+  [
+   650,
+   3.9763
+  ],
+  [
+   700,
+   3.9164
+  ],
+  [
+   750,
+   3.8865
+  ],
+  [
+   800,
+   3.8577
+  ],
+  [
+   850,
+   3.8062
+  ],
+  [
+   900,
+   3.7828
+  ],
+  [
+   950,
+   3.7447
+  ],
+  [
+   1000,
+   3.7179
+  ],
+  [
+   1050,
+   3.6961
+  ],
+  [
+   1100,
+   3.6824
+  ],
+  [
+   1150,
+   3.6454
+  ],
+  [
+   1159,
+   3.6457
+  ]
+ ],
+ "train_seconds": 79.66,
+ "wall_seconds": 93.86,
+ "chars_per_sec": 119284,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Spy. She saw a big ving in the ground. She wanted to spring that the fence was lost. She wanted to help the magic wind. So Kitty asked her friend to go inside and problem.\nKitty put the tail near the tree. She slided down, hopping the chane and picked it up the esphave. She was sad, but they couldn't warot. She thought she couldn't see what was and full of bed. It was a very finally bed. But she could not get the tail anymore. She wanted to play with her. But she was not exarnger to the bird.\nLucy saw her bedroom and said, \"I can't now. I will be my mistake, you can find.\" Wake looked up and saw the woods it into the building tied. She had an idea.\nSue had a plan and said, \"I can not touch it. That before you can't play with you again.\"\nSally realally tried to driving the rain, but she said, \"I know. But I cannot veget that I am so having you an umet to perfect the day!\"\n",
+ "rule_init": {
+  "variant": "cf",
+  "L0.ffn": {
+   "gain": 4,
+   "ce_nats": 6.8872
+  },
+  "L1.ffn": {
+   "gain": 1,
+   "ce_nats": 6.8883
+  }
+ },
+ "ngram_init": {}
+}

@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 1.0,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn\\o1-da16-m1_lr1e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 1.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "max_len": 256
+ },
+ "params_total": 64964,
+ "params_nonemb": 58692,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.63424,
+ "evals": [
+  [
+   305,
+   2.02131
+  ],
+  [
+   610,
+   1.81824
+  ],
+  [
+   915,
+   1.6898
+  ],
+  [
+   1220,
+   1.63458
+  ],
+  [
+   1221,
+   1.63424
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.2553
+  ],
+  [
+   50,
+   5.528
+  ],
+  [
+   100,
+   3.8894
+  ],
+  [
+   150,
+   3.0161
+  ],
+  [
+   200,
+   2.559
+  ],
+  [
+   250,
+   2.3075
+  ],
+  [
+   300,
+   2.1615
+  ],
+  [
+   350,
+   2.0718
+  ],
+  [
+   400,
+   1.9993
+  ],
+  [
+   450,
+   1.9588
+  ],
+  [
+   500,
+   1.9181
+  ],
+  [
+   550,
+   1.867
+  ],
+  [
+   600,
+   1.8378
+  ],
+  [
+   650,
+   1.8167
+  ],
+  [
+   700,
+   1.7944
+  ],
+  [
+   750,
+   1.78
+  ],
+  [
+   800,
+   1.7539
+  ],
+  [
+   850,
+   1.7358
+  ],
+  [
+   900,
+   1.7207
+  ],
+  [
+   950,
+   1.7062
+  ],
+  [
+   1000,
+   1.6763
+  ],
+  [
+   1050,
+   1.6684
+  ],
+  [
+   1100,
+   1.6582
+  ],
+  [
+   1150,
+   1.6501
+  ],
+  [
+   1200,
+   1.6527
+  ],
+  [
+   1220,
+   1.6517
+  ]
+ ],
+ "train_seconds": 63.11,
+ "wall_seconds": 70.95,
+ "chars_per_sec": 158497,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Tom. He was sink, and they mouse,\" Ben said, \"Hi, I want to the ball. He said, \"I tea his momn't ran to the tree. It banked to you dress. They were friends and the toy shark. They were happy to always in the kat. She wanted told always the started to dance. Picky has t",
+ "rule_init": {}
+}

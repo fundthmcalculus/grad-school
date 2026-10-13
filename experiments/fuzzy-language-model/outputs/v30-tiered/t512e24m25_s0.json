@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t512e24m25_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 97664,
+ "params_nonemb": 59648,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.09796,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.24613
+  ],
+  [
+   100,
+   1.60021
+  ],
+  [
+   200,
+   1.44428
+  ],
+  [
+   300,
+   1.37471
+  ],
+  [
+   400,
+   1.31985
+  ],
+  [
+   500,
+   1.2719
+  ],
+  [
+   600,
+   1.22658
+  ],
+  [
+   700,
+   1.19202
+  ],
+  [
+   800,
+   1.15996
+  ],
+  [
+   900,
+   1.13338
+  ],
+  [
+   1000,
+   1.11614
+  ],
+  [
+   1100,
+   1.10171
+  ],
+  [
+   1160,
+   1.09796
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2647
+  ],
+  [
+   50,
+   8.1015
+  ],
+  [
+   100,
+   6.2824
+  ],
+  [
+   150,
+   5.3894
+  ],
+  [
+   200,
+   4.9301
+  ],
+  [
+   250,
+   4.6622
+  ],
+  [
+   300,
+   4.4921
+  ],
+  [
+   350,
+   4.3749
+  ],
+  [
+   400,
+   4.2846
+  ],
+  [
+   450,
+   4.1855
+  ],
+  [
+   500,
+   4.1164
+  ],
+  [
+   550,
+   4.0381
+  ],
+  [
+   600,
+   3.9622
+  ],
+  [
+   650,
+   3.887
+  ],
+  [
+   700,
+   3.8282
+  ],
+  [
+   750,
+   3.7919
+  ],
+  [
+   800,
+   3.7265
+  ],
+  [
+   850,
+   3.6698
+  ],
+  [
+   900,
+   3.6359
+  ],
+  [
+   950,
+   3.5869
+  ],
+  [
+   1000,
+   3.5483
+  ],
+  [
+   1050,
+   3.5232
+  ],
+  [
+   1100,
+   3.5095
+  ],
+  [
+   1150,
+   3.5092
+  ],
+  [
+   1159,
+   3.5058
+  ]
+ ],
+ "train_seconds": 80.72,
+ "wall_seconds": 94.94,
+ "chars_per_sec": 117720,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and red bird. The bird loved to play with the birds and make fun. One day, the bird saw the bird with a big tree. The bird was sad, but the bird could not find the bird too.\nThe bird was so small. The bird was very tired. The bird went to the bird and said, \"Thank you, little bird!\" The bird picked the bird the birds and saved the bird.\nThe bird's mom started to move and road. They said, \"I am not and full of jeep. I will touch it.\" The bird said, \"Yes, and I will not four!\" They played together in the sky and had lots of fun.\n<|eot|>\n\nOnce upon a time, there was a little girl called Sally. She had a shield and a magic boat. She missed her arms and her readices. She loved it very much outside her cry.\nOne day, Sally found a small bush. She wanted to play with her eyes. She walked to the town and came outside. Sally was sad and saw who was important to buy the car. \nWhen Sally said, \"I know you can help you like it!\"\nThe next day, Sally went to the town and thanked Sue for her. She said, \"I am",
+ "rule_init": {},
+ "ngram_init": {}
+}

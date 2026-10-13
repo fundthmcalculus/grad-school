@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 200,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v23-wu30\\wu200_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.09288,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.37572
+  ],
+  [
+   580,
+   1.23078
+  ],
+  [
+   870,
+   1.13973
+  ],
+  [
+   1160,
+   1.09288
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3706
+  ],
+  [
+   50,
+   8.4594
+  ],
+  [
+   100,
+   6.4335
+  ],
+  [
+   150,
+   5.4327
+  ],
+  [
+   200,
+   4.9542
+  ],
+  [
+   250,
+   4.6816
+  ],
+  [
+   300,
+   4.5058
+  ],
+  [
+   350,
+   4.3796
+  ],
+  [
+   400,
+   4.2915
+  ],
+  [
+   450,
+   4.1871
+  ],
+  [
+   500,
+   4.1145
+  ],
+  [
+   550,
+   4.026
+  ],
+  [
+   600,
+   3.9509
+  ],
+  [
+   650,
+   3.8791
+  ],
+  [
+   700,
+   3.825
+  ],
+  [
+   750,
+   3.7894
+  ],
+  [
+   800,
+   3.7226
+  ],
+  [
+   850,
+   3.6652
+  ],
+  [
+   900,
+   3.6314
+  ],
+  [
+   950,
+   3.581
+  ],
+  [
+   1000,
+   3.5371
+  ],
+  [
+   1050,
+   3.5109
+  ],
+  [
+   1100,
+   3.4944
+  ],
+  [
+   1150,
+   3.4964
+  ],
+  [
+   1159,
+   3.4919
+  ]
+ ],
+ "train_seconds": 79.64,
+ "wall_seconds": 86.08,
+ "chars_per_sec": 119324,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, a big, big red red bird. The persurfled was a little. The bird wanted to splask to make the red red red rock.\nOne day, the magic rock saw a beautiful flower and saw a big, green flower. The flower was sad because it was a stubble slowly. The flower jumped and danced. The flowers were happy.\nThe sun was clear, but they couldn't wait to play. The flowers were very happy and thanked the flower again. The other flowers was very happy and thanked the flower.\nThank you, and the flowers decided to play with the flower. They played, even more than to play together. The flower was so happy to have many things. They played with the flower and the flower became good friends.\n<|eot|>\nOnce, in a friendly man named Tim and his friends, found a red bucket. They had lots of funny sands. Tim was very happy to use his friends. They grew, and it was about the times. One day, Tim met a little girl named Lily who loved to play with her friends.\nIn the park, Tim found a big, red car. He ran to the park and said, \"Well, why are my best, Tim!\" Sue was happy and thanked the girl for her friend",
+ "rule_init": {},
+ "ngram_init": {}
+}

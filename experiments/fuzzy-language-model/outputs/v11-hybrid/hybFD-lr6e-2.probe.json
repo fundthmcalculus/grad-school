@@ -1,0 +1,84 @@
+{
+ "ckpt": "outputs/v11-hybrid/hybFD-lr6e-2_10M_s0.pt",
+ "train_ctx": 512,
+ "params": 94144,
+ "positions": {
+  "windows": 32,
+  "length": 512,
+  "by_position": {
+   "0-256": 1.3083,
+   "256-512": 1.306,
+   "512-1024": null,
+   "1024-end": null
+  },
+  "by_story_distance": {
+   "0-64": 1.0904,
+   "64-128": 1.363,
+   "128-256": 1.3945,
+   "256-512": 1.3682,
+   "512-end": null
+  },
+  "chars_by_position": [
+   25882,
+   25745,
+   0,
+   0
+  ]
+ },
+ "name_recall": [
+  {
+   "k": 0,
+   "prompt_tokens": 24,
+   "margin_named": 1.133,
+   "prior_abs_margin": 1.455,
+   "recall_gain_bits": 1.133,
+   "pairs": 56,
+   "skipped": 0
+  },
+  {
+   "k": 1,
+   "prompt_tokens": 32,
+   "margin_named": 0.948,
+   "prior_abs_margin": 1.571,
+   "recall_gain_bits": 0.948,
+   "pairs": 56,
+   "skipped": 0
+  },
+  {
+   "k": 3,
+   "prompt_tokens": 54,
+   "margin_named": 0.74,
+   "prior_abs_margin": 1.472,
+   "recall_gain_bits": 0.74,
+   "pairs": 56,
+   "skipped": 0
+  },
+  {
+   "k": 6,
+   "prompt_tokens": 88,
+   "margin_named": 0.605,
+   "prior_abs_margin": 1.285,
+   "recall_gain_bits": 0.605,
+   "pairs": 56,
+   "skipped": 0
+  },
+  {
+   "k": 12,
+   "prompt_tokens": 152,
+   "margin_named": 0.316,
+   "prior_abs_margin": 1.285,
+   "recall_gain_bits": 0.316,
+   "pairs": 56,
+   "skipped": 0
+  },
+  {
+   "k": 24,
+   "prompt_tokens": 280,
+   "margin_named": 0.106,
+   "prior_abs_margin": 1.236,
+   "recall_gain_bits": 0.106,
+   "pairs": 56,
+   "skipped": 0
+  }
+ ]
+}

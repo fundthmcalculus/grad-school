@@ -1,0 +1,159 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 56,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v5-spend\\b-512-d56-m2.0_10M_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe512",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 512
+ },
+ "config": {
+  "vocab_size": 512,
+  "d_model": 56,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 94616,
+ "params_nonemb": 65944,
+ "steps": 510,
+ "chars_seen": 10018634,
+ "chars_per_token": 2.3979958,
+ "val_bpc": 1.33501,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   127,
+   1.7117
+  ],
+  [
+   254,
+   1.50975
+  ],
+  [
+   381,
+   1.39945
+  ],
+  [
+   508,
+   1.33587
+  ],
+  [
+   510,
+   1.33501
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.4716
+  ],
+  [
+   50,
+   7.5056
+  ],
+  [
+   100,
+   5.6334
+  ],
+  [
+   150,
+   4.6604
+  ],
+  [
+   200,
+   4.1641
+  ],
+  [
+   250,
+   3.8617
+  ],
+  [
+   300,
+   3.6844
+  ],
+  [
+   350,
+   3.5401
+  ],
+  [
+   400,
+   3.4286
+  ],
+  [
+   450,
+   3.3368
+  ],
+  [
+   500,
+   3.2699
+  ],
+  [
+   509,
+   3.2627
+  ]
+ ],
+ "train_seconds": 102.28,
+ "wall_seconds": 122.61,
+ "chars_per_sec": 40847,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big great time. It was very old and take a lung.\n\"Let's high standle! Ture is a bigger time!\" Lily felt hold and singing.\n\"No,, sorry! We are not too big and bunny!\" he asked.\n\"I'm we roll,\" Mom said.\n\"Hi! That is still. You are so understandful,\" she says. You have fun,\" Anna says.\n\"Tom, don't want to go.\" Lily ran away the store. He left, scared. \"Oh night,\" said the dog.\nLily, Tom and her mom were trying to play in her use. She tries to down a pando the bloom and following them to scream. It won't dank it. But, the fast sharp were running and the old party. They they had a sore animals.\n\"And!\" Ben smiled and say.\n\"I",
+ "rule_init": {},
+ "ngram_init": {}
+}

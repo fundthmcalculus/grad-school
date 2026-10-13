@@ -1,0 +1,259 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v22-tribble\\data_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10701,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.27489
+  ],
+  [
+   100,
+   1.56615
+  ],
+  [
+   200,
+   1.41121
+  ],
+  [
+   300,
+   1.34512
+  ],
+  [
+   400,
+   1.29726
+  ],
+  [
+   500,
+   1.25718
+  ],
+  [
+   600,
+   1.22483
+  ],
+  [
+   700,
+   1.1914
+  ],
+  [
+   800,
+   1.16138
+  ],
+  [
+   900,
+   1.14037
+  ],
+  [
+   1000,
+   1.1213
+  ],
+  [
+   1100,
+   1.1104
+  ],
+  [
+   1160,
+   1.10701
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3774
+  ],
+  [
+   50,
+   8.0638
+  ],
+  [
+   100,
+   6.1917
+  ],
+  [
+   150,
+   5.2783
+  ],
+  [
+   200,
+   4.8219
+  ],
+  [
+   250,
+   4.5741
+  ],
+  [
+   300,
+   4.3923
+  ],
+  [
+   350,
+   4.2966
+  ],
+  [
+   400,
+   4.2036
+  ],
+  [
+   450,
+   4.1183
+  ],
+  [
+   500,
+   4.0482
+  ],
+  [
+   550,
+   3.9889
+  ],
+  [
+   600,
+   3.9181
+  ],
+  [
+   650,
+   3.8634
+  ],
+  [
+   700,
+   3.8109
+  ],
+  [
+   750,
+   3.774
+  ],
+  [
+   800,
+   3.7346
+  ],
+  [
+   850,
+   3.6965
+  ],
+  [
+   900,
+   3.6558
+  ],
+  [
+   950,
+   3.6278
+  ],
+  [
+   1000,
+   3.5845
+  ],
+  [
+   1050,
+   3.5649
+  ],
+  [
+   1100,
+   3.5488
+  ],
+  [
+   1150,
+   3.5264
+  ],
+  [
+   1159,
+   3.5172
+  ]
+ ],
+ "train_seconds": 79.05,
+ "wall_seconds": 93.01,
+ "chars_per_sec": 120209,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy. \nThe little boy named Tim loved to play. He would play with his friends and have fun. He would play outside and push the small berrible beautiful things.\nOne day, Tim went to vireatis them to play. He found a big tree. He slid down and started to drove. Tim and Mr. Ty are not happy.\nAfter a long time, they were playing, Tim and the bird. They played with the bird and had lots of fun. Tim laughed and found a big, fillow. The sun went down and laughed. The bird's friends decided to play with the bird.\nAfter the day, Tim and his friends played with the bird. The bird was scared, but it was not worry. Tim and his friends were friends. They played with the bird, and they lived happily ever after.\n<|eot|>\n\nMorn never saw a big else who was decormated. He was very excited to use her her favorite gun. It was a big tree to play near one day.\nThe next time, a big, deep forest came out. It bed the big boat in the yard in the town. But it was too small and strang. The bug was grateful that it would not cold the rock.\nThe bug started",
+ "rule_init": {
+  "L0.mix": 256,
+  "L0.ffn": 72,
+  "L1.mix": 256,
+  "L1.ffn": 72
+ },
+ "ngram_init": {}
+}

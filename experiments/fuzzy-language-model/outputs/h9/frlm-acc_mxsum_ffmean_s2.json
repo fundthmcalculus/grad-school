@@ -1,0 +1,189 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 2,
+  "threads": 1,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/h9/frlm-acc_mxsum_ffmean_s2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "max_len": 256
+ },
+ "params_total": 28260,
+ "params_nonemb": 25124,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.76478,
+ "evals": [
+  [
+   305,
+   2.17907
+  ],
+  [
+   610,
+   1.95455
+  ],
+  [
+   915,
+   1.83135
+  ],
+  [
+   1220,
+   1.76461
+  ],
+  [
+   1221,
+   1.76478
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.7477
+  ],
+  [
+   50,
+   5.3613
+  ],
+  [
+   100,
+   3.9871
+  ],
+  [
+   150,
+   3.2139
+  ],
+  [
+   200,
+   2.7707
+  ],
+  [
+   250,
+   2.4973
+  ],
+  [
+   300,
+   2.336
+  ],
+  [
+   350,
+   2.2252
+  ],
+  [
+   400,
+   2.1441
+  ],
+  [
+   450,
+   2.0878
+  ],
+  [
+   500,
+   2.0498
+  ],
+  [
+   550,
+   2.0157
+  ],
+  [
+   600,
+   1.9872
+  ],
+  [
+   650,
+   1.9611
+  ],
+  [
+   700,
+   1.9425
+  ],
+  [
+   750,
+   1.9168
+  ],
+  [
+   800,
+   1.8962
+  ],
+  [
+   850,
+   1.8734
+  ],
+  [
+   900,
+   1.8509
+  ],
+  [
+   950,
+   1.8404
+  ],
+  [
+   1000,
+   1.828
+  ],
+  [
+   1050,
+   1.804
+  ],
+  [
+   1100,
+   1.7896
+  ],
+  [
+   1150,
+   1.7781
+  ],
+  [
+   1200,
+   1.7726
+  ],
+  [
+   1220,
+   1.7738
+  ]
+ ],
+ "train_seconds": 937.56,
+ "wall_seconds": 1083.09,
+ "chars_per_sec": 10669,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "device": "cpu",
+ "device_name": "11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz",
+ "host": "localhost.localdomain",
+ "sample": "Once upon a time, there was new friends. They would started to try well be lived her friends, they each the park! The girl who liked to sside the asked. Thit when them and her by lirred got the food cat too cow. The lives time, there was something started and away and a big and the scared.\n<|eot|>\n\n\nMax walked and they pic",
+ "rule_init": {}
+}

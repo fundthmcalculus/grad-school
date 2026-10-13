@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 192,
+  "layers": 4,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.04,
+  "wd": 0.01,
+  "warmup": 300,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "outputs/v29-big1b/d192-L4_30M_lr4e-2_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 192,
+  "n_layers": 4,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 1323904,
+ "params_nonemb": 1127296,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 0.82537,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.18066
+  ],
+  [
+   580,
+   0.99696
+  ],
+  [
+   870,
+   0.88641
+  ],
+  [
+   1160,
+   0.82537
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.3275
+  ],
+  [
+   50,
+   8.1928
+  ],
+  [
+   100,
+   5.9928
+  ],
+  [
+   150,
+   4.934
+  ],
+  [
+   200,
+   4.4128
+  ],
+  [
+   250,
+   4.1101
+  ],
+  [
+   300,
+   3.9093
+  ],
+  [
+   350,
+   3.7467
+  ],
+  [
+   400,
+   3.6155
+  ],
+  [
+   450,
+   3.4933
+  ],
+  [
+   500,
+   3.4055
+  ],
+  [
+   550,
+   3.3153
+  ],
+  [
+   600,
+   3.2328
+  ],
+  [
+   650,
+   3.151
+  ],
+  [
+   700,
+   3.0876
+  ],
+  [
+   750,
+   3.0374
+  ],
+  [
+   800,
+   2.957
+  ],
+  [
+   850,
+   2.8898
+  ],
+  [
+   900,
+   2.8467
+  ],
+  [
+   950,
+   2.7839
+  ],
+  [
+   1000,
+   2.7306
+  ],
+  [
+   1050,
+   2.6937
+  ],
+  [
+   1100,
+   2.6661
+  ],
+  [
+   1150,
+   2.6571
+  ],
+  [
+   1159,
+   2.6541
+  ]
+ ],
+ "train_seconds": 165.13,
+ "wall_seconds": 179.68,
+ "chars_per_sec": 57546,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big warm bird. The bird loved to fly high and see new friends. One day, the bird saw a big, flexible dog. The dog had a magic warm coat. The dog loved to go and play with his friend, a little fish named Fin.\nThe bird and Fin played with the big, red warm sun. They were very happy. They had a lot of fun. After a while, they saw a big, red ball in the park. The ball said, \"Thank you, Tin!\" They played with the ball and had a great day. The warm sun was grin and the sun was hot outside.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. Tim loved to play in the park. One day, while playing, he saw something shiny. It was a big, soft, green wheel. It looked stuck in the wheel and he felt sad.\nTim's mom saw what happened and said, \"Why are you sad?\" Tim said, \"I want to touch the tree to play with.\" His mom said, \"Let's play together!\"\nTim started to pick the tree. He looked for the wheel and found a toy. But then, something unexpected happened. The toy started to move! The toy was too big to pick! The toy was not brok",
+ "rule_init": {},
+ "ngram_init": {}
+}
