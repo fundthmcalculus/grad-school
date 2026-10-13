@@ -7,3 +7,6 @@ User: "Let's raise the model size a bit, say 2M or so, try that, then try the se
 **Sequence** (one GPU cell at a time): (1) TinyStories 1B chars; (2) coherence set 14 (2.2M vs 1.32M vs 96K, seeds 50-51, blind, scores before key); (3) Cosmopedia 30M, then 300M, then 1B chars at 2.2M. A 3B-char Cosmopedia run at 2.2M (~10 h estimated) is not included.
 
 **Predictions.** (1) TinyStories 1B BPC 0.58-0.62 (65%; 1.32M gave 0.636, the ladder 96K/251K/653K/1.32M gave 0.98/0.817/0.694/0.636, diminishing steps); below 0.636 (90%). (2) Coherence total above 1.32M's 10.0: 60%; at or above 12/15 (the session's bar): 25%. (3) Cosmopedia: 30M BPC 1.45-1.65 (50%); 300M 1.25-1.45 (50%); at 300M it beats the 300M-token trigram (1.622) (85%); 1B below 1.30 (50%).
+
+## Outcome 1: TinyStories 1B chars, d256 x 4 (2,223,936 params), seed 0, lr 2e-2, warm-up 300
+**val BPC 0.59891** (38,653 steps, 5,717 s, 55K chars/s). Ladder at 1B chars: 96K 0.980, 251K 0.817, 653K 0.694, 1.32M 0.636, **2.22M 0.599**. Prediction 0.58-0.62 (65%): **right**; below 0.636 (90%): **right**. Gain per size step keeps shrinking (-0.037 for 1.7x the parameters). One seed, lr not re-tuned: a ranking point, not a citable claim. Coherence set 14 waits until the Cosmopedia cells finish (one GPU cell at a time).
