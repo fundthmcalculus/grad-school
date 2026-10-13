@@ -10,3 +10,10 @@ User: "Let's raise the model size a bit, say 2M or so, try that, then try the se
 
 ## Outcome 1: TinyStories 1B chars, d256 x 4 (2,223,936 params), seed 0, lr 2e-2, warm-up 300
 **val BPC 0.59891** (38,653 steps, 5,717 s, 55K chars/s). Ladder at 1B chars: 96K 0.980, 251K 0.817, 653K 0.694, 1.32M 0.636, **2.22M 0.599**. Prediction 0.58-0.62 (65%): **right**; below 0.636 (90%): **right**. Gain per size step keeps shrinking (-0.037 for 1.7x the parameters). One seed, lr not re-tuned: a ranking point, not a citable claim. Coherence set 14 waits until the Cosmopedia cells finish (one GPU cell at a time).
+
+## Outcome 2: Cosmopedia at 2.22M (d256 x 4, seed 0, lr 2e-2, warm-up 300; Cosmopedia valid, first 1M chars)
+| chars | 2.22M BPC | 96K ref | 96K tiered |
+|---|---|---|---|
+| 30M | **1.4727** (209 s) | 1.873 (5 seeds) | 1.856 |
+| 300M | **1.2007** (2,089 s) | 1.761 | 1.744 |
+Trigram baseline (300M tokens) 1.622: beaten at both budgets (prediction 85%: **right**). 30M prediction 1.45-1.65 (50%): **right** (1.473). 300M prediction 1.25-1.45 (50%): **wrong**, better than predicted (1.201). The 96K model was capacity-bound on this corpus (it never reached the trigram); 23x the parameters gains 0.40 BPC at 30M and 0.56 at 300M, so on broad text size, not data, is the lever. 1B-char cell running.
