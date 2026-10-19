@@ -3,7 +3,7 @@
 Written 2026-10-11 by the CPU session for your review. This is the clean entry point: what works, what was dropped, what the evidence says about
 coherence and explainability, and the path from here. Every claim points to a section of [`RESULTS.md`](RESULTS.md), where hypotheses are registered
 before runs and outcomes (including the ones that went against us) are recorded. Decisions I took while you were away are in [`DECISIONS.md`](DECISIONS.md).
-The progress page (charts) is https://claude.ai/artifact/SEDQDg6ZPvBeHZZth515kP; the local demo is `demo/` (`python demo/server.py`).
+The progress page (charts) is https://claude.ai/artifact/SEDQDg6ZPvBeHZZth515kP; the browser demo is `demo/web/` (see `demo/README.md`; the former Python inference server was removed).
 
 ## 1. Goal and where we stand
 

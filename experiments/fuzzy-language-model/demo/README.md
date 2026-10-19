@@ -10,24 +10,16 @@ python demo/build_standalone.py [--all]      # or one self-contained file, demo/
 ```
 
 * Models: the 96K 3B-character reference (386 KB of weights), the 98K tiered-embedding model (the best sub-100K likelihood, 0.961 BPC at 1B characters, seed 1), and the 1.32M model (fp16, 2.6 MB; over the 100K cap, included for comparison). Generation costs 0.2-1 ms per word piece.
-* `python demo/export_web.py` rebuilds `web/models/` from the checkpoints (run from the experiment directory). It densifies the tiered embedding (input row and tied output row of a token are both `model.embed(token)`; checked against the original model before writing) and precomputes the rule views of the Python demo (membership histograms over 48 validation windows) with the same functions. For the 1.32M model only the most used rules carry data histograms; any other rule shows its membership functions from the weights.
-* Checks: `node demo/web/test_parity.mjs` compares the engine with the torch logits (max |dlogit| 2e-5 for the 96K model, 1e-4 for the tiered one, 1e-2 for the fp16 1.32M one; argmax identical) and the tokenizer with the HF tokenizer on 8 strings (`python demo/export_tok_check.py` regenerates the references). A greedy 12-piece run also reproduced all 36 rule rows of the Python demo (layer, rule, contribution, raised pieces).
-* Differences from the Python demo: the seeded sampler is JavaScript's (the same seed gives different text than the Python demo); prompt plus generated text is capped at the model's context (512 word pieces) instead of sliding the window.
+* `python demo/export_web.py` rebuilds `web/models/` from the checkpoints (run from the experiment directory). It densifies the tiered embedding (input row and tied output row of a token are both `model.embed(token)`; checked against the original model before writing) and precomputes the rule views (`rule_views.py`: membership histograms over 48 validation windows). For the 1.32M model only the most used rules carry data histograms; any other rule shows its membership functions from the weights.
+* Checks: `node demo/web/test_parity.mjs` compares the engine with the torch logits (max |dlogit| 2e-5 for the 96K model, 1e-4 for the tiered one, 1e-2 for the fp16 1.32M one; argmax identical) and the tokenizer with the HF tokenizer on 8 strings (`python demo/export_tok_check.py` regenerates the references). Before the server was removed, a greedy 12-piece run also reproduced all 36 rule rows of its rule explanations (layer, rule, contribution, raised pieces).
+* Limits: the seeded sampler is JavaScript's (it does not reproduce torch's random stream); prompt plus generated text is capped at the model's context (512 word pieces).
 
-## Local-server version (Python, torch)
-A small local web page for trying the fuzzy language models, served by Python and torch.
-
-```bash
-cd experiments/fuzzy-language-model
-.venv/bin/python demo/server.py            # then open http://127.0.0.1:8765
-```
-
-* Pick a checkpoint (any BPE1024 `.pt` under `outputs/`; the committed 3B-character 96K model is first), type a prompt, set length, temperature, top-k and seed, press Generate.
-* Hover or click any word piece: the five most likely alternatives at that point, and the strongest fuzzy FFN rules that pushed that piece (gate, signed effect on the piece's score, and what the rule raises most overall).
-  The rule view uses the exact direct-path decomposition in `flm/rule_dist.py`; turn it off for speed, or it switches itself off for models whose FFN is not the first-order TSK form.
-* **Model structure card:** layer count and what each layer contains (causal convolution, fuzzy recurrent mixer heads and memory rules, TSK feed-forward rules and antecedent size).
-* **Rule timeline:** a heatmap of which feed-forward rules fired (gate sign and size) for each generated piece, per layer; click a rule label to inspect it, or a column to select that piece.
-* **Most used rules** per layer, with the pieces each raises, and a **rule inspector**: the rule's membership function on each of its 16 antecedent dimensions (centre and width, the product of which is the firing), the data distribution along each dimension overall and where the rule fires, ordered by selectivity, plus the contexts where it fires most. Endpoints: `/structure`, `/rules`, `/rule`, `/mixrule` (memory-rule centres and widths).
-* CPU only, localhost only (binds 127.0.0.1), standard library HTTP server plus torch. Generation is serialised by a lock; the first request for a model loads it.
-* Pieces that repeat a three-piece run already in the text get a dotted underline, and the line under the story gives the share. In the rated stories, repetition (of rule sets and of token runs) tracked lower coherence scores at r of about -0.3 (RESULTS.md, rule-view analysis).
+## What the page shows
+* Pick a model, type a prompt, set length, temperature, top-k and seed, press Generate.
+* **Architecture diagrams** (three, drawn from the selected model's real sizes): the whole model, one fuzzy memory head, one fuzzy feed-forward rule.
+* Hover or click any word piece: the five most likely alternatives at that point, and the strongest fuzzy FFN rules that pushed that piece (gate, signed effect on the piece's score, and what the rule raises most overall). The rule view is the exact direct-path decomposition of `flm/rule_dist.py`.
+* **Model structure card**, **rule timeline** (which rules fired for each generated piece, per layer), **most used rules** per layer and a **rule inspector** (membership function on each antecedent dimension, data distribution overall and where the rule fires, contexts where it fires most).
+* Pieces that repeat a three-piece run already in the text get a dotted underline, and the line under the story gives the share. In the rated stories, repetition tracked lower coherence scores at r of about -0.3 (RESULTS.md, rule-view analysis).
 * The rule view explains how a piece's score is assembled, not why the story has or lacks a plot; a rule's listed pushes are not necessarily the piece it helped produce (the output is a sum of many rules).
+
+The former Python inference server (`demo/server.py`, torch on localhost) and its static sample output were removed: the browser page does everything they did, and `rule_views.py` keeps only the part the exporter needs.

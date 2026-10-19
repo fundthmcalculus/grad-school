@@ -29,7 +29,7 @@ ROOT = HERE.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(HERE))
 
-import server as S  # noqa: E402  (the Python demo: structure / rule_list / rule_detail)
+import rule_views as S  # noqa: E402  (structure / rule_list / rule_detail)
 from flm.models import ModelConfig, TinyLM  # noqa: E402
 from flm.rules import make_codec  # noqa: E402
 

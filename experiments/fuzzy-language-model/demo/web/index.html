@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FLM Inference Demo (in your browser)</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%230e7c72%27/%3E%3Cpath d=%27M3 25 C8 25 9 7 16 7 S24 25 29 25%27 fill=%27none%27 stroke=%27white%27 stroke-width=%273%27/%3E%3C/svg%3E">
 <style>
 /* layout: controls column + generated text, with a detail panel for the token you point at */
 :root {
@@ -77,6 +78,17 @@ td.rs { font-family: var(--mono); overflow-wrap: anywhere; }
 svg { display: block; width: 100%; height: auto; }
 .ctx { font-size: 0.82rem; margin: 2px 0; font-family: var(--mono); overflow-wrap: anywhere; }
 tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--accent-soft); }
+
+.fig { margin: 0 0 18px; }
+.fig .scroll { overflow-x: auto; }
+.fig svg { min-width: 640px; max-width: 920px; margin: 0 auto; }
+.fig figcaption { color: var(--muted); font-size: 0.84rem; max-width: 80ch; margin-top: 6px; }
+.fig h3 { font-size: 0.9rem; margin: 0 0 6px; font-weight: 600; }
+svg .tx { font: 12.5px var(--sans); fill: currentColor; } svg .tx.b { font-weight: 600; } svg .sb { font: 11.5px var(--sans); fill: var(--muted); }
+svg .bx { fill: var(--panel); stroke: currentColor; stroke-width: 1.2; } svg .bx.f { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.6; } svg .bx.n { stroke-dasharray: 4 3; fill: none; stroke: var(--muted); }
+svg .ln { stroke: currentColor; stroke-width: 1.3; fill: none; } svg .ln.thick { stroke-width: 3; stroke: var(--accent); } svg .ln.thin { stroke-width: 0.8; opacity: .6; } svg .ln.f { stroke: var(--accent); stroke-width: 2; } svg .ln.warn { stroke: var(--warn); }
+svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); stroke-width: 1.6; }
+.expect { font-size: 0.86rem; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -126,6 +138,13 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--accent-soft); }
     </div>
   </section>
 
+  <section class="card" aria-label="Model architecture diagrams">
+    <h2>The architecture, drawn for the model selected above</h2>
+    <figure class="fig"><h3>1. The whole model, one piece at a time</h3><div class="scroll" id="arch1"></div><figcaption id="arch1-cap"></figcaption></figure>
+    <figure class="fig"><h3>2. Inside one fuzzy memory head</h3><div class="scroll" id="arch2"></div><figcaption id="arch2-cap"></figcaption></figure>
+    <figure class="fig"><h3>3. Inside one fuzzy feed-forward rule</h3><div class="scroll" id="arch3"></div><figcaption id="arch3-cap"></figcaption></figure>
+  </section>
+
   <section class="card" aria-label="Model structure">
     <h2>How this model is built</h2>
     <div class="struct" id="struct"></div>
@@ -153,6 +172,11 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--accent-soft); }
     <h2 style="margin-top:14px">Where it fires most</h2>
     <div id="ctxs"></div>
   </section>
+  <section class="card expect" aria-label="What to expect">
+    <h2>What to expect</h2>
+    <p>These are tiny models (about 100 thousand parameters; the third entry has 1.3 million for comparison) trained only on simple children's stories (TinyStories). They write fluent, short, childlike sentences, then often drift, repeat or lose the plot after a few sentences: in blind ratings the 96K-class models scored about 5 to 8 out of 15 for coherence and the 1.3 million model about 10. They know nothing outside that story world, and nothing here is reviewed for accuracy. The seeded sampler is JavaScript's, so a seed does not reproduce the Python runs in the write-up.</p>
+    <p>Source, training scripts and results: <code>experiments/fuzzy-language-model</code> in the grad-school repository (<code>WRITEUP.md</code>). Everything on this page runs on your device; nothing you type is sent anywhere.</p>
+  </section>
 </main>
 
 <script src="flm.js"></script>
@@ -178,6 +202,8 @@ api.models().then((ms) => {
   window.MODELS = ms;
   for (const m of ms) { const o = document.createElement('option'); o.value = m.id; o.textContent = `${m.label} (${nf(m.params)})`; o.title = m.id; $('model').appendChild(o); }
   showModel();
+  loadModelViews();
+  $('go').click();   // show a story straight away
 }).catch(() => { $('err').textContent = LOAD_HELP; });
 $('model').onchange = showModel;
 function showModel() { const m = (window.MODELS || []).find((x) => x.id === $('model').value); $('minfo').textContent = m ? `${nf(m.params)} parameters, ${m.layers} layers, width ${m.d}, context ${m.ctx} word pieces (${m.tok})` : ''; }
@@ -239,10 +265,123 @@ const SVGNS = 'http://www.w3.org/2000/svg';
 const sv = (tag, a, parent, text) => { const e = document.createElementNS(SVGNS, tag); for (const k in (a || {})) e.setAttribute(k, a[k]); if (text != null) e.textContent = text; if (parent) parent.appendChild(e); return e; };
 let tlLayer = 0, spans = [];
 
+// ---------- architecture diagrams, drawn from the selected model's real numbers ----------
+const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const T = (x, y, t, cls, anchor) => `<text x="${x}" y="${y}" class="${cls || 'tx'}"${anchor ? ` text-anchor="${anchor}"` : ''}>${esc(t)}</text>`;
+const BOX = (x, y, w, h, title, sub, cls) =>
+  `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" class="bx ${cls || ''}"/>` +
+  T(x + w / 2, y + (sub ? h / 2 - 3 : h / 2 + 4), title, 'tx b', 'middle') + (sub ? T(x + w / 2, y + h / 2 + 12, sub, 'sb', 'middle') : '');
+const ARR = (pts, id, label, lx, ly, cls) =>
+  `<polyline points="${pts.map((p) => p.join(',')).join(' ')}" class="ln ${cls || ''}" marker-end="url(#${id})"/>` + (label ? T(lx, ly, label, 'sb') : '');
+const DEFS = (id) => `<defs><marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>`;
+const SVG = (w, h, body, label) => `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(label)}">${body}</svg>`;
+const bell = (x, y, w, h, mu) => {
+  let d = '';
+  for (let i = 0; i <= 30; i++) { const u = i / 30, g = Math.exp(-0.5 * ((u - 0.5) / 0.16) ** 2); d += (i ? 'L' : 'M') + (x + u * w).toFixed(1) + ',' + (y + h - g * h).toFixed(1); }
+  const px = x + w * mu;
+  return `<path d="${d}" class="ln f"/><line x1="${x}" y1="${y + h}" x2="${x + w}" y2="${y + h}" class="ln thin"/><line x1="${px}" y1="${y + h + 3}" x2="${px}" y2="${y - 2}" class="ln warn" stroke-dasharray="3 2"/>`;
+};
+
+function drawArch(st, info) {
+  const L0 = st.layers[0], d = st.d_model, nl = st.n_layers, vocab = (info && /bpe(\d+)/.exec(info.tok || '') || [0, 1024])[1];
+  const H = L0.heads, R = L0.mixer_rules_per_head, dh = L0.head_dim, FR = L0.ffn_rules, da = L0.ffn_antecedent_dim, cw = L0.conv;
+
+  // ---- 1. the whole model
+  let a = DEFS('a1');
+  a += BOX(110, 8, 280, 30, 'prompt text');
+  a += ARR([[250, 38], [250, 56]], 'a1');
+  a += BOX(110, 56, 280, 40, 'byte-level BPE', `text becomes word pieces (vocabulary ${vocab})`);
+  a += ARR([[250, 96], [250, 114]], 'a1');
+  a += BOX(110, 114, 280, 40, 'embedding table E', `${vocab} x ${d}: one ${d}-number vector per piece`);
+  a += ARR([[250, 154], [250, 170], [404, 170], [404, 214]], 'a1', `${d} numbers per piece: the start of the residual stream`, 262, 166, 'thick');
+  a += `<rect x="44" y="184" width="376" height="340" rx="10" class="bx n"/>` + T(56, 202, `Block 1 of ${nl}`, 'tx b') + T(136, 202, '(each block has its own weights)', 'sb');
+  a += `<line x1="404" y1="210" x2="404" y2="516" class="ln thick"/>` + T(427, 262, 'residual', 'sb') + T(427, 275, 'stream', 'sb');
+  // sub-layer A: mixer
+  a += ARR([[404, 218], [215, 218], [215, 226]], 'a1');
+  a += BOX(95, 226, 240, 26, 'RMSNorm');
+  a += ARR([[215, 252], [215, 260]], 'a1');
+  a += BOX(95, 260, 240, 40, 'causal convolution', cw ? `blends the last ${cw} pieces, per channel` : '');
+  a += ARR([[215, 300], [215, 308]], 'a1');
+  a += BOX(95, 308, 240, 56, 'fuzzy memory mixer', `${H} heads x ${R} memory rules, ${dh} numbers each`, 'f');
+  a += ARR([[215, 364], [215, 376], [392, 376]], 'a1');
+  a += `<circle cx="404" cy="376" r="9" class="bx"/>` + T(404, 380, '+', 'tx b', 'middle');
+  // sub-layer B: FFN
+  a += ARR([[404, 388], [215, 388], [215, 396]], 'a1');
+  a += BOX(95, 396, 240, 26, 'RMSNorm');
+  a += ARR([[215, 422], [215, 430]], 'a1');
+  a += BOX(95, 430, 240, 56, 'fuzzy rule feed-forward', `${FR} rules over a ${da}-number antecedent`, 'f');
+  a += ARR([[215, 486], [215, 502], [392, 502]], 'a1');
+  a += `<circle cx="404" cy="502" r="9" class="bx"/>` + T(404, 506, '+', 'tx b', 'middle');
+  if (nl > 1) {
+    a += ARR([[404, 516], [404, 530], [250, 530], [250, 538]], 'a1', null, 0, 0, 'thick');
+    a += `<rect x="110" y="538" width="280" height="28" rx="6" class="bx n"/>` + T(250, 556, nl > 2 ? `blocks 2 to ${nl}, same layout` : 'block 2, same layout', 'sb', 'middle');
+    a += ARR([[250, 566], [250, 580]], 'a1');
+  } else a += ARR([[404, 516], [404, 548], [250, 548], [250, 580]], 'a1', null, 0, 0, 'thick');
+  a += BOX(110, 580, 280, 40, 'RMSNorm, then E transposed', `a score for each of the ${vocab} pieces`);
+  a += ARR([[250, 620], [250, 636]], 'a1');
+  a += BOX(110, 636, 280, 40, 'softmax, temperature, top-k', 'sample the next piece, feed it back in');
+  // annotations
+  a += T(486, 280, 'short-range smoothing of the last', 'sb') + T(486, 293, `${cw || 'few'} pieces`, 'sb');
+  a += T(486, 328, 'long-range memory: a small matrix per head,', 'sb') + T(486, 341, 'updated once per piece (figure 2)', 'sb');
+  a += T(486, 450, 'each rule fires when the input is near its', 'sb') + T(486, 463, 'centre; fired rules add their consequent to', 'sb') + T(486, 476, 'the stream (figure 3)', 'sb');
+  a += T(486, 600, 'the same rule contributions explain the', 'sb') + T(486, 613, 'score of each piece (the rule view below)', 'sb');
+  $('arch1').innerHTML = SVG(760, 690, a, `Architecture of this ${st.params.toLocaleString()}-parameter model: embedding, ${nl} blocks of causal convolution, fuzzy memory mixer and fuzzy rule feed-forward on a residual stream, then a tied output layer`);
+  $('arch1-cap').textContent = `One piece at a time: it is embedded, then passes through ${nl} identical-layout blocks. Each block reads the residual stream (the thick line), adds the output of a fuzzy memory mixer, then adds the output of a bank of fuzzy rules. Teal parts are the fuzzy systems; they carry ${st.params.toLocaleString()} parameters in all, ${(vocab * d).toLocaleString()} of them in the embedding (tied: it is also the output layer).`;
+
+  // ---- 2. one memory head
+  let b = DEFS('a2');
+  b += BOX(8, 130, 100, 60, 'layer input', `${d} numbers`);
+  b += ARR([[108, 148], [150, 66]], 'a2') + ARR([[108, 160], [150, 162]], 'a2') + ARR([[108, 172], [150, 268]], 'a2');
+  b += BOX(150, 40, 96, 44, 'key k', `${dh} numbers`) + BOX(150, 140, 96, 44, 'value v', `${dh} numbers`) + BOX(150, 250, 96, 44, 'query q', `${dh} numbers`);
+  b += BOX(290, 40, 160, 44, 'fuzzify the key', `phi(k): ${R} memberships`, 'f') + BOX(290, 250, 160, 44, 'fuzzify the query', `phi(q): ${R} memberships`, 'f');
+  b += ARR([[246, 62], [290, 62]], 'a2') + ARR([[246, 272], [290, 272]], 'a2');
+  const gx = 520, gy = 140, gc = 12, gr = 6, cell = 14;
+  b += T(gx - 10, gy - 8, `memory S: ${dh} x ${R}`, 'sb', 'end');
+  for (let i = 0; i < gr; i++) for (let j = 0; j < gc; j++) b += `<rect x="${gx + j * cell}" y="${gy + i * cell}" width="${cell - 1.5}" height="${cell - 1.5}" class="cellr" style="opacity:${(0.25 + 0.6 * ((i * 7 + j * 3) % 5) / 4).toFixed(2)}"/>`;
+  b += T(gx, gy + gr * cell + 15, 'one column per rule', 'sb');
+  b += `<rect x="${gx + 4 * cell - 1}" y="${gy - 3}" width="${cell + 1}" height="${gr * cell + 5}" class="hl"/>`;
+  b += ARR([[450, 62], [gx + 4.5 * cell, 62], [gx + 4.5 * cell, gy - 5]], 'a2', 'write: S += beta (v - S phi(k)) phi(k)^T', 460, 53);
+  b += ARR([[246, 162], [gx - 6, 162]], 'a2', 'v: the value to store', 262, 155);
+  b += ARR([[450, 272], [gx + 11.5 * cell, 272], [gx + 11.5 * cell, gy + gr * cell + 5]], 'a2', 'read: y = S phi(q)', 460, 263);
+  b += BOX(730, 152, 112, 60, 'head output y', `${dh} numbers`);
+  b += ARR([[gx + gc * cell + 4, 182], [730, 182]], 'a2');
+  b += T(425, 322, 'Before each write the whole memory is scaled by alpha (forgetting). alpha and beta are computed from the layer input, per head.', 'sb', 'middle');
+  $('arch2').innerHTML = SVG(850, 336, b, `One memory head: the key selects which of ${R} rules to write into, the value is stored by the delta rule, the query reads the memory back`);
+  $('arch2-cap').textContent = `Each of the ${H} heads keeps a small table S with one column per fuzzy rule. The key's rule memberships say which columns a new piece belongs to; the delta rule writes only the error between the value and what the memory already predicts, so repeated facts are not stored twice. The query reads the table back through its own memberships. The mixer concatenates the ${H} head outputs (${H} x ${dh} = ${H * dh} numbers) and projects them back to ${d}.`;
+
+  // ---- 3. one feed-forward rule
+  let c = DEFS('a3');
+  c += BOX(8, 122, 100, 56, 'block input', `${d} numbers`);
+  c += ARR([[108, 150], [150, 150]], 'a3');
+  c += BOX(150, 122, 110, 56, 'project', `${da} numbers u`);
+  c += T(330, 28, `one rule: a bell on each of the ${da} numbers`, 'sb');
+  const mus = [[0.46, 'u1'], [0.7, 'u2'], [0.33, '...']];
+  mus.forEach(([mu, n], i) => {
+    const y = 44 + i * 70;
+    c += bell(330, y, 100, 34, mu) + T(440, y + 28, n, 'sb') + ARR([[260, 150], [318, y + 17]], 'a3') + ARR([[470, y + 17], [504, 150 + (i - 1) * 8]], 'a3');
+  });
+  c += `<circle cx="520" cy="150" r="16" class="bx f"/>` + T(520, 155, 'x', 'tx b', 'middle') + T(520, 184, 'firing f', 'sb', 'middle') + T(520, 197, '0 to 1', 'sb', 'middle');
+  c += BOX(330, 262, 150, 44, 'slope s = w.x + b', 'scales the input', '');
+  c += ARR([[58, 178], [58, 284], [330, 284]], 'a3');
+  c += ARR([[480, 284], [630, 284], [630, 172]], 'a3');
+  c += ARR([[536, 150], [616, 150]], 'a3');
+  c += `<circle cx="640" cy="150" r="24" class="bx f"/>` + T(640, 147, 'gate', 'sb', 'middle') + T(640, 160, 'g = f s', 'sb', 'middle');
+  c += ARR([[664, 150], [700, 150]], 'a3');
+  c += BOX(700, 122, 140, 56, 'consequent c', `${d} numbers, fixed`);
+  c += ARR([[770, 178], [770, 250]], 'a3');
+  c += T(762, 206, 'g x c, summed', 'sb', 'end') + T(762, 219, `over all ${FR} rules`, 'sb', 'end');
+  c += BOX(700, 250, 140, 36, 'added to the stream', '');
+  c += `<rect x="560" y="14" width="280" height="44" rx="6" class="bx n" style="stroke:var(--warn)"/>` + T(700, 32, 'also: g x (a fixed score profile) is added to', 'sb', 'middle') + T(700, 46, "each piece's score: the rule view below", 'sb', 'middle');
+  c += ARR([[640, 126], [640, 58]], 'a3', null, 0, 0, 'warn');
+  $('arch3').innerHTML = SVG(850, 322, c, `One feed-forward rule: bells on each antecedent number multiply into a firing strength, a slope scales it into a gate, and the gated consequent vector is added to the residual stream`);
+  $('arch3-cap').textContent = `A rule is "IF the input is near my centre on all ${da} antecedent numbers THEN add my consequent vector". Each bell is a Gaussian with its own centre and width (dashed line: where this input sits); the product of the ${da} bells is the firing. The slope makes the rule first-order, so it can also switch sign. ${FR} rules run in parallel; their gated consequents add up. Because the output layer is a fixed matrix, the same gate times a fixed score profile per rule also adds directly to each piece's score, which is what the rule view in this page shows (orange dashed box).`;
+}
+
 async function loadModelViews() {
   const id = $('model').value; if (!id) return;
   try {
     const st = await api.structure(id);
+    drawArch(st, (window.MODELS || []).find((x) => x.id === id));
     const host = $('struct'); host.textContent = '';
     for (const L of st.layers) {
       const d = document.createElement('div'); d.className = 'lay';
@@ -272,7 +411,6 @@ async function loadModelViews() {
   } catch (e) { $('struct-note').textContent = 'Could not load the structure view: ' + e.message; }
 }
 $('model').addEventListener('change', loadModelViews);
-setTimeout(loadModelViews, 300);
 
 function timeline(d) {
   const card = $('tl-card');
