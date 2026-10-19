@@ -71,3 +71,6 @@ Reading: the vocabulary gain saturates between 3072 and 4096 at this parameter b
 
 ## V4096 tail-10 at 300M registered before running (`flm/run_tiervocab_arm.py v4096h256e10m15 300`, `v43-tiervocab-arm`; seeds 0-1; reference V3072 head 384 tail-12 FFN x1.5 at 300M: 0.95758 / 0.96015)
 Predictions: V4096 within 0.005 of V3072 at 300M on both seeds (50%); better than V3072 by >= 0.005 on both seeds (20%: tail tokens get ~3,800 x 10 parameters and see more examples); worse by >= 0.005 on both seeds (30%).
+
+## V4096 tail-10 at 300M outcome (`v43-tiervocab-arm`; 98,432 params; seeds 0-1)
+**0.96652 / 0.96166 (mean 0.96409)** against V3072 head 384 tail 12 at 300M: 0.95758 / 0.96015 (mean 0.95886): **+0.0089 / +0.0015 (mean +0.0052)**, V4096 worse on both seeds. Predictions: within 0.005 of V3072 on both seeds (50%): **wrong** (seed 0 is 0.0089 behind); better by >= 0.005 on both (20%): no; worse by >= 0.005 on both (30%): no (seed 1 is only 0.0015 behind): the outcome is a mild loss that the registered ranges did not cover. At 30M the two tied (1.0546 vs 1.0547); with more data the larger vocabulary does not pull ahead, so **V3072 head 384 tail 12 FFN x1.5 stays the recipe** (the tail rank 10 vs 12 and the extra 1,000 tail tokens cost more than the extra characters per token buy).
