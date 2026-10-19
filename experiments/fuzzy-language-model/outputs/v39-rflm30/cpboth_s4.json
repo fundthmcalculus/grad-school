@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta_cpboth",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v39-rflm30\\cpboth_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta_cpboth",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98464,
+ "params_nonemb": 49312,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11766,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.28161
+  ],
+  [
+   100,
+   1.58313
+  ],
+  [
+   200,
+   1.42111
+  ],
+  [
+   300,
+   1.35653
+  ],
+  [
+   400,
+   1.31033
+  ],
+  [
+   500,
+   1.27397
+  ],
+  [
+   600,
+   1.23335
+  ],
+  [
+   700,
+   1.20419
+  ],
+  [
+   800,
+   1.17823
+  ],
+  [
+   900,
+   1.1539
+  ],
+  [
+   1000,
+   1.13442
+  ],
+  [
+   1100,
+   1.12282
+  ],
+  [
+   1160,
+   1.11766
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3559
+  ],
+  [
+   50,
+   8.1533
+  ],
+  [
+   100,
+   6.2596
+  ],
+  [
+   150,
+   5.3467
+  ],
+  [
+   200,
+   4.844
+  ],
+  [
+   250,
+   4.594
+  ],
+  [
+   300,
+   4.4213
+  ],
+  [
+   350,
+   4.3116
+  ],
+  [
+   400,
+   4.2069
+  ],
+  [
+   450,
+   4.1534
+  ],
+  [
+   500,
+   4.0861
+  ],
+  [
+   550,
+   4.036
+  ],
+  [
+   600,
+   3.9639
+  ],
+  [
+   650,
+   3.9107
+  ],
+  [
+   700,
+   3.8745
+  ],
+  [
+   750,
+   3.8296
+  ],
+  [
+   800,
+   3.7817
+  ],
+  [
+   850,
+   3.7281
+  ],
+  [
+   900,
+   3.6948
+  ],
+  [
+   950,
+   3.6677
+  ],
+  [
+   1000,
+   3.63
+  ],
+  [
+   1050,
+   3.5928
+  ],
+  [
+   1100,
+   3.579
+  ],
+  [
+   1150,
+   3.5562
+  ],
+  [
+   1159,
+   3.558
+  ]
+ ],
+ "train_seconds": 79.83,
+ "wall_seconds": 94.09,
+ "chars_per_sec": 119037,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and the bird. \nThe mean dog asked, \"Why are you sad, little bird?\" The bird said, \"I have a pizza to move. They will help you.\" They both liked the widel. They worked together and tired.\n<|eot|>\nOnce upon a time, there was a big, red ball. The chair lived in a big box. The sand calthday was very pretty.\nOne day, the paw was a little bunny. The fountain was playing with the pass all. The paws were very grateful and knew it was fun. The bunny played all day, even not just scared.\nBut the paw was hoopy and delicious. But the paw was very tight. The mleep was very nice and couldn't find it. The lacalss frog had so much fun. But then, something unexpected happened. The bunny met a little girl named Sue. The bunny was so happy, wanted to play with the bunny.\nThe small bunny marnked and played with the hult. The priult went down and gave it a funny tree. The munny was happy again. The munny grow the bosset, and the munny and played with the m",
+ "rule_init": {},
+ "ngram_init": {}
+}

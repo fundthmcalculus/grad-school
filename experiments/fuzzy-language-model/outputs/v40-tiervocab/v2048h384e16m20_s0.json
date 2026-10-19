@@ -1,0 +1,234 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v2048h384e16m20_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe2048",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 2048
+ },
+ "config": {
+  "vocab_size": 2048,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99280,
+ "params_nonemb": 53456,
+ "steps": 1001,
+ "chars_seen": 30011180,
+ "chars_per_token": 3.6598144,
+ "val_bpc": 1.07432,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05289
+  ],
+  [
+   100,
+   1.49064
+  ],
+  [
+   200,
+   1.33436
+  ],
+  [
+   300,
+   1.2747
+  ],
+  [
+   400,
+   1.2366
+  ],
+  [
+   500,
+   1.18787
+  ],
+  [
+   600,
+   1.15273
+  ],
+  [
+   700,
+   1.12597
+  ],
+  [
+   800,
+   1.10108
+  ],
+  [
+   900,
+   1.08333
+  ],
+  [
+   1000,
+   1.07424
+  ],
+  [
+   1001,
+   1.07432
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.152
+  ],
+  [
+   50,
+   8.7651
+  ],
+  [
+   100,
+   6.8026
+  ],
+  [
+   150,
+   5.8005
+  ],
+  [
+   200,
+   5.2834
+  ],
+  [
+   250,
+   4.9739
+  ],
+  [
+   300,
+   4.8053
+  ],
+  [
+   350,
+   4.7078
+  ],
+  [
+   400,
+   4.608
+  ],
+  [
+   450,
+   4.5152
+  ],
+  [
+   500,
+   4.4438
+  ],
+  [
+   550,
+   4.3735
+  ],
+  [
+   600,
+   4.3094
+  ],
+  [
+   650,
+   4.2371
+  ],
+  [
+   700,
+   4.1836
+  ],
+  [
+   750,
+   4.1387
+  ],
+  [
+   800,
+   4.1046
+  ],
+  [
+   850,
+   4.0413
+  ],
+  [
+   900,
+   4.0183
+  ],
+  [
+   950,
+   3.9856
+  ],
+  [
+   1000,
+   3.966
+  ]
+ ],
+ "train_seconds": 71.52,
+ "wall_seconds": 83.29,
+ "chars_per_sec": 114657,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little smiles. The shromle liked to play with his toys.\nOne day, the little boy saw a mitten. He wanted to see what was inside. He was sad. He wanted to help the little boy. So, he walked up to the frae. The little girl was sad and grized. She saw the little boy snadfish and said, \"I didn't know it can not find it.\"\nThe little girl listened and said, \"I can help you.\" The little boy was happy and thanked the little boy for not be kind anymore. The big, mosive banle would not have fun. The sun was bigger and grumpy. The little girl was not so happy to have that he knew she could help show him the same thing and help people ever had ever mean to find its treasure.\n<|eot|>\n\nOnce upon a time there were two moral of the story is???tol, who are very 3 year old and boys. Heir the lion and was 3where.\nOne day she was building for something adventureing. She was so so happy! He always wished the bear would always be so stuck like to play with it.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. He loved to play in his room. One day, he found a big dizakber on the floor. It was a big dog. Tim wanted to help the dog",
+ "rule_init": {},
+ "ngram_init": {}
+}

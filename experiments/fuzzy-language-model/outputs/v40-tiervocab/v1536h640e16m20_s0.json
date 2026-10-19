@@ -1,0 +1,242 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v1536h640e16m20_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1536",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1536
+ },
+ "config": {
+  "vocab_size": 1536,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99280,
+ "params_nonemb": 53456,
+ "steps": 1052,
+ "chars_seen": 30013285,
+ "chars_per_token": 3.4826342,
+ "val_bpc": 1.08646,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.11123
+  ],
+  [
+   100,
+   1.52024
+  ],
+  [
+   200,
+   1.37183
+  ],
+  [
+   300,
+   1.29937
+  ],
+  [
+   400,
+   1.25286
+  ],
+  [
+   500,
+   1.21804
+  ],
+  [
+   600,
+   1.18007
+  ],
+  [
+   700,
+   1.15273
+  ],
+  [
+   800,
+   1.12431
+  ],
+  [
+   900,
+   1.10502
+  ],
+  [
+   1000,
+   1.0902
+  ],
+  [
+   1052,
+   1.08646
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.8295
+  ],
+  [
+   50,
+   8.5895
+  ],
+  [
+   100,
+   6.6593
+  ],
+  [
+   150,
+   5.6719
+  ],
+  [
+   200,
+   5.1654
+  ],
+  [
+   250,
+   4.8834
+  ],
+  [
+   300,
+   4.7017
+  ],
+  [
+   350,
+   4.563
+  ],
+  [
+   400,
+   4.46
+  ],
+  [
+   450,
+   4.3886
+  ],
+  [
+   500,
+   4.3182
+  ],
+  [
+   550,
+   4.2391
+  ],
+  [
+   600,
+   4.1802
+  ],
+  [
+   650,
+   4.1379
+  ],
+  [
+   700,
+   4.083
+  ],
+  [
+   750,
+   4.0265
+  ],
+  [
+   800,
+   3.9755
+  ],
+  [
+   850,
+   3.9178
+  ],
+  [
+   900,
+   3.9041
+  ],
+  [
+   950,
+   3.8781
+  ],
+  [
+   1000,
+   3.8359
+  ],
+  [
+   1050,
+   3.8165
+  ],
+  [
+   1051,
+   3.8119
+  ]
+ ],
+ "train_seconds": 74.49,
+ "wall_seconds": 86.78,
+ "chars_per_sec": 115690,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little boy named Tom. Tom was a little friend.\nTom saw that he was curious that he wanted to help. He asked the boy about the shell. The boy said, \"Hi, a magic thing.\" The boy said, \"Hi, childse, I am a friend. I can help you. I will help you don't know.\" Sue stopped and gave the mederitituthes from the farm.\nTom decided to work under her bed and make exoursure. He opened the box and didn't know what to do. He thought that the class would be more careful with his friends. But then, something unexpected happened. Tom's friend came out from under the bed and Tim did not want to hide the box.\nBut then, something unexpected happened! A little girl came into the room. The mom saw them, she came into the room and saw the bug and said, \"I lost my lesson that! I am a big, friendly bird.\" The bird was not scared for him. They were not looking for the lesson. The bird asked if they could play with the mud. The bird was happy and he could not keep the big ball.\n<|eot|>\nOnce upon a time, there was a big, old bear. He liked to play outside in the park. One day, he saw a big lion very fast. The bunny was curious.\nThe bunny went to the box. He saw a",
+ "rule_init": {},
+ "ngram_init": {}
+}

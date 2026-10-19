@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta_cpread",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v39-rflm30\\cpread_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta_cpread",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98464,
+ "params_nonemb": 49312,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.1228,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.28161
+  ],
+  [
+   100,
+   1.5809
+  ],
+  [
+   200,
+   1.43223
+  ],
+  [
+   300,
+   1.35998
+  ],
+  [
+   400,
+   1.31411
+  ],
+  [
+   500,
+   1.27594
+  ],
+  [
+   600,
+   1.23741
+  ],
+  [
+   700,
+   1.20666
+  ],
+  [
+   800,
+   1.17997
+  ],
+  [
+   900,
+   1.15868
+  ],
+  [
+   1000,
+   1.14015
+  ],
+  [
+   1100,
+   1.12773
+  ],
+  [
+   1160,
+   1.1228
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3559
+  ],
+  [
+   50,
+   8.1508
+  ],
+  [
+   100,
+   6.2655
+  ],
+  [
+   150,
+   5.3487
+  ],
+  [
+   200,
+   4.8521
+  ],
+  [
+   250,
+   4.6055
+  ],
+  [
+   300,
+   4.4325
+  ],
+  [
+   350,
+   4.3223
+  ],
+  [
+   400,
+   4.2153
+  ],
+  [
+   450,
+   4.1611
+  ],
+  [
+   500,
+   4.0942
+  ],
+  [
+   550,
+   4.0445
+  ],
+  [
+   600,
+   3.9748
+  ],
+  [
+   650,
+   3.9237
+  ],
+  [
+   700,
+   3.8872
+  ],
+  [
+   750,
+   3.8398
+  ],
+  [
+   800,
+   3.7898
+  ],
+  [
+   850,
+   3.7394
+  ],
+  [
+   900,
+   3.7067
+  ],
+  [
+   950,
+   3.6818
+  ],
+  [
+   1000,
+   3.6449
+  ],
+  [
+   1050,
+   3.6081
+  ],
+  [
+   1100,
+   3.5917
+  ],
+  [
+   1150,
+   3.5706
+  ],
+  [
+   1159,
+   3.5717
+  ]
+ ],
+ "train_seconds": 80.58,
+ "wall_seconds": 94.66,
+ "chars_per_sec": 117932,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Spikequitiind vaisa. She would feed her hope to make 3 year old and have an idea. One day, she found a toy car in a big tree. She felt making a gift of a plane box. The flower sliding in a big tree and a chair.\nAs the spend was so yelly. She opened it in a tree, but it was too scared. She said, \"Can you teavraw others too?\" The apple said, \"I will wear the tree.\" The tree was not foolet anymore.\nIn the tree, the tree was not fairy. It thought that it should know what was only. But the Pa had an idea. He thought it would be making a ornament and learned that it's fun and found them never bread. The tree was tied that he had an idea.\nThe moral of the story is to always be gun. It was a special game of pastws if they should not have to might!\n<|eot|>\n\nOnce upon a time, there was a little girl named Joe. Suddenly she was so excited to see the floor. Her mommy went to the umbreng and showed the mighty wa",
+ "rule_init": {},
+ "ngram_init": {}
+}

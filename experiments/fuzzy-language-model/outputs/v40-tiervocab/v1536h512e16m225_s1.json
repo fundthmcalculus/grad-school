@@ -1,0 +1,242 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.25,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v1536h512e16m225_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1536",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1536
+ },
+ "config": {
+  "vocab_size": 1536,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.25,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98280,
+ "params_nonemb": 56552,
+ "steps": 1052,
+ "chars_seen": 30013285,
+ "chars_per_token": 3.4826342,
+ "val_bpc": 1.08435,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.08772
+  ],
+  [
+   100,
+   1.52133
+  ],
+  [
+   200,
+   1.37471
+  ],
+  [
+   300,
+   1.30423
+  ],
+  [
+   400,
+   1.25318
+  ],
+  [
+   500,
+   1.21357
+  ],
+  [
+   600,
+   1.17887
+  ],
+  [
+   700,
+   1.14803
+  ],
+  [
+   800,
+   1.11933
+  ],
+  [
+   900,
+   1.1002
+  ],
+  [
+   1000,
+   1.08712
+  ],
+  [
+   1052,
+   1.08435
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.7619
+  ],
+  [
+   50,
+   8.4867
+  ],
+  [
+   100,
+   6.5778
+  ],
+  [
+   150,
+   5.6356
+  ],
+  [
+   200,
+   5.1483
+  ],
+  [
+   250,
+   4.8895
+  ],
+  [
+   300,
+   4.6999
+  ],
+  [
+   350,
+   4.5766
+  ],
+  [
+   400,
+   4.4677
+  ],
+  [
+   450,
+   4.3785
+  ],
+  [
+   500,
+   4.3124
+  ],
+  [
+   550,
+   4.231
+  ],
+  [
+   600,
+   4.1714
+  ],
+  [
+   650,
+   4.1028
+  ],
+  [
+   700,
+   4.0187
+  ],
+  [
+   750,
+   3.9978
+  ],
+  [
+   800,
+   3.9718
+  ],
+  [
+   850,
+   3.9273
+  ],
+  [
+   900,
+   3.893
+  ],
+  [
+   950,
+   3.8664
+  ],
+  [
+   1000,
+   3.8255
+  ],
+  [
+   1050,
+   3.8018
+  ],
+  [
+   1051,
+   3.8031
+  ]
+ ],
+ "train_seconds": 74.24,
+ "wall_seconds": 87.14,
+ "chars_per_sec": 116088,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, in a small house, there lived a funny village. She had a big, old day, he liked to show her friends.\nOne day, the big, pretty fish flew in the garden. The duck was not sad anymore. She said, \"Let's play, frog!\" The fish smiled and said, \"I am sorry, I don't know.\" Sue stopped and gave the fish out of the water. She said, \"Thank you, Amy, I don't need here.\"\n<|eot|>\nOne day, a little girl named Lily went to the park to see her. She saw a big red, shiny blue, green tree on the ground. Lily wanted to help Lily, but the nest did not want to eat.\nLily asked, \"Can I have some it?\" The bird said, \"I can help you, Lily. I will find many things.\" Lily looked around and saw something shiny. Tom was so happy to play with Sue. He liked the day and hugged Max with his mom.\n<|eot|>\nOne day, a little girl named Lily went to a boy named Tim asked her help. Her mom asked if they could play with the music. They wanted to play to go, so they got the elese. They were sad and Sue could not reach it.\nThen, a little girl came to the boy called. She felt bad and saw her very sad. The boy was sad. She went to show the cat to build a big hat",
+ "rule_init": {},
+ "ngram_init": {}
+}

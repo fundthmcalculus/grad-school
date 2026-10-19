@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta_static",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "fixed",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v39-rflm30\\fixed_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta_static",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "fixed",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 94880,
+ "params_nonemb": 45728,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.13684,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.29193
+  ],
+  [
+   100,
+   1.58692
+  ],
+  [
+   200,
+   1.43673
+  ],
+  [
+   300,
+   1.36771
+  ],
+  [
+   400,
+   1.31971
+  ],
+  [
+   500,
+   1.2806
+  ],
+  [
+   600,
+   1.24505
+  ],
+  [
+   700,
+   1.21785
+  ],
+  [
+   800,
+   1.19046
+  ],
+  [
+   900,
+   1.16916
+  ],
+  [
+   1000,
+   1.15272
+  ],
+  [
+   1100,
+   1.14048
+  ],
+  [
+   1160,
+   1.13684
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.4488
+  ],
+  [
+   50,
+   8.1459
+  ],
+  [
+   100,
+   6.2721
+  ],
+  [
+   150,
+   5.3531
+  ],
+  [
+   200,
+   4.9012
+  ],
+  [
+   250,
+   4.6445
+  ],
+  [
+   300,
+   4.4666
+  ],
+  [
+   350,
+   4.3655
+  ],
+  [
+   400,
+   4.2715
+  ],
+  [
+   450,
+   4.1906
+  ],
+  [
+   500,
+   4.1186
+  ],
+  [
+   550,
+   4.0672
+  ],
+  [
+   600,
+   3.9949
+  ],
+  [
+   650,
+   3.9551
+  ],
+  [
+   700,
+   3.8965
+  ],
+  [
+   750,
+   3.8614
+  ],
+  [
+   800,
+   3.8232
+  ],
+  [
+   850,
+   3.7945
+  ],
+  [
+   900,
+   3.7576
+  ],
+  [
+   950,
+   3.7342
+  ],
+  [
+   1000,
+   3.6873
+  ],
+  [
+   1050,
+   3.656
+  ],
+  [
+   1100,
+   3.6471
+  ],
+  [
+   1150,
+   3.6296
+  ],
+  [
+   1159,
+   3.62
+  ]
+ ],
+ "train_seconds": 79.21,
+ "wall_seconds": 92.69,
+ "chars_per_sec": 119974,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Sally. She loved to play with her new things at her house.\nOne day, Anna saw a big box. She wanted to push the box. Anna told Lily how to play with her friend. She looked at her friend's grandma and put the plane a big tree. She slumed to get the box and smiled.\n\"Hello, Ben, it's go!\" Ben said. \"Sure, it's arrick's arfe!\" said the amazed.\nThe amazed, \"That's a big red toy!\" The rail said, \"Do you want to play!\" Sued and the race was scared.\nBut the race was not hot anymore. The ride was not hear. It was now a nice lady, so he started to push the car. But the race was too long. The race was on the tirelf. The race was very small and ugly. The race, and the gen. The race was a good bird, and they were all dangerous anymore.\n<|eot|>\n\n\nSara's mom. Sara nodded. She wanted to learn what was inside. She thought she did not have persess. Ben having leaf and called his mommy and dad.\n\"I'm",
+ "rule_init": {},
+ "ngram_init": {}
+}
