@@ -1,9 +1,9 @@
 """Build ONE self-contained HTML file of the in-browser demo (opens from a file:// address, works offline).
 
-    python demo/build_standalone.py [--all]  ->  demo/dist/flm-demo.html
+    python demo/build_standalone.py [--all]  ->  demo/dist/index.html
 
 The weights and rule views of the models are embedded as base64. By default only the sub-100K models go in (about 2.5 MB);
-``--all`` adds the 1.32M model (over the cap, about 4.5 MB more). The output is gitignored: rebuild it, don't commit it.
+``--all`` adds the 1.32M model (over the cap, about 4.5 MB more). The output is committed (demo/dist/index.html, under the 5 MB data limit) so GitHub Pages can serve it statically; rebuild and commit it when demo/web changes.
 """
 
 import base64
@@ -35,7 +35,7 @@ def main():
         "<!--EMBED-->", "<script>window.FLM_EMBED = " + json.dumps(emb) + ";</script>"
     )
     DIST.mkdir(exist_ok=True)
-    out = DIST / "flm-demo.html"
+    out = DIST / "index.html"
     out.write_text(html, encoding="utf-8")
     print(f"{out}  {out.stat().st_size / 1e6:.2f} MB  ({len(index)} models)")
 

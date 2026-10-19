@@ -6,9 +6,10 @@ The whole demo, including generation, runs in the browser tab. A JavaScript port
 
 ```bash
 cd experiments/fuzzy-language-model/demo/web && python -m http.server 8000     # then open http://localhost:8000
-python demo/build_standalone.py [--all]      # or one self-contained file, demo/dist/flm-demo.html, that opens from a file:// address
+python demo/build_standalone.py [--all]      # or one self-contained file, demo/dist/index.html, that opens from a file:// address
 ```
 
+* **GitHub Pages:** `demo/dist/index.html` is committed and self-contained (3.3 MB, both sub-100K models, no external requests), so publishing the `demo/dist` folder (or the repository with Pages pointed at it) serves the demo statically.
 * Models: the 96K 3B-character reference (386 KB of weights), the 98K tiered-embedding model (the best sub-100K likelihood, 0.961 BPC at 1B characters, seed 1), and the 1.32M model (fp16, 2.6 MB; over the 100K cap, included for comparison). Generation costs 0.2-1 ms per word piece.
 * `python demo/export_web.py` rebuilds `web/models/` from the checkpoints (run from the experiment directory). It densifies the tiered embedding (input row and tied output row of a token are both `model.embed(token)`; checked against the original model before writing) and precomputes the rule views (`rule_views.py`: membership histograms over 48 validation windows). For the 1.32M model only the most used rules carry data histograms; any other rule shows its membership functions from the weights.
 * Checks: `node demo/web/test_parity.mjs` compares the engine with the torch logits (max |dlogit| 2e-5 for the 96K model, 1e-4 for the tiered one, 1e-2 for the fp16 1.32M one; argmax identical) and the tokenizer with the HF tokenizer on 8 strings (`python demo/export_tok_check.py` regenerates the references). Before the server was removed, a greedy 12-piece run also reproduced all 36 rule rows of its rule explanations (layer, rule, contribution, raised pieces).
