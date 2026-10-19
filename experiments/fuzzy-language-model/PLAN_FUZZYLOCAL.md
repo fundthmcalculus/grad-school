@@ -63,3 +63,7 @@ Predictions: twelve rules recover at least a third of the gate's cost (45%): fga
 
 ## Run state after the machine crash (2026-10-19)
 The crash killed the stage 1 confirmation (`v46`, seed 0 reached step 5,000 of 9,522, no result kept) and nothing else was lost; every result above is committed and pushed. All runners skip cells that already have a result. The queue is now one resumable script, `scripts/chain_fuzzy.sh`: stage 1 at 300M (2 seeds), stage 3a, stage 3b, stage 4b.
+
+## Stage 1 confirmation outcome (`v46-fuzzylocal300m`; 300M characters, seeds 0-1; the machine crash killed the first attempt, this is the rerun; 99,548 params)
+4-token fuzzy local layer (no convolution): **0.96546 / 0.96679 (mean 0.96612)** against the same recipe with the convolution (`v41`) 0.95758 / 0.96015 (mean 0.95886): **+0.0079 / +0.0066 (mean +0.0073)**, worse on both seeds. Predictions: within 0.005 of the convolution on both seeds (55%): **wrong**; better on both (15%): no; worse by >= 0.005 on both (30%): **right**.
+Reading: the 30M screen (+0.0013, se 0.0057) was too noisy to see a cost this size; at 300M the fuzzy conjunctive rule layer over four tokens costs **0.0073 BPC (about 0.8%)** and the convolution is the better local operator. Under the owner's goal (every component a fuzzy inference layer) the fuzzy local layer stays in the composed model and its cost is the reported number; the plain convolution is the comparison arm. Stage 3a is running.
