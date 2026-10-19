@@ -12,7 +12,7 @@ TEXTS = [
     "Once upon a time",
     "Lily and Ben went to the park.",
     "The little dog was sad because",
-    "One day, a girl named Mia found a shiny red ball!\n\nShe said, \"Wow, it's so big.\"",
+    'One day, a girl named Mia found a shiny red ball!\n\nShe said, "Wow, it\'s so big."',
     "  leading spaces,  double  spaces and a trailing newline\n",
     "Numbers 123 and 4567; symbols #$%&* -- ok?",
     "It's they're we've I'm you'll he'd",
