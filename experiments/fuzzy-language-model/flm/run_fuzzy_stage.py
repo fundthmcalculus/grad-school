@@ -15,6 +15,11 @@ ARMS = {  # name: env overrides
     "scaleonly": {"FUZZ_NORM": "scale"},
     "fgate": {"FUZZ_GATE": "1"},
     "fnorm_fgate": {"FUZZ_NORM": "fuzzy", "FUZZ_GATE": "1"},
+    "fgate12": {
+        "FUZZ_GATE": "1",
+        "FUZZ_GATE_R": "12",
+        "MULT": "1.3",
+    },  # stage 4b: twelve rules, FFN trimmed to stay under the cap
 }
 if __name__ == "__main__":
     (OUT / "logs").mkdir(parents=True, exist_ok=True)
@@ -26,7 +31,7 @@ if __name__ == "__main__":
                 continue
             a = argv("random", seed)
             a[a.index("--out") + 1] = str(out)
-            a[a.index("--ffn-mult") + 1] = "1.5"
+            a[a.index("--ffn-mult") + 1] = ARMS[name].get("MULT", "1.5")
             a[a.index("--tok") + 1] = "bpe3072"
             env = dict(
                 os.environ,
@@ -34,7 +39,7 @@ if __name__ == "__main__":
                 TIER_E="12",
                 TIER_FREQ="outputs/freq_bpe3072.npz",
                 PYTHONPATH=".",
-                **ARMS[name],
+                **{k: v for k, v in ARMS[name].items() if k != "MULT"},
             )
             with open(OUT / "logs" / f"{name}_s{seed}.log", "w") as f:
                 r = subprocess.run(
