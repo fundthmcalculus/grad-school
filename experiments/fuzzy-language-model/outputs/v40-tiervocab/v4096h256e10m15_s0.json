@@ -1,0 +1,226 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v4096h256e10m15_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe4096",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 4096
+ },
+ "config": {
+  "vocab_size": 4096,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98432,
+ "params_nonemb": 47264,
+ "steps": 927,
+ "chars_seen": 30025470,
+ "chars_per_token": 3.9538496,
+ "val_bpc": 1.05885,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.09592
+  ],
+  [
+   100,
+   1.40528
+  ],
+  [
+   200,
+   1.2723
+  ],
+  [
+   300,
+   1.20903
+  ],
+  [
+   400,
+   1.16647
+  ],
+  [
+   500,
+   1.14404
+  ],
+  [
+   600,
+   1.10993
+  ],
+  [
+   700,
+   1.08863
+  ],
+  [
+   800,
+   1.07103
+  ],
+  [
+   900,
+   1.0615
+  ],
+  [
+   927,
+   1.05885
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   12.229
+  ],
+  [
+   50,
+   9.628
+  ],
+  [
+   100,
+   7.2231
+  ],
+  [
+   150,
+   6.0428
+  ],
+  [
+   200,
+   5.4518
+  ],
+  [
+   250,
+   5.1363
+  ],
+  [
+   300,
+   4.9622
+  ],
+  [
+   350,
+   4.8318
+  ],
+  [
+   400,
+   4.7319
+  ],
+  [
+   450,
+   4.6672
+  ],
+  [
+   500,
+   4.5958
+  ],
+  [
+   550,
+   4.54
+  ],
+  [
+   600,
+   4.4751
+  ],
+  [
+   650,
+   4.4248
+  ],
+  [
+   700,
+   4.3725
+  ],
+  [
+   750,
+   4.3328
+  ],
+  [
+   800,
+   4.3056
+  ],
+  [
+   850,
+   4.2633
+  ],
+  [
+   900,
+   4.2285
+  ],
+  [
+   926,
+   4.2158
+  ]
+ ],
+ "train_seconds": 72.57,
+ "wall_seconds": 84.99,
+ "chars_per_sec": 104644,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a girl named Lily. Lily liked to play and play with them every day. One day, Lily and her mom said, \"Yes, Mom. But a big, friendly flower. It is something pileing!\" Lily thought they would never buy some corn on the grass.\nLily put the fish with her mom. She sat on the ground and saw the water. She wanted to help him find her. She thought it would be fun to be nice, but they could not find her best. Lily was not scared of her. she asked her friend, Sue.\nLily saw Lily and said sorry to Lily. Lily said, \"I am in my table. I have a duck on my hand.\"\nLily and Sue wanted to make her book. They ran to the magic shop. \"Why don't you give me a train, dad?\" she said. \"I know, Lily. Let's play. What did you help me find the trap if I can try. We'll find your pen. I have fun.\" Lily said, \"I am sorry, Lily. I'm sorry\". They did not know what we are. Let's run together one thing. Can I break it?\" Tom said, \"Yes, Lily. It is my big box!\" Lily and Lily were excited. They laughed and had fun. They needed to find the box.\nLily and Lily were happy. They played with the box and were best friends. They would rested",
+ "rule_init": {},
+ "ngram_init": {}
+}

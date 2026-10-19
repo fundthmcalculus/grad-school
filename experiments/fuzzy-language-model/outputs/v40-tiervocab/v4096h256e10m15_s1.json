@@ -1,0 +1,226 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v4096h256e10m15_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe4096",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 4096
+ },
+ "config": {
+  "vocab_size": 4096,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98432,
+ "params_nonemb": 47264,
+ "steps": 927,
+ "chars_seen": 30025470,
+ "chars_per_token": 3.9538496,
+ "val_bpc": 1.05093,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.0782
+  ],
+  [
+   100,
+   1.38323
+  ],
+  [
+   200,
+   1.25955
+  ],
+  [
+   300,
+   1.19952
+  ],
+  [
+   400,
+   1.15856
+  ],
+  [
+   500,
+   1.12641
+  ],
+  [
+   600,
+   1.1024
+  ],
+  [
+   700,
+   1.08035
+  ],
+  [
+   800,
+   1.0623
+  ],
+  [
+   900,
+   1.05277
+  ],
+  [
+   927,
+   1.05093
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   12.1533
+  ],
+  [
+   50,
+   9.312
+  ],
+  [
+   100,
+   6.9991
+  ],
+  [
+   150,
+   5.8833
+  ],
+  [
+   200,
+   5.3515
+  ],
+  [
+   250,
+   5.0617
+  ],
+  [
+   300,
+   4.887
+  ],
+  [
+   350,
+   4.7989
+  ],
+  [
+   400,
+   4.7045
+  ],
+  [
+   450,
+   4.6193
+  ],
+  [
+   500,
+   4.5532
+  ],
+  [
+   550,
+   4.4907
+  ],
+  [
+   600,
+   4.4404
+  ],
+  [
+   650,
+   4.3941
+  ],
+  [
+   700,
+   4.3378
+  ],
+  [
+   750,
+   4.3032
+  ],
+  [
+   800,
+   4.2626
+  ],
+  [
+   850,
+   4.2359
+  ],
+  [
+   900,
+   4.1992
+  ],
+  [
+   926,
+   4.2069
+  ]
+ ],
+ "train_seconds": 72.78,
+ "wall_seconds": 85.35,
+ "chars_per_sec": 104345,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a girl named Lily. Lily loved to play and play with them every day.\nOne day, Lily met a little girl named Lily. Lily's dad said, \"This is a great job\". Lily looked for a hug and she didn't know what to do. The oats wanted to help her. Tom said, \"I promise, mom is bad. I will listen to my mom.\"\nLily took the big red chair to Lily's house. She gave them a plan to the vice about her. At the kitchen was not for her mom. Lily said, \"You are a big best!\" Lily was happy to have many toys in her table. Lily followed her dime on the air.\nLily and Lily stayed open. They had lots of fun together. They had so much fun with the doll and the day.\n<|eot|>\nOnce upon a time, there was a smelly cat named Bob. Bob liked to watch his friends run in the park. One day, rich cat told him to help him do something fun.\nTim wanted to help Tuna and help him. He found a picture of a large box on the floor. He went up to the big box and saw the cat. \"Look, Bob! Let's sort the box and the box!\" Bob said, \"I am going under the wall too!\"\nThe moral of the story is to always take a book for you, and have fun and help sharing can have the toys. And you",
+ "rule_init": {},
+ "ngram_init": {}
+}

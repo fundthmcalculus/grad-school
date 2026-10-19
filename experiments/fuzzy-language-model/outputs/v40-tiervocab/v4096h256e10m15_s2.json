@@ -1,0 +1,226 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v4096h256e10m15_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe4096",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 4096
+ },
+ "config": {
+  "vocab_size": 4096,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98432,
+ "params_nonemb": 47264,
+ "steps": 927,
+ "chars_seen": 30025470,
+ "chars_per_token": 3.9538496,
+ "val_bpc": 1.05803,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06311
+  ],
+  [
+   100,
+   1.38624
+  ],
+  [
+   200,
+   1.24902
+  ],
+  [
+   300,
+   1.19993
+  ],
+  [
+   400,
+   1.16186
+  ],
+  [
+   500,
+   1.13284
+  ],
+  [
+   600,
+   1.10755
+  ],
+  [
+   700,
+   1.08825
+  ],
+  [
+   800,
+   1.07069
+  ],
+  [
+   900,
+   1.06051
+  ],
+  [
+   927,
+   1.05803
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   12.0656
+  ],
+  [
+   50,
+   9.384
+  ],
+  [
+   100,
+   7.0903
+  ],
+  [
+   150,
+   5.9263
+  ],
+  [
+   200,
+   5.3714
+  ],
+  [
+   250,
+   5.0744
+  ],
+  [
+   300,
+   4.8982
+  ],
+  [
+   350,
+   4.7767
+  ],
+  [
+   400,
+   4.6937
+  ],
+  [
+   450,
+   4.617
+  ],
+  [
+   500,
+   4.5599
+  ],
+  [
+   550,
+   4.5169
+  ],
+  [
+   600,
+   4.4587
+  ],
+  [
+   650,
+   4.401
+  ],
+  [
+   700,
+   4.3448
+  ],
+  [
+   750,
+   4.3198
+  ],
+  [
+   800,
+   4.2791
+  ],
+  [
+   850,
+   4.25
+  ],
+  [
+   900,
+   4.2252
+  ],
+  [
+   926,
+   4.2018
+  ]
+ ],
+ "train_seconds": 72.69,
+ "wall_seconds": 84.34,
+ "chars_per_sec": 104476,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a girl named Lily. Lily loved to play and play with them every day. One day, Lily got a clumsy red car like to play in the park. She saw a big, tired fox on the ground.\nLily asked her mom, \"Why can I take the part to the little bird with my house?\" Her mom said, \"Yes, I can help you. We can't find you.\" She put the treasure on the swings and the bird lay under the tree. The bear was happy and not scared. They became friends. They thanked the bird and the bird. The bird laughed and said, \"Thank you, Lily!\"\nThe bird said, \"Thank you, Lily!\"\nThe bird laughed and played with the ball. Lily and the bird became good friends, and they all became good friends and played together every day.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She liked to play with her toys and play. One day, she found a big box of walls. She decided to whistle a drive of money.\nLily's mom went to the park and saw her room. She was very surprised. She could not go to the park with her toy car. Lily's mom said, \"Can you help me, I have a lot?\"\nLily smiled and said, \"That's a lot, Mia!\" Mia had a bit scared. She put on her toys and hold and fall. It was the basket and felt very",
+ "rule_init": {},
+ "ngram_init": {}
+}
