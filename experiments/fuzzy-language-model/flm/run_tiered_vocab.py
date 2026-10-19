@@ -21,10 +21,15 @@ ARMS = {  # name: (vocab, head tokens, tail width, ffn mult)
         "2.25",
     ),  # 98,280: iso-parameter with t768e16m225 on BPE1024
     "v2048h512e16m15": (2048, 512, 16, "1.5"),  # 97,184
+    # round 2: more vocabulary, other shapes (all under 100K)
+    "v2048h384e16m20": (2048, 384, 16, "2.0"),  # 99,280
+    "v2048h512e12m22": (2048, 512, 12, "2.2"),  # 99,620
+    "v3072h384e12m15": (3072, 384, 12, "1.5"),  # 98,528
+    "v4096h256e8m20": (4096, 256, 8, "2.0"),
 }
 if __name__ == "__main__":
     (OUT / "logs").mkdir(parents=True, exist_ok=True)
-    arms = sys.argv[1:] or list(ARMS)
+    arms = sys.argv[1:] or list(ARMS)[:3]
     for seed in range(5):
         for name in arms:
             v, nh, e, m = ARMS[name]
