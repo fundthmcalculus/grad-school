@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v47-fuzzyffn\\ffn_raw1_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98488,
+ "params_nonemb": 47224,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06518,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05004
+  ],
+  [
+   100,
+   1.42966
+  ],
+  [
+   200,
+   1.29102
+  ],
+  [
+   300,
+   1.22577
+  ],
+  [
+   400,
+   1.18516
+  ],
+  [
+   500,
+   1.15363
+  ],
+  [
+   600,
+   1.1245
+  ],
+  [
+   700,
+   1.1005
+  ],
+  [
+   800,
+   1.08085
+  ],
+  [
+   900,
+   1.06768
+  ],
+  [
+   953,
+   1.06518
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7189
+  ],
+  [
+   50,
+   9.2236
+  ],
+  [
+   100,
+   7.0393
+  ],
+  [
+   150,
+   5.9283
+  ],
+  [
+   200,
+   5.3549
+  ],
+  [
+   250,
+   5.0423
+  ],
+  [
+   300,
+   4.8758
+  ],
+  [
+   350,
+   4.7485
+  ],
+  [
+   400,
+   4.6414
+  ],
+  [
+   450,
+   4.5733
+  ],
+  [
+   500,
+   4.4998
+  ],
+  [
+   550,
+   4.4569
+  ],
+  [
+   600,
+   4.3875
+  ],
+  [
+   650,
+   4.3278
+  ],
+  [
+   700,
+   4.2839
+  ],
+  [
+   750,
+   4.2575
+  ],
+  [
+   800,
+   4.2144
+  ],
+  [
+   850,
+   4.1775
+  ],
+  [
+   900,
+   4.1503
+  ],
+  [
+   950,
+   4.1435
+  ],
+  [
+   952,
+   4.1416
+  ]
+ ],
+ "train_seconds": 69.71,
+ "wall_seconds": 80.93,
+ "chars_per_sec": 111996,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. Mia was busy and had a lot of fun. She had a box to read, and Sue was very happy.\nOne day, Sue said to her mom. Her mom said, \"Why are you here?\" Her mom said, \"Yes, Sue!\" They both went to the kitchen every day, and they worked together together. The cakey was having a fun day with a baking.\n<|eot|>\nOnce upon a time, in a small house, there was a little bird. The cat had a big red ball. He wanted to play with it.\nOne day, the cat flew into the ball. It could not wait to go away. The cat said, \"Tim, can we help me touch the big ball?\"\nThe cat said, \"Yes, I can fly with me.\" His mom looked at the ball and said, \"I have some juices. Let's go to the yard together.\" The cat smiled and thanked the cat. The cat was happy.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to jump in the park and play with her all day. One day, she found a big gem in the stoura. She picked it up and looked at it.\nLily started to feel better. She remembered it was blue and right. She pushed up and pulled it back. She was very sad. At the park, she found a big light tree. The p",
+ "rule_init": {},
+ "ngram_init": {}
+}

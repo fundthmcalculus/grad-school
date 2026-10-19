@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v47-fuzzyffn\\ffn_proj0_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99152,
+ "params_nonemb": 47888,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.08505,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.08086
+  ],
+  [
+   100,
+   1.45843
+  ],
+  [
+   200,
+   1.29475
+  ],
+  [
+   300,
+   1.23724
+  ],
+  [
+   400,
+   1.20315
+  ],
+  [
+   500,
+   1.1708
+  ],
+  [
+   600,
+   1.14263
+  ],
+  [
+   700,
+   1.11782
+  ],
+  [
+   800,
+   1.10031
+  ],
+  [
+   900,
+   1.08902
+  ],
+  [
+   953,
+   1.08505
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.8544
+  ],
+  [
+   50,
+   9.6409
+  ],
+  [
+   100,
+   7.3007
+  ],
+  [
+   150,
+   6.0415
+  ],
+  [
+   200,
+   5.4243
+  ],
+  [
+   250,
+   5.1063
+  ],
+  [
+   300,
+   4.9344
+  ],
+  [
+   350,
+   4.8356
+  ],
+  [
+   400,
+   4.7366
+  ],
+  [
+   450,
+   4.6447
+  ],
+  [
+   500,
+   4.5784
+  ],
+  [
+   550,
+   4.5092
+  ],
+  [
+   600,
+   4.441
+  ],
+  [
+   650,
+   4.4032
+  ],
+  [
+   700,
+   4.3609
+  ],
+  [
+   750,
+   4.3294
+  ],
+  [
+   800,
+   4.2765
+  ],
+  [
+   850,
+   4.2482
+  ],
+  [
+   900,
+   4.2354
+  ],
+  [
+   950,
+   4.2151
+  ],
+  [
+   952,
+   4.2167
+  ]
+ ],
+ "train_seconds": 69.62,
+ "wall_seconds": 81.85,
+ "chars_per_sec": 112135,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl at a little girl. She was so happy and her mom was happy. She knew how to get the orcle and help each other.\nBut then, something unexpected happened. It were the water and decided to go home. It was a little girl in it. The little girl was sad, but her mom said. She worked to her room, a big, beautiful door and her friend!\nThe little boy saw her fairy who knew she could help her. \"You are so bad that\". It had a big lected and a big, dangerous banana. The little girl smiled and said, \"I am sorry, Lucy. You are a whole place. \nThe little girl was very happy and're sorry to her. She said, \"Don't worry, I'm very honest. I learned that you can be organized and crossing it.\" They laughed and became good friends.\n<|eot|>\nOnce upon a time, there was a little bunny named Lily. Lily had a toy of red cars and a shirt. One day, Ben saw an crab in the garden. She said, \"Why can I feel?\"\nLily looked at the fruit and thought, \"Look, a small girl named Lily. She said, \"I am hiding through the grass!\" Lily looked so excited and walked to the garden. She saw a big tree and wanted to show her mom.\n\"No, you can have it!\" Lily said, serluffy. \"Thank",
+ "rule_init": {},
+ "ngram_init": {}
+}

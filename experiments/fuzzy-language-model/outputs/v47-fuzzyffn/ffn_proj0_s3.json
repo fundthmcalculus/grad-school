@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v47-fuzzyffn\\ffn_proj0_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99152,
+ "params_nonemb": 47888,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.08616,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.04139
+  ],
+  [
+   100,
+   1.46937
+  ],
+  [
+   200,
+   1.29839
+  ],
+  [
+   300,
+   1.23613
+  ],
+  [
+   400,
+   1.19612
+  ],
+  [
+   500,
+   1.16787
+  ],
+  [
+   600,
+   1.14333
+  ],
+  [
+   700,
+   1.11991
+  ],
+  [
+   800,
+   1.10024
+  ],
+  [
+   900,
+   1.08785
+  ],
+  [
+   953,
+   1.08616
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7108
+  ],
+  [
+   50,
+   9.5137
+  ],
+  [
+   100,
+   7.2946
+  ],
+  [
+   150,
+   6.0719
+  ],
+  [
+   200,
+   5.4382
+  ],
+  [
+   250,
+   5.0974
+  ],
+  [
+   300,
+   4.9248
+  ],
+  [
+   350,
+   4.7982
+  ],
+  [
+   400,
+   4.6929
+  ],
+  [
+   450,
+   4.627
+  ],
+  [
+   500,
+   4.557
+  ],
+  [
+   550,
+   4.5147
+  ],
+  [
+   600,
+   4.4519
+  ],
+  [
+   650,
+   4.3957
+  ],
+  [
+   700,
+   4.3483
+  ],
+  [
+   750,
+   4.3244
+  ],
+  [
+   800,
+   4.2817
+  ],
+  [
+   850,
+   4.2473
+  ],
+  [
+   900,
+   4.2216
+  ],
+  [
+   950,
+   4.2122
+  ],
+  [
+   952,
+   4.211
+  ]
+ ],
+ "train_seconds": 69.93,
+ "wall_seconds": 82.09,
+ "chars_per_sec": 111643,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl called. She was very busy. She wanted to keep her so happy. She said to her mom, so she said, \"You're welcome, Lily. Now first other end, I will help you find your new friend to play with us.\"\nAfter they walked, the big blue ball had found a big, red ball. The birds was very nice and ran away to make the hole out. Every night, she saw the wind and said, \"Wow, you can help you. I will hurt you. You can fly and share my ball together.\"\nThe wind got an old ball and flew away. It was very happy and could not go away. The ball said, \"Thank you for my ball, you will help me.\"\nThe big red ball had a big, red ball. The ball would delue and play with the ball. The ball was so happy! The ball was not a big funny mitten.\n<|eot|>\n\nOnce upon a time, there was a little girl called Tren. She was always hungry like the crab, so a little girl and her mom were always having fun.\nOne sunny day, she wanted to know what she would love her. One day, she said to her friend, to help her help.\n\"What is you, spunk?\" she asked. \nSally decided to look for her. She asked Lucy, \"Do't know what it's?\"\nEmm and said",
+ "rule_init": {},
+ "ngram_init": {}
+}
