@@ -1,0 +1,183 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.003,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-acc-htsk_lr3e-3_sc0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "max_len": 256
+ },
+ "params_total": 28004,
+ "params_nonemb": 24868,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.17659,
+ "evals": [
+  [
+   305,
+   2.73067
+  ],
+  [
+   610,
+   2.34254
+  ],
+  [
+   915,
+   2.21604
+  ],
+  [
+   1220,
+   2.17695
+  ],
+  [
+   1221,
+   2.17659
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8988
+  ],
+  [
+   50,
+   6.3183
+  ],
+  [
+   100,
+   5.2047
+  ],
+  [
+   150,
+   4.2557
+  ],
+  [
+   200,
+   3.5921
+  ],
+  [
+   250,
+   3.1847
+  ],
+  [
+   300,
+   2.9386
+  ],
+  [
+   350,
+   2.7857
+  ],
+  [
+   400,
+   2.6674
+  ],
+  [
+   450,
+   2.5841
+  ],
+  [
+   500,
+   2.5116
+  ],
+  [
+   550,
+   2.4379
+  ],
+  [
+   600,
+   2.3863
+  ],
+  [
+   650,
+   2.3475
+  ],
+  [
+   700,
+   2.3193
+  ],
+  [
+   750,
+   2.2954
+  ],
+  [
+   800,
+   2.2668
+  ],
+  [
+   850,
+   2.2521
+  ],
+  [
+   900,
+   2.2371
+  ],
+  [
+   950,
+   2.2236
+  ],
+  [
+   1000,
+   2.2018
+  ],
+  [
+   1050,
+   2.1969
+  ],
+  [
+   1100,
+   2.1884
+  ],
+  [
+   1150,
+   2.1844
+  ],
+  [
+   1200,
+   2.1898
+  ],
+  [
+   1220,
+   2.1884
+  ]
+ ],
+ "train_seconds": 845.28,
+ "wall_seconds": 1060.98,
+ "chars_per_sec": 11833,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, the the shins for the she made mads and happy and slo be go him.\nMax dog fore agan a big make a big on the saw and sad sail day, saw he side she reame. The did alir poling the for an the fle\ufffd\ufffd. \n\"Canked toige shined the tried to wat the cas. The made and their the sceep. They adn't smiled. Max a p",
+ "rule_init": {}
+}

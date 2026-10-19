@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t512e24m20_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 91472,
+ "params_nonemb": 53456,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10692,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.24746
+  ],
+  [
+   100,
+   1.59789
+  ],
+  [
+   200,
+   1.44558
+  ],
+  [
+   300,
+   1.37539
+  ],
+  [
+   400,
+   1.32727
+  ],
+  [
+   500,
+   1.2862
+  ],
+  [
+   600,
+   1.24008
+  ],
+  [
+   700,
+   1.20473
+  ],
+  [
+   800,
+   1.17228
+  ],
+  [
+   900,
+   1.14542
+  ],
+  [
+   1000,
+   1.12513
+  ],
+  [
+   1100,
+   1.11364
+  ],
+  [
+   1160,
+   1.10692
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2514
+  ],
+  [
+   50,
+   8.0977
+  ],
+  [
+   100,
+   6.2744
+  ],
+  [
+   150,
+   5.3526
+  ],
+  [
+   200,
+   4.8978
+  ],
+  [
+   250,
+   4.6437
+  ],
+  [
+   300,
+   4.4725
+  ],
+  [
+   350,
+   4.36
+  ],
+  [
+   400,
+   4.2857
+  ],
+  [
+   450,
+   4.1848
+  ],
+  [
+   500,
+   4.1291
+  ],
+  [
+   550,
+   4.0639
+  ],
+  [
+   600,
+   4.0054
+  ],
+  [
+   650,
+   3.927
+  ],
+  [
+   700,
+   3.8797
+  ],
+  [
+   750,
+   3.8313
+  ],
+  [
+   800,
+   3.7714
+  ],
+  [
+   850,
+   3.7214
+  ],
+  [
+   900,
+   3.6892
+  ],
+  [
+   950,
+   3.6429
+  ],
+  [
+   1000,
+   3.6022
+  ],
+  [
+   1050,
+   3.5692
+  ],
+  [
+   1100,
+   3.5551
+  ],
+  [
+   1150,
+   3.533
+  ],
+  [
+   1159,
+   3.5302
+  ]
+ ],
+ "train_seconds": 80.31,
+ "wall_seconds": 94.44,
+ "chars_per_sec": 118327,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and first. The driver was special and wanted to make a big box. The people became best friends.\nOne day, the dog and the dog went home. They saw a beautiful surprise and wanted to go inside. The voice said, \"Yes, let's go a steet.\"\nSo, the girl said, \"I am happy. I will selfish you to help each other.\" They played in the park all day. They all laughed and were very happy.\nThey both had a great time. They decided to make him very much. They were so happy and said, \"I am the end of the thread. you did not like your new friend to make them look for your best. That's good.\"\nThe happy story and they worked together with the sun. The moral of the story is that when you where you learned to be on, and we can never break.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. Tim had a plan with a green board. It was a big tree to play. He wanted to play with his friends and have fun.\nOne day, Tim met a big bed. Tim saw the deep shoes. He asked Tim, \"Can you play together?\" Tim said, \"Yes, Tim,, Tim, and I found a big tree.",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v34-mrl\\m2_s4.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.14818,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.28161
+  ],
+  [
+   100,
+   1.61025
+  ],
+  [
+   200,
+   1.45465
+  ],
+  [
+   300,
+   1.39236
+  ],
+  [
+   400,
+   1.3408
+  ],
+  [
+   500,
+   1.30189
+  ],
+  [
+   600,
+   1.26648
+  ],
+  [
+   700,
+   1.23264
+  ],
+  [
+   800,
+   1.20726
+  ],
+  [
+   900,
+   1.18462
+  ],
+  [
+   1000,
+   1.16361
+  ],
+  [
+   1100,
+   1.15331
+  ],
+  [
+   1160,
+   1.14818
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2508
+  ],
+  [
+   50,
+   8.2567
+  ],
+  [
+   100,
+   6.4359
+  ],
+  [
+   150,
+   5.5543
+  ],
+  [
+   200,
+   5.0708
+  ],
+  [
+   250,
+   4.83
+  ],
+  [
+   300,
+   4.6661
+  ],
+  [
+   350,
+   4.5648
+  ],
+  [
+   400,
+   4.4602
+  ],
+  [
+   450,
+   4.4075
+  ],
+  [
+   500,
+   4.3401
+  ],
+  [
+   550,
+   4.2944
+  ],
+  [
+   600,
+   4.2236
+  ],
+  [
+   650,
+   4.1696
+  ],
+  [
+   700,
+   4.1277
+  ],
+  [
+   750,
+   4.086
+  ],
+  [
+   800,
+   4.0385
+  ],
+  [
+   850,
+   3.9848
+  ],
+  [
+   900,
+   3.9544
+  ],
+  [
+   950,
+   3.929
+  ],
+  [
+   1000,
+   3.893
+  ],
+  [
+   1050,
+   3.8549
+  ],
+  [
+   1100,
+   3.8443
+  ],
+  [
+   1150,
+   3.8228
+  ],
+  [
+   1159,
+   3.8236
+  ]
+ ],
+ "train_seconds": 81.88,
+ "wall_seconds": 96.07,
+ "chars_per_sec": 116059,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl. She was a pack measure, and a little girl. She wanted to go fast and play with her friend.\nOn the pizzy, she saw a big dog. The dog was very falling. The dog was scared. The dog wanted to help it. The bird said, \"Yes, bird!\" The dog said, \"I am sorry. I will sit up and help you help each other.\" They then saw a big, red ball and saw something a family. The dog was scared. The cat found a friend, the dog. The dog loved the balloon. The dog said, \"I want to make a four ball together.\" The dog grabbed the ball together, and they both played together again.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. He had a big, toys in the mirror. He lived in a big tree on the yard. Tim loved to sprop on the ground.\nOne day, Tim's mom said, \"I want to play with you!\" His mom saw his mom about his bread.\nTim replied, \"That's your saved! But building away. It can find my sand. It is a new friend. It is a big vegetable. The is having a great day towet. Tim is happy. He does not want",
+ "rule_init": {},
+ "ngram_init": {}
+}

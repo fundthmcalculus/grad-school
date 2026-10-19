@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t256e32m15_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 85664,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.13004,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.22052
+  ],
+  [
+   100,
+   1.62337
+  ],
+  [
+   200,
+   1.46999
+  ],
+  [
+   300,
+   1.39378
+  ],
+  [
+   400,
+   1.34099
+  ],
+  [
+   500,
+   1.298
+  ],
+  [
+   600,
+   1.25828
+  ],
+  [
+   700,
+   1.2197
+  ],
+  [
+   800,
+   1.18885
+  ],
+  [
+   900,
+   1.16673
+  ],
+  [
+   1000,
+   1.14799
+  ],
+  [
+   1100,
+   1.1342
+  ],
+  [
+   1160,
+   1.13004
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.1568
+  ],
+  [
+   50,
+   8.1138
+  ],
+  [
+   100,
+   6.3448
+  ],
+  [
+   150,
+   5.4528
+  ],
+  [
+   200,
+   5.0071
+  ],
+  [
+   250,
+   4.7487
+  ],
+  [
+   300,
+   4.558
+  ],
+  [
+   350,
+   4.4569
+  ],
+  [
+   400,
+   4.3525
+  ],
+  [
+   450,
+   4.2622
+  ],
+  [
+   500,
+   4.1781
+  ],
+  [
+   550,
+   4.1117
+  ],
+  [
+   600,
+   4.0377
+  ],
+  [
+   650,
+   3.9848
+  ],
+  [
+   700,
+   3.9179
+  ],
+  [
+   750,
+   3.869
+  ],
+  [
+   800,
+   3.8234
+  ],
+  [
+   850,
+   3.7901
+  ],
+  [
+   900,
+   3.7507
+  ],
+  [
+   950,
+   3.7185
+  ],
+  [
+   1000,
+   3.6667
+  ],
+  [
+   1050,
+   3.637
+  ],
+  [
+   1100,
+   3.6258
+  ],
+  [
+   1150,
+   3.6078
+  ],
+  [
+   1159,
+   3.5979
+  ]
+ ],
+ "train_seconds": 81.4,
+ "wall_seconds": 95.56,
+ "chars_per_sec": 116735,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and red bird.\nAs they played, there was a little boy. Today heavy was first, he would pizzy to move. They decided to play with and walk to the wide of a mark.\nOne day, a little girl named Lucy found a big slumble house. She jumped and jumped and higher. Lucy was very happy. She wanted to show her mom that she wanted to give it to her she saw something.\nLucy said, \"Do you found it?\" Lucy said, \"Yes, mom,\" her mom said, \"Yes, what a special purb!\" Lucy said, \"Yes, but I can't have to make my fair can do you help.\"\nLucy and the ravy watched a beautiful dog. The cat was so happy with the mark. They lived happily ever after.\n<|eot|>\n\nMimi never buckning handlied tivinglf and put it upseth. She was extragies, but she knew that she had never wanted to play. She realized a small box to mad, she had to buy a big bed. Everyone did not believe her shelohs. \nThe next day, Benmy went to the town towards and saw a big tree. He was scared",
+ "rule_init": {},
+ "ngram_init": {}
+}

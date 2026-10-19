@@ -1,0 +1,213 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 6,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v15-share\\D-ctx512-r32-share2x3_30M_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 2,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 6,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 2,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.12932,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.38639
+  ],
+  [
+   580,
+   1.25253
+  ],
+  [
+   870,
+   1.17169
+  ],
+  [
+   1160,
+   1.12932
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2545
+  ],
+  [
+   50,
+   8.4514
+  ],
+  [
+   100,
+   6.5353
+  ],
+  [
+   150,
+   5.5154
+  ],
+  [
+   200,
+   5.0035
+  ],
+  [
+   250,
+   4.7077
+  ],
+  [
+   300,
+   4.5079
+  ],
+  [
+   350,
+   4.3753
+  ],
+  [
+   400,
+   4.2915
+  ],
+  [
+   450,
+   4.1869
+  ],
+  [
+   500,
+   4.1333
+  ],
+  [
+   550,
+   4.0765
+  ],
+  [
+   600,
+   4.0243
+  ],
+  [
+   650,
+   3.9514
+  ],
+  [
+   700,
+   3.9077
+  ],
+  [
+   750,
+   3.8602
+  ],
+  [
+   800,
+   3.8093
+  ],
+  [
+   850,
+   3.7707
+  ],
+  [
+   900,
+   3.7403
+  ],
+  [
+   950,
+   3.6988
+  ],
+  [
+   1000,
+   3.6604
+  ],
+  [
+   1050,
+   3.6272
+  ],
+  [
+   1100,
+   3.6184
+  ],
+  [
+   1150,
+   3.5995
+  ],
+  [
+   1159,
+   3.5952
+  ]
+ ],
+ "train_seconds": 237.79,
+ "wall_seconds": 257.75,
+ "chars_per_sec": 39963,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big andce. It was a great day ever. It was a atturn. Grandma was so happy.\nOne day, a big, mouse named Tom saw a beautiful tree. It loved to go inside and play. He grabbed them and put the ball away from his head.\nSue heard a loud noises. Tom thought it was another eyes and yelled. Tom was happy to have the gate. He saw a big tree and a little bird. Sue and Sue found a big boxfled. They loved the living room together.\n\"Please, Tom, can I help me find a bit. This was even expensive can do?\" Tom asked.\nTom and Sue didn't want to watch it with the dog. They became good friends, so they had an idea. They went to the park on the box and explained them. They had a great time at the park.\nAt the end of the day, Lily and Tim grew, and they both played together in the box together. They had fun together and play together all day.\n<|eot|>\n\n\nSara and Ben are best. They like to play with them. One day, they want to play with his ball. They pull. They see a gray ball in the mouth. They are small and big.\n",
+ "rule_init": {},
+ "ngram_init": {}
+}

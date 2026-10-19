@@ -1,0 +1,183 @@
+{
+ "args": {
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/fuzzyfix/flm_enmean_rirandom.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "exp_norm": "mean",
+  "max_len": 256
+ },
+ "params_total": 26112,
+ "params_nonemb": 22976,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.97307,
+ "evals": [
+  [
+   305,
+   2.54348
+  ],
+  [
+   610,
+   2.14469
+  ],
+  [
+   915,
+   2.02405
+  ],
+  [
+   1220,
+   1.97329
+  ],
+  [
+   1221,
+   1.97307
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8413
+  ],
+  [
+   50,
+   5.8265
+  ],
+  [
+   100,
+   4.651
+  ],
+  [
+   150,
+   3.7658
+  ],
+  [
+   200,
+   3.2615
+  ],
+  [
+   250,
+   2.9605
+  ],
+  [
+   300,
+   2.746
+  ],
+  [
+   350,
+   2.5951
+  ],
+  [
+   400,
+   2.4654
+  ],
+  [
+   450,
+   2.3738
+  ],
+  [
+   500,
+   2.3059
+  ],
+  [
+   550,
+   2.2349
+  ],
+  [
+   600,
+   2.1896
+  ],
+  [
+   650,
+   2.1592
+  ],
+  [
+   700,
+   2.1342
+  ],
+  [
+   750,
+   2.1136
+  ],
+  [
+   800,
+   2.0843
+  ],
+  [
+   850,
+   2.0694
+  ],
+  [
+   900,
+   2.0521
+  ],
+  [
+   950,
+   2.0375
+  ],
+  [
+   1000,
+   2.0099
+  ],
+  [
+   1050,
+   2.006
+  ],
+  [
+   1100,
+   1.994
+  ],
+  [
+   1150,
+   1.9889
+  ],
+  [
+   1200,
+   1.9925
+  ],
+  [
+   1220,
+   1.991
+  ]
+ ],
+ "train_seconds": 416.7,
+ "wall_seconds": 504.16,
+ "chars_per_sec": 24004,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was not fider, be she worm saw eway. \"He day, Tim's down and laver for her back to make a big on the saw and sad said, \"Hea sawes sight her bamed, \"Max, you rappy be a rug, can the fleag. The leew to gens to play, the good. At she pent away and and playtunny. Ben was walking in the eter went",
+ "rule_init": {}
+}

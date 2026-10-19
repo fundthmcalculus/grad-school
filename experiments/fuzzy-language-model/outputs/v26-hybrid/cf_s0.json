@@ -1,0 +1,152 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 4000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 4,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "outputs\\v26-hybrid\\cf_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 155,
+ "chars_seen": 4010100,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.4377,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   38,
+   1.88423
+  ],
+  [
+   76,
+   1.65533
+  ],
+  [
+   114,
+   1.55039
+  ],
+  [
+   152,
+   1.44267
+  ],
+  [
+   155,
+   1.4377
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.9697
+  ],
+  [
+   50,
+   7.9343
+  ],
+  [
+   100,
+   6.1971
+  ],
+  [
+   150,
+   5.2811
+  ],
+  [
+   154,
+   5.2279
+  ]
+ ],
+ "train_seconds": 715.09,
+ "wall_seconds": 1022.26,
+ "chars_per_sec": 1776,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 4,
+ "device": "cpu",
+ "device_name": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and big bird. \nTheet is a special pif. They would always go to the room. It was so happy to have fun. They learned to help the ball. They allthing, and the first move. They were better to movate together every day. They played game and shared his table, and they played origw them.\n<|eot|>\nOnce upon a time, there was a little girl named Tim. Tim loved to play with her sillame. One day, Sue saw and Sue found a big tree. It was a big, door.\nThe sun wanted to help. He said, \"Don't play outside. you did not know what you have to make my fairch the birds. Tho is a big hug and be scared.\" Ped, they both had a nice friend, the mon, but they were very nice and happy.\nDon found a red buck in thelse, and shiny a small house. He knew that he was not uging her and fun playing with their toys. It was a big tree to play with everyone, but if they were playing with her mouse, and her friends became best friendly. They promised to play with other toys and they were happy. And they were playing, they who lived happily ever after.\n<|eot|>\nOnce upon a time, there was a little girl named Jray",
+ "rule_init": {
+  "variant": "cf",
+  "L0.ffn": {
+   "gain": 4,
+   "ce_nats": 6.8982
+  },
+  "L1.ffn": {
+   "gain": 4,
+   "ce_nats": 6.9068
+  }
+ },
+ "ngram_init": {}
+}

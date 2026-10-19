@@ -1,0 +1,207 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 4,
+  "rules": 16,
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 7,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-final10\\ref2-delta-h4-sc4-lr6e-2_30M_s7.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 4,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93376,
+ "params_nonemb": 44224,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.15699,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.38347
+  ],
+  [
+   580,
+   1.27096
+  ],
+  [
+   870,
+   1.19653
+  ],
+  [
+   1160,
+   1.15699
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3455
+  ],
+  [
+   50,
+   8.1634
+  ],
+  [
+   100,
+   6.3064
+  ],
+  [
+   150,
+   5.3746
+  ],
+  [
+   200,
+   4.8954
+  ],
+  [
+   250,
+   4.6548
+  ],
+  [
+   300,
+   4.4894
+  ],
+  [
+   350,
+   4.3872
+  ],
+  [
+   400,
+   4.2897
+  ],
+  [
+   450,
+   4.22
+  ],
+  [
+   500,
+   4.1577
+  ],
+  [
+   550,
+   4.1141
+  ],
+  [
+   600,
+   4.061
+  ],
+  [
+   650,
+   4.0189
+  ],
+  [
+   700,
+   3.979
+  ],
+  [
+   750,
+   3.9332
+  ],
+  [
+   800,
+   3.896
+  ],
+  [
+   850,
+   3.8438
+  ],
+  [
+   900,
+   3.8085
+  ],
+  [
+   950,
+   3.7765
+  ],
+  [
+   1000,
+   3.7583
+  ],
+  [
+   1050,
+   3.727
+  ],
+  [
+   1100,
+   3.7042
+  ],
+  [
+   1150,
+   3.6893
+  ],
+  [
+   1159,
+   3.6781
+  ]
+ ],
+ "train_seconds": 111.38,
+ "wall_seconds": 118.2,
+ "chars_per_sec": 85316,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big warm bird. \nThe little boy named Bob loved to work outside. On the people were playing, he saw him on the woods, even think he wanted to see the same way to go. The probleas said, \"Thank you, little girl.\" They played all day slid down and tell the purple origer.\nOne day, Tim met a little bird. The little bird saw a small bird. Tim said, \"Hello, little bird, Sue and cat found the bird on the ground. The bird was sad and didn't want to help the bird. The bird's not four others. The bird was not happy, I not.\"\nTim and his friends played together in the park. They all laughed and became best friends. The ship was very happy and played together every day.\n<|eot|>\nOnce upon a time, there was a store. The win were very unknown who lived near a small house. The little girl was very happy because she wanted her favorite board.\nOne day, the little girl went to the park. They played with water until the dog, the cat was sound. The bunny was very happy.\nThen, a cat came to help the bird. The bird was very fast and soon, the cat was very sad. The bird wanted to help the bird.\n",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,142 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 4000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.0,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 6,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-small\\floor0_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 155,
+ "chars_seen": 4010100,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.44967,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   38,
+   1.95835
+  ],
+  [
+   76,
+   1.67224
+  ],
+  [
+   114,
+   1.56675
+  ],
+  [
+   152,
+   1.45014
+  ],
+  [
+   155,
+   1.44967
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2386
+  ],
+  [
+   50,
+   8.2135
+  ],
+  [
+   100,
+   6.3445
+  ],
+  [
+   150,
+   5.3306
+  ],
+  [
+   154,
+   5.2706
+  ]
+ ],
+ "train_seconds": 557.43,
+ "wall_seconds": 780.52,
+ "chars_per_sec": 2278,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 6,
+ "device": "cpu",
+ "device_name": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called her.\nTim and Sue had a special storm at. They would play with the people and climb the hot. They both listened to the garden and laughing. They decided to play with the best friend, a big baby grabbit.\nOne day, Tom's mom said, \"Yes, I have a fun. You will chaugge. Dazed it will go to the clever, but they will give it to a red nest. I is a little bunny. You can sraw on the conter. I can play with it.\" But you want to get the take.\n\"No, a bunny. They are not like to make a favorite. Thispo saw a big huger. But the Pase was very pretty. The fire was sad with the mad. He wanted to stake some store and said, \"Hi, Cliild! Whind me you doing me?\"\nTom said, \"Yes, Tim green, but I am twoms. That behout, if you going and say who can keep her to build the car. He prot down you.\n<|eot|>\nOnce upon a time there was a little girl named Sue. Tim was a big and having friends to play with his friend. Tim wanted to crotray",
+ "rule_init": {},
+ "ngram_init": {}
+}

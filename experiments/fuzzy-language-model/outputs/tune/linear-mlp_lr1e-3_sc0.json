@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "linear",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.001,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/linear-mlp_lr1e-3_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "linear",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 19684,
+ "params_nonemb": 16548,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.24262,
+ "evals": [
+  [
+   305,
+   2.85594
+  ],
+  [
+   610,
+   2.39687
+  ],
+  [
+   915,
+   2.27745
+  ],
+  [
+   1220,
+   2.24253
+  ],
+  [
+   1221,
+   2.24262
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.7711
+  ],
+  [
+   50,
+   6.4049
+  ],
+  [
+   100,
+   5.5148
+  ],
+  [
+   150,
+   4.6491
+  ],
+  [
+   200,
+   3.9474
+  ],
+  [
+   250,
+   3.4601
+  ],
+  [
+   300,
+   3.1391
+  ],
+  [
+   350,
+   2.9213
+  ],
+  [
+   400,
+   2.7595
+  ],
+  [
+   450,
+   2.651
+  ],
+  [
+   500,
+   2.5649
+  ],
+  [
+   550,
+   2.4898
+  ],
+  [
+   600,
+   2.4369
+  ],
+  [
+   650,
+   2.4041
+  ],
+  [
+   700,
+   2.3759
+  ],
+  [
+   750,
+   2.3529
+  ],
+  [
+   800,
+   2.3262
+  ],
+  [
+   850,
+   2.3124
+  ],
+  [
+   900,
+   2.2977
+  ],
+  [
+   950,
+   2.2848
+  ],
+  [
+   1000,
+   2.2625
+  ],
+  [
+   1050,
+   2.261
+  ],
+  [
+   1100,
+   2.2534
+  ],
+  [
+   1150,
+   2.2491
+  ],
+  [
+   1200,
+   2.256
+  ],
+  [
+   1220,
+   2.2547
+  ]
+ ],
+ "train_seconds": 496.85,
+ "wall_seconds": 546.45,
+ "chars_per_sec": 20132,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there coun helived to the mad. Sall deay,\" whark well be sad said, \"Max was didg named to play crouso. She saw and sad say she bast chem, the help and wis together and git the for an herd mady. The leve toige shis and blew and stall she cas. The mad and the play wanted Tom whard the lided. Max and",
+ "rule_init": {}
+}

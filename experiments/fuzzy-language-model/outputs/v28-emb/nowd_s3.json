@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v28-emb\\nowd_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.09461,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.27134
+  ],
+  [
+   100,
+   1.56876
+  ],
+  [
+   200,
+   1.41609
+  ],
+  [
+   300,
+   1.3448
+  ],
+  [
+   400,
+   1.28987
+  ],
+  [
+   500,
+   1.24118
+  ],
+  [
+   600,
+   1.20107
+  ],
+  [
+   700,
+   1.17305
+  ],
+  [
+   800,
+   1.14555
+  ],
+  [
+   900,
+   1.12647
+  ],
+  [
+   1000,
+   1.10895
+  ],
+  [
+   1100,
+   1.09725
+  ],
+  [
+   1160,
+   1.09461
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3771
+  ],
+  [
+   50,
+   8.0848
+  ],
+  [
+   100,
+   6.2067
+  ],
+  [
+   150,
+   5.2946
+  ],
+  [
+   200,
+   4.837
+  ],
+  [
+   250,
+   4.5747
+  ],
+  [
+   300,
+   4.3889
+  ],
+  [
+   350,
+   4.2863
+  ],
+  [
+   400,
+   4.1834
+  ],
+  [
+   450,
+   4.095
+  ],
+  [
+   500,
+   4.0161
+  ],
+  [
+   550,
+   3.9512
+  ],
+  [
+   600,
+   3.8709
+  ],
+  [
+   650,
+   3.8245
+  ],
+  [
+   700,
+   3.7643
+  ],
+  [
+   750,
+   3.7221
+  ],
+  [
+   800,
+   3.6848
+  ],
+  [
+   850,
+   3.6549
+  ],
+  [
+   900,
+   3.6162
+  ],
+  [
+   950,
+   3.5879
+  ],
+  [
+   1000,
+   3.5413
+  ],
+  [
+   1050,
+   3.517
+  ],
+  [
+   1100,
+   3.5061
+  ],
+  [
+   1150,
+   3.4907
+  ],
+  [
+   1159,
+   3.4822
+  ]
+ ],
+ "train_seconds": 79.29,
+ "wall_seconds": 93.65,
+ "chars_per_sec": 119841,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy. \nThe little boy loved to be a little girl who would play with her friends. One day, she saw a big tree on the ground. She wanted to play with it.\nWhen Lucy finished her friend, a little girl named Lucy, she saw a box. The girl said, \"Look, Lucy, that is more organized from my meak tree. Cox!\" Lucy smiled at Lucy and said, \"Yes, Lucy. I will make it like you. You can set. If you make your way to the tree.\"\nLucy said, \"I am the anxious me!\" The girl did not know how to do. It started to spot with the fox.\nTim and Lucy didn't know it was Pox. They knew that the girl would be making, but they could not find the bexious leap. Then, it was gone on the ground. Lucy and her friends went up to her room. They played together in the beep, and even thin.\nThe girl felt happy. She realized her teeping who was important to buy. Her baby was very happy.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. Tim loved to play with his friends, Spot. One day, Tim saw a small milk playing",
+ "rule_init": {},
+ "ngram_init": {}
+}

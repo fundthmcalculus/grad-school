@@ -1,0 +1,183 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-acc-htsk_lr6e-2_sc0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "max_len": 256
+ },
+ "params_total": 28004,
+ "params_nonemb": 24868,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.8281,
+ "evals": [
+  [
+   305,
+   2.26213
+  ],
+  [
+   610,
+   2.02869
+  ],
+  [
+   915,
+   1.90168
+  ],
+  [
+   1220,
+   1.82805
+  ],
+  [
+   1221,
+   1.8281
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8988
+  ],
+  [
+   50,
+   5.3018
+  ],
+  [
+   100,
+   3.9064
+  ],
+  [
+   150,
+   3.1665
+  ],
+  [
+   200,
+   2.7851
+  ],
+  [
+   250,
+   2.5687
+  ],
+  [
+   300,
+   2.4141
+  ],
+  [
+   350,
+   2.3173
+  ],
+  [
+   400,
+   2.2342
+  ],
+  [
+   450,
+   2.1907
+  ],
+  [
+   500,
+   2.1476
+  ],
+  [
+   550,
+   2.0959
+  ],
+  [
+   600,
+   2.0633
+  ],
+  [
+   650,
+   2.0412
+  ],
+  [
+   700,
+   2.0207
+  ],
+  [
+   750,
+   2.0021
+  ],
+  [
+   800,
+   1.9711
+  ],
+  [
+   850,
+   1.9501
+  ],
+  [
+   900,
+   1.9312
+  ],
+  [
+   950,
+   1.9147
+  ],
+  [
+   1000,
+   1.8848
+  ],
+  [
+   1050,
+   1.8763
+  ],
+  [
+   1100,
+   1.8603
+  ],
+  [
+   1150,
+   1.8492
+  ],
+  [
+   1200,
+   1.8481
+  ],
+  [
+   1220,
+   1.8456
+  ]
+ ],
+ "train_seconds": 692.75,
+ "wall_seconds": 878.55,
+ "chars_per_sec": 14439,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there were very happy. She put make and her had a block's do not day with her from the new a big frog. She saw and sad.\nOne day, a big, sit when them and her by liked to to help, Max that me. The sad and Bift shiny the little boy named Tim liked. The bive said,\" Tim's pond what it in the eat to th",
+ "rule_init": {}
+}

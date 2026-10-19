@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v28-emb\\ppmi_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10494,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.38728
+  ],
+  [
+   100,
+   1.55642
+  ],
+  [
+   200,
+   1.40916
+  ],
+  [
+   300,
+   1.34322
+  ],
+  [
+   400,
+   1.29207
+  ],
+  [
+   500,
+   1.25652
+  ],
+  [
+   600,
+   1.21687
+  ],
+  [
+   700,
+   1.18618
+  ],
+  [
+   800,
+   1.1592
+  ],
+  [
+   900,
+   1.1376
+  ],
+  [
+   1000,
+   1.12061
+  ],
+  [
+   1100,
+   1.10953
+  ],
+  [
+   1160,
+   1.10494
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.6735
+  ],
+  [
+   50,
+   7.9044
+  ],
+  [
+   100,
+   6.0955
+  ],
+  [
+   150,
+   5.2332
+  ],
+  [
+   200,
+   4.8026
+  ],
+  [
+   250,
+   4.5605
+  ],
+  [
+   300,
+   4.387
+  ],
+  [
+   350,
+   4.2881
+  ],
+  [
+   400,
+   4.1872
+  ],
+  [
+   450,
+   4.1012
+  ],
+  [
+   500,
+   4.0358
+  ],
+  [
+   550,
+   3.9761
+  ],
+  [
+   600,
+   3.9068
+  ],
+  [
+   650,
+   3.8597
+  ],
+  [
+   700,
+   3.8038
+  ],
+  [
+   750,
+   3.7678
+  ],
+  [
+   800,
+   3.7263
+  ],
+  [
+   850,
+   3.6957
+  ],
+  [
+   900,
+   3.6589
+  ],
+  [
+   950,
+   3.6284
+  ],
+  [
+   1000,
+   3.5855
+  ],
+  [
+   1050,
+   3.5525
+  ],
+  [
+   1100,
+   3.5455
+  ],
+  [
+   1150,
+   3.5289
+  ],
+  [
+   1159,
+   3.5214
+  ]
+ ],
+ "train_seconds": 79.38,
+ "wall_seconds": 93.31,
+ "chars_per_sec": 119714,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big cap. The mistquurin felt special and wanted to make a big feather.\nThen, something unexpected happened. The pizey was moving a big pinet! It was a big, shiny apple. The bird was just tired. It knew it was not a slider inside, but the pizzy was not left the elephindey.\nThen, something unexpected happened. The bird saw something a big box. It was a bow and a ball. It was a big, pretty, cold! The bird wanted to help. The bird flew down and fell down. The bird did not know how to snap her.\nThe bird learned how to go in the most. The bird was very happy with it. It jumped high and the bird around the mess. The bird was very nice and happy.\nAfter playing, the bird flew into the tree. The bird jumped away and jumped up. The bird was happy to see the bird didn't now green.\n<|eot|>\nOnce upon a time, there was a little bird who loved to play in the yard. One day, a little boy named Tim went to the house. He saw a big, red ball. Tim was very sad. He said, \"Hello,\" said the park. \"Hello, Tim! I found a big ball!",
+ "rule_init": {},
+ "ngram_init": {}
+}

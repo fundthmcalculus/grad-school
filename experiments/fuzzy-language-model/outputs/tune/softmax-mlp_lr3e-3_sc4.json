@@ -1,0 +1,179 @@
+{
+ "args": {
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.003,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/softmax-mlp_lr3e-3_sc4.json",
+  "save_model": false
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 19936,
+ "params_nonemb": 16800,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.01971,
+ "evals": [
+  [
+   305,
+   2.50126
+  ],
+  [
+   610,
+   2.16123
+  ],
+  [
+   915,
+   2.05751
+  ],
+  [
+   1220,
+   2.0201
+  ],
+  [
+   1221,
+   2.01971
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.021
+  ],
+  [
+   50,
+   6.2828
+  ],
+  [
+   100,
+   4.9842
+  ],
+  [
+   150,
+   4.0157
+  ],
+  [
+   200,
+   3.4112
+  ],
+  [
+   250,
+   3.0162
+  ],
+  [
+   300,
+   2.7412
+  ],
+  [
+   350,
+   2.5696
+  ],
+  [
+   400,
+   2.4436
+  ],
+  [
+   450,
+   2.3633
+  ],
+  [
+   500,
+   2.2999
+  ],
+  [
+   550,
+   2.2364
+  ],
+  [
+   600,
+   2.1948
+  ],
+  [
+   650,
+   2.1703
+  ],
+  [
+   700,
+   2.1487
+  ],
+  [
+   750,
+   2.1293
+  ],
+  [
+   800,
+   2.106
+  ],
+  [
+   850,
+   2.0925
+  ],
+  [
+   900,
+   2.0787
+  ],
+  [
+   950,
+   2.0686
+  ],
+  [
+   1000,
+   2.0431
+  ],
+  [
+   1050,
+   2.0408
+  ],
+  [
+   1100,
+   2.0331
+  ],
+  [
+   1150,
+   2.0293
+  ],
+  [
+   1200,
+   2.0341
+  ],
+  [
+   1220,
+   2.0346
+  ]
+ ],
+ "train_seconds": 342.72,
+ "wall_seconds": 425.66,
+ "chars_per_sec": 29185,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was new for the storl down as a big and soor looke and said, \"Maxe with her and the park! The like whas trea his sail dold said, \"Cina she reamed, she her lirder got and Ben to the flelw. The lever time, started bleab this watch the said. Bob not bags at the scare. They ad the lids at that d"
+}

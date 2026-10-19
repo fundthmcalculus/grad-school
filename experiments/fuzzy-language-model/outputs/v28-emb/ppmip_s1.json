@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v28-emb\\ppmip_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10533,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.28661
+  ],
+  [
+   100,
+   1.54819
+  ],
+  [
+   200,
+   1.404
+  ],
+  [
+   300,
+   1.33794
+  ],
+  [
+   400,
+   1.28985
+  ],
+  [
+   500,
+   1.25789
+  ],
+  [
+   600,
+   1.22137
+  ],
+  [
+   700,
+   1.18734
+  ],
+  [
+   800,
+   1.16024
+  ],
+  [
+   900,
+   1.14009
+  ],
+  [
+   1000,
+   1.12115
+  ],
+  [
+   1100,
+   1.1115
+  ],
+  [
+   1160,
+   1.10533
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3853
+  ],
+  [
+   50,
+   7.7803
+  ],
+  [
+   100,
+   6.0297
+  ],
+  [
+   150,
+   5.1851
+  ],
+  [
+   200,
+   4.7689
+  ],
+  [
+   250,
+   4.5233
+  ],
+  [
+   300,
+   4.3621
+  ],
+  [
+   350,
+   4.2554
+  ],
+  [
+   400,
+   4.1857
+  ],
+  [
+   450,
+   4.0873
+  ],
+  [
+   500,
+   4.0366
+  ],
+  [
+   550,
+   3.9888
+  ],
+  [
+   600,
+   3.9403
+  ],
+  [
+   650,
+   3.8745
+  ],
+  [
+   700,
+   3.8254
+  ],
+  [
+   750,
+   3.7805
+  ],
+  [
+   800,
+   3.7278
+  ],
+  [
+   850,
+   3.685
+  ],
+  [
+   900,
+   3.6608
+  ],
+  [
+   950,
+   3.621
+  ],
+  [
+   1000,
+   3.581
+  ],
+  [
+   1050,
+   3.5502
+  ],
+  [
+   1100,
+   3.5393
+  ],
+  [
+   1150,
+   3.524
+  ],
+  [
+   1159,
+   3.5216
+  ]
+ ],
+ "train_seconds": 79.14,
+ "wall_seconds": 93.15,
+ "chars_per_sec": 120075,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Ben.\n\"Look, a little girl named Mia. Let's go to the garden,\" Ben said.\nBut then, it was big, the new magic wind came and Kitty. It was a big, solive mark. Mia was so surprised. She reached the little girl's home, and Daddy went home. Finally, Dad found the little girl, and the little girl was full of more in herself. She was so happy and said, \"Thank you, Tin, you have to say your new place for it.\"\nM But then, a little girl came and went inside her bread. She was so excited, even exared. She took the bird to go home and told her important home. Lily smiled and said, \"Thank you for please, mank you, Let's play!\" She thanked the girl and said, \"Thank you, Blocani and help me share the little girl. We would use your family and fun playing together.\"\n<|eot|>\nOnce upon a time, in a small town, in a small town, there lived a mouse named Buddy. Buddy. Buddy liked to play with his toys and play.\nOne day, Buddy saw a big tree and wanted to play with it too. Buddy wanted to help the kitten",
+ "rule_init": {},
+ "ngram_init": {}
+}

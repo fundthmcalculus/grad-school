@@ -1,0 +1,213 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 256,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "outputs/v14-state2/D-ctx512-r256_30M_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 256,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 139424,
+ "params_nonemb": 90272,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10247,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.3731
+  ],
+  [
+   580,
+   1.24208
+  ],
+  [
+   870,
+   1.1495
+  ],
+  [
+   1160,
+   1.10247
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3852
+  ],
+  [
+   50,
+   8.1161
+  ],
+  [
+   100,
+   6.2744
+  ],
+  [
+   150,
+   5.3766
+  ],
+  [
+   200,
+   4.9069
+  ],
+  [
+   250,
+   4.637
+  ],
+  [
+   300,
+   4.4731
+  ],
+  [
+   350,
+   4.3479
+  ],
+  [
+   400,
+   4.2635
+  ],
+  [
+   450,
+   4.1679
+  ],
+  [
+   500,
+   4.1077
+  ],
+  [
+   550,
+   4.0389
+  ],
+  [
+   600,
+   3.9751
+  ],
+  [
+   650,
+   3.9135
+  ],
+  [
+   700,
+   3.8598
+  ],
+  [
+   750,
+   3.8255
+  ],
+  [
+   800,
+   3.7632
+  ],
+  [
+   850,
+   3.6985
+  ],
+  [
+   900,
+   3.6626
+  ],
+  [
+   950,
+   3.6135
+  ],
+  [
+   1000,
+   3.5701
+  ],
+  [
+   1050,
+   3.5452
+  ],
+  [
+   1100,
+   3.5254
+  ],
+  [
+   1150,
+   3.524
+  ],
+  [
+   1159,
+   3.5192
+  ]
+ ],
+ "train_seconds": 112.57,
+ "wall_seconds": 137.22,
+ "chars_per_sec": 84419,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and own. \nOne day, a little girl named Lily went outside to play. She saw a big, fell. Lily wanted to push the chair. She decided to play with her friend, Sue, and they were masks. They put together every day and went to the yard.\nSue took the wet chair and left the way to see them. Sue was so excited that she wanted to give it to her mute. She said, \"Can I tea TOkay?\" She smiled and said, \"Yes, If you like!\"\nSue and the anxious other people were very happy. They went to the expee and took the forest together. The hoop was happy and became best friends. The moral of the story is: Mom, being kind, orange and helping other animals on your valteals can.\n<|eot|>\nOnce upon a time, in a small forest, there was a busy cat. The cat was a gun. It was a big tree to play with everyone in the park. He was very happy who loved to play with his friends.\nOne day, the cat saw a little bird. The bird was sad. She thought about it and asked, \"What is that?\" The bird was scared, but the bird wanted to help.\nThe bird",
+ "rule_init": {},
+ "ngram_init": {}
+}

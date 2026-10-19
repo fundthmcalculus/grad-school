@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 4,
+  "rules": 16,
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.04,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-ref-tune\\delta-h4-sc4-lr4e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 4,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93376,
+ "params_nonemb": 44224,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.27119,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.60066
+  ],
+  [
+   192,
+   1.43186
+  ],
+  [
+   288,
+   1.33334
+  ],
+  [
+   384,
+   1.27168
+  ],
+  [
+   387,
+   1.27119
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3342
+  ],
+  [
+   50,
+   8.3085
+  ],
+  [
+   100,
+   6.3827
+  ],
+  [
+   150,
+   5.4032
+  ],
+  [
+   200,
+   4.9021
+  ],
+  [
+   250,
+   4.5952
+  ],
+  [
+   300,
+   4.3676
+  ],
+  [
+   350,
+   4.1971
+  ],
+  [
+   386,
+   4.1327
+  ]
+ ],
+ "train_seconds": 36.01,
+ "wall_seconds": 44.55,
+ "chars_per_sec": 88040,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and clear. The piecle was a good day at nurse. The cat liked to play with first. One day, the big cat saw a magic wind on the beautiful tree. It loved to go inside and promised to.\nTom and Sam tried to hide. They both laughed and said, \"Hi, I will chair. I will selfish?\"\nThe plan was happy. She asked the mateicle, something unexpected happened. The little bird and the teacher. He decided to listen to her mom and found a big red boat.\nSue and the angather went outside. They played all day and was even explore.\nBut the bird thought that it was a fuch of the tree. Poppy thought it was a big, shiny monster. He wanted to stake and stoped the experly held the parent.\n\"Thank you, Tim!\" said the busy. She gave Tim a big, magic. It was a big tree to play.\nBut then, something unexpected happened. The mouse said, \"Thank you, Lily!\"\nThey promised to keep a snowcy for Max. They were so sad and happy. The bug having a loud bird toward with the pile together. They were curi",
+ "rule_init": {},
+ "ngram_init": {}
+}

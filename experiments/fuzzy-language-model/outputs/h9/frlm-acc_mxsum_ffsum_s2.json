@@ -1,0 +1,189 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 2,
+  "threads": 1,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/h9/frlm-acc_mxsum_ffsum_s2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "sum",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "sum",
+  "max_len": 256
+ },
+ "params_total": 28260,
+ "params_nonemb": 25124,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.85695,
+ "evals": [
+  [
+   305,
+   2.23813
+  ],
+  [
+   610,
+   2.0284
+  ],
+  [
+   915,
+   1.91657
+  ],
+  [
+   1220,
+   1.85646
+  ],
+  [
+   1221,
+   1.85695
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.7657
+  ],
+  [
+   50,
+   5.3547
+  ],
+  [
+   100,
+   3.9559
+  ],
+  [
+   150,
+   3.1868
+  ],
+  [
+   200,
+   2.7623
+  ],
+  [
+   250,
+   2.5059
+  ],
+  [
+   300,
+   2.3723
+  ],
+  [
+   350,
+   2.278
+  ],
+  [
+   400,
+   2.21
+  ],
+  [
+   450,
+   2.1559
+  ],
+  [
+   500,
+   2.1223
+  ],
+  [
+   550,
+   2.1
+  ],
+  [
+   600,
+   2.0698
+  ],
+  [
+   650,
+   2.0434
+  ],
+  [
+   700,
+   2.0268
+  ],
+  [
+   750,
+   2.0055
+  ],
+  [
+   800,
+   1.9893
+  ],
+  [
+   850,
+   1.9638
+  ],
+  [
+   900,
+   1.9408
+  ],
+  [
+   950,
+   1.9289
+  ],
+  [
+   1000,
+   1.9188
+  ],
+  [
+   1050,
+   1.8946
+  ],
+  [
+   1100,
+   1.8812
+  ],
+  [
+   1150,
+   1.8716
+  ],
+  [
+   1200,
+   1.8671
+  ],
+  [
+   1220,
+   1.8661
+  ]
+ ],
+ "train_seconds": 1008.19,
+ "wall_seconds": 1125.81,
+ "chars_per_sec": 9921,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "device": "cpu",
+ "device_name": "11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz",
+ "host": "localhost.localdomain",
+ "sample": "Once upon a time, there was was friend, Bust pub man they happy. They leave do said, \"Doggy was very was not a bocriful. She saw and sad.\nOne day, she hoped and flowem and her friends.\nOne day, Ben and Max me was is leaner in the show able both other a boy said.\n<|eot|>\nOnce upon a time, there was up and mom least. Max and",
+ "rule_init": {}
+}

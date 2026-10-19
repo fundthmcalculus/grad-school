@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v25-rep\\weight_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.09586,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.27134
+  ],
+  [
+   100,
+   1.58088
+  ],
+  [
+   200,
+   1.43111
+  ],
+  [
+   300,
+   1.35424
+  ],
+  [
+   400,
+   1.29318
+  ],
+  [
+   500,
+   1.24926
+  ],
+  [
+   600,
+   1.20937
+  ],
+  [
+   700,
+   1.1767
+  ],
+  [
+   800,
+   1.14988
+  ],
+  [
+   900,
+   1.12785
+  ],
+  [
+   1000,
+   1.11001
+  ],
+  [
+   1100,
+   1.09929
+  ],
+  [
+   1160,
+   1.09586
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.9588
+  ],
+  [
+   50,
+   8.5401
+  ],
+  [
+   100,
+   6.5659
+  ],
+  [
+   150,
+   5.6026
+  ],
+  [
+   200,
+   5.1207
+  ],
+  [
+   250,
+   4.8434
+  ],
+  [
+   300,
+   4.6406
+  ],
+  [
+   350,
+   4.5165
+  ],
+  [
+   400,
+   4.3811
+  ],
+  [
+   450,
+   4.2731
+  ],
+  [
+   500,
+   4.1812
+  ],
+  [
+   550,
+   4.1061
+  ],
+  [
+   600,
+   4.0125
+  ],
+  [
+   650,
+   3.9655
+  ],
+  [
+   700,
+   3.8915
+  ],
+  [
+   750,
+   3.8536
+  ],
+  [
+   800,
+   3.8069
+  ],
+  [
+   850,
+   3.7732
+  ],
+  [
+   900,
+   3.7313
+  ],
+  [
+   950,
+   3.6965
+  ],
+  [
+   1000,
+   3.6481
+  ],
+  [
+   1050,
+   3.6182
+  ],
+  [
+   1100,
+   3.6092
+  ],
+  [
+   1150,
+   3.5933
+  ],
+  [
+   1159,
+   3.5838
+  ]
+ ],
+ "train_seconds": 83.12,
+ "wall_seconds": 101.24,
+ "chars_per_sec": 114327,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called her friend. She loved to come to the park with her. One day she was looking for her to make something special.\nThe little girl was so excited she would go outside and the same cute. She promised to be brave to put all it outside a big tree. But one was a big, red friendly cute. She was so happy and happy.\nThe sun was clear, but they couldn't wait to play anymore. They learned a great time playing with the first. They decided to make more new friends and they were so happy.\nThen, the girl's not four to the sun borred the first in the favorite forest. She was very happy and happy to be good in the sun.\n<|eot|>\nOne day, a boy named Tim went to the park with his friend. They played in the store and found a long bucket. The ball was tied and said, \"Hi, I am too small. I will be green.\" Tim said, \"Yes, but not hurt me. It is if you need to make it mad! What is my friend!\"\nTim went for a walk. He saw a big cat. \"Hey, Okay?\" Tim said, \"I will help you towards the side. Grandm",
+ "rule_init": {},
+ "ngram_init": {}
+}

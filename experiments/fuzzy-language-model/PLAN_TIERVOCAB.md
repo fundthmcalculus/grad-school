@@ -1,0 +1,33 @@
+# PLAN_TIERVOCAB: does the tiered embedding make a larger vocabulary pay? (registered 2026-10-19, before running)
+
+**Why.** `v7-vocab` found BPE1536 d40 (plain embedding, 93,792 params) 0.0086 better than BPE1024 d48 at 30M chars (2 seeds) but each extra token cost 40 numbers. The tiered embedding (`v30-tiered`, `flm/run_tiered.py`) stores tail tokens in E=16 numbers, so a bigger vocabulary costs 16 numbers per extra token. Untested combination. Larger vocabularies also put more characters in each token (3.16 chars/token at 1024), so a 512-token context covers more text.
+**Baseline:** t768e16m225 on BPE1024, 98,280 params, 30M chars, seeds 0-4 (`v30-tiered`, mean 1.0965). Frequencies from the token stream (`outputs/freq_bpe<V>.npz`, first 100M tokens). Same recipe (lr 6e-2, warm-up 100, ctx 512, batch 16, 32 rules, d48, 2 layers).
+**Arms (`flm/run_tiered_vocab.py`, `v40-tiervocab`):** V1536 head 640 FFN x2.0 (99,280 params); **V1536 head 512 FFN x2.25 (98,280, exactly iso-parameter with the baseline)**; V2048 head 512 FFN x1.5 (97,184). Confound to report: at a fixed character budget a bigger vocabulary means fewer optimiser steps (30M chars is about 1,160 steps at BPE1024).
+**Predictions.** The iso-parameter V1536 arm beats the baseline by 0.004-0.012 BPC mean (45%), on >= 4/5 paired seeds (40%); it is worse than the baseline (20%). V1536 head 640 within 0.003 of the iso arm (60%). V2048 worse than the iso V1536 arm by >= 0.005 (60%; its FFN is 1.5x narrower). 
+**Decision rule.** A screen: a >= 0.005 paired gain on >= 4/5 seeds earns a 300M-char two-seed confirmation (~35 min each) and a coherence set; otherwise record as closed. BPC is per character, comparable across tokenizers.
+
+## Round 1 outcome (`v40-tiervocab`, 30M chars, seeds 0-4, paired with `v30-tiered` t768e16m225 on BPE1024, mean 1.0965)
+| arm | params | chars/token | steps | BPC mean | paired diff (se) | seeds better |
+|---|---|---|---|---|---|---|
+| V1536 head 640 FFN x2.0 | 99,280 | 3.48 | 1,052 | 1.0769 | -0.0196 (0.0057) | 5/5 |
+| V1536 head 512 FFN x2.25 (iso-parameter) | 98,280 | 3.48 | 1,052 | 1.0817 | -0.0148 (0.0048) | 5/5 |
+| **V2048 head 512 FFN x1.5** | 97,184 | 3.66 | 1,001 | **1.0704** | **-0.0261** (0.0045) | 5/5 |
+Predictions: iso V1536 beats the baseline by 0.004-0.012 (45%): **wrong, better than predicted** (-0.0148; 5/5 seeds, so the >= 4/5 prediction held); worse than baseline (20%): no; V1536 head 640 within 0.003 of the iso arm (60%): **wrong** (0.0048 better); V2048 worse than the iso V1536 arm by >= 0.005 (60%): **wrong, it is the best arm, 0.0113 better than the iso V1536** despite a 1.5x narrower FFN.
+Reading: the tiered embedding does make a bigger vocabulary pay, and the gain grows with the vocabulary (1024 -> 1536 -> 2048: 0, -0.015, -0.026) even while the FFN shrinks from 108 to 72 rules per layer. The lever is the tokenizer: more characters per token (3.16 -> 3.66) means the same 512-token context covers 16% more text and each prediction step covers more of it. Confound: fixed 30M characters means fewer optimiser steps for the bigger vocabularies (1,001 vs about 1,160), which works against them. Per the decision rule (>= 0.005 on >= 4/5 seeds) this earns round 2: larger vocabularies (3072, 4096; tokenizers being trained) and other V2048 shapes, then a 300M-char two-seed confirmation and a coherence set.
+
+## Round 2 registered before running (30M chars, seeds 0-4, same baseline; tokenizers BPE3072 / BPE4096 trained by `python -m flm.bpe`: 3.85 / 3.95 chars/token on the 600M-char stream, vs 3.16 / 3.66 for 1024 / 2048)
+Arms (`python -m flm.run_tiered_vocab v2048h384e16m20 v2048h512e12m22 v3072h384e12m15 v4096h256e8m20`): V2048 head 384 FFN x2.0 (99,280 params); V2048 head 512 tail-width 12 FFN x2.2 (99,620); **V3072 head 384 tail-width 12 FFN x1.5 (98,528)**; V4096 head 256 tail-width 8 FFN x2.0 (about 97,000; the tail rank must drop to 8 to afford 3,840 tail tokens).
+Predictions: V3072 beats the round-1 best (V2048 head 512 FFN x1.5, mean 1.0704) by >= 0.005 (50%); V4096 is worse than V3072 (55%: rank-8 tail embeddings starve the rare tokens); the two extra V2048 shapes land within 0.006 of V2048 head 512 FFN x1.5 (60%) and neither beats it by 0.005 on >= 4/5 seeds (65%). The vocabulary, not the head/FFN split, is the lever.
+
+## Round 2 outcome (30M chars, seeds 0-4, paired with the BPE1024 tiered baseline 1.0965 and with round 1's best)
+| arm | params | chars/token | steps | BPC mean | vs baseline (se) | seeds better | vs round-1 best (V2048 h512 m1.5, 1.0704) |
+|---|---|---|---|---|---|---|---|
+| V2048 head 384 FFN x2.0 | 99,280 | 3.66 | 1,001 | 1.0743 | -0.0223 (0.0027) | 5/5 | +0.0039 (1/5 better) |
+| V2048 head 512 tail-width 12 FFN x2.2 | 99,620 | 3.66 | 1,001 | 1.0762 | -0.0203 (0.0028) | 5/5 | +0.0058 (1/5) |
+| **V3072 head 384 tail-width 12 FFN x1.5** | 98,528 | 3.85 | 953 | **1.0547** | **-0.0418** (0.0015) | **5/5** | **-0.0157 (5/5)** |
+| V4096 head 256 tail-width 8 FFN x2.0 | 96,848 | 3.95 | 927 | 1.0654 | -0.0311 (0.0033) | 5/5 | -0.0050 (4/5) |
+Predictions: V3072 beats the round-1 best by >= 0.005 (50%): **right** (0.0157, 5/5); V4096 worse than V3072 (55%): **right** (+0.0107; its tail rank is 8); the extra V2048 shapes within 0.006 of the round-1 best (60%): right (+0.004, +0.006) and neither beats it on >= 4/5 seeds (65%): right (1/5 each).
+Reading: the vocabulary is the lever, not the head/FFN split (V2048 shapes differ by <= 0.006). Along the vocabulary axis the tiered recipe gains 0 / 0.015 / 0.026 / 0.042 at 1024 / 1536 / 2048 / 3072, and V4096 falls back only because it had to drop the tail width to 8; the FFN is shrinking at the same time (108 -> 72 rules per layer). Not yet shown: that the gain survives more data (30M is the screen; the 1B BPE1024 number is 0.9646), and whether it moves coherence.
+
+## 300M confirmation registered before running (`flm/run_tiervocab_300m.py`, `v41-tiervocab300m`; V3072 head 384 tail-width 12 FFN x1.5, 98,528 params; seeds 0-1; reference BPE1024 tiered at 300M: 0.98099 / 0.98209)
+Predictions: the gain shrinks with data but stays: V3072 300M BPC in 0.955-0.972 (55%), i.e. a paired gain of 0.010-0.026 (the 30M gain was 0.042; the gain of tiering itself fell from 0.017 at 30M to 0.016 at 300M, i.e. little); below 0.9646 (the best BPE1024 tiered result, at 1B chars) (40%); no better than the BPE1024 reference (10%). Round 3 (head/tail/FFN shapes at V3072 and V4096 tail width 10) follows the confirmation.

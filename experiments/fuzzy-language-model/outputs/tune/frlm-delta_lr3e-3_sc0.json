@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.003,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-delta_lr3e-3_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 28136,
+ "params_nonemb": 25000,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.17408,
+ "evals": [
+  [
+   305,
+   2.67524
+  ],
+  [
+   610,
+   2.34064
+  ],
+  [
+   915,
+   2.21526
+  ],
+  [
+   1220,
+   2.17551
+  ],
+  [
+   1221,
+   2.17408
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8653
+  ],
+  [
+   50,
+   6.3012
+  ],
+  [
+   100,
+   5.0511
+  ],
+  [
+   150,
+   4.0726
+  ],
+  [
+   200,
+   3.4634
+  ],
+  [
+   250,
+   3.0951
+  ],
+  [
+   300,
+   2.8664
+  ],
+  [
+   350,
+   2.7175
+  ],
+  [
+   400,
+   2.6021
+  ],
+  [
+   450,
+   2.529
+  ],
+  [
+   500,
+   2.4712
+  ],
+  [
+   550,
+   2.4108
+  ],
+  [
+   600,
+   2.3703
+  ],
+  [
+   650,
+   2.3414
+  ],
+  [
+   700,
+   2.3179
+  ],
+  [
+   750,
+   2.2981
+  ],
+  [
+   800,
+   2.2714
+  ],
+  [
+   850,
+   2.2571
+  ],
+  [
+   900,
+   2.2387
+  ],
+  [
+   950,
+   2.2271
+  ],
+  [
+   1000,
+   2.2026
+  ],
+  [
+   1050,
+   2.1977
+  ],
+  [
+   1100,
+   2.1881
+  ],
+  [
+   1150,
+   2.1846
+  ],
+  [
+   1200,
+   2.1899
+  ],
+  [
+   1220,
+   2.1896
+  ]
+ ],
+ "train_seconds": 937.24,
+ "wall_seconds": 1217.13,
+ "chars_per_sec": 10672,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, the the shine for the she little saw a the wated told be sad. She bicched was agained the parny round. She saw and sad.\nOnled, \"I sad. They with reamed, \"But to liked to to hushey to hers many up to the this noting. They poth is with helpes. The man to bag and the scee on upht.\nThe plays, they pip",
+ "rule_init": {}
+}

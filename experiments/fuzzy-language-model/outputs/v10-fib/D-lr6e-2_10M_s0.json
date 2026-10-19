@@ -1,0 +1,149 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 10000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v10-fib\\D-lr6e-2_10M_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8
+ },
+ "params_total": 93344,
+ "params_nonemb": 44192,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.2534,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.59073
+  ],
+  [
+   192,
+   1.42237
+  ],
+  [
+   288,
+   1.31472
+  ],
+  [
+   384,
+   1.25379
+  ],
+  [
+   387,
+   1.2534
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3344
+  ],
+  [
+   50,
+   8.0857
+  ],
+  [
+   100,
+   6.2255
+  ],
+  [
+   150,
+   5.3152
+  ],
+  [
+   200,
+   4.84
+  ],
+  [
+   250,
+   4.5447
+  ],
+  [
+   300,
+   4.3313
+  ],
+  [
+   350,
+   4.1704
+  ],
+  [
+   386,
+   4.0816
+  ]
+ ],
+ "train_seconds": 26.85,
+ "wall_seconds": 33.75,
+ "chars_per_sec": 118063,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Sally. She loved to play with her mom. One day, she decided to go fast to her room. \nSure, her mom saw a small berrice. She saw a big box on a yard. She was scared. She picked up the pocor and went to the yughty hear. Grandma picked it up the eyak and wanted to show its mom, but they couldn't wait to find something.\nJoe likes the teacher. He decided to make your fairy. He stopped and said, \"I want to make a foolish.\" The bunny played all day, even not.\"\nThe unusy bird thought that even a new toy important. But the stared, something unexpected happened. The worved, mon, the bird was very nice and happy.\nDon't worry, it was goney, and the musiced. He felt very happy to use her family all around the, and the little bird. The moral of the story is to be brave and different, and her friends became best friends.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She had a big sun outside to play. Her mom was gray, and she would have fun. She liked to listen to her friend",
+ "rule_init": {},
+ "ngram_init": {}
+}

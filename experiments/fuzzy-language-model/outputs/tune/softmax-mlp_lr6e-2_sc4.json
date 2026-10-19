@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/softmax-mlp_lr6e-2_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 19936,
+ "params_nonemb": 16800,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.7724,
+ "evals": [
+  [
+   305,
+   2.12473
+  ],
+  [
+   610,
+   1.97076
+  ],
+  [
+   915,
+   1.83654
+  ],
+  [
+   1220,
+   1.77417
+  ],
+  [
+   1221,
+   1.7724
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.021
+  ],
+  [
+   50,
+   5.1785
+  ],
+  [
+   100,
+   3.7813
+  ],
+  [
+   150,
+   2.9997
+  ],
+  [
+   200,
+   2.5952
+  ],
+  [
+   250,
+   2.3772
+  ],
+  [
+   300,
+   2.2559
+  ],
+  [
+   350,
+   2.1886
+  ],
+  [
+   400,
+   2.1246
+  ],
+  [
+   450,
+   2.0911
+  ],
+  [
+   500,
+   2.0597
+  ],
+  [
+   550,
+   2.0138
+  ],
+  [
+   600,
+   1.9829
+  ],
+  [
+   650,
+   1.9679
+  ],
+  [
+   700,
+   1.9487
+  ],
+  [
+   750,
+   1.9301
+  ],
+  [
+   800,
+   1.9076
+  ],
+  [
+   850,
+   1.8886
+  ],
+  [
+   900,
+   1.8724
+  ],
+  [
+   950,
+   1.8547
+  ],
+  [
+   1000,
+   1.8254
+  ],
+  [
+   1050,
+   1.8144
+  ],
+  [
+   1100,
+   1.8004
+  ],
+  [
+   1150,
+   1.7929
+  ],
+  [
+   1200,
+   1.793
+  ],
+  [
+   1220,
+   1.7917
+  ]
+ ],
+ "train_seconds": 184.63,
+ "wall_seconds": 206.44,
+ "chars_per_sec": 54176,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was a few her, but I pudden see with her down to the can heave a big, did and girl named Sue son and saw a mised sail did and closer. He felt met of the paling on it and fly and Mia learned to the reights there were bag in a time, a said to help. The sat was not poling and tried to ether pic",
+ "rule_init": {}
+}

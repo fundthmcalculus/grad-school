@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 0.3,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-optA30\\clip03_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11573,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.35119
+  ],
+  [
+   580,
+   1.24082
+  ],
+  [
+   870,
+   1.15644
+  ],
+  [
+   1160,
+   1.11573
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2981
+  ],
+  [
+   50,
+   8.0433
+  ],
+  [
+   100,
+   6.1981
+  ],
+  [
+   150,
+   5.2839
+  ],
+  [
+   200,
+   4.809
+  ],
+  [
+   250,
+   4.5676
+  ],
+  [
+   300,
+   4.42
+  ],
+  [
+   350,
+   4.2958
+  ],
+  [
+   400,
+   4.1969
+  ],
+  [
+   450,
+   4.1159
+  ],
+  [
+   500,
+   4.0678
+  ],
+  [
+   550,
+   3.9939
+  ],
+  [
+   600,
+   3.9535
+  ],
+  [
+   650,
+   3.9019
+  ],
+  [
+   700,
+   3.8437
+  ],
+  [
+   750,
+   3.8045
+  ],
+  [
+   800,
+   3.7675
+  ],
+  [
+   850,
+   3.7296
+  ],
+  [
+   900,
+   3.6901
+  ],
+  [
+   950,
+   3.6519
+  ],
+  [
+   1000,
+   3.6228
+  ],
+  [
+   1050,
+   3.5963
+  ],
+  [
+   1100,
+   3.5799
+  ],
+  [
+   1150,
+   3.5455
+  ],
+  [
+   1159,
+   3.5456
+  ]
+ ],
+ "train_seconds": 79.97,
+ "wall_seconds": 86.9,
+ "chars_per_sec": 118833,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Ben. Ben loved to meet a special shiver. One day, Ben saw a little girl named Lily. Lily was very sad. She wanted to play with the toy car.\n\"Wow my friend, Lily, let's play!\" Lily said. \"I am your him, Lily. We can have to get your friend.\" Lily was curious and wanted the toy car.\nMax said, \"You're wear it, Tim.\" Lily's friend, Lily, said, \"Yes, Lily. I will help me play with your toys.\" Lily's friend, Sue, came and picked a red car. They decided to play together. They played near the car, even when they found it, they could help it. The car was full and had a lot of fun.\n<|eot|>\nOne day, a cat and a pig lived in a small room. They liked to play on the yard. They were very happy. They had fun and played with the park.\nA little girl came to the park. She saw a green board. It was a big tree to play. The bunny liked to play with the firechet. But the bug was not bunny. Everyone did not belong to.\nThe bug thought about it and went to play. The bug was grower umet with the bunny. The bug was curi",
+ "rule_init": {},
+ "ngram_init": {}
+}

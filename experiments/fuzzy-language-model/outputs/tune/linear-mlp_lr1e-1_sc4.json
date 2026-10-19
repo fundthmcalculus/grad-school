@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "linear",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.1,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/linear-mlp_lr1e-1_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "linear",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 19940,
+ "params_nonemb": 16804,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.74233,
+ "evals": [
+  [
+   305,
+   2.12738
+  ],
+  [
+   610,
+   1.96013
+  ],
+  [
+   915,
+   1.81614
+  ],
+  [
+   1220,
+   1.74314
+  ],
+  [
+   1221,
+   1.74233
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.0401
+  ],
+  [
+   50,
+   5.083
+  ],
+  [
+   100,
+   3.6973
+  ],
+  [
+   150,
+   2.9691
+  ],
+  [
+   200,
+   2.5924
+  ],
+  [
+   250,
+   2.3717
+  ],
+  [
+   300,
+   2.25
+  ],
+  [
+   350,
+   2.1751
+  ],
+  [
+   400,
+   2.1073
+  ],
+  [
+   450,
+   2.0706
+  ],
+  [
+   500,
+   2.0413
+  ],
+  [
+   550,
+   1.9968
+  ],
+  [
+   600,
+   1.9718
+  ],
+  [
+   650,
+   1.946
+  ],
+  [
+   700,
+   1.9273
+  ],
+  [
+   750,
+   1.9122
+  ],
+  [
+   800,
+   1.8869
+  ],
+  [
+   850,
+   1.8678
+  ],
+  [
+   900,
+   1.8501
+  ],
+  [
+   950,
+   1.8307
+  ],
+  [
+   1000,
+   1.7989
+  ],
+  [
+   1050,
+   1.7879
+  ],
+  [
+   1100,
+   1.7747
+  ],
+  [
+   1150,
+   1.7637
+  ],
+  [
+   1200,
+   1.7649
+  ],
+  [
+   1220,
+   1.7626
+  ]
+ ],
+ "train_seconds": 500.71,
+ "wall_seconds": 560.3,
+ "chars_per_sec": 19977,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was a still to be something start in her darkly back cool.\nMax was a big great it. He saw a big freen better sad.\nOne day, a but her mom for again. But the said, \"Yes, Tom, I can to play. The little in the show belt bag boon. He playing with the winds and said, \"Yes, what it was and they pil",
+ "rule_init": {}
+}

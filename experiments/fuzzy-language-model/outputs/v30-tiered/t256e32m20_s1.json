@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t256e32m20_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 91856,
+ "params_nonemb": 53456,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.12143,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.23279
+  ],
+  [
+   100,
+   1.6161
+  ],
+  [
+   200,
+   1.4539
+  ],
+  [
+   300,
+   1.38641
+  ],
+  [
+   400,
+   1.32795
+  ],
+  [
+   500,
+   1.28667
+  ],
+  [
+   600,
+   1.24712
+  ],
+  [
+   700,
+   1.21168
+  ],
+  [
+   800,
+   1.18602
+  ],
+  [
+   900,
+   1.16053
+  ],
+  [
+   1000,
+   1.13933
+  ],
+  [
+   1100,
+   1.12808
+  ],
+  [
+   1160,
+   1.12143
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2254
+  ],
+  [
+   50,
+   8.1217
+  ],
+  [
+   100,
+   6.3321
+  ],
+  [
+   150,
+   5.415
+  ],
+  [
+   200,
+   4.948
+  ],
+  [
+   250,
+   4.6841
+  ],
+  [
+   300,
+   4.5074
+  ],
+  [
+   350,
+   4.3913
+  ],
+  [
+   400,
+   4.3118
+  ],
+  [
+   450,
+   4.2
+  ],
+  [
+   500,
+   4.1411
+  ],
+  [
+   550,
+   4.0812
+  ],
+  [
+   600,
+   4.0247
+  ],
+  [
+   650,
+   3.9502
+  ],
+  [
+   700,
+   3.9024
+  ],
+  [
+   750,
+   3.8503
+  ],
+  [
+   800,
+   3.7937
+  ],
+  [
+   850,
+   3.7519
+  ],
+  [
+   900,
+   3.7213
+  ],
+  [
+   950,
+   3.674
+  ],
+  [
+   1000,
+   3.6319
+  ],
+  [
+   1050,
+   3.5996
+  ],
+  [
+   1100,
+   3.5853
+  ],
+  [
+   1150,
+   3.5693
+  ],
+  [
+   1159,
+   3.5652
+  ]
+ ],
+ "train_seconds": 80.56,
+ "wall_seconds": 94.63,
+ "chars_per_sec": 117956,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Ben. Ben loved to meet a special piver. One day, Ben saw Ben and his friend, Sam. They put the pizy on the ground, and Lily's knee! They were very happy.\nBob's friend, Sam, saw the pond and said, \"Let's slide, please. Good chair. We will succey and go to each other.\" Ben and Sam walked down the kitchen and hiding the sweet. They became good friends.\n<|eot|>\nOnce upon a time, there was a bfgy cookie named Spot. He had a thet of kids. One day, Spot was playing with his friends.\nBut the space, Spot saw a big battern in the Pil. It was a big, red battern, but it was too nice. It made the bloom. Spot saw the space outside the shriving batterad and found a small batterg in the batter.\nTom was so happy and wanted to play with his friends. He tried to get the batter, but it was too hard. It barked and down. Spot said, \"I know the cake can make you safe.\"\nThe Tom said, \"Thank you, Spot!\" They all played together all day.\n<|eot|>\nOnce upon a time",
+ "rule_init": {},
+ "ngram_init": {}
+}

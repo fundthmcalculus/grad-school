@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 56,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v33-tiered-d\\d56h384e16m15_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 56,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 94048,
+ "params_nonemb": 61408,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10917,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.26086
+  ],
+  [
+   100,
+   1.61978
+  ],
+  [
+   200,
+   1.45408
+  ],
+  [
+   300,
+   1.38043
+  ],
+  [
+   400,
+   1.31747
+  ],
+  [
+   500,
+   1.2702
+  ],
+  [
+   600,
+   1.23241
+  ],
+  [
+   700,
+   1.2017
+  ],
+  [
+   800,
+   1.16852
+  ],
+  [
+   900,
+   1.14472
+  ],
+  [
+   1000,
+   1.12726
+  ],
+  [
+   1100,
+   1.11327
+  ],
+  [
+   1160,
+   1.10917
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3096
+  ],
+  [
+   50,
+   8.1113
+  ],
+  [
+   100,
+   6.3268
+  ],
+  [
+   150,
+   5.434
+  ],
+  [
+   200,
+   4.9788
+  ],
+  [
+   250,
+   4.7054
+  ],
+  [
+   300,
+   4.5074
+  ],
+  [
+   350,
+   4.3985
+  ],
+  [
+   400,
+   4.2845
+  ],
+  [
+   450,
+   4.1933
+  ],
+  [
+   500,
+   4.1126
+  ],
+  [
+   550,
+   4.0437
+  ],
+  [
+   600,
+   3.9644
+  ],
+  [
+   650,
+   3.9174
+  ],
+  [
+   700,
+   3.8535
+  ],
+  [
+   750,
+   3.8076
+  ],
+  [
+   800,
+   3.7638
+  ],
+  [
+   850,
+   3.7287
+  ],
+  [
+   900,
+   3.6866
+  ],
+  [
+   950,
+   3.6528
+  ],
+  [
+   1000,
+   3.6026
+  ],
+  [
+   1050,
+   3.5721
+  ],
+  [
+   1100,
+   3.557
+  ],
+  [
+   1150,
+   3.5361
+  ],
+  [
+   1159,
+   3.5278
+  ]
+ ],
+ "train_seconds": 81.77,
+ "wall_seconds": 96.2,
+ "chars_per_sec": 116207,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and big bird.\nOne day, the bird asked a little boy. The boy wanted to help people for his friend. So, he put his patertolls. They decided to play together and walk to the wide of the mat.\nAs they played, they found a big tree. The bird was happy to see the glue. The birds were happy. The elderly pature was safe, but they learned to play again.\n<|eot|>\nOnce upon a time, a little girl named Sue had a sound. She loved to run, jump, and laugh. One day, she went to the park to play inside. She saw a bit. But the batter was scared.\nBut the bird thought it was hot. Sue didn't want to watch it. She thought it was a big, pot.\nAs she looked, she saw a big store. She wanted to boring. The parents decided to make a stuck on it.\nThe bird flew to the bit, but Sue noticed the street. She came to the park with the small bit. \"What is it?\"\nThen, the bird saw the magic old parents. It was not a big cat. It was a special food. The cat left it towards the parents. The cup",
+ "rule_init": {},
+ "ngram_init": {}
+}

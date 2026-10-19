@@ -1,0 +1,146 @@
+{
+ "S001": {
+  "model": "d192-L4_1000M_s0",
+  "params": 1323904,
+  "prompt": "The little dog was sad because",
+  "seed": 21
+ },
+ "S002": {
+  "model": "D-d48-bpe1024-ctx512-r32_3000M_s0",
+  "params": 96416,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 20
+ },
+ "S003": {
+  "model": "D-d48-bpe1024-ctx512-r32_3000M_s0",
+  "params": 96416,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 20
+ },
+ "S004": {
+  "model": "D-d48-bpe1024-ctx512-r32_1000M_s0",
+  "params": 96416,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 21
+ },
+ "S005": {
+  "model": "d192-L4_1000M_s0",
+  "params": 1323904,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 21
+ },
+ "S006": {
+  "model": "D-d48-bpe1024-ctx512-r32_1000M_s0",
+  "params": 96416,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 20
+ },
+ "S007": {
+  "model": "D-d48-bpe1024-ctx512-r32_3000M_s0",
+  "params": 96416,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 21
+ },
+ "S008": {
+  "model": "D-d48-bpe1024-ctx512-r32_3000M_s0",
+  "params": 96416,
+  "prompt": "The little dog was sad because",
+  "seed": 21
+ },
+ "S009": {
+  "model": "d192-L4_1000M_s0",
+  "params": 1323904,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 20
+ },
+ "S010": {
+  "model": "D-d48-bpe1024-ctx512-r32_3000M_s0",
+  "params": 96416,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 21
+ },
+ "S011": {
+  "model": "D-d48-bpe1024-ctx512-r32_1000M_s0",
+  "params": 96416,
+  "prompt": "The little dog was sad because",
+  "seed": 21
+ },
+ "S012": {
+  "model": "D-d48-bpe1024-ctx512-r32_3000M_s0",
+  "params": 96416,
+  "prompt": "Once upon a time",
+  "seed": 20
+ },
+ "S013": {
+  "model": "D-d48-bpe1024-ctx512-r32_1000M_s0",
+  "params": 96416,
+  "prompt": "Once upon a time",
+  "seed": 20
+ },
+ "S014": {
+  "model": "d192-L4_1000M_s0",
+  "params": 1323904,
+  "prompt": "Once upon a time",
+  "seed": 20
+ },
+ "S015": {
+  "model": "D-d48-bpe1024-ctx512-r32_1000M_s0",
+  "params": 96416,
+  "prompt": "Once upon a time",
+  "seed": 21
+ },
+ "S016": {
+  "model": "D-d48-bpe1024-ctx512-r32_1000M_s0",
+  "params": 96416,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 21
+ },
+ "S017": {
+  "model": "d192-L4_1000M_s0",
+  "params": 1323904,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 21
+ },
+ "S018": {
+  "model": "D-d48-bpe1024-ctx512-r32_3000M_s0",
+  "params": 96416,
+  "prompt": "Once upon a time",
+  "seed": 21
+ },
+ "S019": {
+  "model": "d192-L4_1000M_s0",
+  "params": 1323904,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 20
+ },
+ "S020": {
+  "model": "d192-L4_1000M_s0",
+  "params": 1323904,
+  "prompt": "Once upon a time",
+  "seed": 21
+ },
+ "S021": {
+  "model": "D-d48-bpe1024-ctx512-r32_3000M_s0",
+  "params": 96416,
+  "prompt": "The little dog was sad because",
+  "seed": 20
+ },
+ "S022": {
+  "model": "D-d48-bpe1024-ctx512-r32_1000M_s0",
+  "params": 96416,
+  "prompt": "The little dog was sad because",
+  "seed": 20
+ },
+ "S023": {
+  "model": "d192-L4_1000M_s0",
+  "params": 1323904,
+  "prompt": "The little dog was sad because",
+  "seed": 20
+ },
+ "S024": {
+  "model": "D-d48-bpe1024-ctx512-r32_1000M_s0",
+  "params": 96416,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 20
+ }
+}

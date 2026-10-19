@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.1,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/softmax-mlp_lr1e-1_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 19680,
+ "params_nonemb": 16544,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.82597,
+ "evals": [
+  [
+   305,
+   2.26786
+  ],
+  [
+   610,
+   2.05459
+  ],
+  [
+   915,
+   1.90846
+  ],
+  [
+   1220,
+   1.82439
+  ],
+  [
+   1221,
+   1.82597
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.7136
+  ],
+  [
+   50,
+   4.976
+  ],
+  [
+   100,
+   3.7549
+  ],
+  [
+   150,
+   3.1258
+  ],
+  [
+   200,
+   2.7727
+  ],
+  [
+   250,
+   2.5394
+  ],
+  [
+   300,
+   2.396
+  ],
+  [
+   350,
+   2.3124
+  ],
+  [
+   400,
+   2.2384
+  ],
+  [
+   450,
+   2.2009
+  ],
+  [
+   500,
+   2.1606
+  ],
+  [
+   550,
+   2.1115
+  ],
+  [
+   600,
+   2.0793
+  ],
+  [
+   650,
+   2.0562
+  ],
+  [
+   700,
+   2.0344
+  ],
+  [
+   750,
+   2.0141
+  ],
+  [
+   800,
+   1.9865
+  ],
+  [
+   850,
+   1.967
+  ],
+  [
+   900,
+   1.9468
+  ],
+  [
+   950,
+   1.9242
+  ],
+  [
+   1000,
+   1.8892
+  ],
+  [
+   1050,
+   1.8771
+  ],
+  [
+   1100,
+   1.8587
+  ],
+  [
+   1150,
+   1.8471
+  ],
+  [
+   1200,
+   1.847
+  ],
+  [
+   1220,
+   1.8454
+  ]
+ ],
+ "train_seconds": 160.8,
+ "wall_seconds": 195.61,
+ "chars_per_sec": 62204,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was new from the see pudden see anywhanting all day down and showed her from the new a big froon and saw and sadys all go and closed. He fer and would go alsed on the hus to to her flew fun something sandy and said, \"Cty saw that she got was so and theit,\" Tim's poken had and small at heard ",
+ "rule_init": {}
+}

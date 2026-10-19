@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v28-emb\\nowd_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11611,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.28517
+  ],
+  [
+   100,
+   1.58363
+  ],
+  [
+   200,
+   1.42805
+  ],
+  [
+   300,
+   1.35752
+  ],
+  [
+   400,
+   1.31094
+  ],
+  [
+   500,
+   1.26532
+  ],
+  [
+   600,
+   1.23082
+  ],
+  [
+   700,
+   1.19909
+  ],
+  [
+   800,
+   1.17165
+  ],
+  [
+   900,
+   1.1492
+  ],
+  [
+   1000,
+   1.13199
+  ],
+  [
+   1100,
+   1.11982
+  ],
+  [
+   1160,
+   1.11611
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3706
+  ],
+  [
+   50,
+   8.1269
+  ],
+  [
+   100,
+   6.2487
+  ],
+  [
+   150,
+   5.34
+  ],
+  [
+   200,
+   4.8753
+  ],
+  [
+   250,
+   4.6124
+  ],
+  [
+   300,
+   4.4487
+  ],
+  [
+   350,
+   4.3347
+  ],
+  [
+   400,
+   4.251
+  ],
+  [
+   450,
+   4.1608
+  ],
+  [
+   500,
+   4.0946
+  ],
+  [
+   550,
+   4.0193
+  ],
+  [
+   600,
+   3.9545
+  ],
+  [
+   650,
+   3.8948
+  ],
+  [
+   700,
+   3.8446
+  ],
+  [
+   750,
+   3.8169
+  ],
+  [
+   800,
+   3.7621
+  ],
+  [
+   850,
+   3.7111
+  ],
+  [
+   900,
+   3.6785
+  ],
+  [
+   950,
+   3.638
+  ],
+  [
+   1000,
+   3.6011
+  ],
+  [
+   1050,
+   3.5763
+  ],
+  [
+   1100,
+   3.5628
+  ],
+  [
+   1150,
+   3.5637
+  ],
+  [
+   1159,
+   3.5596
+  ]
+ ],
+ "train_seconds": 79.4,
+ "wall_seconds": 93.63,
+ "chars_per_sec": 119675,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and red bird. The bird was a small bird and a little boy. The bird was going to the bird and fell. The bird was sad and he looked at the bird. They were happy and happy and loved to go together.\n<|eot|>\nOne day, a little boy named Tim went to the park. He saw a slide in the table. He wanted to organize the elephant.\nTim saw a hurt tree. He wanted to play with the ball. He said, \"Can I teacked this ball, but I will help me find it.\"\nTim wanted to help. He said, \"Don't worry, you can sing your ball!\" But Tim felt sorry for help. It said, \"I know that can't beham,\" he said.\nTim and his friends played together, and the big cat were a very nice ball. They had a lot of fun. When it was time to go outside. After playing, they went up to make the ball late. They all had greal time at the table.\nTim and his mom came to the playful ball. They saw who was deep on the ball. They bought the ball on the ball. They gave the ball back to the park. Sam and the pink ball played together with the ball, and They were not brave. The small ball was curi",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,183 @@
+{
+ "args": {
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/fuzzyfix/flm_ensqrt_rirandom.json",
+  "save_model": false,
+  "exp_norm": "sqrt",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "exp_norm": "sqrt",
+  "max_len": 256
+ },
+ "params_total": 26112,
+ "params_nonemb": 22976,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.95405,
+ "evals": [
+  [
+   305,
+   2.48386
+  ],
+  [
+   610,
+   2.13853
+  ],
+  [
+   915,
+   2.00594
+  ],
+  [
+   1220,
+   1.95427
+  ],
+  [
+   1221,
+   1.95405
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8443
+  ],
+  [
+   50,
+   5.8278
+  ],
+  [
+   100,
+   4.6489
+  ],
+  [
+   150,
+   3.7608
+  ],
+  [
+   200,
+   3.2231
+  ],
+  [
+   250,
+   2.8918
+  ],
+  [
+   300,
+   2.6706
+  ],
+  [
+   350,
+   2.5277
+  ],
+  [
+   400,
+   2.4104
+  ],
+  [
+   450,
+   2.3319
+  ],
+  [
+   500,
+   2.2679
+  ],
+  [
+   550,
+   2.2023
+  ],
+  [
+   600,
+   2.1644
+  ],
+  [
+   650,
+   2.1369
+  ],
+  [
+   700,
+   2.1132
+  ],
+  [
+   750,
+   2.0951
+  ],
+  [
+   800,
+   2.0661
+  ],
+  [
+   850,
+   2.0496
+  ],
+  [
+   900,
+   2.0341
+  ],
+  [
+   950,
+   2.0183
+  ],
+  [
+   1000,
+   1.989
+  ],
+  [
+   1050,
+   1.9834
+  ],
+  [
+   1100,
+   1.974
+  ],
+  [
+   1150,
+   1.9669
+  ],
+  [
+   1200,
+   1.9725
+  ],
+  [
+   1220,
+   1.9725
+  ]
+ ],
+ "train_seconds": 394.19,
+ "wall_seconds": 525.32,
+ "chars_per_sec": 25374,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there were help her, be somproude see with her down to cat for her friends, but and girly plain the on the saw and sad.\nThe dog and cleceit with that the red by lirked girt. They were like cowloor and were sand to play, the good. She was eallaw a and and plaited they ear and the moss said. Mave he",
+ "rule_init": {}
+}

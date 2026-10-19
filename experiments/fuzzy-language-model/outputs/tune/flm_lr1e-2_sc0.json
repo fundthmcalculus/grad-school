@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/flm_lr1e-2_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 25856,
+ "params_nonemb": 22720,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.00825,
+ "evals": [
+  [
+   305,
+   2.4468
+  ],
+  [
+   610,
+   2.17606
+  ],
+  [
+   915,
+   2.05762
+  ],
+  [
+   1220,
+   2.00961
+  ],
+  [
+   1221,
+   2.00825
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.6917
+  ],
+  [
+   50,
+   5.7553
+  ],
+  [
+   100,
+   4.5409
+  ],
+  [
+   150,
+   3.6657
+  ],
+  [
+   200,
+   3.1569
+  ],
+  [
+   250,
+   2.8329
+  ],
+  [
+   300,
+   2.625
+  ],
+  [
+   350,
+   2.4973
+  ],
+  [
+   400,
+   2.3951
+  ],
+  [
+   450,
+   2.334
+  ],
+  [
+   500,
+   2.2887
+  ],
+  [
+   550,
+   2.2303
+  ],
+  [
+   600,
+   2.1996
+  ],
+  [
+   650,
+   2.1769
+  ],
+  [
+   700,
+   2.1558
+  ],
+  [
+   750,
+   2.1392
+  ],
+  [
+   800,
+   2.1161
+  ],
+  [
+   850,
+   2.1004
+  ],
+  [
+   900,
+   2.0848
+  ],
+  [
+   950,
+   2.0717
+  ],
+  [
+   1000,
+   2.0431
+  ],
+  [
+   1050,
+   2.0378
+  ],
+  [
+   1100,
+   2.0261
+  ],
+  [
+   1150,
+   2.0217
+  ],
+  [
+   1200,
+   2.0254
+  ],
+  [
+   1220,
+   2.0231
+  ]
+ ],
+ "train_seconds": 316.96,
+ "wall_seconds": 360.57,
+ "chars_per_sec": 31558,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time saw a big night her the seel down askeeet ball avery and Suddy and big get was agreed to play in reast. She saw a mardees all go and chep. Tim hugged was friends lird on it a red dirg to for a ludderly were vens to play, the grion the kinder. The ladn and their the scared.\n<|eot|>\n\n\nMard the liked to ball ",
+ "rule_init": {}
+}

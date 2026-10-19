@@ -1,0 +1,299 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 128,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v8-ctx\\D-d48-bpe1024-ctx128_30M_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 128
+ },
+ "params_total": 93344,
+ "params_nonemb": 44192,
+ "steps": 2320,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.13725,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   580,
+   1.32356
+  ],
+  [
+   1160,
+   1.22947
+  ],
+  [
+   1740,
+   1.16638
+  ],
+  [
+   2320,
+   1.13725
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.335
+  ],
+  [
+   50,
+   8.4671
+  ],
+  [
+   100,
+   6.5381
+  ],
+  [
+   150,
+   5.5687
+  ],
+  [
+   200,
+   5.0817
+  ],
+  [
+   250,
+   4.8163
+  ],
+  [
+   300,
+   4.6441
+  ],
+  [
+   350,
+   4.5082
+  ],
+  [
+   400,
+   4.443
+  ],
+  [
+   450,
+   4.3558
+  ],
+  [
+   500,
+   4.2926
+  ],
+  [
+   550,
+   4.2656
+  ],
+  [
+   600,
+   4.2413
+  ],
+  [
+   650,
+   4.1967
+  ],
+  [
+   700,
+   4.1404
+  ],
+  [
+   750,
+   4.1167
+  ],
+  [
+   800,
+   4.1028
+  ],
+  [
+   850,
+   4.0649
+  ],
+  [
+   900,
+   4.0367
+  ],
+  [
+   950,
+   4.0036
+  ],
+  [
+   1000,
+   3.9751
+  ],
+  [
+   1050,
+   3.9518
+  ],
+  [
+   1100,
+   3.9328
+  ],
+  [
+   1150,
+   3.9139
+  ],
+  [
+   1200,
+   3.9148
+  ],
+  [
+   1250,
+   3.8882
+  ],
+  [
+   1300,
+   3.8641
+  ],
+  [
+   1350,
+   3.8354
+  ],
+  [
+   1400,
+   3.8213
+  ],
+  [
+   1450,
+   3.8036
+  ],
+  [
+   1500,
+   3.7929
+  ],
+  [
+   1550,
+   3.767
+  ],
+  [
+   1600,
+   3.7634
+  ],
+  [
+   1650,
+   3.7504
+  ],
+  [
+   1700,
+   3.7291
+  ],
+  [
+   1750,
+   3.7159
+  ],
+  [
+   1800,
+   3.7005
+  ],
+  [
+   1850,
+   3.691
+  ],
+  [
+   1900,
+   3.6791
+  ],
+  [
+   1950,
+   3.6572
+  ],
+  [
+   2000,
+   3.6427
+  ],
+  [
+   2050,
+   3.6458
+  ],
+  [
+   2100,
+   3.6531
+  ],
+  [
+   2150,
+   3.6482
+  ],
+  [
+   2200,
+   3.6281
+  ],
+  [
+   2250,
+   3.6223
+  ],
+  [
+   2300,
+   3.6086
+  ],
+  [
+   2319,
+   3.6059
+  ]
+ ],
+ "train_seconds": 178.57,
+ "wall_seconds": 185.46,
+ "chars_per_sec": 53217,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Spoor. She was a special shiver. Toborag liked to run and play in the park. She would push the shaper and Lily's beautiful flowers and a faller fair.\nDrank them for being poor and brave and kind. She was happy to see that mom would always chair. She always signed and kind. She was very happy again. She learned that sometimes, if they don't work like you.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. Tim loved to play with his friends. One day, Tim decided to play outside in the park. But the water was not nice to play, but the bird thought it was hot to bow.\nTim tried to come with the food, but the big bird was too small. The bird was sad and sad. Tim thought for a friend, Sam, and he played together every day. After many days, Tim found a small bag with his family. Tim was so happy that he had a special patch. One day, Tim went to the park and saw his friend, a little bird named Tim. Tim asked, \"What did you do not?\" Tim asked. \"Chirp!\" Sam said. Tim thought about how he could help him get his friend, Tim.\nTim decided to play with",
+ "rule_init": {},
+ "ngram_init": {}
+}

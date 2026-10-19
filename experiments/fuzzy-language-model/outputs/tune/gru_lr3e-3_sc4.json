@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "gru",
+  "ffn": "none",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.003,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/gru_lr3e-3_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "gru",
+  "ffn": "none",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 15840,
+ "params_nonemb": 12704,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.1575,
+ "evals": [
+  [
+   305,
+   2.70403
+  ],
+  [
+   610,
+   2.30782
+  ],
+  [
+   915,
+   2.19137
+  ],
+  [
+   1220,
+   2.15746
+  ],
+  [
+   1221,
+   2.1575
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9078
+  ],
+  [
+   50,
+   6.3607
+  ],
+  [
+   100,
+   5.2211
+  ],
+  [
+   150,
+   4.2739
+  ],
+  [
+   200,
+   3.5947
+  ],
+  [
+   250,
+   3.1853
+  ],
+  [
+   300,
+   2.9267
+  ],
+  [
+   350,
+   2.7565
+  ],
+  [
+   400,
+   2.6227
+  ],
+  [
+   450,
+   2.531
+  ],
+  [
+   500,
+   2.4566
+  ],
+  [
+   550,
+   2.3898
+  ],
+  [
+   600,
+   2.3435
+  ],
+  [
+   650,
+   2.313
+  ],
+  [
+   700,
+   2.2887
+  ],
+  [
+   750,
+   2.2668
+  ],
+  [
+   800,
+   2.2414
+  ],
+  [
+   850,
+   2.2279
+  ],
+  [
+   900,
+   2.2145
+  ],
+  [
+   950,
+   2.2015
+  ],
+  [
+   1000,
+   2.1798
+  ],
+  [
+   1050,
+   2.1775
+  ],
+  [
+   1100,
+   2.1697
+  ],
+  [
+   1150,
+   2.1664
+  ],
+  [
+   1200,
+   2.1725
+  ],
+  [
+   1220,
+   2.1707
+  ]
+ ],
+ "train_seconds": 186.73,
+ "wall_seconds": 213.36,
+ "chars_per_sec": 53568,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, the the shile from the seel un mads and her had a blow cald with help be the gog back to make a big on the saw and sad sail, Tim said, \"Cit we fliend away together apperien. They was her flee fun some to time, the pricble.\" the ball are peallaw and shaw the play was the bird and the lids, they pir",
+ "rule_init": {}
+}

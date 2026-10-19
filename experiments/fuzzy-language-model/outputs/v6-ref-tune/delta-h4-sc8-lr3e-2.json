@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 4,
+  "rules": 16,
+  "ffn_mult": 2.6,
+  "tsk_dim": 0,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-ref-tune\\delta-h4-sc8-lr3e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 4,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.6,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93376,
+ "params_nonemb": 44224,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.2756,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.62896
+  ],
+  [
+   192,
+   1.43684
+  ],
+  [
+   288,
+   1.33657
+  ],
+  [
+   384,
+   1.27572
+  ],
+  [
+   387,
+   1.2756
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3998
+  ],
+  [
+   50,
+   8.5088
+  ],
+  [
+   100,
+   6.5387
+  ],
+  [
+   150,
+   5.4845
+  ],
+  [
+   200,
+   4.9407
+  ],
+  [
+   250,
+   4.6135
+  ],
+  [
+   300,
+   4.3808
+  ],
+  [
+   350,
+   4.2082
+  ],
+  [
+   386,
+   4.1448
+  ]
+ ],
+ "train_seconds": 37.1,
+ "wall_seconds": 45.54,
+ "chars_per_sec": 85447,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there lived a little girl who was a tripquet. The vactat had a big box. The people were sad because it was. The little cat was scared because they had a magic window. Kitty was too hard to go inside, so he was scared.\nTom and Sam were both surprised. They played together all day long. They both liked to play and play together. Mr.\n<|eot|>\nOnce upon a time, there was a little girl named Mia. She loved to play with her toy. One day, she found a busy sign on the ground. Max was a small bash. But she couldn't eat the anxious bunny. She did not know what was inside. It was a big dog with a pope in the door. She had a big world come with her food. Lily was very sad, so she started to push. She was reading and said, \"Hi, Tim! You need to make a pretty bugs. I can make the buss?\" Lily and Tim was surprised. They both laughed and thanked the tree to play. They had fun together to play with water and might, and talked.\nJohn promular, the other snowes were happy. Tim said, ???Let???s say,\" she said. \nLethn???s a small marror",
+ "rule_init": {},
+ "ngram_init": {}
+}

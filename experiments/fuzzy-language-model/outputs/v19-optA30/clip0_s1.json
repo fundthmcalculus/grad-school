@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 0.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-optA30\\clip0_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11925,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.37387
+  ],
+  [
+   580,
+   1.2463
+  ],
+  [
+   870,
+   1.16553
+  ],
+  [
+   1160,
+   1.11925
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2386
+  ],
+  [
+   50,
+   8.2493
+  ],
+  [
+   100,
+   6.3807
+  ],
+  [
+   150,
+   5.4138
+  ],
+  [
+   200,
+   4.9304
+  ],
+  [
+   250,
+   4.6522
+  ],
+  [
+   300,
+   4.4681
+  ],
+  [
+   350,
+   4.3529
+  ],
+  [
+   400,
+   4.2791
+  ],
+  [
+   450,
+   4.1802
+  ],
+  [
+   500,
+   4.1227
+  ],
+  [
+   550,
+   4.064
+  ],
+  [
+   600,
+   4.0055
+  ],
+  [
+   650,
+   3.9292
+  ],
+  [
+   700,
+   3.8821
+  ],
+  [
+   750,
+   3.8384
+  ],
+  [
+   800,
+   3.784
+  ],
+  [
+   850,
+   3.7425
+  ],
+  [
+   900,
+   3.7116
+  ],
+  [
+   950,
+   3.6659
+  ],
+  [
+   1000,
+   3.6282
+  ],
+  [
+   1050,
+   3.5948
+  ],
+  [
+   1100,
+   3.5844
+  ],
+  [
+   1150,
+   3.5657
+  ],
+  [
+   1159,
+   3.5624
+  ]
+ ],
+ "train_seconds": 79.12,
+ "wall_seconds": 85.73,
+ "chars_per_sec": 120103,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Suddenly, a big measure saw a little bird. Toppy looked at the cat and said, \"Let's play with the big, shiny moder. Cat are not too my friend, Cat. What are youan?\" Cat was rest. He wanted to slide, but he could not hear the rock. Molly said, \"I am a plang, Bee. I am a big, blue hame!\"\nBob and Billy found a bed. It was a very pretty collirt for the same a special place. Sally threw a bed. They tried to get home, but they could not play again.\nNow, Mary didn't be scared anymore. The rabbit was so happy and the sock, but Lisa had learned to be kind and always found them.\n<|eot|>\nOnce upon a time, there was a little girl named Lucy. She loved to play with her toys. One day, Lucy saw a big tree with a big, red box. One day, Lucy saw a little girl named Lily who was angry. She said, \"I am a hug. I am sorry.\" Lucy smiled and said, \"I cannot go outside to play together!\"\nThey went to the park with the wood outside and play. They were all playing",
+ "rule_init": {},
+ "ngram_init": {}
+}

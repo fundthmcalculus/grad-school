@@ -1,0 +1,207 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 4,
+  "rules": 16,
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-final10\\ref2-delta-h4-sc4-lr6e-2_30M_s4.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 4,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93376,
+ "params_nonemb": 44224,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.15976,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.3917
+  ],
+  [
+   580,
+   1.27555
+  ],
+  [
+   870,
+   1.20018
+  ],
+  [
+   1160,
+   1.15976
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3678
+  ],
+  [
+   50,
+   8.1643
+  ],
+  [
+   100,
+   6.3179
+  ],
+  [
+   150,
+   5.4061
+  ],
+  [
+   200,
+   4.9153
+  ],
+  [
+   250,
+   4.668
+  ],
+  [
+   300,
+   4.499
+  ],
+  [
+   350,
+   4.3931
+  ],
+  [
+   400,
+   4.3136
+  ],
+  [
+   450,
+   4.242
+  ],
+  [
+   500,
+   4.1914
+  ],
+  [
+   550,
+   4.1297
+  ],
+  [
+   600,
+   4.0718
+  ],
+  [
+   650,
+   4.0336
+  ],
+  [
+   700,
+   3.9778
+  ],
+  [
+   750,
+   3.9295
+  ],
+  [
+   800,
+   3.8959
+  ],
+  [
+   850,
+   3.8609
+  ],
+  [
+   900,
+   3.821
+  ],
+  [
+   950,
+   3.7916
+  ],
+  [
+   1000,
+   3.7579
+  ],
+  [
+   1050,
+   3.7336
+  ],
+  [
+   1100,
+   3.7109
+  ],
+  [
+   1150,
+   3.7057
+  ],
+  [
+   1159,
+   3.6909
+  ]
+ ],
+ "train_seconds": 110.77,
+ "wall_seconds": 117.72,
+ "chars_per_sec": 85791,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Lucy.\nSally saw the aira in the ground. She wanted to go fast to sit in the barn. She used her birthday. Sot the toy car's first, soon was not better. So, she pointed a new toy.\nThe moral of the story is that when you organized the way to be saved what the clever, it's important to play with others.\n<|eot|>\nOne day, a little girl named Sue found a bench. She was very silly and wanted to play with her friends. She ran to her friend, the little girl named Sally.\nWhen Sue got to the unchrippace, she saw a big, happy cat. She tried to come with her dog, but the dog was sad. The cat was sad because the cat learned that it would be fun to explore it can. The dog would tied the bug's friend and found new friends.\n<|eot|>\n\nOnce upon a time, there was a little boy. He was very bright. He liked to play with his face and marking and talked.\nOne day, the bird was very happy. He wanted to help his friend, Max, his mom said, \"Hello, ha mean to use!\" Sue was happy and thanked the milk.",
+ "rule_init": {},
+ "ngram_init": {}
+}

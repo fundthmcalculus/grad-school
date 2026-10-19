@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v22-tribble\\assocls_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.1608,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   2.99602
+  ],
+  [
+   100,
+   1.61055
+  ],
+  [
+   200,
+   1.46267
+  ],
+  [
+   300,
+   1.39035
+  ],
+  [
+   400,
+   1.3433
+  ],
+  [
+   500,
+   1.30815
+  ],
+  [
+   600,
+   1.27778
+  ],
+  [
+   700,
+   1.24322
+  ],
+  [
+   800,
+   1.222
+  ],
+  [
+   900,
+   1.19619
+  ],
+  [
+   1000,
+   1.17753
+  ],
+  [
+   1100,
+   1.16514
+  ],
+  [
+   1160,
+   1.1608
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.4556
+  ],
+  [
+   50,
+   7.6439
+  ],
+  [
+   100,
+   6.1499
+  ],
+  [
+   150,
+   5.3539
+  ],
+  [
+   200,
+   4.93
+  ],
+  [
+   250,
+   4.7121
+  ],
+  [
+   300,
+   4.5563
+  ],
+  [
+   350,
+   4.433
+  ],
+  [
+   400,
+   4.3307
+  ],
+  [
+   450,
+   4.2524
+  ],
+  [
+   500,
+   4.1926
+  ],
+  [
+   550,
+   4.1323
+  ],
+  [
+   600,
+   4.0965
+  ],
+  [
+   650,
+   4.0447
+  ],
+  [
+   700,
+   3.9799
+  ],
+  [
+   750,
+   3.9456
+  ],
+  [
+   800,
+   3.9156
+  ],
+  [
+   850,
+   3.867
+  ],
+  [
+   900,
+   3.8325
+  ],
+  [
+   950,
+   3.7917
+  ],
+  [
+   1000,
+   3.7614
+  ],
+  [
+   1050,
+   3.742
+  ],
+  [
+   1100,
+   3.7265
+  ],
+  [
+   1150,
+   3.6899
+  ],
+  [
+   1159,
+   3.6903
+  ]
+ ],
+ "train_seconds": 79.35,
+ "wall_seconds": 93.49,
+ "chars_per_sec": 119763,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big paper. The person is a special shaper. The boy was very happy and sad.\nA little boy came back to the park to play with the magic toy. He had an idea and loved to go inside. He felt good healthy and put the car in a stair.\nThen, a girl named Amy named Lily came out. She was sign and loved to help each other. They had a lot of fun day.\n<|eot|>\nOnce upon a time, a little girl named Sue had a sign. She loved to play with her ball. One day, she saw a big, red carrot. She wanted to play with her. But it was not not nice to her.\n\"My mom, look at the bow, and it worked. But it's not a nice large monstearber. I want to read it. She is never careful with bug. It is not tied. It is angry. It is not useful anymore. It grew fun. It was soft and wanted to play.\nBut this time, a small boy came to the park. It was a shiny thing. It was in the sand. It is a toy. Sue's plane came to the pink tree and Ben has left. They did not know what to do.\n\"I want",
+ "rule_init": {
+  "variant": "assocls",
+  "L0.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.5466
+  },
+  "L1.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.5209
+  }
+ },
+ "ngram_init": {}
+}

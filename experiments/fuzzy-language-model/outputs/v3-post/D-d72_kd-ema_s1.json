@@ -1,0 +1,216 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 72,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.003,
+  "wd": 0.01,
+  "warmup": 50,
+  "seed": 101,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-post\\D-d72_kd-ema_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-big\\D-d72_30M_s1.pt",
+  "ema_decay": 0.999,
+  "teacher": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-big\\teacher-delta-d128_60M_s0.pt",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 72,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 97520,
+ "params_nonemb": 90464,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.24365,
+ "val_bpc_ema": 1.24336,
+ "evals": [
+  [
+   0,
+   1.26859
+  ],
+  [
+   305,
+   1.25905
+  ],
+  [
+   610,
+   1.25313
+  ],
+  [
+   915,
+   1.24634
+  ],
+  [
+   1220,
+   1.24366
+  ],
+  [
+   1221,
+   1.24365
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   1.3048
+  ],
+  [
+   50,
+   1.2792
+  ],
+  [
+   100,
+   1.2678
+  ],
+  [
+   150,
+   1.2635
+  ],
+  [
+   200,
+   1.2706
+  ],
+  [
+   250,
+   1.2668
+  ],
+  [
+   300,
+   1.2694
+  ],
+  [
+   350,
+   1.2672
+  ],
+  [
+   400,
+   1.2599
+  ],
+  [
+   450,
+   1.2627
+  ],
+  [
+   500,
+   1.2643
+  ],
+  [
+   550,
+   1.255
+  ],
+  [
+   600,
+   1.2604
+  ],
+  [
+   650,
+   1.255
+  ],
+  [
+   700,
+   1.2567
+  ],
+  [
+   750,
+   1.2542
+  ],
+  [
+   800,
+   1.2468
+  ],
+  [
+   850,
+   1.2526
+  ],
+  [
+   900,
+   1.2457
+  ],
+  [
+   950,
+   1.2503
+  ],
+  [
+   1000,
+   1.2471
+  ],
+  [
+   1050,
+   1.2497
+  ],
+  [
+   1100,
+   1.2458
+  ],
+  [
+   1150,
+   1.2496
+  ],
+  [
+   1200,
+   1.2523
+  ],
+  [
+   1220,
+   1.2524
+  ]
+ ],
+ "train_seconds": 330.75,
+ "wall_seconds": 376.42,
+ "chars_per_sec": 30242,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a fun day, but he didn't know what to do. He could not get it in the ground. Finally, the ocean fast came into the garages, she gave up. \nThe berries all day long. They were listening to sleep to gets there with the bottle and played with their friends.\nOnce upon a time, there was a weig",
+ "rule_init": {},
+ "ngram_init": {}
+}

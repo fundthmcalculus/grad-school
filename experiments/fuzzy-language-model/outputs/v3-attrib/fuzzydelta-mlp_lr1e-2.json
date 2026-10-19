@@ -1,0 +1,189 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "mlp",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-attrib\\fuzzydelta-mlp_lr1e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzydelta",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "max_len": 256
+ },
+ "params_total": 77256,
+ "params_nonemb": 70984,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.51436,
+ "evals": [
+  [
+   305,
+   1.91914
+  ],
+  [
+   610,
+   1.69545
+  ],
+  [
+   915,
+   1.57622
+  ],
+  [
+   1220,
+   1.51483
+  ],
+  [
+   1221,
+   1.51436
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.1837
+  ],
+  [
+   50,
+   5.305
+  ],
+  [
+   100,
+   3.7576
+  ],
+  [
+   150,
+   2.8987
+  ],
+  [
+   200,
+   2.4429
+  ],
+  [
+   250,
+   2.1906
+  ],
+  [
+   300,
+   2.0512
+  ],
+  [
+   350,
+   1.9638
+  ],
+  [
+   400,
+   1.8867
+  ],
+  [
+   450,
+   1.8433
+  ],
+  [
+   500,
+   1.8073
+  ],
+  [
+   550,
+   1.7579
+  ],
+  [
+   600,
+   1.7256
+  ],
+  [
+   650,
+   1.7038
+  ],
+  [
+   700,
+   1.6813
+  ],
+  [
+   750,
+   1.6646
+  ],
+  [
+   800,
+   1.6423
+  ],
+  [
+   850,
+   1.6225
+  ],
+  [
+   900,
+   1.6084
+  ],
+  [
+   950,
+   1.5904
+  ],
+  [
+   1000,
+   1.5612
+  ],
+  [
+   1050,
+   1.554
+  ],
+  [
+   1100,
+   1.5416
+  ],
+  [
+   1150,
+   1.5312
+  ],
+  [
+   1200,
+   1.5324
+  ],
+  [
+   1220,
+   1.5328
+  ]
+ ],
+ "train_seconds": 82.51,
+ "wall_seconds": 102.43,
+ "chars_per_sec": 121229,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog playing. They and shoes and diad and happy and shiny. He did not wanted to see your car. Sam liked not each other to find it. The bird was sad. They were friends was inside. \nThe little boy named Tim. They picked it to her mom. They went to the best for dirty. They walked to",
+ "rule_init": {}
+}

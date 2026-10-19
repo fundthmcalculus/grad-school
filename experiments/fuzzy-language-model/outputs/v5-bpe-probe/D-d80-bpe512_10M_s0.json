@@ -1,0 +1,159 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 80,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v5-bpe-probe\\D-d80-bpe512_10M_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe512",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 512
+ },
+ "config": {
+  "vocab_size": 512,
+  "d_model": 80,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 150432,
+ "params_nonemb": 109472,
+ "steps": 510,
+ "chars_seen": 10018634,
+ "chars_per_token": 2.3979958,
+ "val_bpc": 1.24794,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   127,
+   1.69132
+  ],
+  [
+   254,
+   1.4815
+  ],
+  [
+   381,
+   1.34438
+  ],
+  [
+   508,
+   1.24856
+  ],
+  [
+   510,
+   1.24794
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.5483
+  ],
+  [
+   50,
+   7.5648
+  ],
+  [
+   100,
+   5.6253
+  ],
+  [
+   150,
+   4.6095
+  ],
+  [
+   200,
+   4.1272
+  ],
+  [
+   250,
+   3.8303
+  ],
+  [
+   300,
+   3.6312
+  ],
+  [
+   350,
+   3.4631
+  ],
+  [
+   400,
+   3.3176
+  ],
+  [
+   450,
+   3.1949
+  ],
+  [
+   500,
+   3.1053
+  ],
+  [
+   509,
+   3.0889
+  ]
+ ],
+ "train_seconds": 78.23,
+ "wall_seconds": 94.03,
+ "chars_per_sec": 53406,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big, feop warm old yellow cake. The kind man was so happy that the stage was at his nide. The man became good friends and played with the ugly car.\n<|eot|>\nOne day, a little boy named Tim went to the box. It was a big, careal doll. They wanted to make rocks. The rock loved to fix the toy. The rock was too hit, and it was inside.\nTim opened it, but the open was not a great pretty bird. The bird tried to if it was too hard. Tim and his mom felt bad. They were dinner liked the yard. Tim was scared. He did not know high. He felt until she loved new sound.\nHer mom looked up to play with the tree and saw Sue around the tree. She got by the tree and dad said, \"No, Tim, I love your by it. Can I help you?\" Tim reached and saw the bird's sad. The bird tried to race, but he could not find it. Tim",
+ "rule_init": {},
+ "ngram_init": {}
+}

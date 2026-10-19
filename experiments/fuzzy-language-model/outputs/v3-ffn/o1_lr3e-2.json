@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn\\o1_lr3e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "max_len": 256
+ },
+ "params_total": 102084,
+ "params_nonemb": 95812,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.72499,
+ "evals": [
+  [
+   305,
+   2.15072
+  ],
+  [
+   610,
+   1.92434
+  ],
+  [
+   915,
+   1.79206
+  ],
+  [
+   1220,
+   1.72571
+  ],
+  [
+   1221,
+   1.72499
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.3262
+  ],
+  [
+   50,
+   5.1914
+  ],
+  [
+   100,
+   3.6941
+  ],
+  [
+   150,
+   2.9378
+  ],
+  [
+   200,
+   2.6036
+  ],
+  [
+   250,
+   2.4197
+  ],
+  [
+   300,
+   2.2784
+  ],
+  [
+   350,
+   2.1995
+  ],
+  [
+   400,
+   2.1317
+  ],
+  [
+   450,
+   2.096
+  ],
+  [
+   500,
+   2.0482
+  ],
+  [
+   550,
+   2.0032
+  ],
+  [
+   600,
+   1.9652
+  ],
+  [
+   650,
+   1.9371
+  ],
+  [
+   700,
+   1.9125
+  ],
+  [
+   750,
+   1.889
+  ],
+  [
+   800,
+   1.8624
+  ],
+  [
+   850,
+   1.8441
+  ],
+  [
+   900,
+   1.8294
+  ],
+  [
+   950,
+   1.8095
+  ],
+  [
+   1000,
+   1.7776
+  ],
+  [
+   1050,
+   1.7692
+  ],
+  [
+   1100,
+   1.7539
+  ],
+  [
+   1150,
+   1.7445
+  ],
+  [
+   1200,
+   1.7466
+  ],
+  [
+   1220,
+   1.7458
+  ]
+ ],
+ "train_seconds": 62.99,
+ "wall_seconds": 71.65,
+ "chars_per_sec": 158802,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was enging green in the ground.\nShe had a new papers in it found a big mety and her fun days of your car. She crean needed and sleep horn, in the story hurt and said, \"I could not red you my friend and his liking the not asking to a collert for a walked and dad, she some in the would for a l",
+ "rule_init": {}
+}

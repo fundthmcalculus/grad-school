@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-mix\\acc-r32_s1.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 91588,
+ "params_nonemb": 85316,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.46349,
+ "evals": [
+  [
+   305,
+   1.89262
+  ],
+  [
+   610,
+   1.67882
+  ],
+  [
+   915,
+   1.53811
+  ],
+  [
+   1220,
+   1.46364
+  ],
+  [
+   1221,
+   1.46349
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.0655
+  ],
+  [
+   50,
+   4.9812
+  ],
+  [
+   100,
+   3.5175
+  ],
+  [
+   150,
+   2.747
+  ],
+  [
+   200,
+   2.3526
+  ],
+  [
+   250,
+   2.1466
+  ],
+  [
+   300,
+   2.0113
+  ],
+  [
+   350,
+   1.9303
+  ],
+  [
+   400,
+   1.864
+  ],
+  [
+   450,
+   1.8084
+  ],
+  [
+   500,
+   1.7721
+  ],
+  [
+   550,
+   1.7355
+  ],
+  [
+   600,
+   1.7099
+  ],
+  [
+   650,
+   1.6826
+  ],
+  [
+   700,
+   1.6579
+  ],
+  [
+   750,
+   1.635
+  ],
+  [
+   800,
+   1.6214
+  ],
+  [
+   850,
+   1.5885
+  ],
+  [
+   900,
+   1.5665
+  ],
+  [
+   950,
+   1.5431
+  ],
+  [
+   1000,
+   1.5248
+  ],
+  [
+   1050,
+   1.5072
+  ],
+  [
+   1100,
+   1.4974
+  ],
+  [
+   1150,
+   1.4843
+  ],
+  [
+   1200,
+   1.4858
+  ],
+  [
+   1220,
+   1.4799
+  ]
+ ],
+ "train_seconds": 61.04,
+ "wall_seconds": 72.8,
+ "chars_per_sec": 163865,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Tom. They hugged, and they had him and said, \"Hi Lily, for wanted to see your plants. The squirrel and sole too. It is the park wheel mind with some window.\nOne day, Tim felt something unexpected happened. They were many expent their mom came to their thanks. They coul",
+ "rule_init": {}
+}

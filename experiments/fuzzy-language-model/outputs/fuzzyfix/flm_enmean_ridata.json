@@ -1,0 +1,186 @@
+{
+ "args": {
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/fuzzyfix/flm_enmean_ridata.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "rule_init": "data"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "exp_norm": "mean",
+  "max_len": 256
+ },
+ "params_total": 26112,
+ "params_nonemb": 22976,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.93977,
+ "evals": [
+  [
+   305,
+   2.45078
+  ],
+  [
+   610,
+   2.11934
+  ],
+  [
+   915,
+   1.99459
+  ],
+  [
+   1220,
+   1.93997
+  ],
+  [
+   1221,
+   1.93977
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8207
+  ],
+  [
+   50,
+   5.8174
+  ],
+  [
+   100,
+   4.6479
+  ],
+  [
+   150,
+   3.7615
+  ],
+  [
+   200,
+   3.2314
+  ],
+  [
+   250,
+   2.8923
+  ],
+  [
+   300,
+   2.6635
+  ],
+  [
+   350,
+   2.5094
+  ],
+  [
+   400,
+   2.393
+  ],
+  [
+   450,
+   2.3173
+  ],
+  [
+   500,
+   2.261
+  ],
+  [
+   550,
+   2.1949
+  ],
+  [
+   600,
+   2.1525
+  ],
+  [
+   650,
+   2.1241
+  ],
+  [
+   700,
+   2.1029
+  ],
+  [
+   750,
+   2.0825
+  ],
+  [
+   800,
+   2.0568
+  ],
+  [
+   850,
+   2.0396
+  ],
+  [
+   900,
+   2.0209
+  ],
+  [
+   950,
+   2.0062
+  ],
+  [
+   1000,
+   1.9776
+  ],
+  [
+   1050,
+   1.9735
+  ],
+  [
+   1100,
+   1.9615
+  ],
+  [
+   1150,
+   1.9557
+  ],
+  [
+   1200,
+   1.9592
+  ],
+  [
+   1220,
+   1.9574
+  ]
+ ],
+ "train_seconds": 435.04,
+ "wall_seconds": 581.29,
+ "chars_per_sec": 22992,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time. He laughs were very trees. It was so excited to play a coundmed.\nMake leopped again fire. The barful care hand Tim sad.\nOnly, a all despirrind the agrawly said. \"Lily, something and she somethiud some were very to play with the ball and peal away and a big named Tim's pond what it. They detted to ",
+ "rule_init": {
+  "L0.ffn": 64,
+  "L1.ffn": 64
+ }
+}

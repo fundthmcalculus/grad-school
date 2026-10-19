@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.02,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-d-lr\\D-lr2e-2_10M_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93344,
+ "params_nonemb": 44192,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.28535,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.62174
+  ],
+  [
+   192,
+   1.43094
+  ],
+  [
+   288,
+   1.33366
+  ],
+  [
+   384,
+   1.28617
+  ],
+  [
+   387,
+   1.28535
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3938
+  ],
+  [
+   50,
+   8.7813
+  ],
+  [
+   100,
+   6.6567
+  ],
+  [
+   150,
+   5.4949
+  ],
+  [
+   200,
+   4.9089
+  ],
+  [
+   250,
+   4.5687
+  ],
+  [
+   300,
+   4.3628
+  ],
+  [
+   350,
+   4.224
+  ],
+  [
+   386,
+   4.1549
+  ]
+ ],
+ "train_seconds": 78.51,
+ "wall_seconds": 94.41,
+ "chars_per_sec": 40382,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Spoco. He knew that one day, he was. \nHa was sad because he knew she could have his pizzy to move. She was beautiful and excited and loved to go inside. He felt making better to them. He poked away and went to the park with his friends.\nOne day, Lily was curious. She saw a big smile on the consheel. She saw the missle and scared. She said, \"Can you tere some long?\" Whiskers, she found a big red boat in her room. She ran to her mom, \"Wow you march your hurt!\" Lily said.\nThey walked up and saw that the hooel was happy. They ready Pinkevered the sky was very happy. They had a great day on the toys and the mud.\n<|eot|>\nOnce upon a time, there was a big, tikey bug named Tom. They liked to play with many toys in the bag. One day, a big girl named Lily went to the park, in her toy in the water. She thought, \"What is my friend,. It is in my wheel. I found that she was not a big tree!\" Lily pighted and looked at the leaf towards the persist.\nLily looked at",
+ "rule_init": {},
+ "ngram_init": {}
+}

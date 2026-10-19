@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn\\z0-rw_lr1e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 0,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 0,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "max_len": 256
+ },
+ "params_total": 85444,
+ "params_nonemb": 79172,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.71774,
+ "evals": [
+  [
+   305,
+   2.14518
+  ],
+  [
+   610,
+   1.9086
+  ],
+  [
+   915,
+   1.77276
+  ],
+  [
+   1220,
+   1.71769
+  ],
+  [
+   1221,
+   1.71774
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9961
+  ],
+  [
+   50,
+   5.4351
+  ],
+  [
+   100,
+   3.9284
+  ],
+  [
+   150,
+   3.1208
+  ],
+  [
+   200,
+   2.6846
+  ],
+  [
+   250,
+   2.4283
+  ],
+  [
+   300,
+   2.2771
+  ],
+  [
+   350,
+   2.1791
+  ],
+  [
+   400,
+   2.0991
+  ],
+  [
+   450,
+   2.0522
+  ],
+  [
+   500,
+   2.0117
+  ],
+  [
+   550,
+   1.9619
+  ],
+  [
+   600,
+   1.9274
+  ],
+  [
+   650,
+   1.9045
+  ],
+  [
+   700,
+   1.8876
+  ],
+  [
+   750,
+   1.8684
+  ],
+  [
+   800,
+   1.8409
+  ],
+  [
+   850,
+   1.8226
+  ],
+  [
+   900,
+   1.8062
+  ],
+  [
+   950,
+   1.7897
+  ],
+  [
+   1000,
+   1.7615
+  ],
+  [
+   1050,
+   1.7554
+  ],
+  [
+   1100,
+   1.7435
+  ],
+  [
+   1150,
+   1.7344
+  ],
+  [
+   1200,
+   1.7359
+  ],
+  [
+   1220,
+   1.7359
+  ]
+ ],
+ "train_seconds": 58.09,
+ "wall_seconds": 69.67,
+ "chars_per_sec": 172189,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a girl green paste something helped, and that he were having him. They wanted was too explain the spire. He loven a small sole to felt in the park where monks was so happy and breath. The faver and happy his on the scame track and learned. The wleeplind was sad down that he went to hear ",
+ "rule_init": {}
+}

@@ -1,0 +1,142 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 4000000.0,
+  "lr": 0.04,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 6,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-small\\lr4_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 155,
+ "chars_seen": 4010100,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.44523,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   38,
+   2.05204
+  ],
+  [
+   76,
+   1.6751
+  ],
+  [
+   114,
+   1.56101
+  ],
+  [
+   152,
+   1.4493
+  ],
+  [
+   155,
+   1.44523
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2386
+  ],
+  [
+   50,
+   8.3667
+  ],
+  [
+   100,
+   6.4201
+  ],
+  [
+   150,
+   5.3594
+  ],
+  [
+   154,
+   5.2965
+  ]
+ ],
+ "train_seconds": 560.81,
+ "wall_seconds": 778.44,
+ "chars_per_sec": 2264,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 6,
+ "device": "cpu",
+ "device_name": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called to exember. He had a special green at her house. Zoba was not good. He would play outside. She liked to play together. One day, Sue were so happy and loved to go inside.\n<|eot|>\nOne day, a little fish named Lucy. Tom loved a stut. He was so happy he decided to play with his chavorite car. He had a sack and show. She liked to play with the tree and went to her friend. He was a little bird and Sue and played together.\nAnna found her room. Tom said, \"I will we see?\"\nMom said, \"Don't play outside. you are pretty. Man I are very scared. I can do you run. This.\"\n\"What is not work?\",\" Mia thought. He wants to pourse, but it was not nice. It looked on acor. She saw it was gone on the tiver. He felt very scared and said, \"I'm sorry, let's green. I can I have to have to bright. I real if you go inside.\"\nTim and Ben played with her mom and said, \"Thank you for you?\"\nTom and Lucy were playing in the park. They were playing outside to play together and had fun, but they both towet together every day. They were all day.\n",
+ "rule_init": {},
+ "ngram_init": {}
+}

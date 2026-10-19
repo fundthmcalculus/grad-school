@@ -1,0 +1,183 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-acc-htsk_lr3e-2_sc0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "max_len": 256
+ },
+ "params_total": 28004,
+ "params_nonemb": 24868,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.82604,
+ "evals": [
+  [
+   305,
+   2.23926
+  ],
+  [
+   610,
+   2.00467
+  ],
+  [
+   915,
+   1.88634
+  ],
+  [
+   1220,
+   1.82592
+  ],
+  [
+   1221,
+   1.82604
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8988
+  ],
+  [
+   50,
+   5.5218
+  ],
+  [
+   100,
+   4.0875
+  ],
+  [
+   150,
+   3.2987
+  ],
+  [
+   200,
+   2.8363
+  ],
+  [
+   250,
+   2.5536
+  ],
+  [
+   300,
+   2.3822
+  ],
+  [
+   350,
+   2.2754
+  ],
+  [
+   400,
+   2.19
+  ],
+  [
+   450,
+   2.1421
+  ],
+  [
+   500,
+   2.1188
+  ],
+  [
+   550,
+   2.0587
+  ],
+  [
+   600,
+   2.0305
+  ],
+  [
+   650,
+   2.0074
+  ],
+  [
+   700,
+   1.9879
+  ],
+  [
+   750,
+   1.9731
+  ],
+  [
+   800,
+   1.946
+  ],
+  [
+   850,
+   1.9288
+  ],
+  [
+   900,
+   1.915
+  ],
+  [
+   950,
+   1.8996
+  ],
+  [
+   1000,
+   1.8718
+  ],
+  [
+   1050,
+   1.8625
+  ],
+  [
+   1100,
+   1.8483
+  ],
+  [
+   1150,
+   1.8409
+  ],
+  [
+   1200,
+   1.8444
+  ],
+  [
+   1220,
+   1.8414
+  ]
+ ],
+ "train_seconds": 721.98,
+ "wall_seconds": 904.74,
+ "chars_per_sec": 13854,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was not find the seel would said, \ufffd\ufffd\ufffdWet, a slide and he had lad to play good fixeced and red on the saw and sad sail down and he sign in treat the red by liked to to her was a big, me was a little tireds. Max wanted to play togethers. They all and their through to sury and just and they pin",
+ "rule_init": {}
+}
