@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.2,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v44-fuzzylocal\\noconv_t8_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 8,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.2,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 8,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99524,
+ "params_nonemb": 48260,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06274,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05654
+  ],
+  [
+   100,
+   1.39978
+  ],
+  [
+   200,
+   1.28398
+  ],
+  [
+   300,
+   1.2236
+  ],
+  [
+   400,
+   1.18199
+  ],
+  [
+   500,
+   1.15436
+  ],
+  [
+   600,
+   1.12391
+  ],
+  [
+   700,
+   1.09865
+  ],
+  [
+   800,
+   1.07831
+  ],
+  [
+   900,
+   1.06662
+  ],
+  [
+   953,
+   1.06274
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7493
+  ],
+  [
+   50,
+   9.166
+  ],
+  [
+   100,
+   6.922
+  ],
+  [
+   150,
+   5.8333
+  ],
+  [
+   200,
+   5.3138
+  ],
+  [
+   250,
+   5.0365
+  ],
+  [
+   300,
+   4.8713
+  ],
+  [
+   350,
+   4.7709
+  ],
+  [
+   400,
+   4.6713
+  ],
+  [
+   450,
+   4.5794
+  ],
+  [
+   500,
+   4.51
+  ],
+  [
+   550,
+   4.4382
+  ],
+  [
+   600,
+   4.3651
+  ],
+  [
+   650,
+   4.3281
+  ],
+  [
+   700,
+   4.2823
+  ],
+  [
+   750,
+   4.2518
+  ],
+  [
+   800,
+   4.1988
+  ],
+  [
+   850,
+   4.1699
+  ],
+  [
+   900,
+   4.155
+  ],
+  [
+   950,
+   4.1355
+  ],
+  [
+   952,
+   4.1372
+  ]
+ ],
+ "train_seconds": 72.39,
+ "wall_seconds": 84.4,
+ "chars_per_sec": 107839,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was busy and had a beautiful thing. At the park, Lucy would sing, he was very bright and wide.\nFrom that day on, Lucy and her mom were best friends. They would always have fun and have fun together. And they all became the best friend, Lucy, and always glowing up the path together.\n<|eot|>\nOne day, a little boy named Tim was playing in the park. Tim was only three leigititak at it. He wanted to play with him. So, he found a big, muber tree. He thought it was shried to many fit, but he could not find it. He put his friends on the tree and went to build a ball.\nTim saw the tree with a big tree. He wanted to play too. He put it on his roll and said, \"Please, I have to play with my ball.\" The tree and his bird came home and said, \"Thank you, Tim!\" They looked at the tree and said, \"Thank you for tomorrow, Tim!\"\n<|eot|>\nOnce upon a time, there was a small boy named Tim. Tim liked to cook and run to the gem. One day, he found a big, red red ball to the red ball. The little girl was very happy.\nIn the big, there was a little bird. The bird did not know what it was. The bird looked around the sky and found a new ball.",
+ "rule_init": {},
+ "ngram_init": {}
+}

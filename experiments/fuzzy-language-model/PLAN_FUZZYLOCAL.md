@@ -19,3 +19,16 @@ Base: the BPE3072 tiered recipe with the convolution kept (98,528 params, mean 1
 * **fgate** (stage 4): the two sigmoid gates of every memory mixer (forgetting alpha, write strength beta: `nn.Linear(d, 8)`) become zero-order TSK systems: six Gaussian rules over the full 48-dimensional layer input (no learned projection), consequent logits per head, defuzzified by the weighted average; 99,456 params. **fnorm_fgate**: both (99,556).
 Predictions: fnorm within 0.003 BPC of the baseline (55%), better by >= 0.003 (15%), worse by >= 0.003 (30%): the gain curve starts as RMSNorm and has few extra parameters. scaleonly worse than the baseline by >= 0.02 (70%) or diverging on some seed (25%). fgate worse by 0.003-0.020 (50%), within 0.003 (25%), better (10%), worse by more than 0.020 (15%): the linear gate sees every input dimension with its own weight, the rule gate only through distances to six centres. fnorm_fgate approximately the sum of the two single effects (60%).
 Order of runs: Stage 1 (`v44-fuzzylocal`) first, then these, one GPU cell at a time; no run longer than 300M characters.
+
+## Stage 1 outcome (`v44-fuzzylocal`, 30M characters, seeds 0-4, paired with the BPE3072 tiered recipe with the convolution, mean 1.0547)
+| arm | params | BPC mean | vs convolution (se) | seeds worse | paired diffs per seed |
+|---|---|---|---|---|---|
+| no convolution | 97,760 | 1.0664 | +0.0117 (0.0027) | 5/5 | +0.020 +0.007 +0.008 +0.007 +0.016 |
+| 3 taps | 99,296 | 1.0620 | +0.0073 (0.0051) | 3/5 | +0.023 +0.013 -0.003 -0.004 +0.008 |
+| **4 taps (FFN x1.45)** | 99,548 | **1.0560** | **+0.0013 (0.0057)** | 3/5 | +0.020 +0.003 -0.015 -0.006 +0.004 |
+| 8 taps (FFN x1.2) | 99,524 | 1.0639 | +0.0091 (0.0037) | 4/5 | +0.020 +0.010 +0.002 -0.000 +0.014 |
+Predictions: dropping the convolution costs 0.005-0.030 (70%): **right** (+0.0117, every seed); 3 taps recovers at least half of that (45%): **wrong** (it recovers 38%, and 3/5 seeds worse); 3 taps matches or beats the baseline (25%): wrong; more taps better up to 4 (50%): **right**; 8 taps worse than 4 because the FFN shrank (60%): **right**; a fuzzy local layer within 0.003 of the convolution (25%): **right for 4 taps on the mean (+0.0013), but the seed-to-seed spread is large (paired differences from -0.015 to +0.020, se 0.0057)**.
+Reading: the convolution does real work (removing it costs 0.012 BPC, always), and a conjunctive fuzzy rule over the last four tokens can take over its job at no measurable cost, with a noisy 5-seed screen. By the decision rule (within 0.003) 4 taps is adopted provisionally; it must be confirmed at 300M characters (two seeds, the BPE3072 recipe's 300M references 0.95758 / 0.96015) before later stages compose with it. The paired spread says the screen cannot separate +0.001 from +0.007: the 300M cell is the real test.
+
+### Stage 1 confirmation registered before running (`flm/run_fuzzy_local_300m.py`, `v46-fuzzylocal300m`; seeds 0-1; queued after the stage 2/4 screens)
+Predictions: the 4-tap fuzzy local layer is within 0.005 of the convolution recipe at 300M on both seeds (55%); better than it on both (15%); worse by >= 0.005 on both (30%). If it loses by >= 0.005 the convolution stays for the later stages and the fuzzy local layer is reported as a measured cost.

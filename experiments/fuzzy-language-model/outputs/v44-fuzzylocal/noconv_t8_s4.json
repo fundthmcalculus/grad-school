@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.2,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v44-fuzzylocal\\noconv_t8_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 8,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.2,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 8,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99524,
+ "params_nonemb": 48260,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06485,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05878
+  ],
+  [
+   100,
+   1.40081
+  ],
+  [
+   200,
+   1.27395
+  ],
+  [
+   300,
+   1.22142
+  ],
+  [
+   400,
+   1.18044
+  ],
+  [
+   500,
+   1.15279
+  ],
+  [
+   600,
+   1.12122
+  ],
+  [
+   700,
+   1.09761
+  ],
+  [
+   800,
+   1.08134
+  ],
+  [
+   900,
+   1.0681
+  ],
+  [
+   953,
+   1.06485
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.724
+  ],
+  [
+   50,
+   9.0656
+  ],
+  [
+   100,
+   6.8801
+  ],
+  [
+   150,
+   5.8026
+  ],
+  [
+   200,
+   5.2611
+  ],
+  [
+   250,
+   4.9967
+  ],
+  [
+   300,
+   4.8311
+  ],
+  [
+   350,
+   4.7177
+  ],
+  [
+   400,
+   4.6195
+  ],
+  [
+   450,
+   4.5504
+  ],
+  [
+   500,
+   4.4809
+  ],
+  [
+   550,
+   4.4188
+  ],
+  [
+   600,
+   4.3861
+  ],
+  [
+   650,
+   4.3401
+  ],
+  [
+   700,
+   4.2916
+  ],
+  [
+   750,
+   4.2439
+  ],
+  [
+   800,
+   4.193
+  ],
+  [
+   850,
+   4.1749
+  ],
+  [
+   900,
+   4.1343
+  ],
+  [
+   950,
+   4.1097
+  ],
+  [
+   952,
+   4.1102
+  ]
+ ],
+ "train_seconds": 71.25,
+ "wall_seconds": 82.12,
+ "chars_per_sec": 109576,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl at the lake. She put the box in the pond, and it was very pretty.\nOne day, the frog met a pretty bird. The bird said, \"I like your friend, Dad. I am scared and I will help you.\" Lily said. She gave the bird a ball on the rock. Tom felt sad because she could not see a big bird in the water.\nThe bird said, \"I can help you,\" Lily said. She packed it and said, \"I am sorry. I have to follow you. Let's fly.\" The bird said, \"Yes, Dad. We can touch it for your friend.\" The bird put down the tree and down the tree.\nWhile the bird was running, the bird began to hide. It wanted to get out the hole. The bird did not roll and get out. It was mad at the bird. The bird put the bird on the rock to get the rock. They were happy. It was a big bird that would give it back. The bird and the bird became best friends with the bird and the bird.\n<|eot|>\nOne day, a little boy named Tim went to the store. He saw a small girl named Lily. Sue said, \"Is to the store, but I am so strong!\" Lucy remembered it and decided to play with her new friend.\nFrom that day on, Lucy and her friends played together every day. They had lots of fun and had",
+ "rule_init": {},
+ "ngram_init": {}
+}
