@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v48-fuzzyproj\\proj_tsk0_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98144,
+ "params_nonemb": 46880,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.2013,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06393
+  ],
+  [
+   100,
+   1.53158
+  ],
+  [
+   200,
+   1.39634
+  ],
+  [
+   300,
+   1.34774
+  ],
+  [
+   400,
+   1.31507
+  ],
+  [
+   500,
+   1.28355
+  ],
+  [
+   600,
+   1.2571
+  ],
+  [
+   700,
+   1.23698
+  ],
+  [
+   800,
+   1.21608
+  ],
+  [
+   900,
+   1.20452
+  ],
+  [
+   953,
+   1.2013
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7675
+  ],
+  [
+   50,
+   9.0964
+  ],
+  [
+   100,
+   7.1664
+  ],
+  [
+   150,
+   6.2047
+  ],
+  [
+   200,
+   5.7248
+  ],
+  [
+   250,
+   5.4853
+  ],
+  [
+   300,
+   5.3356
+  ],
+  [
+   350,
+   5.224
+  ],
+  [
+   400,
+   5.1476
+  ],
+  [
+   450,
+   5.0966
+  ],
+  [
+   500,
+   5.0256
+  ],
+  [
+   550,
+   4.9582
+  ],
+  [
+   600,
+   4.8843
+  ],
+  [
+   650,
+   4.8391
+  ],
+  [
+   700,
+   4.7968
+  ],
+  [
+   750,
+   4.7623
+  ],
+  [
+   800,
+   4.7325
+  ],
+  [
+   850,
+   4.7043
+  ],
+  [
+   900,
+   4.6631
+  ],
+  [
+   950,
+   4.6453
+  ],
+  [
+   952,
+   4.6461
+  ]
+ ],
+ "train_seconds": 72.5,
+ "wall_seconds": 87.65,
+ "chars_per_sec": 107684,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She liked to play with her Kitb. One day, a little girl named Amy was very bright and a pretty bird. The family said, \"I found a fun we get the other people!\"\nMia and the dog went to the park. They played, they learned that sometimes, our things can be dirty. And they were very happy to be happy and good friend.\n<|eot|>\nOnce upon a time, in a small town, there was a little boy named Tim. Tim was very important to unlock. One day, Tim saw something old and to a pink car. The cat was sad, but he could not find it. He put down at it and saw the things hit. She didn't know what to do. Tom looked for Anna's hand and wanted to take a surprise.\n\"Wow, this is this.\"\nThe little bird came into the sky and put the ice cream to them. The cat said they had a big, hungry swive of them. They felt happy. The window was very happy, and they all lived happily ever!\nAs they walked, Tim's friend, Sam, came. He thought, \"Look, Tim! I hope you help you.\" Tim shook her voice to help. He knew they could read it with the spear.\n\"Oge, Tim! You are nice.\" Tim and Max laughed and had to play together. After a small bird lightches. The girl",
+ "rule_init": {},
+ "ngram_init": {}
+}
