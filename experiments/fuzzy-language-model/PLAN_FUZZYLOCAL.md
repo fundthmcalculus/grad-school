@@ -32,3 +32,10 @@ Reading: the convolution does real work (removing it costs 0.012 BPC, always), a
 
 ### Stage 1 confirmation registered before running (`flm/run_fuzzy_local_300m.py`, `v46-fuzzylocal300m`; seeds 0-1; queued after the stage 2/4 screens)
 Predictions: the 4-tap fuzzy local layer is within 0.005 of the convolution recipe at 300M on both seeds (55%); better than it on both (15%); worse by >= 0.005 on both (30%). If it loses by >= 0.005 the convolution stays for the later stages and the fuzzy local layer is reported as a measured cost.
+
+## Stage 3a registered before running (`FuzzyFFNRaw` in `flm/fuzzy_parts.py`, `flm/run_fuzzy_ffn.py`, `v47-fuzzyffn`): the FFN without its linear antecedent projection and without its linear slope
+The FFN today is: a learned linear projection of the 48-dimensional input to a 16-dimensional antecedent, Gaussian rules over it (product t-norm), and a first-order consequent whose slope is another linear map. Proper fuzzification has no projection: each rule carries a membership function on each input dimension. Parameter-matched arms (about 10K parameters per FFN, 98.5K-99.2K in total), BPE3072 tiered recipe with the convolution kept, 30M characters, seeds 0-4, baseline mean 1.0547:
+* **ffn_raw1**: 52 rules with Gaussian memberships on all 48 raw dimensions, first-order slope kept (98,488 at 2M-character smoke).
+* **ffn_raw0**: 70 such rules, zero-order (no slope projection either) (98,576).
+* **ffn_proj0**: the old projected antecedent kept, slope removed (zero-order), 120 rules (99,152): separates the cost of losing the slope from the cost of losing the projection.
+Predictions: ffn_raw1 worse than the baseline by 0.005-0.030 (50%), within 0.005 (25%), better (10%), worse by more than 0.030 (15%); ffn_raw0 worse than ffn_raw1 (80%) and by >= 0.020 against the baseline (60%); ffn_proj0 worse by 0.003-0.020 (50%). The projection matters more than the slope (ffn_raw1 worse than ffn_proj0) (55%). Order of runs: stage 2/4 screen (running), stage 1 confirmation at 300M, then this; one GPU cell at a time.

@@ -9,7 +9,8 @@ FuzzyGate  replaces the sigmoid gates' ``nn.Linear(d, H)``: a zero-order TSK sys
            antecedents, product t-norm in the HTSK 1/d exponent scaling, no learned linear projection), consequent logits in R^H per rule,
            output = sum_r w_r c_r (a defuzzified weighted average).  The consequents start at the old bias, so at step 0 every rule says
            the same thing; the rules differentiate as the centres move.
-``install(model, norm, gate)`` swaps them into a built TinyLM; flm/run_allfuzzy.py does that inside training.
+FuzzyFFNRaw replaces the TSK feed-forward by rules on the raw input (no antecedent projection; optionally no slope).
+``install(model, norm, gate, ...)`` swaps them into a built TinyLM; flm/run_allfuzzy.py does that inside training.
 """
 
 import math
@@ -61,7 +62,41 @@ class FuzzyGate(nn.Module):
         return w @ self.conseq
 
 
-def install(model, norm: str = "", gate: bool = False, gate_rules: int = 6):
+class FuzzyFFNRaw(nn.Module):
+    """TSK feed-forward whose antecedents are Gaussian membership functions on the RAW input: every rule has a centre and a width for each of
+    the d input dimensions and fires as the product t-norm over them (exponent scaled by 1/d, as everywhere), with no learned linear projection
+    in front.  ``order=1``: first-order consequent  g_r (v_r . x + b_r) c_r  (the slope is still linear); ``order=0``: a zero-order system
+    y = sum_r f_r c_r, with no slope projection at all.  Raw firing strengths (no softmax), as in the model's FFN.
+    """
+
+    def __init__(self, d: int, R: int, order: int = 1):
+        super().__init__()
+        self.R, self.order = R, order
+        self.centers = nn.Parameter(torch.randn(R, d))
+        self.log_width = nn.Parameter(torch.zeros(R, d))
+        self.conseq = nn.Parameter(torch.randn(R, d) / math.sqrt(R))
+        if order == 1:
+            self.slope = nn.Linear(d, R, bias=True)
+        self.scale = 1.0 / d
+
+    def forward(self, x):
+        a = torch.exp(-2.0 * self.log_width)
+        ca = self.centers * a
+        quad = (x * x) @ a.T - 2.0 * (x @ ca.T) + (self.centers * ca).sum(-1)
+        w = torch.exp(-0.5 * self.scale * quad)
+        if self.order == 1:
+            w = w * self.slope(x)
+        return w @ self.conseq
+
+
+def install(
+    model,
+    norm: str = "",
+    gate: bool = False,
+    gate_rules: int = 6,
+    ffn: str = "",
+    ffn_rules: int = 52,
+):
     """norm: "" (keep RMSNorm), "fuzzy" or "scale"; gate: replace both sigmoid gates of every fuzzy-delta mixer."""
     d = model.cfg.d_model
     if norm:
@@ -75,4 +110,7 @@ def install(model, norm: str = "", gate: bool = False, gate_rules: int = 6):
             m = blk.mix
             m.gate = FuzzyGate(d, m.H, R=gate_rules, bias=m.gate.bias)
             m.beta = FuzzyGate(d, m.H, R=gate_rules, bias=m.beta.bias)
+    if ffn:  # "raw" (first-order) or "raw0" (zero-order): replace the whole TSK FFN
+        for blk in model.blocks:
+            blk.ffn = FuzzyFFNRaw(d, ffn_rules, order=0 if ffn == "raw0" else 1)
     return model

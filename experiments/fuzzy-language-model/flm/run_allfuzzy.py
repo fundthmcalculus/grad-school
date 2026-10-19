@@ -1,4 +1,4 @@
-"""flm.train with fuzzy replacements for non-fuzzy parts (`python -m flm.run_allfuzzy <train args>`; env FUZZ_NORM = fuzzy|scale, FUZZ_GATE = 1).
+"""flm.train with fuzzy replacements for non-fuzzy parts (`python -m flm.run_allfuzzy <train args>`; env FUZZ_NORM = fuzzy|scale, FUZZ_GATE = 1, FUZZ_FFN = raw|raw0 with FUZZ_FFN_R rules).
 
 Composes with the tiered embedding (TIER_NH / TIER_E / TIER_FREQ as for flm.run_tiered).  train.py and models.py are untouched.
 """
@@ -14,11 +14,13 @@ from flm.models import TinyLM
 _norm = os.environ.get("FUZZ_NORM", "")
 _gate = os.environ.get("FUZZ_GATE", "") == "1"
 _rules = int(os.environ.get("FUZZ_GATE_R", "6"))
+_ffn = os.environ.get("FUZZ_FFN", "")
+_ffn_r = int(os.environ.get("FUZZ_FFN_R", "52"))
 
 
 def _init(self, cfg, *a, **k):
     R._new_init(self, cfg, *a, **k)
-    install(self, _norm, _gate, _rules)
+    install(self, _norm, _gate, _rules, _ffn, _ffn_r)
 
 
 if __name__ == "__main__":
