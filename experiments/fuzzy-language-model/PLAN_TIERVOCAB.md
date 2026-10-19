@@ -5,3 +5,12 @@
 **Arms (`flm/run_tiered_vocab.py`, `v40-tiervocab`):** V1536 head 640 FFN x2.0 (99,280 params); **V1536 head 512 FFN x2.25 (98,280, exactly iso-parameter with the baseline)**; V2048 head 512 FFN x1.5 (97,184). Confound to report: at a fixed character budget a bigger vocabulary means fewer optimiser steps (30M chars is about 1,160 steps at BPE1024).
 **Predictions.** The iso-parameter V1536 arm beats the baseline by 0.004-0.012 BPC mean (45%), on >= 4/5 paired seeds (40%); it is worse than the baseline (20%). V1536 head 640 within 0.003 of the iso arm (60%). V2048 worse than the iso V1536 arm by >= 0.005 (60%; its FFN is 1.5x narrower). 
 **Decision rule.** A screen: a >= 0.005 paired gain on >= 4/5 seeds earns a 300M-char two-seed confirmation (~35 min each) and a coherence set; otherwise record as closed. BPC is per character, comparable across tokenizers.
+
+## Round 1 outcome (`v40-tiervocab`, 30M chars, seeds 0-4, paired with `v30-tiered` t768e16m225 on BPE1024, mean 1.0965)
+| arm | params | chars/token | steps | BPC mean | paired diff (se) | seeds better |
+|---|---|---|---|---|---|---|
+| V1536 head 640 FFN x2.0 | 99,280 | 3.48 | 1,052 | 1.0769 | -0.0196 (0.0057) | 5/5 |
+| V1536 head 512 FFN x2.25 (iso-parameter) | 98,280 | 3.48 | 1,052 | 1.0817 | -0.0148 (0.0048) | 5/5 |
+| **V2048 head 512 FFN x1.5** | 97,184 | 3.66 | 1,001 | **1.0704** | **-0.0261** (0.0045) | 5/5 |
+Predictions: iso V1536 beats the baseline by 0.004-0.012 (45%): **wrong, better than predicted** (-0.0148; 5/5 seeds, so the >= 4/5 prediction held); worse than baseline (20%): no; V1536 head 640 within 0.003 of the iso arm (60%): **wrong** (0.0048 better); V2048 worse than the iso V1536 arm by >= 0.005 (60%): **wrong, it is the best arm, 0.0113 better than the iso V1536** despite a 1.5x narrower FFN.
+Reading: the tiered embedding does make a bigger vocabulary pay, and the gain grows with the vocabulary (1024 -> 1536 -> 2048: 0, -0.015, -0.026) even while the FFN shrinks from 108 to 72 rules per layer. The lever is the tokenizer: more characters per token (3.16 -> 3.66) means the same 512-token context covers 16% more text and each prediction step covers more of it. Confound: fixed 30M characters means fewer optimiser steps for the bigger vocabularies (1,001 vs about 1,160), which works against them. Per the decision rule (>= 0.005 on >= 4/5 seeds) this earns round 2: larger vocabularies (3072, 4096; tokenizers being trained) and other V2048 shapes, then a 300M-char two-seed confirmation and a coherence set.
