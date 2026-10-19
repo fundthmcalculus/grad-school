@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v45-fuzzystage\\scaleonly_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98628,
+ "params_nonemb": 47364,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06578,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.01739
+  ],
+  [
+   100,
+   1.44937
+  ],
+  [
+   200,
+   1.28739
+  ],
+  [
+   300,
+   1.22699
+  ],
+  [
+   400,
+   1.18796
+  ],
+  [
+   500,
+   1.15825
+  ],
+  [
+   600,
+   1.12726
+  ],
+  [
+   700,
+   1.10394
+  ],
+  [
+   800,
+   1.08306
+  ],
+  [
+   900,
+   1.07036
+  ],
+  [
+   953,
+   1.06578
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.5852
+  ],
+  [
+   50,
+   9.2964
+  ],
+  [
+   100,
+   7.1338
+  ],
+  [
+   150,
+   5.9589
+  ],
+  [
+   200,
+   5.381
+  ],
+  [
+   250,
+   5.0778
+  ],
+  [
+   300,
+   4.8934
+  ],
+  [
+   350,
+   4.766
+  ],
+  [
+   400,
+   4.6888
+  ],
+  [
+   450,
+   4.6287
+  ],
+  [
+   500,
+   4.5467
+  ],
+  [
+   550,
+   4.4781
+  ],
+  [
+   600,
+   4.3978
+  ],
+  [
+   650,
+   4.3528
+  ],
+  [
+   700,
+   4.303
+  ],
+  [
+   750,
+   4.2618
+  ],
+  [
+   800,
+   4.2244
+  ],
+  [
+   850,
+   4.1968
+  ],
+  [
+   900,
+   4.1493
+  ],
+  [
+   950,
+   4.1312
+  ],
+  [
+   952,
+   4.1323
+  ]
+ ],
+ "train_seconds": 72.21,
+ "wall_seconds": 83.37,
+ "chars_per_sec": 108119,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. She was very excited to play with her mom. She had a box of toys, but she was very happy.\nOne day, Sue said, \"I like a fun game. I have an idea.\" Sue and Sue laughed and started to come. They went fast and helped the big blue house with a special world. Sue was very happy and ran away to make her looking for.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to play in the sky in the dirt and people sailed. One day, Lily found a big pink ball on the tree. Lily was curious at the tree, but she felt guiled for the ball.\nThe pretty cat had a big, red ball. She said, \"Let's play with this car!\" Lily smiled and said, \"No, but you have a sweet help!\" Lily said, \"Okay, let's play together!\" Her mommy smiled and thanked Lily for a moment. She smiled and said, \"That's my friend, Ben. I was very kind with you.\" Lily said, \"Yes, I will read me to you.\" Lily and Lily both went outside and smiled. They ate the ball together and had full of new friends.\n<|eot|>\nOnce upon a time, there was a little girl named Mia. She had a big blue toy. Mia loved to sing with her new toys. She put it in a small house that she gave her to",
+ "rule_init": {},
+ "ngram_init": {}
+}

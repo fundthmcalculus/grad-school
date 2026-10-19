@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v45-fuzzystage\\fnorm_fgate_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99556,
+ "params_nonemb": 48292,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.068,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.03333
+  ],
+  [
+   100,
+   1.40988
+  ],
+  [
+   200,
+   1.27975
+  ],
+  [
+   300,
+   1.2285
+  ],
+  [
+   400,
+   1.18876
+  ],
+  [
+   500,
+   1.15709
+  ],
+  [
+   600,
+   1.12826
+  ],
+  [
+   700,
+   1.10661
+  ],
+  [
+   800,
+   1.08467
+  ],
+  [
+   900,
+   1.07183
+  ],
+  [
+   953,
+   1.068
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.6703
+  ],
+  [
+   50,
+   9.0061
+  ],
+  [
+   100,
+   6.8536
+  ],
+  [
+   150,
+   5.8294
+  ],
+  [
+   200,
+   5.3081
+  ],
+  [
+   250,
+   5.0175
+  ],
+  [
+   300,
+   4.8563
+  ],
+  [
+   350,
+   4.7232
+  ],
+  [
+   400,
+   4.6827
+  ],
+  [
+   450,
+   4.5984
+  ],
+  [
+   500,
+   4.5384
+  ],
+  [
+   550,
+   4.4591
+  ],
+  [
+   600,
+   4.3783
+  ],
+  [
+   650,
+   4.3313
+  ],
+  [
+   700,
+   4.3059
+  ],
+  [
+   750,
+   4.2852
+  ],
+  [
+   800,
+   4.2282
+  ],
+  [
+   850,
+   4.1862
+  ],
+  [
+   900,
+   4.1558
+  ],
+  [
+   950,
+   4.1428
+  ],
+  [
+   952,
+   4.1424
+  ]
+ ],
+ "train_seconds": 108.15,
+ "wall_seconds": 122.87,
+ "chars_per_sec": 72184,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl at the lake. She put the small red ball and she was happy. She knew how to be fun to play with the other fish, but she would not buy it for her mom. But then, a little bird came to play with the bird. The bird jumped into the big blue ball on the bippin. The little bird flew down and saw the bird fly by the small hole.\nThe bird said, \"I ask,\" The bird was scared and hugged the bird. From that day on, the bird and the bird became best friends.\n<|eot|>\n\n\nLily and Lily were best friends. They loved to play with their hands and play with whole food. One day, they went to the park and see a big, colorful animal. Tom liked to draw with his ball.\nOne day, a big bird came to see the tree. It was a big dog. The dog saw the dog and wanted to have a big cat. The cat was upset. It swung and the dog and the dog. They were scared and scared. They knew the dog was the best dog.\nThe dog and the dog were afraid. They were very creative. But they did not see it. They wanted to play with the dog. They listened for the dog and started to cry.\nBut then, they saw a big dog. The dog said, \"Wow. It has many toys. Can you help me?\" The dog said, \"Yes,",
+ "rule_init": {},
+ "ngram_init": {}
+}

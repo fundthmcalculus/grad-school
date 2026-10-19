@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v45-fuzzystage\\scaleonly_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98628,
+ "params_nonemb": 47364,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06272,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.01923
+  ],
+  [
+   100,
+   1.45988
+  ],
+  [
+   200,
+   1.28713
+  ],
+  [
+   300,
+   1.23325
+  ],
+  [
+   400,
+   1.1874
+  ],
+  [
+   500,
+   1.15478
+  ],
+  [
+   600,
+   1.12897
+  ],
+  [
+   700,
+   1.09917
+  ],
+  [
+   800,
+   1.08012
+  ],
+  [
+   900,
+   1.06637
+  ],
+  [
+   953,
+   1.06272
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.5915
+  ],
+  [
+   50,
+   9.3793
+  ],
+  [
+   100,
+   7.1818
+  ],
+  [
+   150,
+   5.9975
+  ],
+  [
+   200,
+   5.3785
+  ],
+  [
+   250,
+   5.0693
+  ],
+  [
+   300,
+   4.8804
+  ],
+  [
+   350,
+   4.7458
+  ],
+  [
+   400,
+   4.6402
+  ],
+  [
+   450,
+   4.5729
+  ],
+  [
+   500,
+   4.5008
+  ],
+  [
+   550,
+   4.435
+  ],
+  [
+   600,
+   4.4005
+  ],
+  [
+   650,
+   4.3505
+  ],
+  [
+   700,
+   4.3
+  ],
+  [
+   750,
+   4.2492
+  ],
+  [
+   800,
+   4.1937
+  ],
+  [
+   850,
+   4.172
+  ],
+  [
+   900,
+   4.1295
+  ],
+  [
+   950,
+   4.1011
+  ],
+  [
+   952,
+   4.1017
+  ]
+ ],
+ "train_seconds": 71.67,
+ "wall_seconds": 83.02,
+ "chars_per_sec": 108929,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was very excited to play with her friends.\nOne sunny day, Lucy decided to spin in adventures and show her mom her new family. Sue found an old place to draw. She decided to go to her farm with her friends. But soon it was the best friend, the big fish. Lily felt sad because she could not see her friends.\nThe lovely farm had an idea. She gave her a big hug and said, \"Thank you at it, Tim. I love you, Sue,\" she said, and she helped her clean the big toice. Lily and Lucy were both very surprised. They both laughed and had a whole place.\n<|eot|>\nOnce upon a time, there was a boy named Tim. Tim had a favorite dress for his fancy crown. He would fly with his house, and his mom.\nOne day, Tim's friend came to play. Tim was not excited to stretch by the vestiler. He was hungry and wanted to play too. He said, \"Thank you for Mr. crab, someone can't clean and the mill.\"\nTim and Two did not listen. But he could not see the cardao. He picked up the fire, but he had no friends. Tim was sad and did not know about it. He liked his dream and they decided to watch the barop. They all played together. And they all lived happily ever after.\n<|eot|>\nOnce upon a",
+ "rule_init": {},
+ "ngram_init": {}
+}
