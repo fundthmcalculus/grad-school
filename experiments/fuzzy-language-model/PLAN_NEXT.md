@@ -108,3 +108,12 @@ Confirmed under the registered rule (>= 0.003 better on both seeds). Prediction 
 | 96K, 300M chars (0.998) | 5.62 (2.50/1.62/1.50) | 5.50 (2.50/1.62/1.38) |
 | tiered 98,280 params, 300M chars (0.981) | 5.50 (2.38/1.75/1.38) | 5.12 (2.12/1.62/1.38) |
 The tiered model's 0.017-0.023 BPC gain at 300M does not show up as coherence: all three models are within 0.6 points (noise 1.5-2), plot ~1.4 for all. Same finding as the data-scaling and the lever screens: BPC at this size moves without moving blind coherence; only the 1.32M x 1B run did (set 10: ~10/15, plot ~3). Predictions were not registered for this set (I expected, unregistered, a small lift; there was none).
+
+### Item 3 outcome (`v39-rflm30`, GPU, 2026-10-19; 30M characters, seeds 0-4, paired with the `v22-tribble` `random` cells, mean 1.1095; `flm/run_rflm30.py` loads the archived variants by path)
+| variant | params | BPC mean | paired diff vs baseline (se) | seeds better |
+|---|---|---|---|---|
+| fixed recurrence (`fuzzydelta_static`, decay fixed) | 94,880 | 1.1357 | **+0.0263** (0.0050) | 0/5 |
+| consequent propagation, read side | 98,464 | 1.1161 | +0.0067 (0.0038) | 1/5 |
+| consequent propagation, both sides | 98,464 | 1.1138 | +0.0043 (0.0039) | 2/5 |
+Predictions: fixed worse by 0.003-0.010: **wrong** (worse by 0.026, every seed); cpboth better than the baseline by < 0.010 and indistinguishable from the frozen control: **wrong** on sign (it is slightly worse, +0.004, 2/5 seeds better; the frozen-zero control was not run because it is the baseline model in disguise); cpread no effect: right within noise (+0.007, 1.8 se, 1/5 seeds).
+Decision rule (same sign on >= 4/5 seeds and beyond 2 se): fixed is a clear loss; both propagation variants fail the rule in the wrong direction (extra parameters that cost 3,000 fewer elsewhere for nothing). Reading: the data-dependent write strength and forgetting gates carry the model (taking them away costs 0.026 BPC at 30M, five times the size of any recipe gain found since), so a static, convolutional form of the mixer is not an option; consequent propagation is closed. The two RFLM levers are recorded as dead.
