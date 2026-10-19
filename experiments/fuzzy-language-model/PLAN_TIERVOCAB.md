@@ -18,3 +18,13 @@ Reading: the tiered embedding does make a bigger vocabulary pay, and the gain gr
 ## Round 2 registered before running (30M chars, seeds 0-4, same baseline; tokenizers BPE3072 / BPE4096 trained by `python -m flm.bpe`: 3.85 / 3.95 chars/token on the 600M-char stream, vs 3.16 / 3.66 for 1024 / 2048)
 Arms (`python -m flm.run_tiered_vocab v2048h384e16m20 v2048h512e12m22 v3072h384e12m15 v4096h256e8m20`): V2048 head 384 FFN x2.0 (99,280 params); V2048 head 512 tail-width 12 FFN x2.2 (99,620); **V3072 head 384 tail-width 12 FFN x1.5 (98,528)**; V4096 head 256 tail-width 8 FFN x2.0 (about 97,000; the tail rank must drop to 8 to afford 3,840 tail tokens).
 Predictions: V3072 beats the round-1 best (V2048 head 512 FFN x1.5, mean 1.0704) by >= 0.005 (50%); V4096 is worse than V3072 (55%: rank-8 tail embeddings starve the rare tokens); the two extra V2048 shapes land within 0.006 of V2048 head 512 FFN x1.5 (60%) and neither beats it by 0.005 on >= 4/5 seeds (65%). The vocabulary, not the head/FFN split, is the lever.
+
+## Round 2 outcome (30M chars, seeds 0-4, paired with the BPE1024 tiered baseline 1.0965 and with round 1's best)
+| arm | params | chars/token | steps | BPC mean | vs baseline (se) | seeds better | vs round-1 best (V2048 h512 m1.5, 1.0704) |
+|---|---|---|---|---|---|---|---|
+| V2048 head 384 FFN x2.0 | 99,280 | 3.66 | 1,001 | 1.0743 | -0.0223 (0.0027) | 5/5 | +0.0039 (1/5 better) |
+| V2048 head 512 tail-width 12 FFN x2.2 | 99,620 | 3.66 | 1,001 | 1.0762 | -0.0203 (0.0028) | 5/5 | +0.0058 (1/5) |
+| **V3072 head 384 tail-width 12 FFN x1.5** | 98,528 | 3.85 | 953 | **1.0547** | **-0.0418** (0.0015) | **5/5** | **-0.0157 (5/5)** |
+| V4096 head 256 tail-width 8 FFN x2.0 | 96,848 | 3.95 | 927 | 1.0654 | -0.0311 (0.0033) | 5/5 | -0.0050 (4/5) |
+Predictions: V3072 beats the round-1 best by >= 0.005 (50%): **right** (0.0157, 5/5); V4096 worse than V3072 (55%): **right** (+0.0107; its tail rank is 8); the extra V2048 shapes within 0.006 of the round-1 best (60%): right (+0.004, +0.006) and neither beats it on >= 4/5 seeds (65%): right (1/5 each).
+Reading: the vocabulary is the lever, not the head/FFN split (V2048 shapes differ by <= 0.006). Along the vocabulary axis the tiered recipe gains 0 / 0.015 / 0.026 / 0.042 at 1024 / 1536 / 2048 / 3072, and V4096 falls back only because it had to drop the tail width to 8; the FFN is shrinking at the same time (108 -> 72 rules per layer). Not yet shown: that the gain survives more data (30M is the screen; the 1B BPE1024 number is 0.9646), and whether it moves coherence.
