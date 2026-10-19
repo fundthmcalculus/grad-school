@@ -62,6 +62,50 @@ class FuzzyGate(nn.Module):
         return w @ self.conseq
 
 
+class TSKMap(nn.Module):
+    """A zero-order TSK system as a map R^d_in -> R^d_out (a drop-in for ``nn.Linear(d_in, d_out, bias=False)``): R Gaussian rules over the raw
+    input (product t-norm, 1/d exponent), normalised firings (a fuzzy partition), consequent vectors c_r in R^d_out, output = sum_r w_r c_r.
+    Piecewise-constant interpolation between R prototypes: far less expressive than a linear map at equal parameters, which is the point of
+    measuring it."""
+
+    def __init__(self, d_in: int, d_out: int, R: int):
+        super().__init__()
+        self.centers = nn.Parameter(torch.randn(R, d_in))
+        self.log_width = nn.Parameter(torch.zeros(R, d_in))
+        self.conseq = nn.Parameter(torch.randn(R, d_out) / math.sqrt(R))
+        self.scale = 1.0 / d_in
+
+    def forward(self, x):
+        a = torch.exp(-2.0 * self.log_width)
+        ca = self.centers * a
+        quad = (x * x) @ a.T - 2.0 * (x @ ca.T) + (self.centers * ca).sum(-1)
+        return torch.softmax(-0.5 * self.scale * quad, dim=-1) @ self.conseq
+
+
+class TSKLinear(nn.Module):
+    """A first-order TSK map with a shared consequent basis (a drop-in for ``nn.Linear(d_in, d_out, bias=False)``): u = B x (k numbers), R Gaussian
+    rules over u give normalised firings w_r, each rule rescales the k basis directions by s_r, and  y = A (g * u)  with  g = sum_r w_r s_r.
+    That is  y = sum_r w_r (A diag(s_r) B) x : a fuzzy partition of locally linear maps that share their factors.  With s_r = 1 it is exactly the
+    rank-k linear map A B, which is where it starts."""
+
+    def __init__(self, d_in: int, d_out: int, k: int, R: int):
+        super().__init__()
+        self.B = nn.Linear(d_in, k, bias=False)
+        self.A = nn.Linear(k, d_out, bias=False)
+        self.centers = nn.Parameter(torch.randn(R, k) * 0.5)
+        self.log_width = nn.Parameter(torch.zeros(R, k))
+        self.s = nn.Parameter(torch.ones(R, k))
+        self.scale = 1.0 / k
+
+    def forward(self, x):
+        u = self.B(x)
+        a = torch.exp(-2.0 * self.log_width)
+        ca = self.centers * a
+        quad = (u * u) @ a.T - 2.0 * (u @ ca.T) + (self.centers * ca).sum(-1)
+        g = torch.softmax(-0.5 * self.scale * quad, dim=-1) @ self.s
+        return self.A(g * u)
+
+
 class FuzzyFFNRaw(nn.Module):
     """TSK feed-forward whose antecedents are Gaussian membership functions on the RAW input: every rule has a centre and a width for each of
     the d input dimensions and fires as the product t-norm over them (exponent scaled by 1/d, as everywhere), with no learned linear projection
@@ -96,6 +140,7 @@ def install(
     gate_rules: int = 6,
     ffn: str = "",
     ffn_rules: int = 52,
+    proj: str = "",
 ):
     """norm: "" (keep RMSNorm), "fuzzy" or "scale"; gate: replace both sigmoid gates of every fuzzy-delta mixer."""
     d = model.cfg.d_model
@@ -113,4 +158,13 @@ def install(
     if ffn:  # "raw" (first-order) or "raw0" (zero-order): replace the whole TSK FFN
         for blk in model.blocks:
             blk.ffn = FuzzyFFNRaw(d, ffn_rules, order=0 if ffn == "raw0" else 1)
+    if (
+        proj
+    ):  # the mixer's linear q/k/v and output projections: "tsk0" (zero-order rule maps) or "tskl" (rule-gated low-rank maps)
+        for blk in model.blocks:
+            m = blk.mix
+            if proj == "tsk0":
+                m.qkv, m.out = TSKMap(d, 3 * d, 28), TSKMap(d, d, 16)
+            else:
+                m.qkv, m.out = TSKLinear(d, 3 * d, 32, 8), TSKLinear(d, d, 20, 8)
     return model
