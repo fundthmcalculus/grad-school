@@ -1,6 +1,21 @@
 # FLM inference demo
 
-A small local web page for trying the fuzzy language models.
+## Browser-only version (no server, no Python at run time): `demo/web/`
+
+The whole demo, including generation, runs in the browser tab. A JavaScript port of the model's step form (`web/flm.js`: byte-level BPE, causal convolution, fuzzy delta-rule mixer, first-order TSK feed-forward rules, tied embedding) reads the weights from `web/models/`. Same page as below: prompt, length / temperature / top-k / seed, per-piece alternatives, the rules behind each piece, structure card, rule timeline, rule browser and rule inspector.
+
+```bash
+cd experiments/fuzzy-language-model/demo/web && python -m http.server 8000     # then open http://localhost:8000
+python demo/build_standalone.py [--all]      # or one self-contained file, demo/dist/flm-demo.html, that opens from a file:// address
+```
+
+* Models: the 96K 3B-character reference (386 KB of weights), the 98K tiered-embedding model (the best sub-100K likelihood, 0.961 BPC at 1B characters, seed 1), and the 1.32M model (fp16, 2.6 MB; over the 100K cap, included for comparison). Generation costs 0.2-1 ms per word piece.
+* `python demo/export_web.py` rebuilds `web/models/` from the checkpoints (run from the experiment directory). It densifies the tiered embedding (input row and tied output row of a token are both `model.embed(token)`; checked against the original model before writing) and precomputes the rule views of the Python demo (membership histograms over 48 validation windows) with the same functions. For the 1.32M model only the most used rules carry data histograms; any other rule shows its membership functions from the weights.
+* Checks: `node demo/web/test_parity.mjs` compares the engine with the torch logits (max |dlogit| 2e-5 for the 96K model, 1e-4 for the tiered one, 1e-2 for the fp16 1.32M one; argmax identical) and the tokenizer with the HF tokenizer on 8 strings (`python demo/export_tok_check.py` regenerates the references). A greedy 12-piece run also reproduced all 36 rule rows of the Python demo (layer, rule, contribution, raised pieces).
+* Differences from the Python demo: the seeded sampler is JavaScript's (the same seed gives different text than the Python demo); prompt plus generated text is capped at the model's context (512 word pieces) instead of sliding the window.
+
+## Local-server version (Python, torch)
+A small local web page for trying the fuzzy language models, served by Python and torch.
 
 ```bash
 cd experiments/fuzzy-language-model
