@@ -3,7 +3,7 @@
     python demo/build_standalone.py [--all]  ->  demo/dist/index.html
 
 The weights and rule views of the models are embedded as base64. By default only the sub-100K models go in (about 2.5 MB);
-``--all`` adds the 1.32M model (over the cap, about 4.5 MB more). The output is committed (demo/dist/index.html, under the 5 MB data limit) so GitHub Pages can serve it statically; rebuild and commit it when demo/web changes.
+``--all`` adds the 1.32M model (over the cap, about 4.5 MB more). The committed copy (demo/dist/index.html, built with --all, 7.4 MB: the one approved exception to the 5 MB data limit) lets GitHub Pages serve it statically; rebuild it with --all and commit it when demo/web changes.
 """
 
 import base64
