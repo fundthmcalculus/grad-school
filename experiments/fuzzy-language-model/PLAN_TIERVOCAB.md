@@ -48,3 +48,14 @@ Predictions: none beats the V3072 winner by >= 0.005 on >= 4/5 paired seeds (65%
 
 ## Blind coherence set 16 registered before rating (`report/coherence16_*`; `flm/coherence_vocab.py`; fresh seeds 70-71; 5 models x 8 texts: BPE3072 tiered 1B seed 0 (0.9427) and seed 1 (0.9478), BPE1024 tiered 1B seed 0 (0.9680) and seed 1 (0.9613), and the 1.32M 1B model as the scale anchor (0.636); story prompts, T 0.5 / top-k 10, 600 characters; two Claude sub-agent raters reading only the blind file, rubric G/C/P 1-5, total 3-15; scores before the key)
 Predictions: the BPE3072 pair is within 1 point of the BPE1024 tiered pair on both raters (55%); BPE3072 at least 1 point higher on both raters (30%); at least 1 point lower on both (15%); the 1.32M anchor is at least 2 points above every sub-100K model (75%); no sub-100K model reaches 10/15 (85%). The earlier set (13) found no coherence gain from a 0.02 lower BPC at fixed vocabulary; a bigger vocabulary changes the unit of prediction (more characters per piece), so this is not the same question.
+
+### Set 16 scores (two raters; both score files were written before the key was opened; mean total of G+C+P over 8 texts per model, plot in parentheses)
+| model (BPC at 1B chars) | rater A | rater B |
+|---|---|---|
+| BPE3072 tiered seed 0 (0.9427) | 6.25 (1.50) | 6.88 (1.88) |
+| BPE3072 tiered seed 1 (0.9478) | 4.00 (1.00) | 5.88 (1.75) |
+| BPE1024 tiered seed 0 (0.9680) | 5.50 (1.50) | 6.38 (1.88) |
+| BPE1024 tiered seed 1 (0.9613) | 5.75 (1.50) | 6.62 (1.88) |
+| 1.32M anchor (0.636) | 10.12 (3.00) | 10.75 (3.50) |
+BPE3072 pair mean 5.12 / 6.38 vs BPE1024 tiered pair 5.62 / 6.50: difference -0.50 / -0.12. Predictions: the BPE3072 pair within 1 point of the BPE1024 pair on both raters (55%): **right**; at least 1 point higher on both (30%): no; at least 1 point lower on both (15%): no; the 1.32M anchor at least 2 points above every sub-100K model (75%): **right** (3.4 to 6.1 above the best); no sub-100K model reaches 10/15 (85%): **right**.
+Reading: the 0.019 BPC gain from the larger vocabulary buys **no rated coherence**, as with the fixed-vocabulary tiered recipe in set 13; the seed-to-seed spread of the BPE3072 pair (2.25 points on rater A) is larger than the gap between recipes. Likelihood at 98K keeps improving (0.982 -> 0.965 -> 0.945) while rated coherence stays at 4-7/15; only size moved it (1.32M: 10/15). The amended sub-100K target is therefore reported as: best TinyStories BPC 0.9453 (BPE3072 tiered, two seeds, 1B characters), story coherence 4-7/15.
