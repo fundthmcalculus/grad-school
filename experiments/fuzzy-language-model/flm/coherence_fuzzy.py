@@ -33,8 +33,9 @@ def install_from_state(model: TinyLM, st: dict) -> None:
             m.gate, m.beta = FuzzyGate(d, m.H, R=rules), FuzzyGate(d, m.H, R=rules)
         if p + "ffn.ante.weight" not in st and p + "ffn.log_width" in st:
             rules = st[p + "ffn.centers"].shape[0]
+            taps = st[p + "ffn.centers"].shape[1] // d
             blk.ffn = FuzzyFFNRaw(
-                d, rules, order=1 if p + "ffn.slope.weight" in st else 0
+                d, rules, order=1 if p + "ffn.slope.weight" in st else 0, taps=taps
             )
         if p + "mix.qkv.B.weight" in st:  # TSKLinear also has centers: test it first
             blk.mix.qkv = TSKLinear(

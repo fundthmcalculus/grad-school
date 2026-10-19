@@ -113,20 +113,37 @@ class FuzzyFFNRaw(nn.Module):
     y = sum_r f_r c_r, with no slope projection at all.  Raw firing strengths (no softmax), as in the model's FFN.
     """
 
-    def __init__(self, d: int, R: int, order: int = 1):
+    def __init__(self, d: int, R: int, order: int = 1, taps: int = 1):
         super().__init__()
-        self.R, self.order = R, order
-        self.centers = nn.Parameter(torch.randn(R, d))
-        self.log_width = nn.Parameter(torch.zeros(R, d))
+        self.R, self.order, self.taps, self.d = R, order, taps, d
+        self.centers = nn.Parameter(torch.randn(R, taps * d))
+        self.log_width = nn.Parameter(torch.zeros(R, taps * d))
         self.conseq = nn.Parameter(torch.randn(R, d) / math.sqrt(R))
         if order == 1:
             self.slope = nn.Linear(d, R, bias=True)
-        self.scale = 1.0 / d
+        self.scale = 1.0 / (taps * d)
+
+    def antecedent_input(self, x):
+        """taps > 1: the antecedent reads the raw inputs of the last ``taps`` positions side by side (zero before the start): a rule is a
+        conjunction over memberships on the current token AND the previous ones, with no learned linear projection (the fuzzy local layer).
+        """
+        if self.taps == 1:
+            return x
+        T = x.shape[-2]
+        xp = nn.functional.pad(x, (0, 0, self.taps - 1, 0))
+        return torch.cat(
+            [
+                xp[..., self.taps - 1 - j : self.taps - 1 - j + T, :]
+                for j in range(self.taps)
+            ],
+            dim=-1,
+        )
 
     def forward(self, x):
+        u = self.antecedent_input(x)
         a = torch.exp(-2.0 * self.log_width)
         ca = self.centers * a
-        quad = (x * x) @ a.T - 2.0 * (x @ ca.T) + (self.centers * ca).sum(-1)
+        quad = (u * u) @ a.T - 2.0 * (u @ ca.T) + (self.centers * ca).sum(-1)
         w = torch.exp(-0.5 * self.scale * quad)
         if self.order == 1:
             w = w * self.slope(x)
@@ -141,6 +158,8 @@ def install(
     ffn: str = "",
     ffn_rules: int = 52,
     proj: str = "",
+    ffn_taps: int = 1,
+    ffn_rules0: int = 0,
 ):
     """norm: "" (keep RMSNorm), "fuzzy" or "scale"; gate: replace both sigmoid gates of every fuzzy-delta mixer."""
     d = model.cfg.d_model
@@ -156,8 +175,16 @@ def install(
             m.gate = FuzzyGate(d, m.H, R=gate_rules, bias=m.gate.bias)
             m.beta = FuzzyGate(d, m.H, R=gate_rules, bias=m.beta.bias)
     if ffn:  # "raw" (first-order) or "raw0" (zero-order): replace the whole TSK FFN
-        for blk in model.blocks:
-            blk.ffn = FuzzyFFNRaw(d, ffn_rules, order=0 if ffn == "raw0" else 1)
+        for li, blk in enumerate(model.blocks):
+            first = (
+                li == 0 and ffn_taps > 1
+            )  # layer 0 reads the last ffn_taps tokens (the fuzzy local layer, replacing the convolution)
+            blk.ffn = FuzzyFFNRaw(
+                d,
+                (ffn_rules0 or ffn_rules) if first else ffn_rules,
+                order=0 if ffn == "raw0" else 1,
+                taps=ffn_taps if first else 1,
+            )
     if (
         proj
     ):  # the mixer's linear q/k/v and output projections: "tsk0" (zero-order rule maps) or "tskl" (rule-gated low-rank maps)
