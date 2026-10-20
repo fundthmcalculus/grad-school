@@ -224,3 +224,7 @@ Reading: **a third block does not pay for itself at 99K parameters.** The block'
 
 ### b3_lean at 300M registered before running (`E2E_CHARS=300 E2E_SEEDS=0,1 python -m flm.run_fuzzy_e2e b3_lean`; reference: 2-block all-fuzzy `e2e_tail` at 300M, 0.99876 / 1.00263, mean 1.0007)
 Predictions: b3_lean within 0.01 of the 2-block at 300M on both seeds (55%); better than it by >= 0.01 on both seeds (15%: more data may favour depth); worse by >= 0.01 on both (30%).
+
+## b3_lean at 300M outcome (`E2E_CHARS=300`, seeds 0-1; 99,439 params; reference: the 2-block all-fuzzy `e2e_tail` at 300M, 0.99876 / 1.00263)
+**1.01163 / 1.01301 (mean 1.0123)**: **+0.0129 / +0.0104 (mean +0.0116, se 0.0012)** against the 2-block all-fuzzy model, worse on both seeds. Predictions: within 0.01 on both seeds (55%): **wrong** (0.0104 and 0.0129 are just outside); better by >= 0.01 on both (15%): no; worse by >= 0.01 on both (30%): **right**.
+Reading: **depth is closed at this budget: the 3-block all-fuzzy model is worse than the 2-block at both data sizes, and the gap grows with data (+0.005 at 30M, +0.012 at 300M)**, the opposite of every other fuzzy replacement (whose gaps shrank). The rules, projection ranks and feed-forward capacity paid for the third block matter more as data grows. The all-fuzzy model stays at two blocks. Against the hybrid recipe at 300M (0.95758 / 0.96015) the lean 3-block is +0.0535.
