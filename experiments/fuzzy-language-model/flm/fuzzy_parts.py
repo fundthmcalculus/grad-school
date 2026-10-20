@@ -19,6 +19,28 @@ import torch
 import torch.nn as nn
 
 
+class _DataInit:
+    """First-batch, data-driven placement of Gaussian membership functions (classical fuzzification: rule centres are sampled inputs, widths are the
+    per-dimension data spread).  Enabled by ``do_init``; runs once, on the first forward pass, with no gradient and no extra parameters.
+    """
+
+    do_init = False
+    _done = False
+
+    def _maybe_init(self, u):
+        if not self.do_init or self._done:
+            return
+        with torch.no_grad():
+            flat = u.detach().reshape(-1, u.shape[-1])
+            idx = torch.randperm(flat.shape[0], device=flat.device)[
+                : self.centers.shape[0]
+            ]
+            self.centers.copy_(flat[idx])
+            std = flat.std(0).clamp_min(1e-3)
+            self.log_width.copy_(torch.log(std).expand_as(self.log_width))
+        self._done = True
+
+
 class FuzzyNorm(nn.Module):
     def __init__(
         self, d: int, R: int = 5, mode: str = "fuzzy", eps: float = 1.1920929e-07
@@ -45,7 +67,7 @@ class FuzzyNorm(nn.Module):
         return x * torch.exp(g) * self.weight
 
 
-class FuzzyGate(nn.Module):
+class FuzzyGate(_DataInit, nn.Module):
     def __init__(self, d: int, H: int, R: int = 8, bias: torch.Tensor | None = None):
         super().__init__()
         self.centers = nn.Parameter(torch.randn(R, d) * 0.5)
@@ -55,6 +77,7 @@ class FuzzyGate(nn.Module):
         self.scale = 1.0 / d
 
     def forward(self, x):
+        self._maybe_init(x)
         a = torch.exp(-2.0 * self.log_width)  # (R, d)
         ca = self.centers * a
         quad = (x * x) @ a.T - 2.0 * (x @ ca.T) + (self.centers * ca).sum(-1)
@@ -62,7 +85,7 @@ class FuzzyGate(nn.Module):
         return w @ self.conseq
 
 
-class TSKMap(nn.Module):
+class TSKMap(_DataInit, nn.Module):
     """A zero-order TSK system as a map R^d_in -> R^d_out (a drop-in for ``nn.Linear(d_in, d_out, bias=False)``): R Gaussian rules over the raw
     input (product t-norm, 1/d exponent), normalised firings (a fuzzy partition), consequent vectors c_r in R^d_out, output = sum_r w_r c_r.
     Piecewise-constant interpolation between R prototypes: far less expressive than a linear map at equal parameters, which is the point of
@@ -76,13 +99,14 @@ class TSKMap(nn.Module):
         self.scale = 1.0 / d_in
 
     def forward(self, x):
+        self._maybe_init(x)
         a = torch.exp(-2.0 * self.log_width)
         ca = self.centers * a
         quad = (x * x) @ a.T - 2.0 * (x @ ca.T) + (self.centers * ca).sum(-1)
         return torch.softmax(-0.5 * self.scale * quad, dim=-1) @ self.conseq
 
 
-class TSKLinear(nn.Module):
+class TSKLinear(_DataInit, nn.Module):
     """A first-order TSK map with a shared consequent basis (a drop-in for ``nn.Linear(d_in, d_out, bias=False)``): u = B x (k numbers), R Gaussian
     rules over u give normalised firings w_r, each rule rescales the k basis directions by s_r, and  y = A (g * u)  with  g = sum_r w_r s_r.
     That is  y = sum_r w_r (A diag(s_r) B) x : a fuzzy partition of locally linear maps that share their factors.  With s_r = 1 it is exactly the
@@ -99,6 +123,7 @@ class TSKLinear(nn.Module):
 
     def forward(self, x):
         u = self.B(x)
+        self._maybe_init(u)
         a = torch.exp(-2.0 * self.log_width)
         ca = self.centers * a
         quad = (u * u) @ a.T - 2.0 * (u @ ca.T) + (self.centers * ca).sum(-1)
@@ -106,7 +131,7 @@ class TSKLinear(nn.Module):
         return self.A(g * u)
 
 
-class FuzzyFFNRaw(nn.Module):
+class FuzzyFFNRaw(_DataInit, nn.Module):
     """TSK feed-forward whose antecedents are Gaussian membership functions on the RAW input: every rule has a centre and a width for each of
     the d input dimensions and fires as the product t-norm over them (exponent scaled by 1/d, as everywhere), with no learned linear projection
     in front.  ``order=1``: first-order consequent  g_r (v_r . x + b_r) c_r  (the slope is still linear); ``order=0``: a zero-order system
@@ -141,6 +166,7 @@ class FuzzyFFNRaw(nn.Module):
 
     def forward(self, x):
         u = self.antecedent_input(x)
+        self._maybe_init(u)
         a = torch.exp(-2.0 * self.log_width)
         ca = self.centers * a
         quad = (u * u) @ a.T - 2.0 * (u @ ca.T) + (self.centers * ca).sum(-1)
@@ -160,6 +186,7 @@ def install(
     proj: str = "",
     ffn_taps: int = 1,
     ffn_rules0: int = 0,
+    data_init: bool = False,
 ):
     """norm: "" (keep RMSNorm), "fuzzy" or "scale"; gate: replace both sigmoid gates of every fuzzy-delta mixer."""
     d = model.cfg.d_model
@@ -194,4 +221,10 @@ def install(
                 m.qkv, m.out = TSKMap(d, 3 * d, 28), TSKMap(d, d, 16)
             else:
                 m.qkv, m.out = TSKLinear(d, 3 * d, 32, 8), TSKLinear(d, d, 20, 8)
+    if (
+        data_init
+    ):  # place every raw-input / gate / projection rule base from the first batch
+        for mod in model.modules():
+            if isinstance(mod, _DataInit):
+                mod.do_init = True
     return model
