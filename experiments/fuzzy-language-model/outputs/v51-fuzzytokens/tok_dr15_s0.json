@@ -1,0 +1,262 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v51-fuzzytokens\\tok_dr15_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98528,
+ "params_nonemb": 47264,
+ "steps": 1207,
+ "chars_seen": 30007060,
+ "chars_per_token": 3.0347732,
+ "val_bpc": 1.22071,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.03155
+  ],
+  [
+   100,
+   1.56172
+  ],
+  [
+   200,
+   1.43679
+  ],
+  [
+   300,
+   1.38934
+  ],
+  [
+   400,
+   1.35611
+  ],
+  [
+   500,
+   1.32827
+  ],
+  [
+   600,
+   1.30718
+  ],
+  [
+   700,
+   1.28855
+  ],
+  [
+   800,
+   1.2748
+  ],
+  [
+   900,
+   1.24697
+  ],
+  [
+   1000,
+   1.23759
+  ],
+  [
+   1100,
+   1.2291
+  ],
+  [
+   1200,
+   1.22538
+  ],
+  [
+   1207,
+   1.22071
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.6842
+  ],
+  [
+   50,
+   9.3805
+  ],
+  [
+   100,
+   7.3879
+  ],
+  [
+   150,
+   6.3988
+  ],
+  [
+   200,
+   5.9073
+  ],
+  [
+   250,
+   5.6414
+  ],
+  [
+   300,
+   5.4895
+  ],
+  [
+   350,
+   5.3655
+  ],
+  [
+   400,
+   5.2956
+  ],
+  [
+   450,
+   5.2271
+  ],
+  [
+   500,
+   5.1859
+  ],
+  [
+   550,
+   5.1518
+  ],
+  [
+   600,
+   5.0981
+  ],
+  [
+   650,
+   5.0369
+  ],
+  [
+   700,
+   5.0207
+  ],
+  [
+   750,
+   4.9665
+  ],
+  [
+   800,
+   4.9263
+  ],
+  [
+   850,
+   4.8857
+  ],
+  [
+   900,
+   4.8722
+  ],
+  [
+   950,
+   4.8515
+  ],
+  [
+   1000,
+   4.7992
+  ],
+  [
+   1050,
+   4.7653
+  ],
+  [
+   1100,
+   4.7753
+  ],
+  [
+   1150,
+   4.7369
+  ],
+  [
+   1200,
+   4.7264
+  ],
+  [
+   1206,
+   4.7267
+  ]
+ ],
+ "train_seconds": 89.41,
+ "wall_seconds": 103.58,
+ "chars_per_sec": 110585,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. Sue loved to play with her mom. One day, Lucy decided to help her mom and dad, but her friend was not idets.\nMom ran inside and said, \"You didn't come wrong!\" Lucy wanted to bipper a voice and smiled. \"We cat's no fun! It's not is fun.\" She thought for a moment. She said, \"Thank you, It was not too. Let's fly all of a pink car!\" Lucy flew inside and walked. \"I have so much fun!\"\nA heday, Lily, talk. She were touch the mow. She said sorry, \"I will climb your home,\" she said.\nShe walked to the gamer smile and shouted, \"You're welcome you. Let's play together.\"\nJack and Mee went to the picture for her mom. They went and hoped that they could play together. Twubbles hurt, they wanted to help them and watch her bind help.\nWith they laughed and remembered they had a tout. They hugged and thanked her mom's new mom. The got was happy that she gave Mome",
+ "rule_init": {},
+ "ngram_init": {}
+}

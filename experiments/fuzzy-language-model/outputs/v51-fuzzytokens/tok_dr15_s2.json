@@ -1,0 +1,262 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v51-fuzzytokens\\tok_dr15_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98528,
+ "params_nonemb": 47264,
+ "steps": 1207,
+ "chars_seen": 30007060,
+ "chars_per_token": 3.0347732,
+ "val_bpc": 1.23533,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06189
+  ],
+  [
+   100,
+   1.5885
+  ],
+  [
+   200,
+   1.45623
+  ],
+  [
+   300,
+   1.41324
+  ],
+  [
+   400,
+   1.37712
+  ],
+  [
+   500,
+   1.33566
+  ],
+  [
+   600,
+   1.32757
+  ],
+  [
+   700,
+   1.30087
+  ],
+  [
+   800,
+   1.27813
+  ],
+  [
+   900,
+   1.26214
+  ],
+  [
+   1000,
+   1.25072
+  ],
+  [
+   1100,
+   1.2395
+  ],
+  [
+   1200,
+   1.23472
+  ],
+  [
+   1207,
+   1.23533
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7555
+  ],
+  [
+   50,
+   9.4931
+  ],
+  [
+   100,
+   7.4706
+  ],
+  [
+   150,
+   6.4531
+  ],
+  [
+   200,
+   5.947
+  ],
+  [
+   250,
+   5.6894
+  ],
+  [
+   300,
+   5.5148
+  ],
+  [
+   350,
+   5.4179
+  ],
+  [
+   400,
+   5.3108
+  ],
+  [
+   450,
+   5.2789
+  ],
+  [
+   500,
+   5.2264
+  ],
+  [
+   550,
+   5.1544
+  ],
+  [
+   600,
+   5.0984
+  ],
+  [
+   650,
+   5.0718
+  ],
+  [
+   700,
+   5.0331
+  ],
+  [
+   750,
+   4.9699
+  ],
+  [
+   800,
+   4.9373
+  ],
+  [
+   850,
+   4.9053
+  ],
+  [
+   900,
+   4.8683
+  ],
+  [
+   950,
+   4.8393
+  ],
+  [
+   1000,
+   4.8191
+  ],
+  [
+   1050,
+   4.7881
+  ],
+  [
+   1100,
+   4.7575
+  ],
+  [
+   1150,
+   4.7263
+  ],
+  [
+   1200,
+   4.7291
+  ],
+  [
+   1206,
+   4.7274
+  ]
+ ],
+ "train_seconds": 92.16,
+ "wall_seconds": 106.63,
+ "chars_per_sec": 107290,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. Sue loved to play with her friends. One day, Mimi was playing with her. He saw a small, round family. Sue found a fastl of fug and loved to play with him.\nLily went fast with the bird and said, \"Hello, Thank you, verome! I want to learn.\" Tim wanna was very happy. She said, \"Thank you, Dim! I found a big mug. You want to be shas to play with day.\" Lucy was so happy. He put the sheht the peapt forest. Sue and Tom were gone. From that day on, they became a lamed Luty and a lot of fun.\n<|eot|>\nOnce upon a time, there was a funny lig cat named Tom. Tom loved to play with his toys. One sunny day, Tom found a picture of motorty crab in the garden. They walked around the park and play together.\nTom found a big hug and thought it was surpor. He said, \"I urry, but you can you make fut.\"\nTim and Tim played with the jar every day. They all became good friends. They were all in the garden all day",
+ "rule_init": {},
+ "ngram_init": {}
+}

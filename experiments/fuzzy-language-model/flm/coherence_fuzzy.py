@@ -3,7 +3,7 @@ replacements (flm/fuzzy_parts.py) and tiered embeddings of any shape.  Each chec
   blocks.*.n1.centers      -> FuzzyNorm            blocks.*.mix.gate.centers  -> FuzzyGate (rules = rows)
   blocks.*.ffn.slope / no ffn.ante -> FuzzyFFNRaw (order 1 / order 0)
   blocks.*.mix.qkv.centers -> TSKMap               blocks.*.mix.qkv.B.weight  -> TSKLinear (k = rows of B)
-plus the tiered-embedding detection of flm.coherence_vocab.  Stock models load as before.
+plus the tiered-embedding detection of flm.coherence_vocab and the fuzzy token tables of flm/fuzzy_tokens.py (``head_proto`` in the state: all tokens; 'ftail' / 'e2e_tail' in the checkpoint file name: tail tokens only).  Stock models load as before.
 """
 
 import os
@@ -11,6 +11,7 @@ import os
 import torch
 
 import flm.coherence_set as C
+import flm.fuzzy_tokens as FT
 import flm.run_tiered as R
 from flm.fuzzy_parts import FuzzyFFNRaw, FuzzyGate, FuzzyNorm, TSKLinear, TSKMap
 from flm.models import TinyLM
@@ -61,6 +62,8 @@ _state = {}
 def _init(self, cfg, *a, **k):
     tiered = _state.get("tiered", False)
     (R._new_init if tiered else _stock["init"])(self, cfg, *a, **k)
+    if _state.get("emb_mode"):
+        FT.fuzzify_init(self, _state["emb_mode"])
     if _state.get("state") is not None:
         install_from_state(self, _state["state"])
 
@@ -80,10 +83,20 @@ if __name__ == "__main__":
                 if v == 1024
                 else f"outputs/freq_bpe{v}.npz"
             )
-        _state.update(tiered=tiered, state=st)
+        stem = os.path.basename(str(path))
+        emb_mode = (
+            "all"
+            if "head_proto" in st
+            else ("tail" if tiered and ("ftail" in stem or "e2e_tail" in stem) else "")
+        )
+        _state.update(tiered=tiered, state=st, emb_mode=emb_mode)
         TinyLM.__init__ = _init
-        TinyLM.embed = R._embed if tiered else _stock["embed"]
-        TinyLM.logits = R._logits if tiered else _stock["logits"]
+        TinyLM.embed = (
+            FT._embed if emb_mode else (R._embed if tiered else _stock["embed"])
+        )
+        TinyLM.logits = (
+            FT._logits if emb_mode else (R._logits if tiered else _stock["logits"])
+        )
         return ck
 
     torch.load = load
