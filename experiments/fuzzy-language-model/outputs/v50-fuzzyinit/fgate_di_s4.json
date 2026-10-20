@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v50-fuzzyinit\\fgate_di_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99456,
+ "params_nonemb": 48192,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06347,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.07944
+  ],
+  [
+   100,
+   1.42027
+  ],
+  [
+   200,
+   1.28466
+  ],
+  [
+   300,
+   1.22658
+  ],
+  [
+   400,
+   1.18347
+  ],
+  [
+   500,
+   1.15487
+  ],
+  [
+   600,
+   1.1246
+  ],
+  [
+   700,
+   1.09869
+  ],
+  [
+   800,
+   1.08119
+  ],
+  [
+   900,
+   1.06724
+  ],
+  [
+   953,
+   1.06347
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.8232
+  ],
+  [
+   50,
+   9.1498
+  ],
+  [
+   100,
+   6.9656
+  ],
+  [
+   150,
+   5.8742
+  ],
+  [
+   200,
+   5.3216
+  ],
+  [
+   250,
+   5.0417
+  ],
+  [
+   300,
+   4.8681
+  ],
+  [
+   350,
+   4.743
+  ],
+  [
+   400,
+   4.6426
+  ],
+  [
+   450,
+   4.5723
+  ],
+  [
+   500,
+   4.4993
+  ],
+  [
+   550,
+   4.4364
+  ],
+  [
+   600,
+   4.3984
+  ],
+  [
+   650,
+   4.3507
+  ],
+  [
+   700,
+   4.3029
+  ],
+  [
+   750,
+   4.2545
+  ],
+  [
+   800,
+   4.1987
+  ],
+  [
+   850,
+   4.1808
+  ],
+  [
+   900,
+   4.1384
+  ],
+  [
+   950,
+   4.1101
+  ],
+  [
+   952,
+   4.1104
+  ]
+ ],
+ "train_seconds": 72.36,
+ "wall_seconds": 83.95,
+ "chars_per_sec": 107892,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl at the lake. She loved to play with the other animals. One day, a little girl named Amy came to the park. She saw her friend Tom. Sue found a big, red boat.\nSue saw her best friend, the bird. The bird was sad because the bird was sad. They did not care about the bird. The bird said, \"I can't fly, but you have no.\" The bird thought about Tom and said, \"I can help you!\" So, they became good friends and played together in the park.\n<|eot|>\nOnce upon a time, a little girl named Lucy went outside to play. She liked to play in the whole place. She said, \"Tim, talk. Go away,\" the big people and said, \"Don't worry! I like this too. I want to play too.\"\nLucy and Sue went to the park to play. They played with the ice and all the animals all day. They had fun together.\n<|eot|>\nOne day, a little girl named Sue went to the beach. The sun was shining in a beach. Sue was very happy and told her how he had to talk to her.\nThen, she saw a small girl named Lily. Sue said, \"I'm sad, Max. I will help you find you.\" Sue told her, \"I be nice to my toy. Let's play together.\" Sue smiled and said, \"Okay, Sue. Now you can make Mom sad",
+ "rule_init": {},
+ "ngram_init": {}
+}
