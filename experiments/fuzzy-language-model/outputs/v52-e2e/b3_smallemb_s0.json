@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 3,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\b3_smallemb_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 3,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98382,
+ "params_nonemb": 55022,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.15057,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06229
+  ],
+  [
+   100,
+   1.53077
+  ],
+  [
+   200,
+   1.36479
+  ],
+  [
+   300,
+   1.30592
+  ],
+  [
+   400,
+   1.26459
+  ],
+  [
+   500,
+   1.23255
+  ],
+  [
+   600,
+   1.20391
+  ],
+  [
+   700,
+   1.18399
+  ],
+  [
+   800,
+   1.16579
+  ],
+  [
+   900,
+   1.15317
+  ],
+  [
+   953,
+   1.15057
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7657
+  ],
+  [
+   50,
+   9.2478
+  ],
+  [
+   100,
+   7.3147
+  ],
+  [
+   150,
+   6.2358
+  ],
+  [
+   200,
+   5.6687
+  ],
+  [
+   250,
+   5.3467
+  ],
+  [
+   300,
+   5.1683
+  ],
+  [
+   350,
+   5.0261
+  ],
+  [
+   400,
+   4.9832
+  ],
+  [
+   450,
+   4.8904
+  ],
+  [
+   500,
+   4.8354
+  ],
+  [
+   550,
+   4.7557
+  ],
+  [
+   600,
+   4.6752
+  ],
+  [
+   650,
+   4.6284
+  ],
+  [
+   700,
+   4.6067
+  ],
+  [
+   750,
+   4.5889
+  ],
+  [
+   800,
+   4.5354
+  ],
+  [
+   850,
+   4.4985
+  ],
+  [
+   900,
+   4.4717
+  ],
+  [
+   950,
+   4.4564
+  ],
+  [
+   952,
+   4.4572
+  ]
+ ],
+ "train_seconds": 111.17,
+ "wall_seconds": 126.23,
+ "chars_per_sec": 70224,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She had many colors to play with her friends. One day, Lucy's friend, her mom, they found a pretty, blue bee. Lucy wanted to help her mom. But she knew she would go to her.\nInside the arm, Lucy's friends, and they went on the kitchen. Why day, Amy and her mom were very curious. They both became good friends and played together. And she always played with her friends and had a big cookie with her friends.\n<|eot|>\n\nOnce upon a time there was a little girl who liked to go outside to a pink box. One day, she walked up to the park with her house. The man was encks, but it was not a boy named Tom. He had a favorite car gone fort. She wanted to take a surprise and put the car rolling.\n\"Please, let's go to the gamer?\" she shouted and said, \"I can get a ball together!\"\nAt the end of the sun, she went inside. Tom and Lily were so happy that they were happy and became good friends. They had so much fun playing with the ball and friends all day long.\n<|eot|>\nOnce upon a time, there was a delicate dog named Tom. Max loved to play with his toys with his toys. One day, he found a big tree in the jar. It was red, and it would fly and open it.\nAs Tom opened the box,",
+ "rule_init": {},
+ "ngram_init": {}
+}

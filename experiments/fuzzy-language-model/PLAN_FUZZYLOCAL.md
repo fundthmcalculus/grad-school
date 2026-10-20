@@ -212,3 +212,15 @@ Reference from here on is the 2-block all-fuzzy model `e2e_tail` (99,019 params;
 * **b3_smallemb** (98,382): width 48, 16 memory rules, ranks 24 / 16, FFN 42 rules (layer 0: 30), a smaller embedding (head 320 crisp pieces, tail width 10) to fund the rules.
 Predictions (vs the 2-block e2e_tail, 1.1368): the best 3-block arm within 0.02 of the 2-block (50%); better by >= 0.01 (20%); worse by >= 0.02 (30%); b3_d40 worse than the d48 arms (55%: a narrower residual stream hurts a model whose components are already limited); every arm worse than its 2-block counterpart on at least 4 of 5 seeds (35%).
 Decision rule: a 3-block arm that beats the 2-block on >= 4/5 seeds by >= 0.01 goes to 300M (two seeds) and a blind coherence set against the 2-block; otherwise depth is recorded as not paying at this budget.
+
+## 3-block outcome (`b3_*` in `v52-e2e`, 30M characters, seeds 0-4, paired with the 2-block all-fuzzy `e2e_tail`, mean 1.1368; the first sweep attempt crashed after two cells on a runner bug (an arm overrode TIER_NH), fixed and rerun; finished cells were not repeated)
+| arm | params | BPC mean | vs 2-block (se) | seeds better | per-seed diffs |
+|---|---|---|---|---|---|
+| b3_lean (width 48, 16 memory rules, ranks 24/16, FFN 31/21) | 99,439 | 1.1417 | **+0.0050 (0.0032)** | 2/5 | +.013 -.004 +.010 +.006 -.000 |
+| b3_d40 (width 40, 32 memory rules, FFN 44/30) | 99,002 | 1.1462 | +0.0094 (0.0023) | 0/5 | +.012 +.009 +.016 +.003 +.007 |
+| b3_smallemb (width 48, head 320 / tail 10, FFN 42/30) | 98,382 | 1.1534 | +0.0167 (0.0018) | 0/5 | +.016 +.011 +.019 +.017 +.022 |
+No run diverged. Predictions: the best 3-block arm within 0.02 of the 2-block (50%): **right** (b3_lean, +0.005); better by >= 0.01 (20%): no; worse by >= 0.02 (30%): no; b3_d40 worse than the d48 arms (55%): **wrong** (it beats b3_smallemb; it loses to b3_lean); every arm worse than the 2-block on >= 4/5 seeds (35%): **wrong** (b3_lean is worse on 3/5 only).
+Reading: **a third block does not pay for itself at 99K parameters.** The block's cost (about 16K parameters after trimming) is taken from memory rules, projection ranks and feed-forward rules, and those cuts cost about what the extra depth buys: b3_lean, which trims the memory and projections but keeps the width, is within noise of the 2-block (+0.005, two seeds better); cutting the width (b3_d40) or the embedding (b3_smallemb) to fund the rules is clearly worse. Decision rule (>= 0.01 better on >= 4/5 seeds): not met; but b3_lean is a statistical tie at 30M, and the fuzzy forms learn more slowly, so it is checked once at 300M (two seeds) before depth is closed.
+
+### b3_lean at 300M registered before running (`E2E_CHARS=300 E2E_SEEDS=0,1 python -m flm.run_fuzzy_e2e b3_lean`; reference: 2-block all-fuzzy `e2e_tail` at 300M, 0.99876 / 1.00263, mean 1.0007)
+Predictions: b3_lean within 0.01 of the 2-block at 300M on both seeds (55%); better than it by >= 0.01 on both seeds (15%: more data may favour depth); worse by >= 0.01 on both (30%).

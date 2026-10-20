@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 3,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\b3_lean_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 3,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99439,
+ "params_nonemb": 48175,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.14708,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.09412
+  ],
+  [
+   100,
+   1.532
+  ],
+  [
+   200,
+   1.36975
+  ],
+  [
+   300,
+   1.31285
+  ],
+  [
+   400,
+   1.26622
+  ],
+  [
+   500,
+   1.23438
+  ],
+  [
+   600,
+   1.20384
+  ],
+  [
+   700,
+   1.18093
+  ],
+  [
+   800,
+   1.16295
+  ],
+  [
+   900,
+   1.14984
+  ],
+  [
+   953,
+   1.14708
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.8755
+  ],
+  [
+   50,
+   9.5317
+  ],
+  [
+   100,
+   7.4488
+  ],
+  [
+   150,
+   6.2971
+  ],
+  [
+   200,
+   5.7048
+  ],
+  [
+   250,
+   5.3843
+  ],
+  [
+   300,
+   5.2063
+  ],
+  [
+   350,
+   5.0747
+  ],
+  [
+   400,
+   4.962
+  ],
+  [
+   450,
+   4.8901
+  ],
+  [
+   500,
+   4.8146
+  ],
+  [
+   550,
+   4.7653
+  ],
+  [
+   600,
+   4.6948
+  ],
+  [
+   650,
+   4.6362
+  ],
+  [
+   700,
+   4.5885
+  ],
+  [
+   750,
+   4.5636
+  ],
+  [
+   800,
+   4.5212
+  ],
+  [
+   850,
+   4.4852
+  ],
+  [
+   900,
+   4.4579
+  ],
+  [
+   950,
+   4.4494
+  ],
+  [
+   952,
+   4.4475
+  ]
+ ],
+ "train_seconds": 111.81,
+ "wall_seconds": 127.28,
+ "chars_per_sec": 69825,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was very excited to play with her mom.\nOne sunny day, Lucy decided to help her mom for a pretty, but she wanted to play with it. She said, \"Come, I can have to play with this.\" Lucy was so thought for the girl was a onion. She would get up and down. Lucy was very happy and having fun.\nAt playing, Lucy went back to her mom. The moral of the story is to come back and listen to\". Lucy smiled and said, \"Thank you, Tim. You can be to play with the best place to play.\" Lucy was very happy and smiled.\n<|eot|>\nOnce upon a time, there was a boy named Tim. Tim had a big red ball. He liked to play with his ball. He would stay fit a big hole of roll and get it to the tree.\nOne day, Tim saw an big, red ball. It was a big, red ball. The ball was very sad. Tim wanted to help. He tried to be careful, but he could not find it.\nTim showed the ball to his friend, Sam, to play with his ball. Sam's mom said it was a big tree. Tim shook his tail to him. He knew he could read it with the ball. The blue ball was happy and they played together.\n<|eot|>\nOnce upon a time, there was a big, strong bear. The boy liked to play all day",
+ "rule_init": {},
+ "ngram_init": {}
+}
