@@ -51,11 +51,17 @@ def firing_logits(u, centers, log_width, scale):
 
 
 class AllFuzzyLM:
-    def __init__(self, weights=HERE / "e2e_tail_300M_s0.npz", tokenizer=HERE / "bpe3072.json"):
+    def __init__(
+        self, weights=HERE / "e2e_tail_300M_s0.npz", tokenizer=HERE / "bpe3072.json"
+    ):
         z = np.load(weights)
         self.W = {k: z[k] for k in z.files}
         self.tok = Tokenizer.from_file(str(tokenizer))
-        self.d, self.L, self.H = int(z["cfg_d_model"]), int(z["cfg_n_layers"]), int(z["cfg_n_heads"])
+        self.d, self.L, self.H = (
+            int(z["cfg_d_model"]),
+            int(z["cfg_n_layers"]),
+            int(z["cfg_n_heads"]),
+        )
         self.V, self.max_len = int(z["cfg_vocab_size"]), int(z["cfg_max_len"])
         self.dh = self.d // self.H
         self.R_mem = int(z["cfg_n_rules"])
@@ -63,11 +69,17 @@ class AllFuzzyLM:
         self.head_ids, self.tail_ids = z["head_ids"], z["tail_ids"]
         self.pos = np.zeros(self.V, dtype=int)
         self.is_head = np.zeros(self.V, dtype=bool)
-        self.pos[self.head_ids], self.pos[self.tail_ids] = np.arange(len(self.head_ids)), np.arange(len(self.tail_ids))
+        self.pos[self.head_ids], self.pos[self.tail_ids] = np.arange(
+            len(self.head_ids)
+        ), np.arange(len(self.tail_ids))
         self.is_head[self.head_ids] = True
-        self.tail_membership = softmax(self.W["emb_t.weight"])  # (tail pieces, 12): each piece's degrees of membership in the prototypes
+        self.tail_membership = softmax(
+            self.W["emb_t.weight"]
+        )  # (tail pieces, 12): each piece's degrees of membership in the prototypes
         proto = self.W["tier_up.weight"]  # (48, 12): column k is prototype vector k
-        self.E = np.zeros((self.V, self.d))  # the effective embedding of every piece (used for input and, tied, for output scores)
+        self.E = np.zeros(
+            (self.V, self.d)
+        )  # the effective embedding of every piece (used for input and, tied, for output scores)
         self.E[self.head_ids] = self.W["emb_h.weight"]
         self.E[self.tail_ids] = self.tail_membership @ proto.T
         self.reset()
@@ -75,26 +87,37 @@ class AllFuzzyLM:
     # ------------------------------------------------------------------ the fuzzy systems
     def gain_controller(self, x, p):
         """Replaces RMSNorm.  One input variable, z = log rms(x), five Gaussian membership functions on it, first-order consequents
-        b_r + k_r (z - c_r) giving a log-gain; defuzzified by the weighted average; output = x * exp(gain) * weight."""
+        b_r + k_r (z - c_r) giving a log-gain; defuzzified by the weighted average; output = x * exp(gain) * weight.
+        """
         W = self.W
         z = 0.5 * np.log((x**2).mean() + EPS)
-        w = softmax(-0.5 * ((z - W[p + "centers"]) / np.exp(W[p + "log_width"])) ** 2)  # FUZZIFY, FIRE, AGGREGATE
-        gain = (w * (W[p + "offset"] + W[p + "slope"] * (z - W[p + "centers"]))).sum()  # DEFUZZIFY
+        w = softmax(
+            -0.5 * ((z - W[p + "centers"]) / np.exp(W[p + "log_width"])) ** 2
+        )  # FUZZIFY, FIRE, AGGREGATE
+        gain = (
+            w * (W[p + "offset"] + W[p + "slope"] * (z - W[p + "centers"]))
+        ).sum()  # DEFUZZIFY
         return x * np.exp(gain) * W[p + "weight"], w, gain
 
     def gated_map(self, x, p):
         """Replaces a linear projection.  u = B x (a small basis); eight Gaussian rules over u fire; each rule rescales the basis directions by its
-        consequent s_r; the defuzzified rescaling is applied and mapped out by A:  y = A ((sum_r w_r s_r) * u)."""
+        consequent s_r; the defuzzified rescaling is applied and mapped out by A:  y = A ((sum_r w_r s_r) * u).
+        """
         W = self.W
         u = W[p + "B.weight"] @ x
-        w = softmax(firing_logits(u, W[p + "centers"], W[p + "log_width"], 1.0 / len(u)))  # FUZZIFY, FIRE, AGGREGATE
+        w = softmax(
+            firing_logits(u, W[p + "centers"], W[p + "log_width"], 1.0 / len(u))
+        )  # FUZZIFY, FIRE, AGGREGATE
         return W[p + "A.weight"] @ ((w @ W[p + "s"]) * u)  # DEFUZZIFY
 
     def rule_gate(self, x, p):
         """Replaces a sigmoid gate.  Six Gaussian rules over the whole 48-number input; each rule's consequent is one logit per head; the
-        weighted average of the consequents is the gate's logit (the caller squashes it to (0, 1))."""
+        weighted average of the consequents is the gate's logit (the caller squashes it to (0, 1)).
+        """
         W = self.W
-        w = softmax(firing_logits(x, W[p + "centers"], W[p + "log_width"], 1.0 / len(x)))
+        w = softmax(
+            firing_logits(x, W[p + "centers"], W[p + "log_width"], 1.0 / len(x))
+        )
         return w @ W[p + "conseq"], w
 
     def memory_partition(self, u, centers, log_width):
@@ -104,37 +127,62 @@ class AllFuzzyLM:
     def feedforward(self, n2, prev_n2, layer):
         """The feed-forward rule bank.  Antecedent: Gaussian memberships on the RAW normalised input (layer 0: on the current AND previous token's
         input side by side, which replaces the convolution), product t-norm, raw firing strengths.  First-order consequent: rule r pushes
-        conseq_r with strength firing_r * (slope_r . n2 + b_r).  Output = sum of the pushes.  Returns the output and every rule's strength."""
+        conseq_r with strength firing_r * (slope_r . n2 + b_r).  Output = sum of the pushes.  Returns the output and every rule's strength.
+        """
         W, p = self.W, f"blocks.{layer}.ffn."
-        u = np.concatenate([n2, prev_n2]) if W[p + "centers"].shape[1] == 2 * self.d else n2
-        firing = np.exp(firing_logits(u, W[p + "centers"], W[p + "log_width"], 1.0 / len(u)))  # FUZZIFY, FIRE
-        strength = firing * (W[p + "slope.weight"] @ n2 + W[p + "slope.bias"])  # first-order consequent weight
+        u = (
+            np.concatenate([n2, prev_n2])
+            if W[p + "centers"].shape[1] == 2 * self.d
+            else n2
+        )
+        firing = np.exp(
+            firing_logits(u, W[p + "centers"], W[p + "log_width"], 1.0 / len(u))
+        )  # FUZZIFY, FIRE
+        strength = firing * (
+            W[p + "slope.weight"] @ n2 + W[p + "slope.bias"]
+        )  # first-order consequent weight
         return strength @ W[p + "conseq"], strength  # DEFUZZIFY (sum)
 
     # ------------------------------------------------------------------ one word piece in, next-piece scores out
     def reset(self):
-        self.S = [np.zeros((self.H, self.dh, self.R_mem)) for _ in range(self.L)]  # the memory of each head: one column per rule
+        self.S = [
+            np.zeros((self.H, self.dh, self.R_mem)) for _ in range(self.L)
+        ]  # the memory of each head: one column per rule
         self.prev_n2 = [np.zeros(self.d) for _ in range(self.L)]
         self.n_seen = 0
 
     def step(self, tok_id):
         W, d, H, dh = self.W, self.d, self.H, self.dh
-        x = self.E[tok_id].copy()  # the piece's embedding (a crisp row, or the weighted average of the prototypes)
+        x = self.E[
+            tok_id
+        ].copy()  # the piece's embedding (a crisp row, or the weighted average of the prototypes)
         info = {"ffn_strength": []}
         for l in range(self.L):
             b = f"blocks.{l}."
             h, _, _ = self.gain_controller(x, b + "n1.")
-            qkv = self.gated_map(h, b + "mix.qkv.").reshape(3, H, dh)  # q, k, v for each head
-            alpha_logit, _ = self.rule_gate(h, b + "mix.gate.")  # how much each head forgets
-            beta_logit, _ = self.rule_gate(h, b + "mix.beta.")  # how hard each head writes
+            qkv = self.gated_map(h, b + "mix.qkv.").reshape(
+                3, H, dh
+            )  # q, k, v for each head
+            alpha_logit, _ = self.rule_gate(
+                h, b + "mix.gate."
+            )  # how much each head forgets
+            beta_logit, _ = self.rule_gate(
+                h, b + "mix.beta."
+            )  # how hard each head writes
             y = np.zeros((H, dh))
             for hd in range(H):
                 c, lw = W[b + "mix.centers"][hd], W[b + "mix.log_width"][hd]
-                fq, fk = self.memory_partition(qkv[0, hd], c, lw), self.memory_partition(qkv[1, hd], c, lw)
+                fq, fk = self.memory_partition(
+                    qkv[0, hd], c, lw
+                ), self.memory_partition(qkv[1, hd], c, lw)
                 S = self.S[l][hd] * sigmoid(alpha_logit[hd])  # forget
-                S = S + sigmoid(beta_logit[hd]) * np.outer(qkv[2, hd] - S @ fk, fk)  # write the prediction error into the rules fk selects
+                S = S + sigmoid(beta_logit[hd]) * np.outer(
+                    qkv[2, hd] - S @ fk, fk
+                )  # write the prediction error into the rules fk selects
                 self.S[l][hd] = S
-                y[hd] = S @ fq  # read: defuzzify the rules' stored consequents with the query's firing
+                y[hd] = (
+                    S @ fq
+                )  # read: defuzzify the rules' stored consequents with the query's firing
             x = x + self.gated_map(y.reshape(-1), b + "mix.out.")
             n2, _, _ = self.gain_controller(x, b + "n2.")
             out, strength = self.feedforward(n2, self.prev_n2[l], l)
@@ -143,7 +191,9 @@ class AllFuzzyLM:
             x = x + out
         hn, _, gain = self.gain_controller(x, "norm.")
         info["final_gain"] = float(np.exp(gain))
-        logits = self.E @ hn  # tied output table: head pieces crisp, tail pieces = membership-weighted average of the prototype scores
+        logits = (
+            self.E @ hn
+        )  # tied output table: head pieces crisp, tail pieces = membership-weighted average of the prototype scores
         self.n_seen += 1
         return logits, info
 
@@ -151,9 +201,19 @@ class AllFuzzyLM:
     def piece(self, i):
         return "\n<|eot|>\n" if i == 0 else self.tok.decode([int(i)])
 
-    def generate(self, text, max_new_tokens=60, temperature=0.5, top_k=10, seed=0, include_prompt=False, trace=None):
+    def generate(
+        self,
+        text,
+        max_new_tokens=60,
+        temperature=0.5,
+        top_k=10,
+        seed=0,
+        include_prompt=False,
+        trace=None,
+    ):
         """Encode ``text``, run the fuzzy model one word piece at a time, sample the continuation and return it as a string.
-        ``trace``: pass an empty list to receive, per generated piece, the feed-forward rules with the largest effect on its score."""
+        ``trace``: pass an empty list to receive, per generated piece, the feed-forward rules with the largest effect on its score.
+        """
         ids = self.tok.encode(text).ids
         assert 0 < len(ids) < self.max_len, "empty prompt, or longer than the context"
         rng = np.random.default_rng(seed)
@@ -176,15 +236,21 @@ class AllFuzzyLM:
     # ------------------------------------------------------------------ reading the rules
     def profile(self, layer):
         """What each feed-forward rule does to the output scores when it fires with a positive strength: pi_r = (conseq_r * final weight) . E^T."""
-        return (self.W[f"blocks.{layer}.ffn.conseq"] * self.W["norm.weight"]) @ self.E.T  # (rules, pieces)
+        return (
+            self.W[f"blocks.{layer}.ffn.conseq"] * self.W["norm.weight"]
+        ) @ self.E.T  # (rules, pieces)
 
     def explain(self, tok, info, per_layer=3):
         """The feed-forward rules that pushed hardest for (or against) ``tok``: exact, because the output scores are linear in the rules' pushes."""
         rows = []
         for l in range(self.L):
-            contrib = info["ffn_strength"][l] * info["final_gain"] * self.profile(l)[:, tok]
+            contrib = (
+                info["ffn_strength"][l] * info["final_gain"] * self.profile(l)[:, tok]
+            )
             for r in np.argsort(-np.abs(contrib))[:per_layer]:
-                rows.append((l, int(r), float(info["ffn_strength"][l][r]), float(contrib[r])))
+                rows.append(
+                    (l, int(r), float(info["ffn_strength"][l][r]), float(contrib[r]))
+                )
         return rows
 
     def rule_text(self, layer, r, top=8):
@@ -192,10 +258,18 @@ class AllFuzzyLM:
         W, p = self.W, f"blocks.{layer}.ffn."
         c, lw = W[p + "centers"][r], W[p + "log_width"][r]
         D = len(c)
-        sigma = np.exp(lw) * np.sqrt(D)  # the width a single dimension's membership function effectively has, given the 1/D exponent scale
-        names = [f"x[{j}]" if j < self.d else f"prev[{j - self.d}]" for j in range(D)] if D > self.d else [f"x[{j}]" for j in range(D)]
+        sigma = np.exp(lw) * np.sqrt(
+            D
+        )  # the width a single dimension's membership function effectively has, given the 1/D exponent scale
+        names = (
+            [f"x[{j}]" if j < self.d else f"prev[{j - self.d}]" for j in range(D)]
+            if D > self.d
+            else [f"x[{j}]" for j in range(D)]
+        )
         sel = np.argsort(sigma)[:4]  # the four narrowest (most selective) memberships
-        ante = " AND ".join(f"{names[j]} is near {c[j]:+.2f} (width {sigma[j]:.2f})" for j in sel)
+        ante = " AND ".join(
+            f"{names[j]} is near {c[j]:+.2f} (width {sigma[j]:.2f})" for j in sel
+        )
         pi = self.profile(layer)[r]
         up = ", ".join(repr(self.piece(i)) for i in np.argsort(-pi)[:top])
         down = ", ".join(repr(self.piece(i)) for i in np.argsort(pi)[:4])
@@ -212,41 +286,105 @@ def write_rulebook(path="rulebook.txt", model=None):
     W, out = m.W, []
     n_ffn = sum(len(W[f"blocks.{l}.ffn.centers"]) for l in range(m.L))
     out.append("THE ALL-FUZZY LANGUAGE MODEL: ITS RULE BASE")
-    out.append(f"{m.L} blocks, width {m.d}; fuzzy systems per block: 2 gain controllers (5 rules each), 2 gated maps (8 rules each), 2 gates (6 rules each),")
-    out.append(f"a memory ({m.H} heads x {m.R_mem} rules), a feed-forward bank; plus the output gain controller and the fuzzy token table.")
-    out.append(f"Feed-forward rules in total: {n_ffn}; memory rules: {m.L * m.H * m.R_mem}.\n")
-    out.append("== 1. TOKEN TABLE: the 12 prototypes that every tail word piece is a fuzzy set over (the 384 most frequent pieces have crisp rows)")
+    out.append(
+        f"{m.L} blocks, width {m.d}; fuzzy systems per block: 2 gain controllers (5 rules each), 2 gated maps (8 rules each), 2 gates (6 rules each),"
+    )
+    out.append(
+        f"a memory ({m.H} heads x {m.R_mem} rules), a feed-forward bank; plus the output gain controller and the fuzzy token table."
+    )
+    out.append(
+        f"Feed-forward rules in total: {n_ffn}; memory rules: {m.L * m.H * m.R_mem}.\n"
+    )
+    out.append(
+        "== 1. TOKEN TABLE: the 12 prototypes that every tail word piece is a fuzzy set over (the 384 most frequent pieces have crisp rows)"
+    )
     mu = m.tail_membership
     for k in range(mu.shape[1]):
         top = np.argsort(-mu[:, k])[:10]
-        out.append(f"  prototype {k:2d}: strongest members " + ", ".join(repr(m.piece(m.tail_ids[i])) for i in top))
-    out.append("  (a tail piece's embedding = membership-weighted average of the prototypes; its output score = the same weighted average of the prototype scores)\n")
-    out.append("== 2. GAIN-CONTROL RULES (replace RMSNorm): IF log-rms(x) is near c THEN log-gain = b + k (log-rms - c)")
+        out.append(
+            f"  prototype {k:2d}: strongest members "
+            + ", ".join(repr(m.piece(m.tail_ids[i])) for i in top)
+        )
+    out.append(
+        "  (a tail piece's embedding = membership-weighted average of the prototypes; its output score = the same weighted average of the prototype scores)\n"
+    )
+    out.append(
+        "== 2. GAIN-CONTROL RULES (replace RMSNorm): IF log-rms(x) is near c THEN log-gain = b + k (log-rms - c)"
+    )
     names = [f"blocks.{l}.{n}." for l in range(m.L) for n in ("n1", "n2")] + ["norm."]
     for p in names:
-        c, lw, b, k = W[p + "centers"], np.exp(W[p + "log_width"]), W[p + "offset"], W[p + "slope"]
-        out.append(f"  {p[:-1]}: " + "; ".join(f"[c {c[r]:+.2f}, width {lw[r]:.2f}, b {b[r]:+.2f}, k {k[r]:+.2f}]" for r in range(len(c))))
+        c, lw, b, k = (
+            W[p + "centers"],
+            np.exp(W[p + "log_width"]),
+            W[p + "offset"],
+            W[p + "slope"],
+        )
+        out.append(
+            f"  {p[:-1]}: "
+            + "; ".join(
+                f"[c {c[r]:+.2f}, width {lw[r]:.2f}, b {b[r]:+.2f}, k {k[r]:+.2f}]"
+                for r in range(len(c))
+            )
+        )
     for l in range(m.L):
         b = f"blocks.{l}."
         out.append(f"\n== 3. BLOCK {l}: MIXER")
         for nm, sysname in (("mix.qkv.", "q/k/v map"), ("mix.out.", "output map")):
-            c, lw, s = W[b + nm + "centers"], np.exp(W[b + nm + "log_width"]), W[b + nm + "s"]
-            out.append(f"  {sysname}: {len(c)} rules over {c.shape[1]} basis coordinates; IF the basis coordinates are near c THEN rescale the basis directions by s")
+            c, lw, s = (
+                W[b + nm + "centers"],
+                np.exp(W[b + nm + "log_width"]),
+                W[b + nm + "s"],
+            )
+            out.append(
+                f"  {sysname}: {len(c)} rules over {c.shape[1]} basis coordinates; IF the basis coordinates are near c THEN rescale the basis directions by s"
+            )
             for r in range(len(c)):
-                out.append(f"    rule {r}: centre norm {np.linalg.norm(c[r]):.2f}, mean width {lw[r].mean():.2f}; rescaling s: mean {s[r].mean():.2f}, range [{s[r].min():+.2f}, {s[r].max():+.2f}]")
+                out.append(
+                    f"    rule {r}: centre norm {np.linalg.norm(c[r]):.2f}, mean width {lw[r].mean():.2f}; rescaling s: mean {s[r].mean():.2f}, range [{s[r].min():+.2f}, {s[r].max():+.2f}]"
+                )
         for nm, what in (("mix.gate.", "forgetting"), ("mix.beta.", "write strength")):
-            c, lw, cs = W[b + nm + "centers"], np.exp(W[b + nm + "log_width"]), W[b + nm + "conseq"]
-            out.append(f"  {what} gate: {len(c)} rules over the 48-number input; THEN the head logits (before the sigmoid) are:")
+            c, lw, cs = (
+                W[b + nm + "centers"],
+                np.exp(W[b + nm + "log_width"]),
+                W[b + nm + "conseq"],
+            )
+            out.append(
+                f"  {what} gate: {len(c)} rules over the 48-number input; THEN the head logits (before the sigmoid) are:"
+            )
             for r in range(len(c)):
                 sel = np.argsort(lw[r])[:3]
-                out.append(f"    rule {r}: IF " + " AND ".join(f"x[{j}] near {c[r][j]:+.2f}" for j in sel) + " (+45 more) THEN logits per head " + np.array2string(cs[r], precision=2, suppress_small=True))
-        out.append(f"  memory: {m.H} heads x {m.R_mem} rules over each head's {m.dh}-number key/query; a rule's consequent is in-context state (a column of the head's memory),")
-        out.append("          written by the delta rule at run time, so only the antecedents are fixed:")
+                out.append(
+                    f"    rule {r}: IF "
+                    + " AND ".join(f"x[{j}] near {c[r][j]:+.2f}" for j in sel)
+                    + " (+45 more) THEN logits per head "
+                    + np.array2string(cs[r], precision=2, suppress_small=True)
+                )
+        out.append(
+            f"  memory: {m.H} heads x {m.R_mem} rules over each head's {m.dh}-number key/query; a rule's consequent is in-context state (a column of the head's memory),"
+        )
+        out.append(
+            "          written by the delta rule at run time, so only the antecedents are fixed:"
+        )
         for hd in range(m.H):
             c, lw = W[b + "mix.centers"][hd], np.exp(W[b + "mix.log_width"][hd])
             for r in range(m.R_mem):
-                out.append(f"    head {hd} rule {r:2d}: IF key near " + np.array2string(c[r], precision=2, suppress_small=True) + " widths " + np.array2string(lw[r] * np.sqrt(m.dh), precision=2, suppress_small=True))
-        out.append(f"\n== 4. BLOCK {l}: FEED-FORWARD RULES ({len(W[b + 'ffn.centers'])} rules" + (", antecedent over the current AND previous token" if W[b + "ffn.centers"].shape[1] > m.d else "") + ")")
+                out.append(
+                    f"    head {hd} rule {r:2d}: IF key near "
+                    + np.array2string(c[r], precision=2, suppress_small=True)
+                    + " widths "
+                    + np.array2string(
+                        lw[r] * np.sqrt(m.dh), precision=2, suppress_small=True
+                    )
+                )
+        out.append(
+            f"\n== 4. BLOCK {l}: FEED-FORWARD RULES ({len(W[b + 'ffn.centers'])} rules"
+            + (
+                ", antecedent over the current AND previous token"
+                if W[b + "ffn.centers"].shape[1] > m.d
+                else ""
+            )
+            + ")"
+        )
         for r in range(len(W[b + "ffn.centers"])):
             out.append(m.rule_text(l, r))
     Path(path).write_text("\n".join(out) + "\n", encoding="utf-8")
@@ -269,8 +407,14 @@ if __name__ == "__main__":
     ap.add_argument("--text", default="Once upon a time")
     ap.add_argument("--n", type=int, default=60)
     ap.add_argument("--seed", type=int, default=0)
-    ap.add_argument("--trace", action="store_true", help="print the feed-forward rules behind each generated word piece")
-    ap.add_argument("--rules", metavar="FILE", help="write the whole rule base to FILE and exit")
+    ap.add_argument(
+        "--trace",
+        action="store_true",
+        help="print the feed-forward rules behind each generated word piece",
+    )
+    ap.add_argument(
+        "--rules", metavar="FILE", help="write the whole rule base to FILE and exit"
+    )
     a = ap.parse_args()
     if a.rules:
         print(f"wrote {write_rulebook(a.rules)} lines to {a.rules}")
@@ -278,4 +422,10 @@ if __name__ == "__main__":
         tr = [] if a.trace else None
         print(a.text + generate(a.text, max_new_tokens=a.n, seed=a.seed, trace=tr))
         for piece, rows in tr or []:
-            print(f"\n{piece!r}: " + "; ".join(f"layer {l} rule {r} (strength {s:+.2f}, effect {c:+.2f})" for l, r, s, c in rows))
+            print(
+                f"\n{piece!r}: "
+                + "; ".join(
+                    f"layer {l} rule {r} (strength {s:+.2f}, effect {c:+.2f})"
+                    for l, r, s, c in rows
+                )
+            )

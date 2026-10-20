@@ -1,5 +1,5 @@
 """Parity: allfuzzy_lm.py (plain numpy) against the trained torch model, logits at every position of a prompt.
-    PYTHONPATH=. python allfuzzy/test_allfuzzy.py outputs/v52-e2e/e2e_tail_300M_s0.pt      (needs torch and the repo; the script itself does not)
+PYTHONPATH=. python allfuzzy/test_allfuzzy.py outputs/v52-e2e/e2e_tail_300M_s0.pt      (needs torch and the repo; the script itself does not)
 """
 
 import os
@@ -34,5 +34,7 @@ if __name__ == "__main__":
     lm.reset()
     mine = np.stack([lm.step(i)[0] for i in ids])
     err = np.abs(ref - mine).max()
-    print(f"{len(ids)} positions, max |logit difference| numpy vs torch: {err:.2e}; argmax agrees at {(ref.argmax(1) == mine.argmax(1)).mean():.0%} of positions")
+    print(
+        f"{len(ids)} positions, max |logit difference| numpy vs torch: {err:.2e}; argmax agrees at {(ref.argmax(1) == mine.argmax(1)).mean():.0%} of positions"
+    )
     assert err < 1e-3, err

@@ -26,4 +26,6 @@ if __name__ == "__main__":
         arrays["cfg_" + k] = np.array(cfg[k])
     np.savez_compressed(dst, **arrays)
     shutil.copyfile("../../data/tinystories/bpe3072.json", dst.parent / "bpe3072.json")
-    print(f"wrote {dst} ({dst.stat().st_size / 1e3:.0f} KB), {sum(v.numel() for v in ck['state'].values())} parameters")
+    print(
+        f"wrote {dst} ({dst.stat().st_size / 1e3:.0f} KB), {sum(v.numel() for v in ck['state'].values())} parameters"
+    )
