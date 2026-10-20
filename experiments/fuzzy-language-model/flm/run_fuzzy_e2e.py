@@ -70,6 +70,28 @@ ARMS = {  # name: (env, train-arg overrides, ffn mult)
         {"--shortconv": "0", "--layers": "3", "--rules": "16"},
         "1.5",
     ),
+    # 1-block all-fuzzy models (PLAN_FUZZYLOCAL.md): the whole non-embedding budget goes into one block
+    "b1_ffn": (
+        {**BASE, "FUZZ_FFN_R": "52", "FUZZ_FFN_R0": "118", "FUZZ_EMB": "tail"},
+        {"--shortconv": "0", "--layers": "1"},
+        "1.5",
+    ),
+    "b1_mix": (
+        {
+            **BASE,
+            "FUZZ_FFN_R": "52",
+            "FUZZ_FFN_R0": "90",
+            "FUZZ_EMB": "tail",
+            "FUZZ_PROJ_RANKS": "48,32",
+        },
+        {"--shortconv": "0", "--layers": "1", "--rules": "64"},
+        "1.5",
+    ),
+    "b1_d64": (
+        {**BASE, "FUZZ_FFN_R": "52", "FUZZ_FFN_R0": "62", "FUZZ_EMB": "tail"},
+        {"--shortconv": "0", "--layers": "1", "--d": "64"},
+        "1.5",
+    ),
     "e2e_all": (
         {**BASE, "FUZZ_FFN_R": "46", "FUZZ_FFN_R0": "31", "FUZZ_EMB": "all"},
         {"--shortconv": "0"},

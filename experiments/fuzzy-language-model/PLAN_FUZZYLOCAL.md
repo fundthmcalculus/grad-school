@@ -239,3 +239,11 @@ Reading: **depth is closed at this budget: the 3-block all-fuzzy model is worse 
 4. *The FFN antecedent and the gates:* wider antecedents on fewer rules; a first-order gate.
 5. *Combine the winners, confirm at 300M, rate coherence on two checkpoints.*
 Success: within 0.01 BPC of the hybrid at 300M with coherence within the raters' spread, or a clear account of what separates them.
+
+## 1-block all-fuzzy models, registered before running (owner 2026-10-20: "it appears that additional blocks don't improve quality; we should also try a 1-block model experiment"; branch `exp/allfuzzy-1block`)
+The 3-block models were worse than the 2-block (+0.005 BPC at 30M, +0.012 at 300M) and the gap grew with data. With one block the whole non-embedding budget (about 47K parameters of the 99K; the embedding is 51K) can go into a single, richer block. Arms (`flm/run_fuzzy_e2e.py`, `v52-e2e`, 30M characters, seeds 0-4, paired with the 2-block all-fuzzy `e2e_tail`, mean 1.1368; every component fuzzy, tail token table fuzzy; counts from the same parameter counter that reproduces the 2-block's 99,019):
+* **b1_ffn** (about 99,200 params): width 48, one block, the first feed-forward bank (two-token antecedent, replacing the convolution) widened to 118 rules; mixer as in the 2-block model.
+* **b1_mix** (about 99,080): width 48, 64 memory rules per head (was 32), projection ranks 48 / 32 (was 32 / 20), 90 feed-forward rules.
+* **b1_d64** (about 99,450): width 64 (head dimension 8), the 2-block mixer recipe, 62 feed-forward rules; the embedding grows to 57.6K so the block shrinks.
+Predictions: the best 1-block arm within 0.01 BPC of the 2-block (45%); better by >= 0.01 on >= 4/5 seeds (20%); worse by >= 0.02 (35%); b1_ffn the best of the three (45%); b1_d64 the worst (50%).
+Decision rule: a 1-block arm that matches (within 0.005) or beats the 2-block goes to 300M (two seeds) and coherence on two checkpoints; the model then has fewer blocks and the freed budget is the lever for the match-the-hybrid goal.
