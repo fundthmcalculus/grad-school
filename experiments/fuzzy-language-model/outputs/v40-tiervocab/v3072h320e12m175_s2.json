@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.75,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v3072h320e12m175_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.75,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99320,
+ "params_nonemb": 50360,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06163,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05923
+  ],
+  [
+   100,
+   1.41273
+  ],
+  [
+   200,
+   1.28727
+  ],
+  [
+   300,
+   1.2245
+  ],
+  [
+   400,
+   1.18865
+  ],
+  [
+   500,
+   1.15525
+  ],
+  [
+   600,
+   1.1241
+  ],
+  [
+   700,
+   1.09895
+  ],
+  [
+   800,
+   1.07851
+  ],
+  [
+   900,
+   1.06587
+  ],
+  [
+   953,
+   1.06163
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7339
+  ],
+  [
+   50,
+   9.0831
+  ],
+  [
+   100,
+   6.9156
+  ],
+  [
+   150,
+   5.8454
+  ],
+  [
+   200,
+   5.326
+  ],
+  [
+   250,
+   5.0479
+  ],
+  [
+   300,
+   4.8787
+  ],
+  [
+   350,
+   4.7769
+  ],
+  [
+   400,
+   4.683
+  ],
+  [
+   450,
+   4.5875
+  ],
+  [
+   500,
+   4.5152
+  ],
+  [
+   550,
+   4.4449
+  ],
+  [
+   600,
+   4.37
+  ],
+  [
+   650,
+   4.3295
+  ],
+  [
+   700,
+   4.2833
+  ],
+  [
+   750,
+   4.25
+  ],
+  [
+   800,
+   4.1931
+  ],
+  [
+   850,
+   4.1624
+  ],
+  [
+   900,
+   4.1473
+  ],
+  [
+   950,
+   4.1274
+  ],
+  [
+   952,
+   4.129
+  ]
+ ],
+ "train_seconds": 73.53,
+ "wall_seconds": 85.42,
+ "chars_per_sec": 106168,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl called Lucy. She was very upset to play with her friends. One day, Lucy saw a kind man. The man picked it up and saw a big, round cat. Lucy loved the toy.\nLucy saw her best friend, the dog, didn't come. Lucy was very excited. She said, \"I can help you find your else, I have it.\"\nLucy thought her family. Everywhere she would make the dog feel better. She showed her friends how to take it home. She said, \"I wish I was a new place.\"\nLucy felt scared for the dog. She said, \"I need to have a great place to play. I will be careful and show you to me.\"\nLucy felt very happy and said, \"You should not be sorry, Lucy. I learned your home.\" Her mommy said, \"Please, if you go to your room, do not eat!\" From that day on, Lucy and her friends together were the best of friends.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to play with her toys and play with her toys. One day, she wanted to play with her toys all day. She told her family about a doll.\nOne sunny day, Lily found a toy box with a sport. She liked to be nice and contate. She put her toys in a new room. She put it on a big floor andches. She had",
+ "rule_init": {},
+ "ngram_init": {}
+}

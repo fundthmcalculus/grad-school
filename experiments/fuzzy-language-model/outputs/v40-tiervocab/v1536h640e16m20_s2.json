@@ -1,0 +1,242 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v1536h640e16m20_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1536",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1536
+ },
+ "config": {
+  "vocab_size": 1536,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99280,
+ "params_nonemb": 53456,
+ "steps": 1052,
+ "chars_seen": 30013285,
+ "chars_per_token": 3.4826342,
+ "val_bpc": 1.07397,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.08263
+  ],
+  [
+   100,
+   1.52061
+  ],
+  [
+   200,
+   1.36263
+  ],
+  [
+   300,
+   1.29521
+  ],
+  [
+   400,
+   1.24364
+  ],
+  [
+   500,
+   1.20301
+  ],
+  [
+   600,
+   1.16546
+  ],
+  [
+   700,
+   1.13425
+  ],
+  [
+   800,
+   1.11071
+  ],
+  [
+   900,
+   1.0917
+  ],
+  [
+   1000,
+   1.07847
+  ],
+  [
+   1052,
+   1.07397
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.7349
+  ],
+  [
+   50,
+   8.4851
+  ],
+  [
+   100,
+   6.5966
+  ],
+  [
+   150,
+   5.6195
+  ],
+  [
+   200,
+   5.1394
+  ],
+  [
+   250,
+   4.8464
+  ],
+  [
+   300,
+   4.6729
+  ],
+  [
+   350,
+   4.5505
+  ],
+  [
+   400,
+   4.4223
+  ],
+  [
+   450,
+   4.3359
+  ],
+  [
+   500,
+   4.2583
+  ],
+  [
+   550,
+   4.2116
+  ],
+  [
+   600,
+   4.1524
+  ],
+  [
+   650,
+   4.0717
+  ],
+  [
+   700,
+   4.0269
+  ],
+  [
+   750,
+   3.9584
+  ],
+  [
+   800,
+   3.9235
+  ],
+  [
+   850,
+   3.8809
+  ],
+  [
+   900,
+   3.8358
+  ],
+  [
+   950,
+   3.8148
+  ],
+  [
+   1000,
+   3.7813
+  ],
+  [
+   1050,
+   3.7582
+  ],
+  [
+   1051,
+   3.7564
+  ]
+ ],
+ "train_seconds": 74.3,
+ "wall_seconds": 86.94,
+ "chars_per_sec": 115993,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a inted. I can wel with how to go. I have a friend to share the help.\nOne day, a beautiful boy named Tim went to the park to play. He saw a big box near his mouth. He wanted to help the boy. So, he met a friend, a big bird named Tim. Tim was a toy, and Sue wanted to play with the ball.\nAs Tim searched, they ran to the store. The bird saw the ball to look. Tim was very happy. He laughed and said, \"It's okay, Tim. Let's play the ball together!\"\nTim and Tim felt sad. They were happy to have the ball. They became good friends. They had lots of fun to hide on the ball. They danced and became good friends.\nAfter playing, they played together all day long. Tim and Tim played with the ball every day. They had fun and had fun. The important day she had helping others. From that day on, Tim and Tim became best friends. They played together.\n<|eot|>\nOnce upon a time, there was a well. A little boy named Tim liked to play outside with his toy, so he had lots of fun. In the box lived in a big park, a little girl named Lily for her mom. Lily was sad because she could not higher.\nOne day, Lily saw a big box near the box. She asked her mom, \"Mom",
+ "rule_init": {},
+ "ngram_init": {}
+}

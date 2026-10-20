@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\e2e_all_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99009,
+ "params_nonemb": 47745,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.43936,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.13651
+  ],
+  [
+   100,
+   2.23188
+  ],
+  [
+   200,
+   2.04891
+  ],
+  [
+   300,
+   1.86289
+  ],
+  [
+   400,
+   1.72998
+  ],
+  [
+   500,
+   1.63821
+  ],
+  [
+   600,
+   1.55713
+  ],
+  [
+   700,
+   1.50064
+  ],
+  [
+   800,
+   1.4666
+  ],
+  [
+   900,
+   1.4449
+  ],
+  [
+   953,
+   1.43936
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   12.0249
+  ],
+  [
+   50,
+   10.1976
+  ],
+  [
+   100,
+   9.1954
+  ],
+  [
+   150,
+   8.8103
+  ],
+  [
+   200,
+   8.4972
+  ],
+  [
+   250,
+   7.9436
+  ],
+  [
+   300,
+   7.5763
+  ],
+  [
+   350,
+   7.204
+  ],
+  [
+   400,
+   6.9458
+  ],
+  [
+   450,
+   6.7159
+  ],
+  [
+   500,
+   6.493
+  ],
+  [
+   550,
+   6.3326
+  ],
+  [
+   600,
+   6.1432
+  ],
+  [
+   650,
+   5.9802
+  ],
+  [
+   700,
+   5.8593
+  ],
+  [
+   750,
+   5.7851
+  ],
+  [
+   800,
+   5.7016
+  ],
+  [
+   850,
+   5.64
+  ],
+  [
+   900,
+   5.5968
+  ],
+  [
+   950,
+   5.5731
+  ],
+  [
+   952,
+   5.5698
+  ]
+ ],
+ "train_seconds": 75.4,
+ "wall_seconds": 92.24,
+ "chars_per_sec": 103538,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Tim. Tim was very excited to play with her mom.\n<|eot|>\nOnce upon a time, there lived a girl named Sue. They found a big family. Sue found a big place. But, the car saw her excited to play with his friends. But they jumped for the big friend, the big bippcuna. They smiled and said, \"I have some to make the hole!\n\"Wow, she played with Tom and they found the ball. \"You are a bad ball\". Lily said. The little girl sat together and Tim said, \"I will not love the sht tree. Lily's mom was sad. He said, \"Let's mommy!\" Tom was sad, but he loved to make the big tree and said, \"Don't always have an fun?\" I will careful?\" I will keep me!\"\nOne day, a little girl named Ducky was so happy again.\n<|eot|>\n\nOne day, a little girl named Tim saw a big house. The bird was very happy and a big window. The little girl said, \"Tim, no are strong. You can not play together?\" Twitie was very excited and friends. But they stay all said, \"Uh! You can shook their new branch! It was nice. \nThe lady says about it.\n\"No, you sunny do?\" he comes to the park, he started to try. She asked \"What can try that!\" I have a",
+ "rule_init": {},
+ "ngram_init": {}
+}

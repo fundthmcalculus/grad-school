@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.3,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v45-fuzzystage\\fgate12_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.3,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99372,
+ "params_nonemb": 48108,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06166,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06829
+  ],
+  [
+   100,
+   1.41175
+  ],
+  [
+   200,
+   1.28409
+  ],
+  [
+   300,
+   1.22304
+  ],
+  [
+   400,
+   1.18476
+  ],
+  [
+   500,
+   1.15349
+  ],
+  [
+   600,
+   1.12098
+  ],
+  [
+   700,
+   1.09764
+  ],
+  [
+   800,
+   1.07733
+  ],
+  [
+   900,
+   1.06489
+  ],
+  [
+   953,
+   1.06166
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.796
+  ],
+  [
+   50,
+   9.0999
+  ],
+  [
+   100,
+   6.9219
+  ],
+  [
+   150,
+   5.8426
+  ],
+  [
+   200,
+   5.3194
+  ],
+  [
+   250,
+   5.039
+  ],
+  [
+   300,
+   4.8681
+  ],
+  [
+   350,
+   4.7707
+  ],
+  [
+   400,
+   4.6757
+  ],
+  [
+   450,
+   4.5839
+  ],
+  [
+   500,
+   4.5124
+  ],
+  [
+   550,
+   4.4393
+  ],
+  [
+   600,
+   4.3625
+  ],
+  [
+   650,
+   4.3209
+  ],
+  [
+   700,
+   4.2754
+  ],
+  [
+   750,
+   4.2431
+  ],
+  [
+   800,
+   4.1869
+  ],
+  [
+   850,
+   4.1552
+  ],
+  [
+   900,
+   4.1402
+  ],
+  [
+   950,
+   4.1228
+  ],
+  [
+   952,
+   4.1243
+  ]
+ ],
+ "train_seconds": 71.18,
+ "wall_seconds": 82.06,
+ "chars_per_sec": 109672,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. Lucy was very upset. She had a big stassion. The girl was so excited to see what was outside, but her mom don't go first.\nOne sunny day, Lucy decided to go to her friend, a little girl named Lily. Lucy was very excited to help her mom. Lily felt sad because she wanted to see a big gift.\nLucy thought her family. She went to the party and gave her a secret. She packed it and said, \"Hello, little boy, for sharing, Is! You are very important to play with it!\" Lucy was happy and walked closer to theful day.\n<|eot|>\nOnce upon a time, there lived a girl named Lily. She had a big red ball. She liked to draw things. She wanted to make a fit house. Lily looked at her and thought her friend, a selfish friend, Sam.\n\"I want to play with me,\" said Tim. They were happy to play with the ball. They would stay together and play together.\nOne day, Mom found a dress. She put the ball in the water and wanted to play with it. But she could not come near the grass. The ball fell on the bucket and started to run through the ball.\n\"What is you?\" she asked.\n\"Yes, you are!\" she said. \"It is good for it. You have many things. I can try it!\"\nThey went",
+ "rule_init": {},
+ "ngram_init": {}
+}

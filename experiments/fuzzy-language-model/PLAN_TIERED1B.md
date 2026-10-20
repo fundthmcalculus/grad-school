@@ -23,3 +23,5 @@ Predictions: each tiered 1B model within 1 point of the 96K 3B model on both rat
 
 ## 3B-character tiered run deferred (2026-10-19)
 `flm/run_tiered_3b.py` (`v38-tiered3b`, tiered 98K, the `_all` stream, 3,000e6 characters, seed 0, about 2.2 h) was started and killed by the user's instruction ("kill the 3B-char tiered run and do it later") about 35 minutes in, before any evaluation line; no result and no partial log kept. To run it later: `python -m flm.run_tiered_3b 0` from the experiment directory.
+
+**Cancelled 2026-10-19 (owner: "We should drop all 1B-character runs").** The deferred 3B-character tiered run (`flm/run_tiered_3b.py`) will not be run; no 1B-character run of a new recipe will be started. The 300M-character cell is the largest training budget from here on; the 1B numbers already recorded (`v35`, `v42`, ladder, size runs) stay as they are.

@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v47-fuzzyffn\\ffn_proj0_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99152,
+ "params_nonemb": 47888,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.08126,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.07391
+  ],
+  [
+   100,
+   1.45479
+  ],
+  [
+   200,
+   1.29207
+  ],
+  [
+   300,
+   1.23425
+  ],
+  [
+   400,
+   1.19506
+  ],
+  [
+   500,
+   1.1634
+  ],
+  [
+   600,
+   1.13849
+  ],
+  [
+   700,
+   1.11519
+  ],
+  [
+   800,
+   1.09559
+  ],
+  [
+   900,
+   1.08458
+  ],
+  [
+   953,
+   1.08126
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7928
+  ],
+  [
+   50,
+   9.561
+  ],
+  [
+   100,
+   7.2869
+  ],
+  [
+   150,
+   6.0247
+  ],
+  [
+   200,
+   5.4171
+  ],
+  [
+   250,
+   5.1124
+  ],
+  [
+   300,
+   4.9248
+  ],
+  [
+   350,
+   4.7919
+  ],
+  [
+   400,
+   4.7085
+  ],
+  [
+   450,
+   4.6506
+  ],
+  [
+   500,
+   4.569
+  ],
+  [
+   550,
+   4.504
+  ],
+  [
+   600,
+   4.4326
+  ],
+  [
+   650,
+   4.3836
+  ],
+  [
+   700,
+   4.3412
+  ],
+  [
+   750,
+   4.3079
+  ],
+  [
+   800,
+   4.2713
+  ],
+  [
+   850,
+   4.2463
+  ],
+  [
+   900,
+   4.2084
+  ],
+  [
+   950,
+   4.1895
+  ],
+  [
+   952,
+   4.1914
+  ]
+ ],
+ "train_seconds": 69.67,
+ "wall_seconds": 82.06,
+ "chars_per_sec": 112054,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a little boy named Tim. He had a big day that he had to go. Tim was very happy to rest, but he was very happy. He learned to be friends.\nOne day, Tim went to the park with his friends. He had a big bowl on his best friend, the big blue ball on the blue ball. Tom had a lot of fun playing with his ball, and he learned that he could play with his ballhop. The ball made him happy and not scared anymore.\n<|eot|>\n\n\nBen and Ben are friends. They like to play together with the oels. They liked to play many things, but they like to play in the whole place. \nOne day, they talk to each other. It feels a chuter. They opened it and noticed a little bird. The bird was very happy.\n\"Mom, do you want to go to the guter?\" Ben shouted, \"You no one yiverer?\"\n\"No, it's too too time!\"\n\"I will give it back, crab. You can't find the bird. You can play with me?\"\n\"I'm sorry, boy, to come back to the girl and give me some naughty times.\"\nThe girl listened to the boy and said, \"It is my friend, I am in the park!\"\nThe little boy stopped to the boy and his mom. He said, \"What can I have an?\" Mom said",
+ "rule_init": {},
+ "ngram_init": {}
+}

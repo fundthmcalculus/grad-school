@@ -17,9 +17,15 @@ for (const c of J('tokenizer.check.json')) {
   if (!ok || !dok) { bad++; console.log('TOKENIZER MISMATCH', JSON.stringify(c.text), ok ? '' : `ids ${got} vs ${c.ids}`, dok ? '' : `decode ${JSON.stringify(dec)} vs ${JSON.stringify(c.decoded)}`); }
 }
 console.log('tokenizer: ' + J('tokenizer.check.json').length + ' strings checked');
+const tok3 = new FLM.Tokenizer(J('tokenizer-3072.json'));
+for (const c of J('tokenizer-3072.check.json')) {
+  const got = tok3.encode(c.text);
+  if (JSON.stringify(got) !== JSON.stringify(c.ids)) { bad++; console.log('TOKENIZER-3072 MISMATCH', JSON.stringify(c.text)); }
+}
+console.log('tokenizer-3072: ' + J('tokenizer-3072.check.json').length + ' strings checked');
 for (const m of J('models/index.json')) {
   const man = J(`models/${m.id}.json`), chk = J(`models/${m.id}.check.json`);
-  const model = new FLM.Model(man, buf(`models/${m.id}.bin`));
+  const model = man.config.allfuzzy ? new FLM.AllFuzzyModel(man, buf(`models/${m.id}.bin`)) : new FLM.Model(man, buf(`models/${m.id}.bin`));
   let last; const t0 = performance.now();
   for (const id of chk.ids) last = model.step(id, { explain: true });
   const ms = performance.now() - t0;

@@ -498,6 +498,35 @@ Set 10 gave the 1.32M model 9.6 / 10.4 against 5.3-5.5 for the 96K models at 1B 
 
 **Amended target (accepted by the user 2026-10-19: "The modified target is fine"):** report sub-100K capability as BPC on TinyStories (0.9646, two seeds) and rated coherence ~5-8/15, and state that ~10/15 needs >= ~1.3M parameters at 1B chars. That is a finding about this architecture and corpus, not a claim about all tiny LMs. The Cosmopedia 3B-char tiered 98K run reached 1.718 BPC (-0.026 vs 300M; no data lever left) and the expository coherence set 15 rated every sub-100K model at the rubric floor (3-4/15; the 2.22M model 7/15; `PLAN_CORPUS.md`): on broad text sub-100K is not a coherence candidate at any data budget tried.
 
+## 15. The all-fuzzy model: replacing every block component with a fuzzy inference system (2026-10-19 to 10-20)
+
+**Goal (owner, 2026-10-19):** a language model under 100K parameters in which every block component is a proper fuzzy inference layer (fuzzification, rule base, t-norm, defuzzification), with the likelihood and coherence cost of each replacement reported. Registered predictions, per-stage screens (30M characters, five seeds, paired with the BPE3072 tiered recipe, mean 1.0547) and confirmations (300M characters, two seeds) are in `PLAN_FUZZYLOCAL.md`; no run above 300M characters (owner's instruction).
+
+**Replacement by replacement** (change in bits per character against the hybrid recipe; positive is worse):
+
+| component | fuzzy replacement | 30M, five seeds | 300M, two seeds |
+|---|---|---|---|
+| causal convolution | rules over the last 4 tokens (layer-0 antecedent) | +0.0013 (se 0.0057) | **+0.0073** |
+| RMSNorm | first-order TSK gain controller on log-rms (starts as RMSNorm) | **-0.0023** (0.0016) | |
+| RMSNorm | removed (weights only) | +0.0052 (0.0039) | |
+| sigmoid gates | six-rule TSK systems over the raw input | +0.0092 (0.0025) | |
+| sigmoid gates | twelve-rule TSK systems | +0.0086 (0.0038) | |
+| FFN antecedent projection | Gaussian memberships on the raw input (slope kept) | +0.0163 (0.0038) | |
+| FFN slope | removed (zero-order) | +0.0337 (0.0054) | |
+| mixer q/k/v/out projections | zero-order rule maps | +0.1472 (0.0028) | |
+| mixer q/k/v/out projections | rule-gated low-rank first-order TSK maps | **+0.0277** (0.0034) | |
+| token table, tail pieces | fuzzy sets over 12 prototypes, defuzzified output scores | +0.0404 (0.0031) | |
+| token table, head and tail | fuzzy sets over 48 / 12 prototypes | +0.1302 (0.0019) | |
+| tokenizer | BPE dropout 0.05 / 0.15 during training | +0.0582 / +0.1793 | |
+| rule placement | centres and widths from first-batch data | null (-0.002 to +0.004 against the same arms without it) | |
+
+**Composed models** (30M, five seeds; 300M, two seeds; 99,005-99,648 parameters, all under the cap except one arm that was 769 over and is flagged in the plan): the convolution and RMSNorm replacements together cost nothing measurable (-0.0036, se 0.0048); all block components fuzzy with crisp token tables **+0.0549 at 30M, +0.0338 at 300M**; plus the fuzzy tail table **+0.0820 at 30M, +0.0418 at 300M (1.0007 BPC against 0.9589)**; plus the fuzzy head table **+0.3318 at 30M, +0.1158 at 300M**. The costs add almost linearly at 30M (the tail table is sub-additive on top of the fuzzy blocks) and every gap roughly halves or better from 30M to 300M characters: the fuzzy forms learn more slowly rather than hit a lower ceiling.
+
+**Coherence** (blind, two Claude raters, 8 texts per model per checkpoint, two checkpoints per model pooled, sets 17-18; rubric G/C/P 1-5, total 3-15, raters A / B): hybrid recipe 6.25 / 6.81; **all block components fuzzy 6.50 / 7.31** (no loss); + tail table fuzzy 5.12 / 6.00; + head and tail tables fuzzy 4.94 / 5.50; 1.32M anchor 10.25 / 10.94. **Fuzzifying every block component costs 0.034 BPC and no rated coherence; fuzzifying the token tables costs about a point.** One checkpoint per model overstated the tail-table model (set 17 alone had it at the hybrid's level): the minimum for these comparisons is two checkpoints.
+
+**Findings.** (1) The cheap replacements are the normalisation (a TSK gain controller is at least as good as RMSNorm, and removing normalisation outright costs only 0.005) and the convolution (a conjunctive rule over four tokens costs 0.007 at 300M). (2) The expensive ones are the projections (+0.028 with the best rule-gated low-rank map; a zero-order rule lookup loses 0.147), the FFN antecedent (+0.016) and the token side (+0.04 to +0.13): a piecewise-constant or simplex-valued fuzzy form is less expressive per parameter than the linear map or free vector it replaces. (3) The first-order slope is the most valuable linear component of the FFN: dropping it costs twice what dropping the antecedent projection costs, so the slope stays as part of the first-order consequent. (4) The costs are representational, not a placement problem: data-driven initialisation of the membership functions did nothing. (5) Under the cap the best all-fuzzy model is 4.4% worse in likelihood than the hybrid recipe at 300M characters and rates the same coherence when only the blocks are fuzzy; coherence tracks size (the 1.32M anchor rates 10-11 against 5-7.5), not how fuzzy the blocks are.
+**Open:** how to fuzzify the head of the embedding table (seven ideas in the plan); the tokenizer (BPE dropout did not help). **Artifacts:** `allfuzzy/` is the end-to-end model in plain numpy (text in, text out, the whole rule base, a parity test against torch; `allfuzzy/README.md`); the model-comparison artifact carries the progress table, the cost chart and the block map. Limitations: five seeds at 30M and two at 300M (not the ten-seed standard), one hybrid reference checkpoint per seed, model raters of the same family as the author, one sampling setting.
+
 ## References
 
 Full verified bibliographies are in [`literature/`](literature/README.md) (three reviews, 86

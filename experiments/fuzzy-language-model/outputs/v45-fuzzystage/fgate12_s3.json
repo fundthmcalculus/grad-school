@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.3,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v45-fuzzystage\\fgate12_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.3,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99372,
+ "params_nonemb": 48108,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06509,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05232
+  ],
+  [
+   100,
+   1.42044
+  ],
+  [
+   200,
+   1.28627
+  ],
+  [
+   300,
+   1.22668
+  ],
+  [
+   400,
+   1.18969
+  ],
+  [
+   500,
+   1.15271
+  ],
+  [
+   600,
+   1.12631
+  ],
+  [
+   700,
+   1.10154
+  ],
+  [
+   800,
+   1.08115
+  ],
+  [
+   900,
+   1.06903
+  ],
+  [
+   953,
+   1.06509
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.729
+  ],
+  [
+   50,
+   9.0483
+  ],
+  [
+   100,
+   6.8945
+  ],
+  [
+   150,
+   5.8556
+  ],
+  [
+   200,
+   5.3224
+  ],
+  [
+   250,
+   5.0337
+  ],
+  [
+   300,
+   4.874
+  ],
+  [
+   350,
+   4.7538
+  ],
+  [
+   400,
+   4.6502
+  ],
+  [
+   450,
+   4.5839
+  ],
+  [
+   500,
+   4.5118
+  ],
+  [
+   550,
+   4.4639
+  ],
+  [
+   600,
+   4.3956
+  ],
+  [
+   650,
+   4.3398
+  ],
+  [
+   700,
+   4.2891
+  ],
+  [
+   750,
+   4.2615
+  ],
+  [
+   800,
+   4.2156
+  ],
+  [
+   850,
+   4.1789
+  ],
+  [
+   900,
+   4.1518
+  ],
+  [
+   950,
+   4.1427
+  ],
+  [
+   952,
+   4.1413
+  ]
+ ],
+ "train_seconds": 71.0,
+ "wall_seconds": 81.81,
+ "chars_per_sec": 109955,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl at all. She was very excited to see the little girl feeling scared. She knew how to get the cube and help each other.\nOne day, Sue found an old place. But, the old man did not know. She asked her mom if she would borge, she learned on the born? Her mom can help her else.\nThe old man was very proud. She asked her mom if she could help ask her to go home. She hugged her mom and said they could feel important. She said she found something beautiful. She said it was to be important and she was not just fit, but she could not wait.\n<|eot|>\nOnce upon a time, there was a girl named Anna. She had a big red, soft box. She loved to play and dance and make a big house. Every day she would get cross her office, but she would watch it.\nOne day, Anna's mom said, \"Can I am a toy, dad?\" Her mom said, \"Yes, we can make a new toy!\"\nThey took the toy and put the toy in the box. Twip looked up and saw a big, red car. In the car, she picked up the car and started to run through the car.\n\"What is you so kind?\" asked her mom. \nShe saw the car and said, \"Mom, don't try.\"\nThe car was very angry and came to see what",
+ "rule_init": {},
+ "ngram_init": {}
+}

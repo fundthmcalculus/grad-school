@@ -1,0 +1,234 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v2048h512e16m15_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe2048",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 2048
+ },
+ "config": {
+  "vocab_size": 2048,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 97184,
+ "params_nonemb": 47264,
+ "steps": 1001,
+ "chars_seen": 30011180,
+ "chars_per_token": 3.6598144,
+ "val_bpc": 1.07054,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.0817
+  ],
+  [
+   100,
+   1.46543
+  ],
+  [
+   200,
+   1.33133
+  ],
+  [
+   300,
+   1.26259
+  ],
+  [
+   400,
+   1.21773
+  ],
+  [
+   500,
+   1.17676
+  ],
+  [
+   600,
+   1.1479
+  ],
+  [
+   700,
+   1.11819
+  ],
+  [
+   800,
+   1.09404
+  ],
+  [
+   900,
+   1.07799
+  ],
+  [
+   1000,
+   1.07048
+  ],
+  [
+   1001,
+   1.07054
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.2747
+  ],
+  [
+   50,
+   8.7893
+  ],
+  [
+   100,
+   6.7577
+  ],
+  [
+   150,
+   5.743
+  ],
+  [
+   200,
+   5.2344
+  ],
+  [
+   250,
+   4.9464
+  ],
+  [
+   300,
+   4.7734
+  ],
+  [
+   350,
+   4.6491
+  ],
+  [
+   400,
+   4.5751
+  ],
+  [
+   450,
+   4.4938
+  ],
+  [
+   500,
+   4.4043
+  ],
+  [
+   550,
+   4.3189
+  ],
+  [
+   600,
+   4.2644
+  ],
+  [
+   650,
+   4.1912
+  ],
+  [
+   700,
+   4.1421
+  ],
+  [
+   750,
+   4.1083
+  ],
+  [
+   800,
+   4.0531
+  ],
+  [
+   850,
+   4.0318
+  ],
+  [
+   900,
+   4.0259
+  ],
+  [
+   950,
+   3.9689
+  ],
+  [
+   1000,
+   3.9402
+  ]
+ ],
+ "train_seconds": 71.65,
+ "wall_seconds": 83.28,
+ "chars_per_sec": 114449,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl. She loved to play with her toy. She would read the big box.\nOne day, she saw a big tree in her box. She was very happy and wanted to play the game. Her friend, saw the toy and said, \"I want to make anything too. I don't want to get the toy.\"\nThe little girl swam in and took the toy in the toy. She was very excited for the toy, and the toy car looked at the toy. She had a new friend, a little girl named Lucy. She had a lot of fun if she could dance, her toy car.\n<|eot|>\nOnce upon a time, in a small town, there lived an towel. The milch lived in a dark garden. The sheep lived in a big tree and said, \"I want to help you. But we can get it alone.\"\nThe way home and became friends. They were happy. They walked and played together in the garden every day. The moral of the story is that was important to be careful.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. Tim had a little friend, a little boy named Tim. Amy was a very happy dog named Spot. They lived in a big, green tree.\nOne day, Tim and Spot went for a walk to the behind bus. They saw a big smile on the ground. It was a small box of drawings. Tim wanted to run",
+ "rule_init": {},
+ "ngram_init": {}
+}

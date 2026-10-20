@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v45-fuzzystage\\fnorm_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98628,
+ "params_nonemb": 47364,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.05184,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.07772
+  ],
+  [
+   100,
+   1.40697
+  ],
+  [
+   200,
+   1.27494
+  ],
+  [
+   300,
+   1.21908
+  ],
+  [
+   400,
+   1.17176
+  ],
+  [
+   500,
+   1.13928
+  ],
+  [
+   600,
+   1.11034
+  ],
+  [
+   700,
+   1.0853
+  ],
+  [
+   800,
+   1.0683
+  ],
+  [
+   900,
+   1.05518
+  ],
+  [
+   953,
+   1.05184
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.8155
+  ],
+  [
+   50,
+   9.0859
+  ],
+  [
+   100,
+   6.9019
+  ],
+  [
+   150,
+   5.8149
+  ],
+  [
+   200,
+   5.2723
+  ],
+  [
+   250,
+   5.001
+  ],
+  [
+   300,
+   4.8321
+  ],
+  [
+   350,
+   4.7104
+  ],
+  [
+   400,
+   4.6017
+  ],
+  [
+   450,
+   4.5228
+  ],
+  [
+   500,
+   4.4487
+  ],
+  [
+   550,
+   4.3805
+  ],
+  [
+   600,
+   4.3464
+  ],
+  [
+   650,
+   4.2967
+  ],
+  [
+   700,
+   4.2481
+  ],
+  [
+   750,
+   4.1992
+  ],
+  [
+   800,
+   4.148
+  ],
+  [
+   850,
+   4.132
+  ],
+  [
+   900,
+   4.0903
+  ],
+  [
+   950,
+   4.0612
+  ],
+  [
+   952,
+   4.0618
+  ]
+ ],
+ "train_seconds": 74.1,
+ "wall_seconds": 85.74,
+ "chars_per_sec": 105354,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was very excited to see the big tree with her. She wanted to sing, but she was very happy. \nThe little girl said, \"I found a big boat. I am a good friend to play with you.\" Lucy was so happy and said, \"Yes, I can. Why can you help?\" The girl said, \"I can't make things looking for. Every night, I can help you,\" she said.\nLucy's mom said, \"Thank you, Lucy. You can fly and be careful with your friends.\" The girl smiled and played with the tree every day.\n<|eot|>\n\n\nLily and Lily lived in the park. They liked to play with their toys and see a turobe. They liked to play with their toys and their toys. They liked a lot of animals. They liked to sing and build candy on the surse.\nOne day, they went to the park and yawling. They were hungry. They looked at each other and felt sad. They heard a loud noise, but the dog was angry and angry.\n\"Who are you?\" Lily asked. She said, \"What are you sad?\"\nLila looked at Ben and said, \"I'm sad. It helps higher at the camps. We don't want to be nice.\"\nSue hugged Ben and wagged. She pointed at them. She put out a soft and ran off and gave Mom a",
+ "rule_init": {},
+ "ngram_init": {}
+}

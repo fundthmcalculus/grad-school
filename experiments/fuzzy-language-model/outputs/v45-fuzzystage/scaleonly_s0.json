@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v45-fuzzystage\\scaleonly_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98628,
+ "params_nonemb": 47364,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.05904,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.01509
+  ],
+  [
+   100,
+   1.4457
+  ],
+  [
+   200,
+   1.28436
+  ],
+  [
+   300,
+   1.22629
+  ],
+  [
+   400,
+   1.18383
+  ],
+  [
+   500,
+   1.15234
+  ],
+  [
+   600,
+   1.12259
+  ],
+  [
+   700,
+   1.09693
+  ],
+  [
+   800,
+   1.07569
+  ],
+  [
+   900,
+   1.06248
+  ],
+  [
+   953,
+   1.05904
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.5768
+  ],
+  [
+   50,
+   9.3915
+  ],
+  [
+   100,
+   7.1275
+  ],
+  [
+   150,
+   5.9714
+  ],
+  [
+   200,
+   5.3705
+  ],
+  [
+   250,
+   5.0471
+  ],
+  [
+   300,
+   4.8663
+  ],
+  [
+   350,
+   4.7209
+  ],
+  [
+   400,
+   4.68
+  ],
+  [
+   450,
+   4.5899
+  ],
+  [
+   500,
+   4.5265
+  ],
+  [
+   550,
+   4.4391
+  ],
+  [
+   600,
+   4.355
+  ],
+  [
+   650,
+   4.3037
+  ],
+  [
+   700,
+   4.2825
+  ],
+  [
+   750,
+   4.2581
+  ],
+  [
+   800,
+   4.1999
+  ],
+  [
+   850,
+   4.1536
+  ],
+  [
+   900,
+   4.1242
+  ],
+  [
+   950,
+   4.1126
+  ],
+  [
+   952,
+   4.1136
+  ]
+ ],
+ "train_seconds": 102.27,
+ "wall_seconds": 116.36,
+ "chars_per_sec": 76339,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. Sue was very excited to play with her ball.\nOne sunny day, Sue decided to play with Sue's friend, Sam, saw a little girl. \"I don't want what the other people!\" Sue said. \"I know you can come out for the store.\" Sue thought the barms about what to do. \"Mom, let's go to the store with my ball!\" she said, until Tom and Sue found the garm. They all looked around and saw the water. Sue and Sue sat on the mumps. They were scared of the shade and they could not. They both wanted to play with the gures and see. They had no fun and had fun.\nThey reached the bield and opened it. They did not knowing the shield. But it was too high and it was not selfish anymore. Sue learned that again can play and value them can be better.\"\nSue and Sue were hungry. They looked at each other and felt sad. They knew they had never won all the time. They said they had learned that it had to share and be careful with Sam and friends.\n<|eot|>\n\n\nLily and Ben are friends. They like to play with their toys in the park. They like to play with the spunk. But it is too tall and interesting. They are very sleepy.\n\"We need to Ticy!\" Tom says.\n\"I can have a",
+ "rule_init": {},
+ "ngram_init": {}
+}

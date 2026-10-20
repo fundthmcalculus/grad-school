@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.45,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v49-compose\\c_partial_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 4,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.45,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 4,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99648,
+ "params_nonemb": 48384,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.04857,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06688
+  ],
+  [
+   100,
+   1.39478
+  ],
+  [
+   200,
+   1.26443
+  ],
+  [
+   300,
+   1.20595
+  ],
+  [
+   400,
+   1.16586
+  ],
+  [
+   500,
+   1.13219
+  ],
+  [
+   600,
+   1.104
+  ],
+  [
+   700,
+   1.08129
+  ],
+  [
+   800,
+   1.06537
+  ],
+  [
+   900,
+   1.05142
+  ],
+  [
+   953,
+   1.04857
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.788
+  ],
+  [
+   50,
+   9.0377
+  ],
+  [
+   100,
+   6.8506
+  ],
+  [
+   150,
+   5.7636
+  ],
+  [
+   200,
+   5.223
+  ],
+  [
+   250,
+   4.9587
+  ],
+  [
+   300,
+   4.7892
+  ],
+  [
+   350,
+   4.6651
+  ],
+  [
+   400,
+   4.5603
+  ],
+  [
+   450,
+   4.4917
+  ],
+  [
+   500,
+   4.4278
+  ],
+  [
+   550,
+   4.3579
+  ],
+  [
+   600,
+   4.3273
+  ],
+  [
+   650,
+   4.28
+  ],
+  [
+   700,
+   4.2322
+  ],
+  [
+   750,
+   4.185
+  ],
+  [
+   800,
+   4.1334
+  ],
+  [
+   850,
+   4.1191
+  ],
+  [
+   900,
+   4.0792
+  ],
+  [
+   950,
+   4.0509
+  ],
+  [
+   952,
+   4.0514
+  ]
+ ],
+ "train_seconds": 71.45,
+ "wall_seconds": 82.15,
+ "chars_per_sec": 109260,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was busy than her toy Kitit. She was very sad. Lucy liked to help her mom and dad, but her mom would not. Lucy loved her new friend, a boy named Tim.\nOne day, Lucy saw something special by it. He was excited and had found a big, red ball on the swings. The task was having many fun things with shiny. Every night, she played with the ball all day and liked to play with her friends. They became best friends and played together every day.\n<|eot|>\nOne day, a little girl named Lily found a big tree. She walked up to the tree and saw a whole place. She wanted to see the bird talk. She looked up and saw a big tree. She saw Anna's bean and wanted to fly.\n\"Let's play roll!\" said Lily. Her mom said, \"Mom, what is we'llal!\" Her mom said, \"That is a brave girl. It swacaps too hard!\"\n\"I'm sorry for my dog, but you can't find your bird. You can play with me?\" Lily asked.\n\"I thought, I will stay my grass!\" Lily said. \"It is not nice. It is very help me.\"\nThey put the bird on the tree. They saw a big tree. They had an idea. They asked a new friend. She put it on a tree and said, \"No,",
+ "rule_init": {},
+ "ngram_init": {}
+}

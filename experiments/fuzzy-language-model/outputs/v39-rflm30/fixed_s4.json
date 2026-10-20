@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta_static",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "fixed",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v39-rflm30\\fixed_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta_static",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "fixed",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 94880,
+ "params_nonemb": 45728,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.13736,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.26116
+  ],
+  [
+   100,
+   1.59501
+  ],
+  [
+   200,
+   1.43903
+  ],
+  [
+   300,
+   1.37176
+  ],
+  [
+   400,
+   1.32104
+  ],
+  [
+   500,
+   1.28265
+  ],
+  [
+   600,
+   1.24818
+  ],
+  [
+   700,
+   1.21867
+  ],
+  [
+   800,
+   1.19367
+  ],
+  [
+   900,
+   1.17186
+  ],
+  [
+   1000,
+   1.15291
+  ],
+  [
+   1100,
+   1.14124
+  ],
+  [
+   1160,
+   1.13736
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.319
+  ],
+  [
+   50,
+   8.1637
+  ],
+  [
+   100,
+   6.2988
+  ],
+  [
+   150,
+   5.3901
+  ],
+  [
+   200,
+   4.8939
+  ],
+  [
+   250,
+   4.6438
+  ],
+  [
+   300,
+   4.4686
+  ],
+  [
+   350,
+   4.3589
+  ],
+  [
+   400,
+   4.2474
+  ],
+  [
+   450,
+   4.1904
+  ],
+  [
+   500,
+   4.1222
+  ],
+  [
+   550,
+   4.0719
+  ],
+  [
+   600,
+   3.9998
+  ],
+  [
+   650,
+   3.9539
+  ],
+  [
+   700,
+   3.9162
+  ],
+  [
+   750,
+   3.8717
+  ],
+  [
+   800,
+   3.8255
+  ],
+  [
+   850,
+   3.7775
+  ],
+  [
+   900,
+   3.7461
+  ],
+  [
+   950,
+   3.7226
+  ],
+  [
+   1000,
+   3.6891
+  ],
+  [
+   1050,
+   3.6502
+  ],
+  [
+   1100,
+   3.6354
+  ],
+  [
+   1150,
+   3.6153
+  ],
+  [
+   1159,
+   3.6165
+  ]
+ ],
+ "train_seconds": 79.13,
+ "wall_seconds": 92.68,
+ "chars_per_sec": 120087,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy. \nOne day, Lucy asked her mom, \"What do you hear me?? I do him?\" she said. Lucy was sad, but she wanted Lily's mom.\nSudy said, \"I'm mum. We just tired.\"\nThe next day, she slid into the timon and Lily was curious. She put on the bed, and the sun was at her home. Lucy was very happy and said, \"I will help you like you. You can sound. If you can play with your door.\"\nThe sun went down and picked up the table. \"She, sunny!\"\nLily and her friends played with the fairy cable all day. They were happy they didn't want to watch it with her food. The sun was like the medicine. Spot and Lily learned that trees and trying.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to make water to play with her family. One day, she saw a triance. The sun was very big, soft little girl named Lily, \"Why are you sad?\"\nIs she went for a walk. She asked her mom, \"Why do you want to do you?\" Her mom said, \"I am angry!\" So, Lily and her mom decided to make the",
+ "rule_init": {},
+ "ngram_init": {}
+}

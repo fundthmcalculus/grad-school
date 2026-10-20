@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.3,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v45-fuzzystage\\fgate12_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.3,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99372,
+ "params_nonemb": 48108,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06073,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05837
+  ],
+  [
+   100,
+   1.4304
+  ],
+  [
+   200,
+   1.28598
+  ],
+  [
+   300,
+   1.23066
+  ],
+  [
+   400,
+   1.18641
+  ],
+  [
+   500,
+   1.15083
+  ],
+  [
+   600,
+   1.12268
+  ],
+  [
+   700,
+   1.09458
+  ],
+  [
+   800,
+   1.07693
+  ],
+  [
+   900,
+   1.06444
+  ],
+  [
+   953,
+   1.06073
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7429
+  ],
+  [
+   50,
+   9.2236
+  ],
+  [
+   100,
+   7.0269
+  ],
+  [
+   150,
+   5.906
+  ],
+  [
+   200,
+   5.3372
+  ],
+  [
+   250,
+   5.0553
+  ],
+  [
+   300,
+   4.8792
+  ],
+  [
+   350,
+   4.7454
+  ],
+  [
+   400,
+   4.6445
+  ],
+  [
+   450,
+   4.5673
+  ],
+  [
+   500,
+   4.4953
+  ],
+  [
+   550,
+   4.4248
+  ],
+  [
+   600,
+   4.3909
+  ],
+  [
+   650,
+   4.3386
+  ],
+  [
+   700,
+   4.2905
+  ],
+  [
+   750,
+   4.2371
+  ],
+  [
+   800,
+   4.1867
+  ],
+  [
+   850,
+   4.1663
+  ],
+  [
+   900,
+   4.1245
+  ],
+  [
+   950,
+   4.0988
+  ],
+  [
+   952,
+   4.0992
+  ]
+ ],
+ "train_seconds": 70.93,
+ "wall_seconds": 81.93,
+ "chars_per_sec": 110064,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. She had a big, red ball and a pretty crown. She loved to sing, but she was very happy.\nOne day, Sue said, \"I found a soft boat. I am not scared.\" Sue and the dog went to the lake. They looked, but they could not play. Tom felt sad because they could not see the big fish. They all thought it was.\nSue said, \"I love you, Sue. I love you with you.\" Sue smiled and said, \"Okay, but I love you. Let's go home to play with the fish. We can fit, but you have to wait for a whole place. zybye, and they could not get away. It feels now and bugs.\n<|eot|>\nOnce upon a time, there was a little girl named Jane. She had a big kiss in her house. She lived in a small house with her mom and dad. One day, Jane's mom saw a big tree near her room. Her mom said, \"Let's play for dinner, crab!\"\nSara and her mom played together. They were happy to read new things with her. But she could not see the TV. But her mom picked up the bed and started to run through the bed.\nAs Jack was playing, Jane's mom said, \"Hello, Lucy! You are too late. I am a new friend. Can I play with my bed?\" Her mom gave Mom a",
+ "rule_init": {},
+ "ngram_init": {}
+}

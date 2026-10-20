@@ -26,6 +26,10 @@ ARMS = {  # name: (vocab, head tokens, tail width, ffn mult)
     "v2048h512e12m22": (2048, 512, 12, "2.2"),  # 99,620
     "v3072h384e12m15": (3072, 384, 12, "1.5"),  # 98,528
     "v4096h256e8m20": (4096, 256, 8, "2.0"),
+    # round 3: shapes around the V3072 winner
+    "v3072h320e12m175": (3072, 320, 12, "1.75"),  # 99,320
+    "v3072h384e10m20": (3072, 384, 10, "2.0"),
+    "v4096h256e10m15": (4096, 256, 10, "1.5"),  # 98,432
 }
 if __name__ == "__main__":
     (OUT / "logs").mkdir(parents=True, exist_ok=True)

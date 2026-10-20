@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v50-fuzzyinit\\proj_tskl_di_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98720,
+ "params_nonemb": 47456,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.08694,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.07469
+  ],
+  [
+   100,
+   1.44903
+  ],
+  [
+   200,
+   1.31494
+  ],
+  [
+   300,
+   1.25759
+  ],
+  [
+   400,
+   1.21247
+  ],
+  [
+   500,
+   1.17873
+  ],
+  [
+   600,
+   1.15197
+  ],
+  [
+   700,
+   1.12638
+  ],
+  [
+   800,
+   1.10536
+  ],
+  [
+   900,
+   1.09108
+  ],
+  [
+   953,
+   1.08694
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.8056
+  ],
+  [
+   50,
+   9.1145
+  ],
+  [
+   100,
+   6.9803
+  ],
+  [
+   150,
+   5.9433
+  ],
+  [
+   200,
+   5.4172
+  ],
+  [
+   250,
+   5.1517
+  ],
+  [
+   300,
+   4.9828
+  ],
+  [
+   350,
+   4.8586
+  ],
+  [
+   400,
+   4.7575
+  ],
+  [
+   450,
+   4.6771
+  ],
+  [
+   500,
+   4.6061
+  ],
+  [
+   550,
+   4.5394
+  ],
+  [
+   600,
+   4.5013
+  ],
+  [
+   650,
+   4.4489
+  ],
+  [
+   700,
+   4.3984
+  ],
+  [
+   750,
+   4.3492
+  ],
+  [
+   800,
+   4.2928
+  ],
+  [
+   850,
+   4.2735
+  ],
+  [
+   900,
+   4.2293
+  ],
+  [
+   950,
+   4.1992
+  ],
+  [
+   952,
+   4.2006
+  ]
+ ],
+ "train_seconds": 73.27,
+ "wall_seconds": 85.85,
+ "chars_per_sec": 106550,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was very excited to see the big, pretty crown.\nAmy wanted to help her or be foolish. She opened it, \"I am not first. A little girl named Dad came inside and looked at each other. Lucy saw something special to play on the kitchen. She had found a big, brave voice on the tower. The aunt said, \"What is that?\"\nSally was scared of the egg and said, \"Let's keep playing at it!\" But Lucy was scared, but she was scared. She was not scared like Tim. She said, \"I am sorry, I fit, but I could not play too. But I don't know that I can show you if you're doing you, Lucy. I want to play with you.\" She nodded and said, \"I love the kitchen, mommy. Let's do it!\"\nLucy and Anna smiled and said, \"You don't know no one.\" They both talked together. It swe and making more time together. Amy was proud of them. They became best friends with the park and became good friends.\n<|eot|>\n\n\nLily and Tom liked to play in the garden. They put a grass in a big yard and slide, splash, down, through red grass. They started to sail and make them clean. But it was too tall to turn.\nLily's mom came to drive it up. She put out a soft swag and started to laugh.",
+ "rule_init": {},
+ "ngram_init": {}
+}

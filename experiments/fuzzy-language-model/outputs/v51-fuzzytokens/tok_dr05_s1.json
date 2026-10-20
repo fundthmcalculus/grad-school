@@ -1,0 +1,238 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v51-fuzzytokens\\tok_dr05_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98528,
+ "params_nonemb": 47264,
+ "steps": 1025,
+ "chars_seen": 30024276,
+ "chars_per_token": 3.5756808,
+ "val_bpc": 1.10714,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.04917
+  ],
+  [
+   100,
+   1.44357
+  ],
+  [
+   200,
+   1.31748
+  ],
+  [
+   300,
+   1.26392
+  ],
+  [
+   400,
+   1.22632
+  ],
+  [
+   500,
+   1.20512
+  ],
+  [
+   600,
+   1.17439
+  ],
+  [
+   700,
+   1.15403
+  ],
+  [
+   800,
+   1.13321
+  ],
+  [
+   900,
+   1.11924
+  ],
+  [
+   1000,
+   1.11111
+  ],
+  [
+   1025,
+   1.10714
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7014
+  ],
+  [
+   50,
+   9.2429
+  ],
+  [
+   100,
+   7.1893
+  ],
+  [
+   150,
+   6.1443
+  ],
+  [
+   200,
+   5.6542
+  ],
+  [
+   250,
+   5.391
+  ],
+  [
+   300,
+   5.2306
+  ],
+  [
+   350,
+   5.1343
+  ],
+  [
+   400,
+   5.0324
+  ],
+  [
+   450,
+   4.9645
+  ],
+  [
+   500,
+   4.9145
+  ],
+  [
+   550,
+   4.8757
+  ],
+  [
+   600,
+   4.7933
+  ],
+  [
+   650,
+   4.7515
+  ],
+  [
+   700,
+   4.7309
+  ],
+  [
+   750,
+   4.6726
+  ],
+  [
+   800,
+   4.6422
+  ],
+  [
+   850,
+   4.6078
+  ],
+  [
+   900,
+   4.5812
+  ],
+  [
+   950,
+   4.5526
+  ],
+  [
+   1000,
+   4.5212
+  ],
+  [
+   1024,
+   4.5147
+  ]
+ ],
+ "train_seconds": 76.79,
+ "wall_seconds": 88.84,
+ "chars_per_sec": 109350,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl called Lucy. She was very excited to play with her friends. One day, a girl named Sue went to the park to show her mom her mom. She showed Lucy what was in the othies, and her mom said, \"Don't worry, come out for the hot will?\"\nAs Lily felt sad, she said, \"I have a big tree and the hole! I want to learn.\" Tim said, \"I found the rock to be lucky.\" Tim felt happy and said, \"Okay! I found a big, shiny bite. I just love the sht to my fit, but I am not so much fun.\"\nAmy was so happy. She picked up the rock and watched the big rock and said, \"Don't worry, I like my magic friend.\" And they did not roll their friends and learned that even if they go to thek of the fast on and have to no one can get home.\n<|eot|>\nOne day, a little girl named Tim went to the door for a walk with his mom with her. Tim was very excited and asked, \"?\" His mom said, \"I won't stop come from the grass again!\"\nTim and her mom shook their voices. They said, \"Wook it, Tim! We can go to the yard and helps.\"\nTim and her mom started to tame. They found a big light and gave it out",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -242,6 +242,129 @@
     }
   }
 
+
+  // ------------------------------------------------------------------ the all-fuzzy model (every block component a fuzzy inference system)
+  // A line-for-line port of allfuzzy/allfuzzy_lm.py: gain controllers instead of RMSNorm, rule-gated low-rank maps instead of q/k/v/out projections,
+  // six-rule TSK gates, a fuzzy associative memory, a feed-forward bank of Gaussian rules on the raw input (layer 0 reads two tokens), and a token
+  // table whose tail pieces are fuzzy sets over 12 prototypes.  Same interface as Model (reset, step, profiles, ruleShape, mixerRule).
+  function gaussLogits(u, c, a, R, D, scale) {          // FUZZIFY + FIRE: log of each rule's product-t-norm firing strength
+    const out = new Float64Array(R);
+    for (let r = 0; r < R; r++) { let q = 0; const b = r * D; for (let j = 0; j < D; j++) { const df = u[j] - c[b + j]; q += a[b + j] * df * df; } out[r] = -0.5 * scale * q; }
+    return out;
+  }
+  function softmaxF(v) { let mx = -Infinity; for (const x of v) if (x > mx) mx = x; let s = 0; const o = new Float64Array(v.length); for (let i = 0; i < v.length; i++) { o[i] = Math.exp(v[i] - mx); s += o[i]; } for (let i = 0; i < o.length; i++) o[i] /= s; return o; }
+  class AllFuzzyModel {
+    constructor(manifest, buf) {
+      const c = manifest.config;
+      this.manifest = manifest; this.cfg = c;
+      const W = (this.W = readTensors(manifest, buf));
+      const g = (k) => W[k].data;
+      this.V = c.vocab_size; this.d = c.d_model; this.H = c.n_heads; this.dh = this.d / this.H; this.R = c.n_rules; this.L = c.n_layers; this.maxLen = c.max_len;
+      const headIds = g('head_ids'), tailIds = g('tail_ids'), embH = g('emb_h.weight'), embT = g('emb_t.weight'), up = g('tier_up.weight'), K = W['emb_t.weight'].shape[1], d = this.d;
+      this.E = new Float32Array(this.V * d);              // effective embedding of every piece: crisp row, or membership-weighted average of the 12 prototypes
+      headIds.forEach((id, i) => this.E.set(embH.subarray(i * d, i * d + d), id * d));
+      for (let t = 0; t < tailIds.length; t++) {
+        const mu = softmaxF(embT.subarray(t * K, t * K + K)), id = tailIds[t];
+        for (let j = 0; j < d; j++) { let a = 0; for (let k = 0; k < K; k++) a += up[j * K + k] * mu[k]; this.E[id * d + j] = a; }
+      }
+      this.nw = g('norm.weight');
+      const wd = (k) => { const x = g(k), o = new Float64Array(x.length); for (let i = 0; i < x.length; i++) o[i] = Math.exp(-2 * x[i]); return o; };
+      this.A = [];                                         // 1 / s^2 of every membership function
+      for (let l = 0; l < this.L; l++) { const b = 'blocks.' + l + '.'; this.A.push({ mem: wd(b + 'mix.log_width'), qkv: wd(b + 'mix.qkv.log_width'), out: wd(b + 'mix.out.log_width'), gate: wd(b + 'mix.gate.log_width'), beta: wd(b + 'mix.beta.log_width'), ffn: wd(b + 'ffn.log_width') }); }
+      this.pi = null;
+      this.reset();
+    }
+    reset() {
+      this.S = Array.from({ length: this.L }, () => new Float64Array(this.H * this.dh * this.R));
+      this.prevN2 = Array.from({ length: this.L }, () => new Float64Array(this.d));
+      this.pos = 0;
+    }
+    gain(x, p) {                                           // TSK gain controller: one input variable, z = log rms(x), five rules, defuzzified log-gain
+      const W = this.W, c = W[p + 'centers'].data, lw = W[p + 'log_width'].data, off = W[p + 'offset'].data, sl = W[p + 'slope'].data, wt = W[p + 'weight'].data;
+      let ss = 0; for (let i = 0; i < x.length; i++) ss += x[i] * x[i];
+      const z = 0.5 * Math.log(ss / x.length + EPS), lg = new Float64Array(c.length);
+      for (let r = 0; r < c.length; r++) { const t = (z - c[r]) / Math.exp(lw[r]); lg[r] = -0.5 * t * t; }
+      const w = softmaxF(lg); let gn = 0; for (let r = 0; r < c.length; r++) gn += w[r] * (off[r] + sl[r] * (z - c[r]));
+      const e = Math.exp(gn), out = new Float64Array(x.length); for (let i = 0; i < x.length; i++) out[i] = x[i] * e * wt[i];
+      return { out, gain: gn };
+    }
+    gatedMap(x, p, a, outDim) {                            // rule-gated low-rank map: u = B x, rules over u rescale the basis directions, y = A (g * u)
+      const W = this.W, B = W[p + 'B.weight'], Am = W[p + 'A.weight'].data, c = W[p + 'centers'], s = W[p + 's'].data, k = B.shape[0], d = x.length, R = c.shape[0];
+      const u = new Float64Array(k); for (let o = 0; o < k; o++) { let v = 0; for (let i = 0; i < d; i++) v += B.data[o * d + i] * x[i]; u[o] = v; }
+      const w = softmaxF(gaussLogits(u, c.data, a, R, k, 1 / k)), gv = new Float64Array(k);
+      for (let j = 0; j < k; j++) { let v = 0; for (let r = 0; r < R; r++) v += w[r] * s[r * k + j]; gv[j] = v * u[j]; }
+      const y = new Float64Array(outDim); for (let o = 0; o < outDim; o++) { let v = 0; for (let j = 0; j < k; j++) v += Am[o * k + j] * gv[j]; y[o] = v; }
+      return y;
+    }
+    ruleGate(x, p, a) {                                    // six Gaussian rules over the whole input; consequents are per-head logits; weighted average
+      const W = this.W, c = W[p + 'centers'], cs = W[p + 'conseq'].data, R = c.shape[0], H = this.H;
+      const w = softmaxF(gaussLogits(x, c.data, a, R, x.length, 1 / x.length)), out = new Float64Array(H);
+      for (let h = 0; h < H; h++) { let v = 0; for (let r = 0; r < R; r++) v += w[r] * cs[r * H + h]; out[h] = v; }
+      return out;
+    }
+    step(tok, opts) {
+      const { d, H, dh, R, W } = this;
+      const x = Float64Array.from(this.E.subarray(tok * d, tok * d + d));
+      const strengths = [];
+      for (let l = 0; l < this.L; l++) {
+        const b = 'blocks.' + l + '.', A = this.A[l];
+        const h = this.gain(x, b + 'n1.').out;
+        const qkv = this.gatedMap(h, b + 'mix.qkv.', A.qkv, 3 * d);
+        const al = this.ruleGate(h, b + 'mix.gate.', A.gate), be = this.ruleGate(h, b + 'mix.beta.', A.beta);
+        const mc = W[b + 'mix.centers'].data, y = new Float64Array(d), S = this.S[l];
+        for (let hd = 0; hd < H; hd++) {
+          const co = hd * R * dh, cs = mc.subarray(co, co + R * dh), as = A.mem.subarray(co, co + R * dh);
+          const fq = softmaxF(gaussLogits(qkv.subarray(hd * dh, hd * dh + dh), cs, as, R, dh, 1 / dh));
+          const fk = softmaxF(gaussLogits(qkv.subarray(d + hd * dh, d + hd * dh + dh), cs, as, R, dh, 1 / dh));
+          const alpha = sigmoid(al[hd]), beta = sigmoid(be[hd]), base = hd * dh * R;
+          for (let j = 0; j < dh; j++) {                  // forget, predict, write the error into the rules fk selects, read with fq
+            const row = base + j * R, vj = qkv[2 * d + hd * dh + j]; let pred = 0;
+            for (let r = 0; r < R; r++) { S[row + r] *= alpha; pred += S[row + r] * fk[r]; }
+            const e = beta * (vj - pred); let yo = 0;
+            for (let r = 0; r < R; r++) { S[row + r] += e * fk[r]; yo += S[row + r] * fq[r]; }
+            y[hd * dh + j] = yo;
+          }
+        }
+        const mo = this.gatedMap(y, b + 'mix.out.', A.out, d); for (let i = 0; i < d; i++) x[i] += mo[i];
+        const n2 = this.gain(x, b + 'n2.').out;
+        const fc = W[b + 'ffn.centers'], D = fc.shape[1], FR = fc.shape[0];
+        let u = n2; if (D === 2 * d) { u = new Float64Array(D); u.set(n2, 0); u.set(this.prevN2[l], d); }
+        const fl = gaussLogits(u, fc.data, A.ffn, FR, D, 1 / D), sw = W[b + 'ffn.slope.weight'].data, sb = W[b + 'ffn.slope.bias'].data, cq = W[b + 'ffn.conseq'].data;
+        const st = new Float64Array(FR);
+        for (let r = 0; r < FR; r++) { let sl = sb[r]; for (let i = 0; i < d; i++) sl += sw[r * d + i] * n2[i]; st[r] = Math.exp(fl[r]) * sl; }
+        for (let r = 0; r < FR; r++) { const s_ = st[r]; for (let i = 0; i < d; i++) x[i] += s_ * cq[r * d + i]; }
+        this.prevN2[l] = n2; strengths.push(st);
+      }
+      const gf = this.gain(x, 'norm.'), logits = new Float32Array(this.V);
+      for (let v = 0; v < this.V; v++) { let a = 0; const r = v * d; for (let i = 0; i < d; i++) a += this.E[r + i] * gf.out[i]; logits[v] = a; }
+      this.pos++;
+      return opts && opts.explain ? { logits, gates: strengths, s: Math.exp(gf.gain) } : { logits };
+    }
+    profiles() {                                           // pi_r = (conseq_r * output weight) . E^T: what rule r does to the output scores when it fires positively
+      if (this.pi) return this.pi;
+      const { d, V } = this;
+      this.pi = Array.from({ length: this.L }, (_, l) => {
+        const cq = this.W['blocks.' + l + '.ffn.conseq'], R = cq.shape[0], pi = new Float32Array(R * V), cw = new Float32Array(d);
+        for (let r = 0; r < R; r++) {
+          for (let i = 0; i < d; i++) cw[i] = cq.data[r * d + i] * this.nw[i];
+          for (let v = 0; v < V; v++) { let a = 0; for (let i = 0; i < d; i++) a += cw[i] * this.E[v * d + i]; pi[r * V + v] = a; }
+        }
+        return pi;
+      });
+      return this.pi;
+    }
+    ruleShape(layer, rule) {                               // the rule's most selective membership functions, read from the weights
+      const fc = this.W['blocks.' + layer + '.ffn.centers'], lw = this.W['blocks.' + layer + '.ffn.log_width'].data, D = fc.shape[1], dims = [];
+      for (let j = 0; j < D; j++) dims.push({ dim: j, center: fc.data[rule * D + j], sigma: Math.exp(lw[rule * D + j]) * Math.sqrt(D) });
+      return dims.sort((a, b) => a.sigma - b.sigma).slice(0, 24);
+    }
+    mixerRule(layer, head, rule) {
+      const b = (head * this.R + rule) * this.dh, c = this.W['blocks.' + layer + '.mix.centers'].data, lw = this.W['blocks.' + layer + '.mix.log_width'].data, cc = [], w = [];
+      for (let j = 0; j < this.dh; j++) { cc.push(c[b + j]); w.push(Math.exp(lw[b + j])); }
+      return { layer, head, rule, center: cc, width: w };
+    }
+  }
+
   // ------------------------------------------------------------------ sampling
   function mulberry32(a) {
     return function () {
@@ -271,13 +394,17 @@
       this.base = base || '.'; this.fj = fetchJson; this.fb = fetchBuf; this.loaded = {}; this.tokp = null; this.idx = null;
     }
     async models() { return (this.idx = this.idx || (await this.fj(this.base + '/models/index.json'))); }
-    async tok() { return (this.tokp = this.tokp || this.fj(this.base + '/tokenizer.json').then((j) => new Tokenizer(j))); }
+    async tok(name) {                                      // one tokenizer per vocabulary: bpe1024 (tokenizer.json), bpe3072 (tokenizer-3072.json)
+      const f = name && name !== 'bpe1024' ? '/tokenizer-' + name.replace('bpe', '') + '.json' : '/tokenizer.json';
+      this.tokp = this.tokp || {};
+      return (this.tokp[f] = this.tokp[f] || this.fj(this.base + f).then((j) => new Tokenizer(j)));
+    }
     async load(id) {
       if (!this.loaded[id]) {
         this.loaded[id] = (async () => {
           const man = await this.fj(`${this.base}/models/${id}.json`);
           const [buf, rules] = await Promise.all([this.fb(`${this.base}/models/${id}.bin`), this.fj(`${this.base}/models/${id}.rules.json`)]);
-          return { model: new Model(man, buf), rules, man };
+          return { model: man.config.allfuzzy ? new AllFuzzyModel(man, buf) : new Model(man, buf), rules, man };
         })();
       }
       return this.loaded[id];
@@ -305,7 +432,7 @@
       return { ...m, center: m.center.map((v) => rnd(v, 3)), width: m.width.map((v) => rnd(v, 3)) };
     }
     async generate(req) {
-      const { model } = await this.load(req.model), tok = await this.tok();
+      const { model, man } = await this.load(req.model), tok = await this.tok(man.tok);
       const prompt = req.prompt || 'Once upon a time';
       const ctx = model.maxLen, ids = tok.encode(prompt);
       if (!ids.length) throw new Error('empty prompt');
@@ -353,6 +480,6 @@
     }
   }
 
-  const FLM = { Tokenizer, Model, Api, mulberry32, softmax };
+  const FLM = { Tokenizer, Model, AllFuzzyModel, Api, mulberry32, softmax };
   if (typeof module !== 'undefined' && module.exports) module.exports = FLM; else root.FLM = FLM;
 })(typeof window !== 'undefined' ? window : globalThis);

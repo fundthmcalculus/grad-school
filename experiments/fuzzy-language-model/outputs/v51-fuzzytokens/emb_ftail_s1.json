@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v51-fuzzytokens\\emb_ftail_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98528,
+ "params_nonemb": 47264,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.09144,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06157
+  ],
+  [
+   100,
+   1.47429
+  ],
+  [
+   200,
+   1.30832
+  ],
+  [
+   300,
+   1.2505
+  ],
+  [
+   400,
+   1.21199
+  ],
+  [
+   500,
+   1.17778
+  ],
+  [
+   600,
+   1.1514
+  ],
+  [
+   700,
+   1.12829
+  ],
+  [
+   800,
+   1.10885
+  ],
+  [
+   900,
+   1.09639
+  ],
+  [
+   953,
+   1.09144
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7676
+  ],
+  [
+   50,
+   9.1827
+  ],
+  [
+   100,
+   7.1904
+  ],
+  [
+   150,
+   6.0244
+  ],
+  [
+   200,
+   5.4452
+  ],
+  [
+   250,
+   5.155
+  ],
+  [
+   300,
+   4.9768
+  ],
+  [
+   350,
+   4.8495
+  ],
+  [
+   400,
+   4.7645
+  ],
+  [
+   450,
+   4.7025
+  ],
+  [
+   500,
+   4.6223
+  ],
+  [
+   550,
+   4.5531
+  ],
+  [
+   600,
+   4.4787
+  ],
+  [
+   650,
+   4.433
+  ],
+  [
+   700,
+   4.3845
+  ],
+  [
+   750,
+   4.3511
+  ],
+  [
+   800,
+   4.3185
+  ],
+  [
+   850,
+   4.2882
+  ],
+  [
+   900,
+   4.2447
+  ],
+  [
+   950,
+   4.2296
+  ],
+  [
+   952,
+   4.2308
+  ]
+ ],
+ "train_seconds": 72.06,
+ "wall_seconds": 83.32,
+ "chars_per_sec": 108346,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. Sue was very excited to play with her friends.\nOne sunny day, Lucy decided to spin in the park. She found her friend a little girl on her favorite hand. But, the other people in the town were best friends. They played together all day, and they learned that sometimes they should not get it together. And now, Sue and her friends were lovely things.\n<|eot|>\nOnce upon a time, there was a loyal little girl named Sue. Sue loved to eat things. One day, Sue went for a walk on the pond. The girl found a big tree and flew up to the tree. Sue was sad but asked her mom told the girl about it.\nSue went to the park to find the big tree. Sue said, \"You are so pretty and very green. Let's play together!\" Sue said, \"No, Tim! I'm not good friends.\"\nThe magic cat and Sue played all day and they were very happy. They went for a walk that they found a big, miscomorn. They became best friends with the park and the day were always happy.\n<|eot|>\nOnce upon a time, there was a nosy cat named Fluffy. Bobo loved to play all day and played with his friends every day. One day, Momo met a little dog named Spot. Spot liked to run and explore. They looked everywhere, and they were very happy. They hopped and looked around the sky andced down.\nWhen",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,242 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v1536h640e16m20_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1536",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1536
+ },
+ "config": {
+  "vocab_size": 1536,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99280,
+ "params_nonemb": 53456,
+ "steps": 1052,
+ "chars_seen": 30013285,
+ "chars_per_token": 3.4826342,
+ "val_bpc": 1.07046,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.07835
+  ],
+  [
+   100,
+   1.51103
+  ],
+  [
+   200,
+   1.36712
+  ],
+  [
+   300,
+   1.2957
+  ],
+  [
+   400,
+   1.2439
+  ],
+  [
+   500,
+   1.20073
+  ],
+  [
+   600,
+   1.1652
+  ],
+  [
+   700,
+   1.132
+  ],
+  [
+   800,
+   1.10512
+  ],
+  [
+   900,
+   1.08639
+  ],
+  [
+   1000,
+   1.07341
+  ],
+  [
+   1052,
+   1.07046
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.7332
+  ],
+  [
+   50,
+   8.5044
+  ],
+  [
+   100,
+   6.5806
+  ],
+  [
+   150,
+   5.5963
+  ],
+  [
+   200,
+   5.114
+  ],
+  [
+   250,
+   4.8609
+  ],
+  [
+   300,
+   4.69
+  ],
+  [
+   350,
+   4.5666
+  ],
+  [
+   400,
+   4.4491
+  ],
+  [
+   450,
+   4.3592
+  ],
+  [
+   500,
+   4.2761
+  ],
+  [
+   550,
+   4.211
+  ],
+  [
+   600,
+   4.1343
+  ],
+  [
+   650,
+   4.0821
+  ],
+  [
+   700,
+   4.023
+  ],
+  [
+   750,
+   3.9581
+  ],
+  [
+   800,
+   3.9196
+  ],
+  [
+   850,
+   3.8706
+  ],
+  [
+   900,
+   3.8345
+  ],
+  [
+   950,
+   3.8169
+  ],
+  [
+   1000,
+   3.7926
+  ],
+  [
+   1050,
+   3.7645
+  ],
+  [
+   1051,
+   3.7674
+  ]
+ ],
+ "train_seconds": 74.11,
+ "wall_seconds": 86.35,
+ "chars_per_sec": 116284,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little boy named Tom. Tom was very excited to go to the store that he saw many clumsy.\nOne day, Tom and Tom went to the store to play. They saw many boxs and blocking its. Tom was so happy. Tom said, \"I'm scared, Tom. I found it together!\" Tomly said, \"It's a big box! Today!\"\nTom nodded. He ran off, and saw the box.\nTom said, \"The box is that Lucy's mommy didn't repair the box. I will be brave, but you shouldn???t do it in bree. I need to get the box and can take you into your doll now.\" Tom looked at his dad and said, \"It's okay, Tom. And you did not listen. They are so proud of the box. And now ending and Tom learned that being furant than breaker important to be careful when we are brave and take you to your best friend.\n<|eot|>\nOne day, a boy named Tim went for a walk. He asked his mom, \"Can we play with?\" The dog said, \"No, Tim, I will be a sharp and bring food, but you are very brave. I will unp of the sky.\"\nTim said, \"You are a wise day at the park now. Thank you for help, but we do. It is so",
+ "rule_init": {},
+ "ngram_init": {}
+}

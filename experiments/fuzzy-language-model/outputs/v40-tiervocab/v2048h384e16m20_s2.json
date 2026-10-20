@@ -1,0 +1,234 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v2048h384e16m20_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe2048",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 2048
+ },
+ "config": {
+  "vocab_size": 2048,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99280,
+ "params_nonemb": 53456,
+ "steps": 1001,
+ "chars_seen": 30011180,
+ "chars_per_token": 3.6598144,
+ "val_bpc": 1.07051,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.04137
+  ],
+  [
+   100,
+   1.4831
+  ],
+  [
+   200,
+   1.33413
+  ],
+  [
+   300,
+   1.26968
+  ],
+  [
+   400,
+   1.21562
+  ],
+  [
+   500,
+   1.17643
+  ],
+  [
+   600,
+   1.14993
+  ],
+  [
+   700,
+   1.12126
+  ],
+  [
+   800,
+   1.09678
+  ],
+  [
+   900,
+   1.07965
+  ],
+  [
+   1000,
+   1.07039
+  ],
+  [
+   1001,
+   1.07051
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.1038
+  ],
+  [
+   50,
+   8.7806
+  ],
+  [
+   100,
+   6.7888
+  ],
+  [
+   150,
+   5.7754
+  ],
+  [
+   200,
+   5.2658
+  ],
+  [
+   250,
+   4.973
+  ],
+  [
+   300,
+   4.7885
+  ],
+  [
+   350,
+   4.6548
+  ],
+  [
+   400,
+   4.5794
+  ],
+  [
+   450,
+   4.4633
+  ],
+  [
+   500,
+   4.41
+  ],
+  [
+   550,
+   4.3504
+  ],
+  [
+   600,
+   4.2885
+  ],
+  [
+   650,
+   4.2189
+  ],
+  [
+   700,
+   4.164
+  ],
+  [
+   750,
+   4.1122
+  ],
+  [
+   800,
+   4.0633
+  ],
+  [
+   850,
+   4.0261
+  ],
+  [
+   900,
+   3.9933
+  ],
+  [
+   950,
+   3.9643
+  ],
+  [
+   1000,
+   3.948
+  ]
+ ],
+ "train_seconds": 72.43,
+ "wall_seconds": 84.45,
+ "chars_per_sec": 113221,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl. The girl was very cold and sad. She was very excited to see her persight and see what was even better.\nOne day, a little girl named Amy came off. She saw a big star that they were crying and scared. The girl said, \"I found your mom's help. If you know, Tim you can have some.\"\nAmy felt sad and replied, \"I will help you!\" The girl and the girl learned that it's important to always be silly again.\nFrom that night together, playing, even about the old lady's mom's tead! From that day on, Sue would be a giants and helpful is grateful to unfurroon. From that day on, she always always remembered him to always help and help people try to be mean.\n<|eot|>\nOne day, a boy named Tim went to the park. He saw a big tree in the tree. He did not know what to do. He had a button on the bag. The tree was scared.\nTim picked his ball up on the ball. His friend, Sam, saw them under her string. Tim opened it and wanted to play. He found his ball and tried to help him. He looked at Tim and said, \"Stop! Now, you can go to the park. It's dizble to find some colors. They sailed like the tree.\"\nTim and Sam were",
+ "rule_init": {},
+ "ngram_init": {}
+}

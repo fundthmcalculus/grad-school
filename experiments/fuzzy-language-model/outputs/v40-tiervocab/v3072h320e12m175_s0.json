@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.75,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v3072h320e12m175_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.75,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99320,
+ "params_nonemb": 50360,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.05882,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05281
+  ],
+  [
+   100,
+   1.42995
+  ],
+  [
+   200,
+   1.28721
+  ],
+  [
+   300,
+   1.22817
+  ],
+  [
+   400,
+   1.18494
+  ],
+  [
+   500,
+   1.15224
+  ],
+  [
+   600,
+   1.12127
+  ],
+  [
+   700,
+   1.0988
+  ],
+  [
+   800,
+   1.07658
+  ],
+  [
+   900,
+   1.06228
+  ],
+  [
+   953,
+   1.05882
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7248
+  ],
+  [
+   50,
+   9.1001
+  ],
+  [
+   100,
+   6.944
+  ],
+  [
+   150,
+   5.8972
+  ],
+  [
+   200,
+   5.3602
+  ],
+  [
+   250,
+   5.0456
+  ],
+  [
+   300,
+   4.8733
+  ],
+  [
+   350,
+   4.7278
+  ],
+  [
+   400,
+   4.6792
+  ],
+  [
+   450,
+   4.5889
+  ],
+  [
+   500,
+   4.5222
+  ],
+  [
+   550,
+   4.438
+  ],
+  [
+   600,
+   4.3553
+  ],
+  [
+   650,
+   4.2998
+  ],
+  [
+   700,
+   4.2758
+  ],
+  [
+   750,
+   4.2528
+  ],
+  [
+   800,
+   4.1944
+  ],
+  [
+   850,
+   4.1492
+  ],
+  [
+   900,
+   4.1234
+  ],
+  [
+   950,
+   4.1095
+  ],
+  [
+   952,
+   4.1099
+  ]
+ ],
+ "train_seconds": 74.39,
+ "wall_seconds": 86.53,
+ "chars_per_sec": 104946,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl called Sara. She was very excited to play the store. She decided to watch a big blanket, and the trains in the sky.\nBut then, something unexpected happened. A big boat picked up the pond and went to look for a little girl. The sun was leaves, a ball on the ground. Lily felt scared because she wanted to see a big fan.\nThe little girl tried to find its tail. She said, \"I found the pot! I can't take it to my pillow.\"\nThe little girl sat on the path and clapped her head to the tree. She looked at the chest, but she could not wait to go away. The little girl felt better and they could not find its friend.\nThe animal said, \"Don't worry, little girl. I will fit a big hole of spaghetti!\"\nThe little girl and her selfish friend came and said, \"Thank you!\" The girl looked at the flower and smiled. She was happy when she noticed the puzzle and felt happy. From that day on, the crab knew the large bee could wait to wait to sleep.\n<|eot|>\n\n\nSara and Ben are friends. They know who liked to play in the sky. One day, they go to the park to find a nice truck.\n\"Look, mom, I want to play with you!\" Ben says. He says. He feels a new trade.\n\"Look, Ben, don't like Mom.",
+ "rule_init": {},
+ "ngram_init": {}
+}

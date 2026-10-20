@@ -20,7 +20,10 @@ def main():
     index = json.loads((WEB / "models" / "index.json").read_text())
     if not everything:
         index = [m for m in index if m["params"] < 100_000]
-    files = {"tokenizer.json": WEB / "tokenizer.json"}
+    files = {
+        "tokenizer.json": WEB / "tokenizer.json",
+        "tokenizer-3072.json": WEB / "tokenizer-3072.json",
+    }
     for m in index:
         for ext in ("json", "bin", "rules.json"):
             files[f"models/{m['id']}.{ext}"] = WEB / "models" / f"{m['id']}.{ext}"
