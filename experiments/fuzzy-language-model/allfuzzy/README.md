@@ -16,7 +16,7 @@ python allfuzzy_lm.py --rules rulebook.txt                  # 788 lines: 87 feed
 `generate(text, max_new_tokens=60, temperature=0.5, top_k=10, seed=0, include_prompt=False, trace=None)`; the prompt plus continuation is capped at the 512-piece context.
 
 **Files.** `e2e_tail_300M_s0.npz` (weights, 467 KB), `bpe3072.json` (tokenizer), `rulebook.txt` (the generated rule base), `export_weights.py` (one-off checkpoint to npz export, needs torch),
-`test_allfuzzy.py` (parity test against the torch model: max logit difference 1.5e-5 over a 24-piece prompt, identical argmax at every position).
+`check_parity.py` (parity test against the torch model: max logit difference 1.5e-5 over a 24-piece prompt, identical argmax at every position).
 
 **What the fuzzy systems are** (per block unless stated): two gain controllers (TSK systems on log-rms, replacing RMSNorm; 5 rules each); two rule-gated low-rank maps (8 rules each, replacing the
 q/k/v and output projections); two six-rule TSK gates (forgetting, write strength); a fuzzy associative memory (8 heads x 32 Gaussian rules over a 6-number key/query, consequents written in context by the delta rule);

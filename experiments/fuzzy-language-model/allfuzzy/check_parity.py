@@ -1,5 +1,5 @@
-"""Parity: allfuzzy_lm.py (plain numpy) against the trained torch model, logits at every position of a prompt.
-PYTHONPATH=. python allfuzzy/test_allfuzzy.py outputs/v52-e2e/e2e_tail_300M_s0.pt      (needs torch and the repo; the script itself does not)
+"""Parity check (a script, not a pytest test): allfuzzy_lm.py (plain numpy) against the trained torch model, logits at every position of a prompt.
+PYTHONPATH=. python allfuzzy/check_parity.py outputs/v52-e2e/e2e_tail_300M_s0.pt      (needs torch and the repo; the script itself does not)
 """
 
 import os
