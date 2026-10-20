@@ -30,7 +30,7 @@ FFN = ["--ffn", "tsk", "--ffn-order", "1", "--ffn-norm", "none"]
 
 def argv(arm, d, lr, seed, out):
     if arm == "fuzzy":  # model D's recipe, heads and antecedent width shrunk with d
-        h = 1 if d <= 8 else 2 if d <= 16 else 4
+        h = 1 if d <= 8 else 2
         a = DM + FFN + ["--tsk-dim", str(min(16, d // 2)), "--heads", str(h)]
         a += ["--rules", "16", "--ffn-mult", "1.5", "--shortconv", "8"]
     else:  # the neural delta-rule + MLP reference at its CPU-tuned settings
