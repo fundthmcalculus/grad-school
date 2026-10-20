@@ -25,5 +25,14 @@
   "d": 192,
   "layers": 4,
   "tok": "bpe1024"
+ },
+ {
+  "id": "flm-allfuzzy",
+  "label": "99K ALL-FUZZY: every block component a fuzzy system, tail token table fuzzy (300M characters)",
+  "params": 99019,
+  "ctx": 512,
+  "d": 48,
+  "layers": 2,
+  "tok": "bpe3072"
  }
 ]
