@@ -86,6 +86,7 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--accent-soft); }
 .fig h3 { font-size: 0.9rem; margin: 0 0 6px; font-weight: 600; }
 svg .tx { font: 12.5px var(--sans); fill: currentColor; } svg .tx.b { font-weight: 600; } svg .sb { font: 11.5px var(--sans); fill: var(--muted); }
 svg .bx { fill: var(--panel); stroke: currentColor; stroke-width: 1.2; } svg .bx.f { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.6; } svg .bx.n { stroke-dasharray: 4 3; fill: none; stroke: var(--muted); }
+svg .bx.nf { fill: none; stroke: var(--muted); stroke-dasharray: 1 3; stroke-linecap: round; }
 svg .ln { stroke: currentColor; stroke-width: 1.3; fill: none; } svg .ln.thick { stroke-width: 3; stroke: var(--accent); } svg .ln.thin { stroke-width: 0.8; opacity: .6; } svg .ln.f { stroke: var(--accent); stroke-width: 2; } svg .ln.warn { stroke: var(--warn); }
 svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); stroke-width: 1.6; }
 .expect { font-size: 0.86rem; color: var(--muted); }
@@ -650,24 +651,24 @@ function drawArch(st, info) {
   let a = DEFS('a1');
   a += BOX(110, 8, 280, 30, 'prompt text');
   a += ARR([[250, 38], [250, 56]], 'a1');
-  a += BOX(110, 56, 280, 40, 'byte-level BPE', `text becomes word pieces (vocabulary ${vocab})`);
+  a += BOX(110, 56, 280, 40, 'byte-level BPE', `text becomes word pieces (vocabulary ${vocab})`, 'nf');
   a += ARR([[250, 96], [250, 114]], 'a1');
-  a += BOX(110, 114, 280, 40, 'embedding table E', `${vocab} x ${d}: one ${d}-number vector per piece`);
+  a += BOX(110, 114, 280, 40, 'embedding table E', `${vocab} x ${d}: one ${d}-number vector per piece`, 'nf');
   a += ARR([[250, 154], [250, 170], [404, 170], [404, 214]], 'a1', `${d} numbers per piece: the start of the residual stream`, 262, 166, 'thick');
   a += `<rect x="44" y="184" width="376" height="340" rx="10" class="bx n"/>` + T(56, 202, `Block 1 of ${nl}`, 'tx b') + T(136, 202, '(each block has its own weights)', 'sb');
   a += `<line x1="404" y1="210" x2="404" y2="516" class="ln thick"/>` + T(427, 262, 'residual', 'sb') + T(427, 275, 'stream', 'sb');
   // sub-layer A: mixer
   a += ARR([[404, 218], [215, 218], [215, 226]], 'a1');
-  a += BOX(95, 226, 240, 26, 'RMSNorm');
+  a += BOX(95, 226, 240, 26, 'RMSNorm', '', 'nf');
   a += ARR([[215, 252], [215, 260]], 'a1');
-  a += BOX(95, 260, 240, 40, 'causal convolution', cw ? `blends the last ${cw} pieces, per channel` : '');
+  a += BOX(95, 260, 240, 40, 'causal convolution', cw ? `blends the last ${cw} pieces, per channel` : '', 'nf');
   a += ARR([[215, 300], [215, 308]], 'a1');
   a += BOX(95, 308, 240, 56, 'fuzzy memory mixer', `${H} heads x ${R} memory rules, ${dh} numbers each`, 'f');
   a += ARR([[215, 364], [215, 376], [392, 376]], 'a1');
   a += `<circle cx="404" cy="376" r="9" class="bx"/>` + T(404, 380, '+', 'tx b', 'middle');
   // sub-layer B: FFN
   a += ARR([[404, 388], [215, 388], [215, 396]], 'a1');
-  a += BOX(95, 396, 240, 26, 'RMSNorm');
+  a += BOX(95, 396, 240, 26, 'RMSNorm', '', 'nf');
   a += ARR([[215, 422], [215, 430]], 'a1');
   a += BOX(95, 430, 240, 56, 'fuzzy rule feed-forward', `${FR} rules over a ${da}-number antecedent`, 'f');
   a += ARR([[215, 486], [215, 502], [392, 502]], 'a1');
@@ -677,16 +678,20 @@ function drawArch(st, info) {
     a += `<rect x="110" y="538" width="280" height="28" rx="6" class="bx n"/>` + T(250, 556, nl > 2 ? `blocks 2 to ${nl}, same layout` : 'block 2, same layout', 'sb', 'middle');
     a += ARR([[250, 566], [250, 580]], 'a1');
   } else a += ARR([[404, 516], [404, 548], [250, 548], [250, 580]], 'a1', null, 0, 0, 'thick');
-  a += BOX(110, 580, 280, 40, 'RMSNorm, then E transposed', `a score for each of the ${vocab} pieces`);
+  a += BOX(110, 580, 280, 40, 'RMSNorm, then E transposed', `a score for each of the ${vocab} pieces`, 'nf');
   a += ARR([[250, 620], [250, 636]], 'a1');
-  a += BOX(110, 636, 280, 40, 'softmax, temperature, top-k', 'sample the next piece, feed it back in');
-  // annotations
+  a += BOX(110, 636, 280, 40, 'softmax, temperature, top-k', 'sample the next piece, feed it back in', 'nf');
+  // legend and annotations
+  a += `<rect x="486" y="14" width="26" height="14" rx="4" class="bx f"/>` + T(520, 25, 'fuzzy inference system', 'sb');
+  a += `<rect x="486" y="36" width="26" height="14" rx="4" class="bx nf"/>` + T(520, 47, 'conventional operation', 'sb');
+  a += T(486, 354, 'inside it, the q/k/v and output', 'sb') + T(486, 367, 'projections and both gates are linear', 'sb');
+  a += T(486, 489, 'inside it, the antecedent projection', 'sb') + T(486, 502, 'in front of the rules is a linear map', 'sb');
   a += T(486, 280, 'short-range smoothing of the last', 'sb') + T(486, 293, `${cw || 'few'} pieces`, 'sb');
   a += T(486, 328, 'long-range memory: a small matrix per head,', 'sb') + T(486, 341, 'updated once per piece (figure 2)', 'sb');
   a += T(486, 450, 'each rule fires when the input is near its', 'sb') + T(486, 463, 'centre; fired rules add their consequent to', 'sb') + T(486, 476, 'the stream (figure 3)', 'sb');
   a += T(486, 600, 'the same rule contributions explain the', 'sb') + T(486, 613, 'score of each piece (the rule view below)', 'sb');
   $('arch1').innerHTML = SVG(760, 690, a, `Architecture of this ${st.params.toLocaleString()}-parameter model: embedding, ${nl} blocks of causal convolution, fuzzy memory mixer and fuzzy rule feed-forward on a residual stream, then a tied output layer`);
-  $('arch1-cap').textContent = `One piece at a time: it is embedded, then passes through ${nl} identical-layout blocks. Each block reads the residual stream (the thick line), adds the output of a fuzzy memory mixer, then adds the output of a bank of fuzzy rules. Teal parts are the fuzzy systems; they carry ${st.params.toLocaleString()} parameters in all, ${(vocab * d).toLocaleString()} of them in the embedding (tied: it is also the output layer).`;
+  $('arch1-cap').textContent = `One piece at a time: it is embedded, then passes through ${nl} identical-layout blocks. Each block reads the residual stream (the thick line), adds the output of a fuzzy memory mixer, then adds the output of a bank of fuzzy rules. Teal parts are the fuzzy systems; dotted parts are conventional operations, and inside the teal blocks the projections and gates are still linear maps (the model comparison page measures what replacing each with a fuzzy system costs). The whole model has ${st.params.toLocaleString()} parameters, ${(vocab * d).toLocaleString()} of them in the embedding (tied: it is also the output layer).`;
 
   // ---- 2. one memory head
   let b = DEFS('a2');
