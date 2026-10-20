@@ -192,3 +192,15 @@ Reading: **fuzzifying every block component costs 0.034 BPC but no rated coheren
 ## Coherence set 18 registered before rating (`report/coherence18_*`; seeds 82-83; the seed-1 checkpoints at 300M of the hybrid recipe, c_full2, e2e_tail, e2e_all, plus the 1.32M anchor; the same protocol as set 17; two Claude sub-agent raters reading only the blind file; scores written before the key is opened)
 Purpose: set 17 had one checkpoint per model and a 1-2 point seed-to-seed spread; sets 17 and 18 together give two checkpoints (and two prompt/seed draws) per model.
 Predictions: the all-block-fuzzy model (c_full2) within 1.5 points of the hybrid recipe on both raters (60%); the tail-table model within 1.5 points of the hybrid (55%); the head-table model (e2e_all) at least 1 point below the hybrid on both raters (60%); the 1.32M anchor within 1 point of its set-17 rating (10.5 / 10.6) (65%).
+
+### Set 18 scores (seed-1 checkpoints at 300M; both score files written before the key was read; mean total of G+C+P over 8 texts, plot in parentheses)
+| model | rater A | rater B |
+|---|---|---|
+| hybrid recipe, seed 1 | 6.25 (1.75) | 7.00 (2.00) |
+| all block layers fuzzy | 5.88 (1.50) | 6.75 (1.88) |
+| + tail token table fuzzy | 4.62 (1.12) | 5.38 (1.25) |
+| + head AND tail token tables fuzzy | 4.88 (1.25) | 6.00 (1.75) |
+| 1.32M anchor | 10.00 (2.75) | 11.25 (3.50) |
+Predictions: all-block-fuzzy within 1.5 points of the hybrid on both raters (60%): **right** (0.4 / 0.25 below); tail-table model within 1.5 points (55%): **wrong** (1.6 / 1.6 below); head-table model at least 1 point below the hybrid on both (60%): **right** (1.4 / 1.0); the anchor within 1 point of its set-17 rating (65%): **right** (-0.5 / +0.6).
+**Pooled sets 17 and 18 (two checkpoints, 16 texts per model per rater): hybrid recipe 6.25 / 6.81; all block layers fuzzy 6.50 / 7.31; + tail token table fuzzy 5.12 / 6.00; + head and tail tables fuzzy 4.94 / 5.50; 1.32M anchor 10.25 / 10.94.**
+Reading, revised with the second checkpoint: **fuzzifying every block component costs no rated coherence** (+0.25 / +0.50 against the hybrid, inside the raters' spread); **fuzzifying the token tables costs about one point** (tail table -1.1 / -0.8; head and tail -1.3 / -1.3), which set 17 alone had hidden (there the tail table looked free). Set 17's single checkpoint overstated how well the tail-table model does: two checkpoints per model are the minimum for these comparisons (the seed-to-seed spread of one model is 1-2 points). Sub-100K coherence stays at 5-7.5/15 whichever layers are fuzzy; only the 1.32M anchor reaches 10-11.
