@@ -24,6 +24,11 @@ BASE = {
     "FUZZ_FFN_TAPS": "2",
 }
 ARMS = {  # name: (env, train-arg overrides, ffn mult)
+    "c_full2": (
+        {**BASE, "FUZZ_FFN_R": "52", "FUZZ_FFN_R0": "35"},
+        {"--shortconv": "0"},
+        "1.5",
+    ),  # block layers only, crisp token tables
     "e2e_tail": (
         {**BASE, "FUZZ_FFN_R": "52", "FUZZ_FFN_R0": "35", "FUZZ_EMB": "tail"},
         {"--shortconv": "0"},

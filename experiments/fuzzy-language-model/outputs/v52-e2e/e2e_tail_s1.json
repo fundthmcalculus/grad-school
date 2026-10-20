@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\e2e_tail_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99019,
+ "params_nonemb": 47755,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.14056,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.0499
+  ],
+  [
+   100,
+   1.52171
+  ],
+  [
+   200,
+   1.35373
+  ],
+  [
+   300,
+   1.29151
+  ],
+  [
+   400,
+   1.25334
+  ],
+  [
+   500,
+   1.22473
+  ],
+  [
+   600,
+   1.19602
+  ],
+  [
+   700,
+   1.17385
+  ],
+  [
+   800,
+   1.15652
+  ],
+  [
+   900,
+   1.14474
+  ],
+  [
+   953,
+   1.14056
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.6972
+  ],
+  [
+   50,
+   9.2135
+  ],
+  [
+   100,
+   7.3006
+  ],
+  [
+   150,
+   6.1888
+  ],
+  [
+   200,
+   5.6238
+  ],
+  [
+   250,
+   5.3314
+  ],
+  [
+   300,
+   5.1408
+  ],
+  [
+   350,
+   5.0146
+  ],
+  [
+   400,
+   4.9325
+  ],
+  [
+   450,
+   4.8716
+  ],
+  [
+   500,
+   4.7937
+  ],
+  [
+   550,
+   4.727
+  ],
+  [
+   600,
+   4.6505
+  ],
+  [
+   650,
+   4.6069
+  ],
+  [
+   700,
+   4.5641
+  ],
+  [
+   750,
+   4.5313
+  ],
+  [
+   800,
+   4.4988
+  ],
+  [
+   850,
+   4.4725
+  ],
+  [
+   900,
+   4.4305
+  ],
+  [
+   950,
+   4.4154
+  ],
+  [
+   952,
+   4.4167
+  ]
+ ],
+ "train_seconds": 75.36,
+ "wall_seconds": 86.24,
+ "chars_per_sec": 103595,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a little boy named Tim. He loved to put his mom in the cars, and he was very happy. Tim decided that the trains would make his toy toy new things. Sue found other favorite toys and the farm of the work.\nTim and the toys were happy to come to the house, and they played together every day, and they worked together together. The toys was having many fun things with time. Every day, Tim and his mom were friends and they were very happy.\n<|eot|>\nOnce upon a time, in a big room, there was a little girl named Lily. Lily liked to play with her friends. Lily loved to play for her family. The whole guie was very happy.\nOne day, Lily found a big, red ball. She looked for a long time, but she did not fit a big hole. It was so happy to see her friends. Lily was sad. She put the osh and went to the veieiler.\nOne day, Lily's mom came to the park. She saw a big tree, a big bird with her nose and a pretty bird. Lily had an idea. She looked at the tall tree, and they played all day. The bird picked up the green tree and started to help.\nAt the flowers, Lily and the bird became friends. They watched the bird to seek and singing the carrot. Lucy was happy and had a great time. After a while, she was having a important",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\e2e_all_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99009,
+ "params_nonemb": 47745,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.36564,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   2.98446
+  ],
+  [
+   100,
+   2.08725
+  ],
+  [
+   200,
+   1.91071
+  ],
+  [
+   300,
+   1.70287
+  ],
+  [
+   400,
+   1.59004
+  ],
+  [
+   500,
+   1.51458
+  ],
+  [
+   600,
+   1.45701
+  ],
+  [
+   700,
+   1.41348
+  ],
+  [
+   800,
+   1.39043
+  ],
+  [
+   900,
+   1.37173
+  ],
+  [
+   953,
+   1.36564
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.46
+  ],
+  [
+   50,
+   9.9822
+  ],
+  [
+   100,
+   8.9637
+  ],
+  [
+   150,
+   8.223
+  ],
+  [
+   200,
+   7.7735
+  ],
+  [
+   250,
+   7.3275
+  ],
+  [
+   300,
+   6.9271
+  ],
+  [
+   350,
+   6.6171
+  ],
+  [
+   400,
+   6.3805
+  ],
+  [
+   450,
+   6.1603
+  ],
+  [
+   500,
+   5.9745
+  ],
+  [
+   550,
+   5.8257
+  ],
+  [
+   600,
+   5.6908
+  ],
+  [
+   650,
+   5.5989
+  ],
+  [
+   700,
+   5.5145
+  ],
+  [
+   750,
+   5.4614
+  ],
+  [
+   800,
+   5.3967
+  ],
+  [
+   850,
+   5.3451
+  ],
+  [
+   900,
+   5.324
+  ],
+  [
+   950,
+   5.3029
+  ],
+  [
+   952,
+   5.3024
+  ]
+ ],
+ "train_seconds": 76.93,
+ "wall_seconds": 91.87,
+ "chars_per_sec": 101475,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Tim. Can to the park, a beautiful dog called her friend. He wanted to sing, but they played with his friend, but her friend were very brave.\nOne day, the bird came inside and played with her. She asked her friends, \"Why want to find a cream on the bippice. You can play together else.\"\nThe little girl was lovely and her family. Every day, she thought the truck and said, \"Alo!\"\nLily and Lily became friends, and the rabbit wanted to be careful. She felt very happy to read the ball and they were many fit.\n<|eot|>\n\n\nThey were a big button guistdyzy. They went, a pretty cat who had to see. The cat was very gone. \"Hello, I can fly with me a big hole!\" His mommy said, \"Please, let's go insides?\" Tim said, \"I don't know no?\"\n\"Don't a slow house!\" he smiled and said, \"I should!\" The picture of the park, but the large dress felt strong. She said, \"No, Twit!\"\nTim's mom thought, and they played all day. The boy picked up and said, \"I am you tell help!\"\nLily asked it and Ben then they runss and play of the ship. They hugged the carts and asked, \"Yes, Tthy!\" \"What can try that!\"\nThey help",
+ "rule_init": {},
+ "ngram_init": {}
+}
