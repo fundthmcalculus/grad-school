@@ -11,7 +11,7 @@ write_rulebook("rulebook.txt")                   # every rule of every fuzzy sys
 ```
 ```
 python allfuzzy_lm.py --text "Once upon a time" --trace    # also prints, per word piece, the feed-forward rules that pushed it most (exact direct-path effects)
-python allfuzzy_lm.py --rules rulebook.txt                  # 788 lines: 87 feed-forward rules, 512 memory rules, 20 gate rules, 16 projection rules, 25 gain rules, 12 prototypes
+python allfuzzy_lm.py --rules rulebook.txt                  # 788 lines: 87 feed-forward rules, 512 memory rules, 24 gate rules, 32 projection rules, 25 gain rules, 12 prototypes
 ```
 `generate(text, max_new_tokens=60, temperature=0.5, top_k=10, seed=0, include_prompt=False, trace=None)`; the prompt plus continuation is capped at the 512-piece context.
 
