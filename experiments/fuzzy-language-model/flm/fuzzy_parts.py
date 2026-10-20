@@ -187,6 +187,7 @@ def install(
     ffn_taps: int = 1,
     ffn_rules0: int = 0,
     data_init: bool = False,
+    proj_ranks: tuple = (32, 20),
 ):
     """norm: "" (keep RMSNorm), "fuzzy" or "scale"; gate: replace both sigmoid gates of every fuzzy-delta mixer."""
     d = model.cfg.d_model
@@ -220,7 +221,9 @@ def install(
             if proj == "tsk0":
                 m.qkv, m.out = TSKMap(d, 3 * d, 28), TSKMap(d, d, 16)
             else:
-                m.qkv, m.out = TSKLinear(d, 3 * d, 32, 8), TSKLinear(d, d, 20, 8)
+                m.qkv, m.out = TSKLinear(d, 3 * d, proj_ranks[0], 8), TSKLinear(
+                    d, d, proj_ranks[1], 8
+                )
     if (
         data_init
     ):  # place every raw-input / gate / projection rule base from the first batch

@@ -34,6 +34,42 @@ ARMS = {  # name: (env, train-arg overrides, ffn mult)
         {"--shortconv": "0"},
         "1.5",
     ),
+    # 3-block all-fuzzy models (PLAN_FUZZYLOCAL.md): the third block is paid for with narrower width or fewer rules / lower projection ranks
+    "b3_lean": (
+        {
+            **BASE,
+            "FUZZ_FFN_R": "31",
+            "FUZZ_FFN_R0": "21",
+            "FUZZ_EMB": "tail",
+            "FUZZ_PROJ_RANKS": "24,16",
+        },
+        {"--shortconv": "0", "--layers": "3", "--rules": "16"},
+        "1.5",
+    ),
+    "b3_d40": (
+        {
+            **BASE,
+            "FUZZ_FFN_R": "44",
+            "FUZZ_FFN_R0": "30",
+            "FUZZ_EMB": "tail",
+            "FUZZ_PROJ_RANKS": "24,16",
+        },
+        {"--shortconv": "0", "--layers": "3", "--d": "40"},
+        "1.5",
+    ),
+    "b3_smallemb": (
+        {
+            **BASE,
+            "FUZZ_FFN_R": "42",
+            "FUZZ_FFN_R0": "30",
+            "FUZZ_EMB": "tail",
+            "FUZZ_PROJ_RANKS": "24,16",
+            "TIER_NH": "320",
+            "TIER_E": "10",
+        },
+        {"--shortconv": "0", "--layers": "3", "--rules": "16"},
+        "1.5",
+    ),
     "e2e_all": (
         {**BASE, "FUZZ_FFN_R": "46", "FUZZ_FFN_R0": "31", "FUZZ_EMB": "all"},
         {"--shortconv": "0"},
