@@ -259,3 +259,11 @@ Reading: **a single block is as good as two** at this budget (within 0.002 for t
 
 ### 1-block at 300M registered before running (`E2E_CHARS=300 E2E_SEEDS=0,1 python -m flm.run_fuzzy_e2e b1_d64 b1_ffn`; reference: the 2-block all-fuzzy at 300M, 0.99876 / 1.00263, mean 1.0007)
 Predictions: b1_d64 within 0.01 of the 2-block on both seeds (55%); better than it on both (20%); worse by >= 0.01 on both (25%); b1_ffn within 0.01 on both seeds (45%). The gaps of the fuzzy replacements shrank with data; the 3-block gap grew: for 1 block the direction is open (the single block has fewer places to learn in, but a fuzzy form learns slowly and 1 block has fewer layers to train).
+
+## 1-block outcome at 300M (`E2E_CHARS=300`, seeds 0-1; reference: the 2-block all-fuzzy at 300M, 0.99876 / 1.00263)
+| arm | params | BPC (seeds 0 / 1) | mean | vs 2-block (se) | vs the hybrid recipe at 300M |
+|---|---|---|---|---|---|
+| b1_d64 | 99,450 | 1.03127 / 1.03460 | 1.0329 | **+0.0322 (0.0003)** (+.0325 / +.0320) | +0.0741 |
+| b1_ffn | 99,202 | 1.03023 / 1.02764 | 1.0289 | **+0.0282 (0.0032)** (+.0315 / +.0250) | +0.0701 |
+Predictions: b1_d64 within 0.01 of the 2-block on both seeds (55%): **wrong**; better on both (20%): no; worse by >= 0.01 on both (25%): **right**; b1_ffn within 0.01 on both (45%): **wrong**.
+Reading: **the 30M tie was an artefact of the small budget**: with ten times the data a single block loses 0.03 BPC to two blocks (b1_d64: +0.002 at 30M, +0.032 at 300M). Block count against the two-block all-fuzzy model: 1 block +0.028 to +0.032, 3 blocks +0.012 (both at 300M, and the 3-block gap also grew with data from +0.005). **Two blocks is the optimum at 99K parameters**: the model needs depth up to two, and a third block costs more in thinned rules than it returns. A 30M screen would have wrongly shown "block count does not matter"; confirmations at 300M are not optional for architecture questions. The all-fuzzy model stays at two blocks; the gap to the hybrid recipe (+0.042 at 300M) has to be closed by other levers (the learning-rate sweep and the projection / token-table work listed in the goal section).
