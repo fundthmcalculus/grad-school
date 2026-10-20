@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 1,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\b1_d64_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 64,
+  "n_layers": 1,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99450,
+ "params_nonemb": 41850,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.13738,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.08463
+  ],
+  [
+   100,
+   1.5019
+  ],
+  [
+   200,
+   1.34514
+  ],
+  [
+   300,
+   1.28906
+  ],
+  [
+   400,
+   1.24757
+  ],
+  [
+   500,
+   1.2185
+  ],
+  [
+   600,
+   1.19136
+  ],
+  [
+   700,
+   1.16827
+  ],
+  [
+   800,
+   1.1523
+  ],
+  [
+   900,
+   1.14065
+  ],
+  [
+   953,
+   1.13738
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.82
+  ],
+  [
+   50,
+   9.2365
+  ],
+  [
+   100,
+   7.2533
+  ],
+  [
+   150,
+   6.1293
+  ],
+  [
+   200,
+   5.5602
+  ],
+  [
+   250,
+   5.2812
+  ],
+  [
+   300,
+   5.1056
+  ],
+  [
+   350,
+   4.9769
+  ],
+  [
+   400,
+   4.8797
+  ],
+  [
+   450,
+   4.8064
+  ],
+  [
+   500,
+   4.7385
+  ],
+  [
+   550,
+   4.6755
+  ],
+  [
+   600,
+   4.6469
+  ],
+  [
+   650,
+   4.6047
+  ],
+  [
+   700,
+   4.5616
+  ],
+  [
+   750,
+   4.5157
+  ],
+  [
+   800,
+   4.4698
+  ],
+  [
+   850,
+   4.4572
+  ],
+  [
+   900,
+   4.4155
+  ],
+  [
+   950,
+   4.3869
+  ],
+  [
+   952,
+   4.3876
+  ]
+ ],
+ "train_seconds": 46.36,
+ "wall_seconds": 53.3,
+ "chars_per_sec": 168397,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a little boy named Tim. He thought it would have to play with his ball. One day, Tim saw a big tree. He wanted to show his mom to his family. Sue wanted to help Tom. But, the car saw Tim and said, \"Don't worry, Tim. I want to play with you?\" Tim nodded Tom and said, \"I won't be curious.\" Tim was sad and looking for the ball. He did not know who knew he could do. He did not know that he was. It had a lot of people who was not clean. Tim was sad to play with the ball. He just asked, \"You'll have so much fun buttons. I will be careful and better.\" Tim and his friends was happy.\n<|eot|>\n\nOnce upon a time, there was a little girl named Lily. She did not know what happened. She did not want to go inside. She took her smile and shouted to her. Her mommy smiled and thanked her. She could not play with her too.\nOne day, Mia and Ben were playing in the park with her friend and the park. They were happy they could go to the park. But they could not see the button. But then, something unexpected happened. The dog was sad because it was too big.\nLily and Ben remembered what to do. Lily and Lily walked over to see what was inside. She looked at each other. She saw a big, scary light came. Mom said",
+ "rule_init": {},
+ "ngram_init": {}
+}

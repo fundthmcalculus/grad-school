@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 1,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\b1_ffn_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 1,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99202,
+ "params_nonemb": 47938,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.14465,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.08123
+  ],
+  [
+   100,
+   1.50983
+  ],
+  [
+   200,
+   1.34784
+  ],
+  [
+   300,
+   1.28624
+  ],
+  [
+   400,
+   1.25016
+  ],
+  [
+   500,
+   1.22005
+  ],
+  [
+   600,
+   1.1954
+  ],
+  [
+   700,
+   1.17443
+  ],
+  [
+   800,
+   1.15816
+  ],
+  [
+   900,
+   1.14785
+  ],
+  [
+   953,
+   1.14465
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.8008
+  ],
+  [
+   50,
+   9.3158
+  ],
+  [
+   100,
+   7.3385
+  ],
+  [
+   150,
+   6.1807
+  ],
+  [
+   200,
+   5.5933
+  ],
+  [
+   250,
+   5.293
+  ],
+  [
+   300,
+   5.121
+  ],
+  [
+   350,
+   5.0221
+  ],
+  [
+   400,
+   4.92
+  ],
+  [
+   450,
+   4.8309
+  ],
+  [
+   500,
+   4.7665
+  ],
+  [
+   550,
+   4.6976
+  ],
+  [
+   600,
+   4.6324
+  ],
+  [
+   650,
+   4.602
+  ],
+  [
+   700,
+   4.5619
+  ],
+  [
+   750,
+   4.5353
+  ],
+  [
+   800,
+   4.4868
+  ],
+  [
+   850,
+   4.4604
+  ],
+  [
+   900,
+   4.4511
+  ],
+  [
+   950,
+   4.4367
+  ],
+  [
+   952,
+   4.4378
+  ]
+ ],
+ "train_seconds": 44.47,
+ "wall_seconds": 51.2,
+ "chars_per_sec": 175575,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there were many animals. They lived in a big truck that day on a beautiful nest, and a small cat. They had a fun day.\nOne day, a little girl named Lily went to the park. She saw a girl named Lily. Lily said, \"Don't worry, Lily. I am hot!\" She also found a ghigy on the ground. The caop was having a lovely hat.\nAnna was very happy. She said, \"I have fun. Do you want to take a ball\". Lily said, \"I can't be friends. You are the best to play with the ball. You are my best friend.\"\nThey played together every day. They had lots of fun. They learned that being nice is fun!\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to play near a small house. She had a sweet stone and a long gamer. She had a mitten like a yiler.\nOne day, Lily's mom said, \"Tom, do you feel frightened. Can we be kind a dress or laiving!\"\nLily and her friend were afraid to slot. They could not see them all the girl's inside. She said, \"I'm sad! I help me!\"\nAnna felt bad and remembered it to help her in the water. She gave her a toy to the red ball. It was very happy. She said, \"I'm sorry, Lily",
+ "rule_init": {},
+ "ngram_init": {}
+}

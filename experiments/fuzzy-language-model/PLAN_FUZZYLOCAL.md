@@ -247,3 +247,15 @@ The 3-block models were worse than the 2-block (+0.005 BPC at 30M, +0.012 at 300
 * **b1_d64** (about 99,450): width 64 (head dimension 8), the 2-block mixer recipe, 62 feed-forward rules; the embedding grows to 57.6K so the block shrinks.
 Predictions: the best 1-block arm within 0.01 BPC of the 2-block (45%); better by >= 0.01 on >= 4/5 seeds (20%); worse by >= 0.02 (35%); b1_ffn the best of the three (45%); b1_d64 the worst (50%).
 Decision rule: a 1-block arm that matches (within 0.005) or beats the 2-block goes to 300M (two seeds) and coherence on two checkpoints; the model then has fewer blocks and the freed budget is the lever for the match-the-hybrid goal.
+
+## 1-block outcome (`b1_*` in `v52-e2e`, 30M characters, seeds 0-4, paired with the 2-block all-fuzzy `e2e_tail`, mean 1.1368)
+| arm | params | BPC mean | vs 2-block (se) | seeds better | per-seed diffs |
+|---|---|---|---|---|---|
+| **b1_d64** (width 64, head dim 8, 62 FFN rules) | 99,450 | 1.1386 | **+0.0019 (0.0015)** | 1/5 | +.006 +.000 +.005 -.003 +.001 |
+| b1_ffn (width 48, 118 rules in the one FFN bank) | 99,202 | 1.1412 | +0.0044 (0.0035) | 2/5 | +.009 -.005 +.014 -.002 +.006 |
+| b1_mix (64 memory rules, ranks 48/32, 90 FFN rules) | 99,078 | 1.1438 | +0.0070 (0.0017) | 0/5 | +.007 +.001 +.010 +.010 +.007 |
+No run diverged. Predictions: the best 1-block arm within 0.01 of the 2-block (45%): **right** (+0.002); better by >= 0.01 on >= 4/5 seeds (20%): no; worse by >= 0.02 (35%): no; b1_ffn the best of the three (45%): **wrong** (b1_d64 is); b1_d64 the worst (50%): **wrong** (b1_mix is).
+Reading: **a single block is as good as two** at this budget (within 0.002 for the width-64 arm, +0.004 for the wide-FFN arm), and the 3-block models were worse: block count does not buy quality for the all-fuzzy model; the budget is better spent on width and rules. Decision rule (within 0.005): b1_d64 and b1_ffn go to 300M.
+
+### 1-block at 300M registered before running (`E2E_CHARS=300 E2E_SEEDS=0,1 python -m flm.run_fuzzy_e2e b1_d64 b1_ffn`; reference: the 2-block all-fuzzy at 300M, 0.99876 / 1.00263, mean 1.0007)
+Predictions: b1_d64 within 0.01 of the 2-block on both seeds (55%); better than it on both (20%); worse by >= 0.01 on both (25%); b1_ffn within 0.01 on both seeds (45%). The gaps of the fuzzy replacements shrank with data; the 3-block gap grew: for 1 block the direction is open (the single block has fewer places to learn in, but a fuzzy form learns slowly and 1 block has fewer layers to train).
