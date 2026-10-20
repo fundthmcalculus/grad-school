@@ -34,6 +34,42 @@ ARMS = {  # name: (env, train-arg overrides, ffn mult)
         {"--shortconv": "0"},
         "1.5",
     ),
+    # 3-block all-fuzzy models (PLAN_FUZZYLOCAL.md): the third block is paid for with narrower width or fewer rules / lower projection ranks
+    "b3_lean": (
+        {
+            **BASE,
+            "FUZZ_FFN_R": "31",
+            "FUZZ_FFN_R0": "21",
+            "FUZZ_EMB": "tail",
+            "FUZZ_PROJ_RANKS": "24,16",
+        },
+        {"--shortconv": "0", "--layers": "3", "--rules": "16"},
+        "1.5",
+    ),
+    "b3_d40": (
+        {
+            **BASE,
+            "FUZZ_FFN_R": "44",
+            "FUZZ_FFN_R0": "30",
+            "FUZZ_EMB": "tail",
+            "FUZZ_PROJ_RANKS": "24,16",
+        },
+        {"--shortconv": "0", "--layers": "3", "--d": "40"},
+        "1.5",
+    ),
+    "b3_smallemb": (
+        {
+            **BASE,
+            "FUZZ_FFN_R": "42",
+            "FUZZ_FFN_R0": "30",
+            "FUZZ_EMB": "tail",
+            "FUZZ_PROJ_RANKS": "24,16",
+            "TIER_NH": "320",
+            "TIER_E": "10",
+        },
+        {"--shortconv": "0", "--layers": "3", "--rules": "16"},
+        "1.5",
+    ),
     "e2e_all": (
         {**BASE, "FUZZ_FFN_R": "46", "FUZZ_FFN_R0": "31", "FUZZ_EMB": "all"},
         {"--shortconv": "0"},
@@ -66,14 +102,14 @@ if __name__ == "__main__":
                     a[a.index(k) + 1] = v
                 else:
                     a += [k, v]
-            env = dict(
-                os.environ,
-                TIER_NH="384",
-                TIER_E="12",
-                TIER_FREQ="outputs/freq_bpe3072.npz",
-                PYTHONPATH=".",
-                **envx,
-            )
+            env = {
+                **os.environ,
+                "TIER_NH": "384",
+                "TIER_E": "12",
+                "TIER_FREQ": "outputs/freq_bpe3072.npz",
+                "PYTHONPATH": ".",
+                **envx,  # an arm may override the defaults above (b3_smallemb changes the embedding)
+            }
             with open(OUT / "logs" / f"{name}_{CH}M_s{seed}.log", "w") as f:
                 r = subprocess.run(
                     [sys.executable, "-m", "flm.run_allfuzzy"] + a,
