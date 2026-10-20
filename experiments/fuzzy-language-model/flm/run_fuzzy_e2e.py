@@ -102,14 +102,14 @@ if __name__ == "__main__":
                     a[a.index(k) + 1] = v
                 else:
                     a += [k, v]
-            env = dict(
-                os.environ,
-                TIER_NH="384",
-                TIER_E="12",
-                TIER_FREQ="outputs/freq_bpe3072.npz",
-                PYTHONPATH=".",
-                **envx,
-            )
+            env = {
+                **os.environ,
+                "TIER_NH": "384",
+                "TIER_E": "12",
+                "TIER_FREQ": "outputs/freq_bpe3072.npz",
+                "PYTHONPATH": ".",
+                **envx,  # an arm may override the defaults above (b3_smallemb changes the embedding)
+            }
             with open(OUT / "logs" / f"{name}_{CH}M_s{seed}.log", "w") as f:
                 r = subprocess.run(
                     [sys.executable, "-m", "flm.run_allfuzzy"] + a,
