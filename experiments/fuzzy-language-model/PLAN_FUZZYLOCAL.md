@@ -168,3 +168,12 @@ Blind coherence set (`flm/coherence_fuzzy.py`, seeds 80-81, two raters, 8 texts 
 7. *Sharper memberships*: a learned temperature per token or sparsemax, to move from a soft average toward few-rule firing.
 **Diagnostics first (cheap, no training):** per-frequency-band loss and per-token loss difference of `e2e_all` vs the recipe on the validation set; coverage of the top-k tokens (what share of characters the 128 / 384 most frequent tokens spell); the effective rank of the trained crisp head table.
 The tail table (tail tokens over 12 prototypes) is the first thing to retry with the same ideas: its +0.040 may shrink under ideas 2 and 3.
+
+## 300M confirmation outcome (`v52-e2e` at 300M characters, seeds 0-1; reference: the hybrid BPE3072 recipe at 300M, 0.95758 / 0.96015, mean 0.95886)
+| model | what is fuzzy | params | BPC (seeds 0 / 1) | mean | vs hybrid recipe | at 30M (five seeds) |
+|---|---|---|---|---|---|---|
+| **c_full2** | every block component; token tables crisp | 99,019 | 0.99938 / 0.98601 | 0.9927 | **+0.0338** (+.042 / +.026) | +0.0549 |
+| **e2e_tail** | every block component + the tail token table | 99,019 | 0.99876 / 1.00263 | 1.0007 | **+0.0418** (+.041 / +.043) | +0.0820 |
+| **e2e_all** | every block component + head AND tail token tables | 99,009 | 1.10507 / 1.04419 | 1.0746 | **+0.1158** (+.148 / +.084) | +0.3318 |
+Predictions: c_full2 +0.03 to +0.07 (50%): **right** (at the low edge); e2e_tail +0.05 to +0.10 (50%): **wrong, better than the range** (+0.042); e2e_all >= +0.15 (60%): **wrong** (+0.116, seed 1 only +0.084); the gap of each fuzzy arm smaller at 300M than at 30M (60%): **right for all three** (0.055 -> 0.034, 0.082 -> 0.042, 0.332 -> 0.116).
+Reading: **the all-fuzzy number: with every block component fuzzy (convolution, normalisation, projections, gates, feed-forward antecedents) and the tail token table fuzzy, the model scores 1.0007 BPC at 300M characters, 0.042 (4.4%) worse than the hybrid recipe; with the head token table fuzzy as well it scores 1.0746 (12% worse); with the token tables left crisp 0.9927 (3.5% worse).** Every gap halves or better between 30M and 300M characters: the fuzzy forms learn more slowly rather than reach a lower ceiling, so the cost at larger data is smaller than the screens say (and the 1B numbers of the hybrid recipe, 0.945, were not run for the fuzzy models: no 1B runs, by the owner's instruction).
