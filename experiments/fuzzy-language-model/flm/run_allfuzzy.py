@@ -1,4 +1,4 @@
-"""flm.train with fuzzy replacements for non-fuzzy parts (`python -m flm.run_allfuzzy <train args>`; env FUZZ_NORM = fuzzy|scale, FUZZ_GATE = 1, FUZZ_FFN = raw|raw0 with FUZZ_FFN_R rules, FUZZ_PROJ = tsk0|tskl, FUZZ_FFN_TAPS / FUZZ_FFN_R0 for the layer-0 raw local rules, FUZZ_INIT=data, FUZZ_PROJ_RANKS=qkv,out (default 32,20), FUZZ_EMB=tail|all: fuzzy token tables of flm/fuzzy_tokens.py).
+"""flm.train with fuzzy replacements for non-fuzzy parts (`python -m flm.run_allfuzzy <train args>`; env FUZZ_NORM = fuzzy|scale, FUZZ_GATE = 1, FUZZ_FFN = raw|raw0 with FUZZ_FFN_R rules, FUZZ_PROJ = tsk0|tskl, FUZZ_FFN_TAPS / FUZZ_FFN_R0 for the layer-0 raw local rules, FUZZ_INIT=data, FUZZ_PROJ_RANKS=qkv,out (default 32,20), FUZZ_PROJ_R=8 rules, FUZZ_PROJ_ANTE=u|raw, FUZZ_PROJ_BIAS=1, FUZZ_EMB=tail|all: fuzzy token tables of flm/fuzzy_tokens.py).
 
 Composes with the tiered embedding (TIER_NH / TIER_E / TIER_FREQ as for flm.run_tiered).  train.py and models.py are untouched.
 """
@@ -23,13 +23,31 @@ _r0 = int(os.environ.get("FUZZ_FFN_R0", "0"))
 _di = os.environ.get("FUZZ_INIT", "") == "data"
 _ranks = tuple(int(x) for x in os.environ.get("FUZZ_PROJ_RANKS", "32,20").split(","))
 _emb = os.environ.get("FUZZ_EMB", "")
+_proj_r = int(os.environ.get("FUZZ_PROJ_R", "8"))
+_proj_ante = os.environ.get("FUZZ_PROJ_ANTE", "u")
+_proj_bias = os.environ.get("FUZZ_PROJ_BIAS", "") == "1"
 
 
 def _init(self, cfg, *a, **k):
     R._new_init(self, cfg, *a, **k)
     if _emb:
         FT.fuzzify_init(self, _emb)
-    install(self, _norm, _gate, _rules, _ffn, _ffn_r, _proj, _taps, _r0, _di, _ranks)
+    install(
+        self,
+        _norm,
+        _gate,
+        _rules,
+        _ffn,
+        _ffn_r,
+        _proj,
+        _taps,
+        _r0,
+        _di,
+        _ranks,
+        _proj_r,
+        _proj_ante,
+        _proj_bias,
+    )
 
 
 if __name__ == "__main__":
