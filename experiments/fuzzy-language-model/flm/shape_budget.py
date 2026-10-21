@@ -42,6 +42,8 @@ def count(
     mult=None,
     ctx=512,
     extra=(),
+    hr=0,
+    mid=(),
 ):
     """Parameters of the all-fuzzy model with these shapes (`extra`: more train-args, e.g. ('--tsk-dim', '12'))."""
     a = argv("random", 0)
@@ -61,6 +63,8 @@ def count(
     args = T.get_args(a)
     args.vocab_size = V
     R.NH, R.E = NH, E
+    FT.HEADRANK = hr
+    FT.MID = tuple(mid)
     RA._ffn_r, RA._r0 = rules, rules0
     freq = np.ones(V)
     np.savez("outputs/_shape_freq.npz", freq=freq)
@@ -73,17 +77,84 @@ def fit(cap=CAP, **kw):
     """Largest layer-1 rule count (layer 0 at 35/52 of it) that keeps the model at or under the cap; returns (rules, rules0, params)."""
     n0 = count(rules=52, rules0=35, **kw)
     slope = count(rules=53, rules0=round(53 * 35 / 52), **kw) - n0
-    guess = int(52 + (cap - n0) / slope)
+    r = max(2, int(52 + (cap - n0) / slope) - 6)
     best = None
-    for r in range(max(2, guess - 4), guess + 5):
+    for r in range(r, r + 60):
         r0 = max(1, round(r * 35 / 52))
         n = count(rules=r, rules0=r0, **kw)
-        if n <= cap and (best is None or n > best[2]):
-            best = (r, r0, n)
+        if n > cap:
+            break
+        best = (r, r0, n)
     return best
 
 
+# arms of PLAN_SHAPE.md (stage 1); V / head (NH) / tail width (E) / block width d; the rule counts are fitted by `python -m flm.shape_budget --table`
+ARMS = {
+    "ref": dict(V=3072, NH=384, E=12, d=48),
+    "E1a_h192": dict(V=3072, NH=192, E=12, d=48),
+    "E1b_h288": dict(V=3072, NH=288, E=12, d=48),
+    "E1c_h512": dict(V=3072, NH=512, E=12, d=48),
+    "E1d_h640": dict(V=3072, NH=640, E=12, d=48),
+    "E2a_e8": dict(V=3072, NH=384, E=8, d=48),
+    "E2b_h192e16": dict(V=3072, NH=192, E=16, d=48),
+    "E2c_h256e16": dict(V=3072, NH=256, E=16, d=48),
+    "E3a_v2560": dict(V=2560, NH=384, E=12, d=48),
+    "E3b_v4096e8": dict(V=4096, NH=384, E=8, d=48),
+    "E3c_v4096e10": dict(V=4096, NH=384, E=10, d=48),
+    "E3d_v6144h256": dict(V=6144, NH=256, E=6, d=48),
+    "E3e_v6144h192": dict(V=6144, NH=192, E=6, d=48),
+    "E3f_v8192": dict(V=8192, NH=256, E=6, d=48),
+    "E4a_d32": dict(V=3072, NH=512, E=12, d=32),
+    "E4b_d40": dict(V=3072, NH=448, E=12, d=40),
+    "E4c_d56": dict(V=3072, NH=320, E=12, d=56),
+    "E4d_d64": dict(V=3072, NH=192, E=10, d=64),
+    # E7: a reversible shared embedding (`PLAN_SHAPE.md`): orthonormal prototypes (ortho), a cycle loss (cycle), a rank-limited head (hr)
+    "E7a_ortho1": dict(V=3072, NH=384, E=12, d=48, ortho=1.0),
+    "E7b_ortho01": dict(V=3072, NH=384, E=12, d=48, ortho=0.1),
+    "E7c_cycle005": dict(V=3072, NH=384, E=12, d=48, cycle=0.05),
+    "E7d_cycle02": dict(V=3072, NH=384, E=12, d=48, cycle=0.2),
+    "E7e_hr32": dict(V=3072, NH=384, E=12, d=48, hr=32),
+    "E7f_hr24": dict(V=3072, NH=384, E=12, d=48, hr=24),
+    "E7g_hr16": dict(V=3072, NH=384, E=12, d=48, hr=16),
+    "E7h_hr24ortho": dict(V=3072, NH=384, E=12, d=48, hr=24, ortho=1.0),
+    # E5: three-tier embedding, mid = (tokens in the middle tier, its prototype count)
+    "E5a_v4096_m768": dict(V=4096, NH=256, E=6, d=48, mid=[768, 16]),
+    "E5b_v4096_m1024": dict(V=4096, NH=192, E=6, d=48, mid=[1024, 16]),
+    "E5c_v3072_m768": dict(V=3072, NH=384, E=8, d=48, mid=[768, 16]),
+}
+
+
 if __name__ == "__main__":
+    if "--table" in sys.argv:
+        import json
+
+        def emb(V, NH, E, d, hr=0, mid=(), **_):
+            head = NH * hr + hr * d if hr else NH * d
+            nm, e1 = mid if mid else (0, 0)
+            return head + (V - NH - nm) * E + E * d + nm * e1 + (e1 * d if nm else 0)
+
+        only = [a for a in sys.argv[1:] if not a.startswith("--")]
+        out = (
+            json.load(open("report/shape_arms.json"))
+            if only and os.path.exists("report/shape_arms.json")
+            else {}
+        )
+        for name, kw in ARMS.items():
+            if only and name not in only:
+                continue
+            fk = {k: kw[k] for k in ("V", "NH", "E", "d", "hr", "mid") if k in kw}
+            r = fit(**fk)
+            out[name] = dict(
+                **kw,
+                rules=r[0],
+                rules0=r[1],
+                params=r[2],
+                emb=emb(**kw),
+                share=round(emb(**kw) / r[2], 3),
+            )
+            print(name, out[name], flush=True)
+        json.dump(out, open("report/shape_arms.json", "w"), indent=1)
+        sys.exit(0)
     print(
         "recipe e2e_tail (V3072, head 384, tail 12, d48, 2 layers, rules 52/35):",
         count(),

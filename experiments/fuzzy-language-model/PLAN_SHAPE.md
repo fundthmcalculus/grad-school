@@ -64,7 +64,7 @@ Question: where does the vocabulary lever stop (3.85 characters per token at 307
 | E4d | 64 | 192 | 10 | 41,728 | 43 / 29 | 99,820 |
 Question: is d 48 the right width for the fuzzy blocks (a narrower model buys many more rules; a wider one buys richer mixers)?
 
-**E5: three-tier embedding (new code: `flm/fuzzy_tokens.py`, a second tail group).** Head tokens at full width d, a middle tier at width E1 with its own prototypes, a tail at width E2 < E1, each with its own up-projection. Rationale: the E3 and E2 arms are forced to cut the tail rank for rare tokens to afford a larger vocabulary; a middle tier keeps rank 16 where tokens still carry loss mass and rank 6 only where they do not. Arms at V4096: **E5a** head 256 / middle 768 at 16 / tail 3,072 at 6; **E5b** head 192 / middle 1,024 at 16 / tail 2,880 at 6; counts fitted when the module exists. Hypothesis: this beats the best two-tier arm at V4096.
+**E5: three-tier embedding (new code: `flm/fuzzy_tokens.py`, a second tail group).** Head tokens at full width d, a middle tier at width E1 with its own prototypes, a tail at width E2 < E1, each with its own up-projection. Rationale: the E3 and E2 arms are forced to cut the tail rank for rare tokens to afford a larger vocabulary; a middle tier keeps rank 16 where tokens still carry loss mass and rank 6 only where they do not. Implemented (`FUZZ_TOK_MID` in `flm/fuzzy_tokens.py`, verified: tier shapes, embedding parameter count equal to the formula, finite logits). Arms (fitted): **E5a** V4096, head 256 / middle 768 at 16 / tail 3,072 at 6, 73 / 49 rules, 99,918 parameters; **E5b** V4096, head 192 / middle 1,024 at 16 / tail 2,880 at 6, 73 / 49 rules, 99,790; **E5c** V3072, head 384 / middle 768 at 16 / tail 1,920 at 8, 64 / 43 rules, 99,615. Hypothesis: this beats the best two-tier arm at V4096.
 
 **E6: tokenizer algorithm at V3072 (conditional).** `flm/prep_superbpe.py` (superword merges that cross word boundaries; untracked, used locally) raises characters per token without changing the vocabulary size; one arm if the stream reaches at least 4.3 characters per token with BPE3072-sized tables, otherwise dropped.
 
@@ -111,3 +111,36 @@ Total about **5 GPU hours**, none of it 1B characters; the E series with its con
 - Iso-parameter fits move the FFN rule count by large factors (30 to 117 rules per layer); a result may then reflect the FFN rule count more than the embedding shape, so the E1 series (head size against rules) is read together with the FFN-only controls from stage 10 (trimming layer-1 rules to 41 costs 0.0046).
 - Larger vocabularies reduce the optimiser steps at 30M characters (about 900 steps): an effect against them that the 300M stage corrects.
 - `flm/fuzzy_tokens.py` is touched for E5 only; the screens E1-E4 need no model change (`TIER_NH`, `TIER_E`, `FUZZ_FFN_R`, `FUZZ_FFN_R0`, `--d`, `--tok`).
+
+## 8. E7: a common, essentially reversible embedding / de-embedding layer (added 2026-10-21 at the owner's request: "evaluate the idea of a common embedding / de-embedding layer, so that we save parameters. The embedding layer should be essentially reversible.")
+
+**What exists.** The model already has one shared layer: the table that embeds a token (`E[t]`) also de-embeds the output (`score_s = <h, E[s]>`; head rows crisp, tail rows `tier_up(mu(emb_t))`), so the V x d output matrix is not paid twice (the untied variants of stages 8-9 cost +0.002 to +0.014 at 30M and gain nothing at 300M). The new questions are (a) how reversible the shared layer is (decode(embed(t)) = t), (b) whether making it reversible by construction helps, and (c) whether a smaller shared layer saves parameters without losing what the recipe has.
+
+**Baseline measurement** (`flm/embed_reversibility.py`, `outputs/embed_reversibility.log`; trained 300M checkpoints; round trip with the model's own tied scoring, h = E[t], share of tokens whose top-1 decode is the token itself):
+| model | head tokens (384) | tail tokens (2,688) | all tokens, frequency-weighted | effective rank of E (of 48) |
+|---|---|---|---|---|
+| hybrid recipe, 300M | 0.893 | 0.182 | 0.818 | 5.6 |
+| all-fuzzy `e2e_tail`, warm-up 1000, 300M | 0.992 | 0.190 | 0.865 | 6.9 |
+| all-fuzzy `e2e_tail`, 1B | 0.995 | 0.137 | 0.844 | 7.4 |
+| fully fuzzy embedding (`e2e_all_tanh`), 300M | 0.997 | 0.494 | 0.935 | 10.9 |
+Reading: the shared table is **already essentially reversible where it matters**: head tokens round-trip almost perfectly and the tokens that carry the probability mass round-trip 82-94% of the time. The tail does not (14-19% top-1; 2,688 tokens in 12 dimensions cannot be told apart by a dot product), and the fully fuzzy table is the most reversible tail (49%). The effective rank of the whole table is **5.6-10.9 of 48**: the embedding uses a small subspace, which suggests a rank-limited head may cost little (the earlier factorised embedding, `v16-factemb`, lost 0.040 or more by limiting *every* token's rank; here only the head is limited and the tail keeps its own prototypes).
+
+**Arms** (`E7*` in `flm/shape_budget.py`, fitted; V3072, head 384, tail 12, d 48; `flm/run_embed_rev.py` adds the loss terms, `FUZZ_TOK_HEADRANK` the rank limit):
+| arm | change | params | FFN rules L1/L0 |
+|---|---|---|---|
+| E7a ortho1 | orthonormality penalty (weight 1) on the tail prototypes (`tier_up`): the membership vector is exactly recoverable from the embedding | 99,694 | 54 / 36 |
+| E7b ortho0.1 | the same, weight 0.1 | 99,694 | 54 / 36 |
+| E7c cycle0.05 | cycle loss: the shared table is trained to decode its own embedding (CE of `embed(t) . E^T` against t, 512 tokens per step), weight 0.05 | 99,694 | 54 / 36 |
+| E7d cycle0.2 | the same, weight 0.2 | 99,694 | 54 / 36 |
+| E7e hr32 | head tokens through a rank-32 bottleneck with a shared up-projection (saves 4,608 parameters, spent on feed-forward rules) | 99,714 | 66 / 44 |
+| E7f hr24 | rank 24 (saves 8,064) | 99,729 | 75 / 50 |
+| E7g hr16 | rank 16 (saves 11,520) | 99,551 | 83 / 56 |
+| E7h hr24 + ortho | rank 24 with orthonormal head and tail prototypes: a small, reversible shared layer | 99,729 | 75 / 50 |
+Re-run the reversibility measurement on the winning checkpoints (baseline above); the loss terms leave the plain cross-entropy as the logged training loss.
+
+**Registered predictions (E7).**
+1. E7a / E7b (orthonormal prototypes, no parameter change) are within 0.005 of the reference (55%); neither beats it by 0.005 on four of five seeds (80%).
+2. E7c / E7d (cycle loss) are no better than the reference by 0.005 (75%); the 0.2 weight is worse than the reference (50%): the output scoring is a language-model task, not a retrieval task, and the table is already reversible for the head.
+3. A rank-limited head that saves parameters: E7e (rank 32) is within 0.005 of the reference (45%); E7f (rank 24) beats the reference by 0.005 on four of five seeds (20%); E7g (rank 16) is worse than the reference by 0.005 (65%). The effective rank of 6-11 says the head table is compressible; the earlier factorised-embedding loss says the cost of limiting rank is real.
+4. E7h (rank 24, orthonormal) beats E7f (rank 24, free) (35%).
+5. Round-trip reversibility of the tail (tokens recovered) rises with the orthonormal penalty by at least 0.1 absolute (60%) without a likelihood gain: reversibility by construction is a property, not a lever.
