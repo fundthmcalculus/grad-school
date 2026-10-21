@@ -16,6 +16,9 @@ Stage 6 options (environment; the defaults reproduce stage 5 exactly):
 Stage 6b (`v56-embed2`, from the literature review `literature/04-fuzzy-embeddings.md`):
   FUZZ_TOK_BIAS = head             a learned per-token output bias for the head tokens, initialised at the log unigram probability (+NH parameters)
   FUZZ_TOK_GAIN = 1                a learned output gain and a per-head-token amplitude on the head logits (1 + NH parameters), lifting the bound that a convex combination puts on the scores
+  FUZZ_TOK_UNTIE = 1              the head's input and output prototype matrices are separate (+d*d parameters)
+  FUZZ_TOK_MOS = M                 a mixture of M softmaxes (low-rank per-component state shift, rank FUZZ_TOK_MOS_RANK, plus a gate)
+  FUZZ_TOK_PQ = G                  product-quantised head: G groups of d/G prototypes, a membership vector per group, prototype matrix G*(d/G)*(d/G)
   FUZZ_TOK_TIER = 1                a soft tier gate: P(token) = P(tier | h) * P(token | tier), the tier probability a sigmoid of a linear function of h (d + 1 parameters)
 """
 
@@ -34,6 +37,10 @@ PRIOR = os.environ.get("FUZZ_TOK_PRIOR", "") == "1"
 BIAS = os.environ.get("FUZZ_TOK_BIAS", "")
 GAIN = os.environ.get("FUZZ_TOK_GAIN", "") == "1"
 TIER = os.environ.get("FUZZ_TOK_TIER", "") == "1"
+UNTIE = os.environ.get("FUZZ_TOK_UNTIE", "") == "1"
+MOS = int(os.environ.get("FUZZ_TOK_MOS", "0"))
+MOS_RANK = int(os.environ.get("FUZZ_TOK_MOS_RANK", "8"))
+PQ = int(os.environ.get("FUZZ_TOK_PQ", "0"))
 
 
 def _mu(logits):
@@ -47,7 +54,15 @@ def fuzzify_init(self, mode: str):
         nn.init.normal_(self.emb_t.weight, std=1.0)
     if mode == "all":
         nn.init.normal_(self.emb_h.weight, std=1.0)
-        self.head_proto = nn.Parameter(torch.randn(d, d) / d**0.5)
+        if PQ:
+            g, k = PQ, d // PQ
+            self.head_kind = "pq"
+            self.head_pq = nn.Parameter(torch.randn(g, k, d // g) / k**0.5)
+        else:
+            self.head_kind = "proto"
+            self.head_proto = nn.Parameter(torch.randn(d, d) / d**0.5)
+            if UNTIE:
+                self.head_proto_out = nn.Parameter(torch.randn(d, d) / d**0.5)
         if RES:
             self.head_res = nn.Embedding(R.NH, RES)
             self.head_res_up = nn.Parameter(torch.randn(RES, d) * 0.1)
@@ -70,6 +85,10 @@ def fuzzify_init(self, mode: str):
     if GAIN:
         self.out_gain = nn.Parameter(torch.ones(()))
         self.head_amp = nn.Parameter(torch.ones(R.NH))
+    if MOS:
+        self.mos_down = nn.Parameter(torch.randn(MOS, d, MOS_RANK) * 0.1)
+        self.mos_up = nn.Parameter(torch.randn(MOS, MOS_RANK, d) * 0.1)
+        self.mos_pi = nn.Parameter(torch.zeros(d, MOS))
 
 
 def _embed(self, idx):
@@ -79,16 +98,36 @@ def _embed(self, idx):
     mt = _mu(self.emb_t(p.clamp(max=self.emb_t.num_embeddings - 1)))
     xt = self.tier_up(mt)
     mh = self.emb_h(p.clamp(max=R.NH - 1))
-    if hasattr(self, "head_proto"):
+    kind = getattr(self, "head_kind", None)
+    if kind == "pq":
+        g, k, dg = self.head_pq.shape
+        mu = _mu(mh.reshape(*mh.shape[:-1], g, k))
+        xh = torch.einsum("...gk,gkc->...gc", mu, self.head_pq).reshape(
+            *mh.shape[:-1], g * dg
+        )
+    elif kind == "proto":
         xh = _mu(mh) @ self.head_proto.T
         if hasattr(self, "head_res"):
             xh = xh + self.head_res(p.clamp(max=R.NH - 1)) @ self.head_res_up
     else:
         xh = mh
+    if kind == "pq" and hasattr(self, "head_res"):
+        xh = xh + self.head_res(p.clamp(max=R.NH - 1)) @ self.head_res_up
     return torch.where(self.t_head[idx][..., None], xh, xt)
 
 
 def _logits(self, h):
+    if not MOS:
+        return _core(self, h)
+    logpi = torch.log_softmax(h @ self.mos_pi, dim=-1)
+    comps = []
+    for j in range(MOS):
+        hj = h + (h @ self.mos_down[j]) @ self.mos_up[j]
+        comps.append(torch.log_softmax(_core(self, hj), dim=-1) + logpi[..., j : j + 1])
+    return torch.logsumexp(torch.stack(comps, 0), dim=0)
+
+
+def _core(self, h):
     hn = None  # the normalised state, when this call computed it
     if self.tok_mode == "crisp":
         out = R._logits(self, h)
@@ -96,8 +135,20 @@ def _logits(self, h):
         h = hn = self.norm(h)
         mt = _mu(self.emb_t.weight)  # (V-NH, E) memberships of the tail tokens
         lt = (h @ self.tier_up.weight) @ mt.T
-        if hasattr(self, "head_proto"):
-            lh = (h @ self.head_proto) @ _mu(self.emb_h.weight).T
+        kind = getattr(self, "head_kind", None)
+        if kind == "pq":
+            g, k, dg = self.head_pq.shape
+            sc = torch.einsum(
+                "...gc,gkc->...gk", h.reshape(*h.shape[:-1], g, dg), self.head_pq
+            )
+            lh = torch.einsum(
+                "...gk,vgk->...v", sc, _mu(self.emb_h.weight.reshape(-1, g, k))
+            )
+            if hasattr(self, "head_res"):
+                lh = lh + (h @ self.head_res_up.T) @ self.head_res.weight.T
+        elif kind == "proto":
+            out_proto = self.head_proto_out if UNTIE else self.head_proto
+            lh = (h @ out_proto) @ _mu(self.emb_h.weight).T
             if hasattr(self, "head_res"):
                 lh = lh + (h @ self.head_res_up.T) @ self.head_res.weight.T
         else:
