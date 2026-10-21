@@ -1,5 +1,5 @@
 """The stage-7 winners at 300M characters (`v59-e2e300`, PLAN_FUZZYLOCAL.md stage 7): lr 6e-2, warm-up 1000 (the 300M optimum, `v53-fuzzylr`), seeds 0-1, checkpoints saved; paired with `e2e_tail` at
-warm-up 1000 (0.98929, two seeds) and the hybrid recipe (0.9589).  Arms: `e2e_prior` (fuzzy blocks and tail table, crisp head, log-unigram prior), `e2e_all_tp` (head table fuzzy too: signed memberships plus the prior).
+warm-up 1000 (0.98929, two seeds) and the hybrid recipe (0.9589).  Arms (`e2e_all_tanh`, signed memberships without the prior, added after the first four runs showed the prior hurts at 300M): `e2e_prior` (fuzzy blocks and tail table, crisp head, log-unigram prior), `e2e_all_tp` (head table fuzzy too: signed memberships plus the prior).
 ``python -m flm.run_fuzzy_e2e300 [arm ...]``
 """
 
@@ -15,6 +15,7 @@ OUT = Path("outputs/v59-e2e300")
 GRID = {  # name: (e2e arm, extra environment)
     "e2e_prior": ("e2e_tail", {"FUZZ_TOK_PRIOR": "1"}),
     "e2e_all_tp": ("e2e_all", {"FUZZ_TOK_FORM": "tanh", "FUZZ_TOK_PRIOR": "1"}),
+    "e2e_all_tanh": ("e2e_all", {"FUZZ_TOK_FORM": "tanh"}),
 }
 if __name__ == "__main__":
     (OUT / "logs").mkdir(parents=True, exist_ok=True)
