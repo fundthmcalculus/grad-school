@@ -2,7 +2,7 @@
 
 ``python -m flm.run_ss_screen 30 [arm ...]``   30M characters, seeds 0-4 (`v67-ss30`)
 ``python -m flm.run_ss_screen 300 [arm ...]``  300M characters, seeds 0-1, checkpoints saved (`v68-ss300`)
-Arms: ``hyb_lr6`` / ``hyb_lr3`` (the hybrid recipe, `flm.run_tiered`, warm-up 100, lr 6e-2 / 3e-2) and ``fz_lr6`` / ``fz_lr3`` (`e2e_tail`, `flm.run_allfuzzy`, warm-up 600 at 30M and 1000 at 300M).  The TinyStories-tuned
+Warm-up screen arms ``fz_wu300`` / ``fz_wu1000`` (all-fuzzy, lr 6e-2, warm-up 300 / 1000 at 30M).  Arms: ``hyb_lr6`` / ``hyb_lr3`` (the hybrid recipe, `flm.run_tiered`, warm-up 100, lr 6e-2 / 3e-2) and ``fz_lr6`` / ``fz_lr3`` (`e2e_tail`, `flm.run_allfuzzy`, warm-up 600 at 30M and 1000 at 300M).  The TinyStories-tuned
 recipes are transferred, not re-tuned; both models get the same two learning rates.
 """
 
@@ -20,6 +20,8 @@ ARMS = {
     "hyb_lr3": ("hyb", "3e-2"),
     "fz_lr6": ("fz", "6e-2"),
     "fz_lr3": ("fz", "3e-2"),
+    "fz_wu300": ("fz", "6e-2", "300"),  # 30M warm-up screen (PLAN_NEXTROUND.md 3.4.5)
+    "fz_wu1000": ("fz", "6e-2", "1000"),
 }
 if __name__ == "__main__":
     scale = sys.argv[1]
@@ -33,7 +35,7 @@ if __name__ == "__main__":
     ]
     for seed in seeds:
         for name in arms:
-            kind, lr = ARMS[name]
+            kind, lr, *wu = ARMS[name]
             out = out_dir / f"{name}_s{seed}.json"
             if out.exists():
                 continue
@@ -45,7 +47,7 @@ if __name__ == "__main__":
             if kind == "fz":
                 envx, over, mult = E2E["e2e_tail"]
                 a[a.index("--ffn-mult") + 1] = mult
-                a[a.index("--warmup") + 1] = "1000" if big else "600"
+                a[a.index("--warmup") + 1] = wu[0] if wu else ("1000" if big else "600")
                 for k, v in over.items():
                     a[a.index(k) + 1] = v
             else:

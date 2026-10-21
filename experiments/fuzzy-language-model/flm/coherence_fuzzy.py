@@ -95,7 +95,7 @@ if __name__ == "__main__":
         FT.MOS = st["mos_pi"].shape[1] if "mos_pi" in st else 0
         FT.MOS_RANK = st["mos_down"].shape[2] if "mos_down" in st else FT.MOS_RANK
         FT.RES = st["head_res.weight"].shape[1] if "head_res.weight" in st else 0
-        tail_names = ("ftail", "e2e_tail", "e2e_prior", "lr6_wu")
+        tail_names = ("ftail", "e2e_tail", "e2e_prior", "lr6_wu", "fz_lr")
         emb_mode = (
             "all"
             if "head_proto" in st or "head_pq" in st
