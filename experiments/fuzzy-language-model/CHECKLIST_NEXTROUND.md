@@ -15,7 +15,7 @@ Branch `exp/allfuzzy-nextround`. Item IDs are stable (never renumber). Every ite
 - [x] S2 Plan with datasets and registered predictions: `PLAN_NEXTROUND.md`.
 - [x] S3 Reporting tool `flm/report_nextround.py`; checked against stage 10 (reproduces `proj_r16` +0.0009, `ffn_r41` +0.0046, `proj_bias` +0.0028). Evidence: command output in this session; rerun reproduces it.
 - [x] S4 Group-learning-rate runner `flm/run_fuzzy_groups.py`; smoke run of `g_c3` and `g_wd0` printed the parameter groups (learning-rate multiplier and weight decay per group, with sizes). Evidence: `outputs/smoke-groups/logs/`.
-- [ ] S5 Pinned `black==26.5.1` on every new `.py` (done for the two files above; repeat for each new file).
+- [x] S5 Pinned `black==26.5.1` on every new `.py` (done for the two files above; repeat for each new file).
 
 ## A. Training efficiency (TinyStories)
 - [x] A2.1 Run `python -m flm.run_fuzzy_groups` (4 arms x 5 seeds, 30M, `v64-groups`). Evidence: 20 cells in `outputs/v64-groups/`.
@@ -44,7 +44,7 @@ Branch `exp/allfuzzy-nextround`. Item IDs are stable (never renumber). Every ite
 - [ ] B5.2 NOT RUN (optional) (far end, optional) Cosmopedia mix from the existing `data/mixed`.
 
 ## R. Reporting and housekeeping
-- [ ] R1 After each result: PLAN entry, commit, dashboard section updated, push notification.
-- [ ] R2 After each model change: `allfuzzy/export_weights.py`, parity check (numpy against torch, browser against numpy), demo rebuilt, gh-pages republished.
-- [ ] R3 Open a PR for `exp/allfuzzy-nextround` once track A closes (stacked on #275 or on main after #275 merges); body states inherited CI failures separately from this change.
+- [x] R1 (dashboard sections: 1B scaling, corpus gap; stage 10) After each result: PLAN entry, commit, dashboard section updated, push notification.
+- [x] R2 (no model changed this round: the demo is unchanged) After each model change: `allfuzzy/export_weights.py`, parity check (numpy against torch, browser against numpy), demo rebuilt, gh-pages republished.
+- [x] R3 (#276, stacked on #275) Open a PR for `exp/allfuzzy-nextround` once track A closes (stacked on #275 or on main after #275 merges); body states inherited CI failures separately from this change.
 - [ ] R4 Memory: record any new standing decision (the 1B exception, the dataset choice).
