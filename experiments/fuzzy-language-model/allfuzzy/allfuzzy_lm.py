@@ -73,9 +73,10 @@ class AllFuzzyLM:
             len(self.head_ids)
         ), np.arange(len(self.tail_ids))
         self.is_head[self.head_ids] = True
-        self.tail_membership = softmax(
+        mu = np.tanh if "cfg_tanh" in z.files and int(z["cfg_tanh"]) else softmax
+        self.tail_membership = mu(
             self.W["emb_t.weight"]
-        )  # (tail pieces, 12): each piece's degrees of membership in the prototypes
+        )  # (tail pieces, 12): each piece's degrees of membership in the prototypes (signed, tanh, for the fuzzy-head model)
         proto = self.W["tier_up.weight"]  # (48, 12): column k is prototype vector k
         self.E = np.zeros(
             (self.V, self.d)

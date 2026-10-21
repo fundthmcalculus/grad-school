@@ -28,8 +28,17 @@
  },
  {
   "id": "flm-allfuzzy",
-  "label": "99K ALL-FUZZY: every block component a fuzzy system, tail token table fuzzy (300M characters)",
+  "label": "99K ALL-FUZZY: every block component a fuzzy system, tail token table fuzzy (300M characters, 0.987 bits per character)",
   "params": 99019,
+  "ctx": 512,
+  "d": 48,
+  "layers": 2,
+  "tok": "bpe3072"
+ },
+ {
+  "id": "flm-allfuzzy-embed",
+  "label": "99K FULLY-FUZZY EMBEDDING: every block component and both token tables fuzzy sets (300M characters, 0.997 bits per character)",
+  "params": 99009,
   "ctx": 512,
   "d": 48,
   "layers": 2,
