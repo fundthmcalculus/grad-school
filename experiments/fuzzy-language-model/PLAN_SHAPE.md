@@ -157,3 +157,27 @@ Seed 0 of stage 1 (provisional, one seed): a larger vocabulary (V4096 tail 10 -0
 | C6 | 6144 | 512 | 8 | 40 | 33 / 22 | 99,939 | 0.66 |
 The large embedding shares push the feed-forward banks to 19-34 rules per layer (the reference has 54), so these arms also test how far rules can be traded for embedding; the stage 10 control (41 rules costs 0.0046) says the trade is not free.
 Predictions: the best combination beats the best single-axis arm of stage 1 by at least 0.005 on the three-seed mean (45%); some combination reaches at least 0.035 better than the reference (30%); C4 (19 rules) is worse than C2 (73 rules) (55%: the feed-forward floor); C3 beats C1 (50%).
+
+## 10. Stage 1 results (recorded 2026-10-21 18:45-19:10; `v69-shape`, 30M characters, three seeds, iso-parameter, refit reference 1.1213 on seeds 0-2 (54 / 36 rules, 99,694 parameters); `report/shape_stage1.md`; change against the reference, negative is better)
+| series | arm | BPC | change (se) | per seed | FFN rules |
+|---|---|---|---|---|---|
+| head size | h192 | 1.1451 | +0.0242 (0.0015) | +0.0249 +0.0214 +0.0265 | 72 / 48 |
+| | h288 | 1.1324 | +0.0115 (0.0039) | +0.0113 +0.0049 +0.0184 | 63 / 42 |
+| | **h512** | 1.1109 | **-0.0099** (0.0015) | -0.0124 -0.0101 -0.0071 | 42 / 28 |
+| | **h640** | 1.1122 | **-0.0086** (0.0022) | -0.0089 -0.0123 -0.0046 | 30 / 20 |
+| tail width | e8 (head 384) | 1.1387 | +0.0179 (0.0039) | +0.0203 +0.0102 +0.0232 | 82 / 55 |
+| | h192 e16 | 1.1378 | +0.0170 (0.0017) | +0.0168 +0.0141 +0.0201 | 42 / 28 |
+| | h256 e16 | 1.1303 | +0.0095 (0.0021) | +0.0102 +0.0056 +0.0127 | 36 / 24 |
+| vocabulary | V2560 | 1.1403 | +0.0195 (0.0024) | +0.0148 +0.0210 +0.0226 | 70 / 47 |
+| | **V4096 h384 e8** | 1.0999 | **-0.0209** (0.0021) | -0.0232 -0.0230 -0.0167 | 61 / 41 |
+| | **V4096 h384 e10** | **1.0935** | **-0.0273** (0.0028) | -0.0276 -0.0320 -0.0222 | 42 / 28 |
+| | **V6144 h256 e6** | 1.0991 | **-0.0218** (0.0007) | -0.0230 -0.0207 -0.0216 | 63 / 42 |
+| | V6144 h192 e6 | 1.1199 | -0.0009 (0.0041) | -0.0025 -0.0071 +0.0069 | 70 / 47 |
+| | **V8192 h256 e6** | 1.1045 | **-0.0163** (0.0015) | -0.0190 -0.0138 -0.0162 | 31 / 21 |
+| block width | d32 (head 512) | 1.1215 | +0.0007 (0.0014) | +0.0032 -0.0016 +0.0006 | 128 / 86 |
+| | d40 (head 448) | 1.1160 | -0.0048 (0.0023) | -0.0067 -0.0076 -0.0002 | 82 / 55 |
+| | d56 (head 320) | 1.1337 | +0.0128 (0.0029) | +0.0154 +0.0071 +0.0161 | 36 / 24 |
+| | d64 (head 192, e10) | 1.1589 | +0.0381 (0.0004) | +0.0375 +0.0379 +0.0389 | 43 / 29 |
+Survivors to stage 2 (better on all three seeds by at least 0.003 on average): **E1c h512, E1d h640, E3b V4096 e8, E3c V4096 e10, E3d V6144 h256, E3f V8192, E4b d40** (seven arms; seeds 3 and 4 follow).
+Predictions (section 6): at least one arm beats the reference on four of five seeds (50%): **right on three seeds, five-seed confirmation pending**; best arm gains at least 0.015 (25%): **right** (V4096 e10, -0.0273); best head between 288 and 512 (65%): **right at the edge** (512 beats 640 by 0.001); both 192 and 640 worse than the reference by 0.005 (45%): **wrong** (640 gains 0.0086); E2a worse than the reference (60%): **right**; E2b beats E1a by 0.005 (40%): **right** (0.0073, every seed); V4096 beats V3072 (30%): **wrong** (-0.021 and -0.027); V6144 and V8192 worse than V3072 (65%): **wrong** (-0.022 and -0.016); V2560 worse (65%): **right**; d48 within 0.005 of the best width (70%): **right, just** (d40, -0.0048); no width beats d48 on four of five seeds (75%): pending.
+Reading: **the recipe's embedding shape was not optimal**: a vocabulary of 4096 with the 384 head and a rank-10 tail beats the vocabulary-3072 recipe by 0.027 bits per character (2.4%) on every seed, through the same mechanism as the earlier vocabulary lever (characters per token 3.85 to 3.95), and a larger head (512-640) gains 0.009-0.010 at vocabulary 3072 even though it cuts the feed-forward rules from 54 to 30-42. Both trade feed-forward rules for embedding and win, so the feed-forward banks are the cheaper component to shrink. The tail wants at least rank 10 (rank 8 loses 0.006 at vocabulary 4096 and 0.018 at 3072), the vocabulary lever peaks near 4096-6144 (8192 loses 0.011 against 4096 e10 once the tail is 6 wide), and d 40-48 is the right block width. Combinations (E8) are queued.
