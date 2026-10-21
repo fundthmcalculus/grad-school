@@ -5,6 +5,7 @@ replacements (flm/fuzzy_parts.py) and tiered embeddings of any shape.  Each chec
   blocks.*.mix.qkv.centers -> TSKMap               blocks.*.mix.qkv.B.weight  -> TSKLinear (k = rows of B)
 plus the tiered-embedding detection of flm.coherence_vocab and the fuzzy token tables of flm/fuzzy_tokens.py (``head_proto`` / ``head_pq`` in the state: all tokens; 'ftail' / 'e2e_tail' / 'e2e_prior' / 'lr6_wu' (the e2e_tail warm-up runs) in the checkpoint file name: tail tokens only).
 Stage 6-8 head options are read from the state (``prior_alpha``, ``tok_bias``, ``tier_w``, ``out_gain``, ``head_proto_out``, ``mos_pi``, ``head_pq``, ``head_res``); the one thing the state cannot say is the membership function, so a checkpoint whose file name contains 'tanh' or '_tp' (``e2e_all_tanh``, ``e2e_all_tp``, ``fall_tanh*``) is loaded with signed (tanh) memberships.  Stock models load as before.
+A checkpoint trained on another corpus needs ``COH_TIER_FREQ`` (its token-frequency file: the head set is the most frequent tokens) and ``GRAD_SCHOOL_DATA`` (its tokenizer); without them the head tokens are the wrong ones and the text is gibberish (coherence set 22).
 """
 
 import os
@@ -79,11 +80,11 @@ if __name__ == "__main__":
         if tiered:
             R.NH, R.E = st["emb_h.weight"].shape[0], st["emb_t.weight"].shape[1]
             v = ck["config"]["vocab_size"]
-            os.environ["TIER_FREQ"] = (
+            os.environ["TIER_FREQ"] = os.environ.get("COH_TIER_FREQ") or (
                 "outputs/v22-tribble/ppmi_k48_v1024.npz"
                 if v == 1024
                 else f"outputs/freq_bpe{v}.npz"
-            )
+            )  # COH_TIER_FREQ: the frequency file the checkpoint was trained with (a different corpus has a different head set)
         stem = os.path.basename(str(path))
         FT.FORM = "tanh" if ("tanh" in stem or "_tp" in stem) else "softmax"
         FT.PRIOR = "prior_alpha" in st

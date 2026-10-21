@@ -18,7 +18,12 @@ from flm.bpe import BPE, EOT_CH, stream_text
 from flm.models import ModelConfig, TinyLM
 
 REPO = Path(__file__).resolve().parents[3]
-os.environ["TIER_FREQ"] = "outputs/freq_bpe3072.npz"
+NATIVE = (
+    os.environ.get("SS_NATIVE") == "1"
+)  # SimpleStories-trained checkpoints on their own validation stream (the rebuild check)
+os.environ["TIER_FREQ"] = (
+    "outputs/freq_simplestories_bpe3072.npz" if NATIVE else "outputs/freq_bpe3072.npz"
+)
 
 
 def simple_valid_tokens(bp: BPE, chars=1_000_000):
@@ -32,14 +37,14 @@ def simple_valid_tokens(bp: BPE, chars=1_000_000):
 if __name__ == "__main__":
     bp = BPE(3072)
     T.TOK = bp
-    val = simple_valid_tokens(bp)
+    val = np.asarray(bp.load("valid")) if NATIVE else simple_valid_tokens(bp)
     for path in sys.argv[1:]:
         ck = torch.load(path, map_location="cpu", weights_only=False)
         st = ck["state"]
         R.NH, R.E = st["emb_h.weight"].shape[0], st["emb_t.weight"].shape[1]
         stem = Path(path).name
         FT.FORM = "tanh" if "tanh" in stem or "_tp" in stem else "softmax"
-        tail = any(n in stem for n in ("e2e_tail", "lr6_wu"))
+        tail = any(n in stem for n in ("e2e_tail", "lr6_wu", "fz_lr"))
         CF._state.update(
             tiered=True,
             state=st,
@@ -51,8 +56,7 @@ if __name__ == "__main__":
         m = TinyLM(ModelConfig(**ck["config"]))
         m.load_state_dict(st)
         b = T.evaluate(m, val, 512, 1_000_000)
-        own = None
         print(
-            f"{path}: {b:.4f} bits per character on SimpleStories text (own-corpus validation {ck.get('val_bpc', float('nan'))})",
+            f"{path}: {b:.4f} bits per character on SimpleStories text ",
             flush=True,
         )
