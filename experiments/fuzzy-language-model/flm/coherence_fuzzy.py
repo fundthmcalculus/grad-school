@@ -3,7 +3,8 @@ replacements (flm/fuzzy_parts.py) and tiered embeddings of any shape.  Each chec
   blocks.*.n1.centers      -> FuzzyNorm            blocks.*.mix.gate.centers  -> FuzzyGate (rules = rows)
   blocks.*.ffn.slope / no ffn.ante -> FuzzyFFNRaw (order 1 / order 0)
   blocks.*.mix.qkv.centers -> TSKMap               blocks.*.mix.qkv.B.weight  -> TSKLinear (k = rows of B)
-plus the tiered-embedding detection of flm.coherence_vocab and the fuzzy token tables of flm/fuzzy_tokens.py (``head_proto`` in the state: all tokens; 'ftail' / 'e2e_tail' in the checkpoint file name: tail tokens only).  Stock models load as before.
+plus the tiered-embedding detection of flm.coherence_vocab and the fuzzy token tables of flm/fuzzy_tokens.py (``head_proto`` / ``head_pq`` in the state: all tokens; 'ftail' / 'e2e_tail' / 'e2e_prior' / 'lr6_wu' (the e2e_tail warm-up runs) in the checkpoint file name: tail tokens only).
+Stage 6-8 head options are read from the state (``prior_alpha``, ``tok_bias``, ``tier_w``, ``out_gain``, ``head_proto_out``, ``mos_pi``, ``head_pq``, ``head_res``); the one thing the state cannot say is the membership function, so a checkpoint whose file name contains 'tanh' or '_tp' (``e2e_all_tanh``, ``e2e_all_tp``, ``fall_tanh*``) is loaded with signed (tanh) memberships.  Stock models load as before.
 """
 
 import os
@@ -84,11 +85,24 @@ if __name__ == "__main__":
                 else f"outputs/freq_bpe{v}.npz"
             )
         stem = os.path.basename(str(path))
+        FT.FORM = "tanh" if ("tanh" in stem or "_tp" in stem) else "softmax"
+        FT.PRIOR = "prior_alpha" in st
+        FT.BIAS = "head" if "tok_bias" in st else ""
+        FT.TIER = "tier_w" in st
+        FT.GAIN = "out_gain" in st
+        FT.UNTIE = "head_proto_out" in st
+        FT.PQ = st["head_pq"].shape[0] if "head_pq" in st else 0
+        FT.MOS = st["mos_pi"].shape[1] if "mos_pi" in st else 0
+        FT.MOS_RANK = st["mos_down"].shape[2] if "mos_down" in st else FT.MOS_RANK
+        FT.RES = st["head_res.weight"].shape[1] if "head_res.weight" in st else 0
+        tail_names = ("ftail", "e2e_tail", "e2e_prior", "lr6_wu")
         emb_mode = (
             "all"
-            if "head_proto" in st
-            else ("tail" if tiered and ("ftail" in stem or "e2e_tail" in stem) else "")
+            if "head_proto" in st or "head_pq" in st
+            else ("tail" if tiered and any(n in stem for n in tail_names) else "")
         )
+        if not emb_mode and (FT.PRIOR or FT.TIER):
+            emb_mode = "crisp"
         _state.update(tiered=tiered, state=st, emb_mode=emb_mode)
         TinyLM.__init__ = _init
         TinyLM.embed = (
