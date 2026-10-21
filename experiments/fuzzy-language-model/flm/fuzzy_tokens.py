@@ -13,6 +13,10 @@ Stage 6 options (environment; the defaults reproduce stage 5 exactly):
   FUZZ_TOK_FORM = softmax | tanh   membership function: a partition of unity, or signed memberships in (-1, 1) (a free, not convex, combination)
   FUZZ_TOK_RES  = r                head tokens also carry a crisp rank-r residual row on top of the fuzzy part (all mode)
   FUZZ_TOK_PRIOR = 1               add alpha * log unigram probability to every logit (alpha learned, initial 1; one parameter, no table)
+Stage 6b (`v56-embed2`, from the literature review `literature/04-fuzzy-embeddings.md`):
+  FUZZ_TOK_BIAS = head             a learned per-token output bias for the head tokens, initialised at the log unigram probability (+NH parameters)
+  FUZZ_TOK_GAIN = 1                a learned output gain and a per-head-token amplitude on the head logits (1 + NH parameters), lifting the bound that a convex combination puts on the scores
+  FUZZ_TOK_TIER = 1                a soft tier gate: P(token) = P(tier | h) * P(token | tier), the tier probability a sigmoid of a linear function of h (d + 1 parameters)
 """
 
 import os
@@ -27,6 +31,9 @@ MODE = "tail"
 FORM = os.environ.get("FUZZ_TOK_FORM", "softmax")
 RES = int(os.environ.get("FUZZ_TOK_RES", "0"))
 PRIOR = os.environ.get("FUZZ_TOK_PRIOR", "") == "1"
+BIAS = os.environ.get("FUZZ_TOK_BIAS", "")
+GAIN = os.environ.get("FUZZ_TOK_GAIN", "") == "1"
+TIER = os.environ.get("FUZZ_TOK_TIER", "") == "1"
 
 
 def _mu(logits):
@@ -45,13 +52,24 @@ def fuzzify_init(self, mode: str):
             self.head_res = nn.Embedding(R.NH, RES)
             self.head_res_up = nn.Parameter(torch.randn(RES, d) * 0.1)
             nn.init.normal_(self.head_res.weight, std=0.1)
-    if PRIOR:
+    if PRIOR or BIAS or TIER:
         freq = np.load(os.environ["TIER_FREQ"])["freq"].astype(np.float64)
         logp = np.log((freq + 1.0) / (freq + 1.0).sum())
-        self.register_buffer(
-            "tok_logp", torch.tensor(logp, dtype=torch.float32), persistent=False
-        )
-        self.prior_alpha = nn.Parameter(torch.ones(()))
+        lp = torch.tensor(logp, dtype=torch.float32)
+        self.register_buffer("tok_logp", lp, persistent=False)
+        if PRIOR:
+            self.prior_alpha = nn.Parameter(torch.ones(()))
+        if BIAS:
+            self.tok_bias = nn.Parameter(lp[self.t_head_ids].clone())
+        if TIER:
+            share = float(np.exp(logp)[self.t_head_ids.cpu().numpy()].sum())
+            self.tier_w = nn.Parameter(torch.zeros(d))
+            self.tier_b = nn.Parameter(
+                torch.tensor(np.log(share / (1 - share)), dtype=torch.float32)
+            )
+    if GAIN:
+        self.out_gain = nn.Parameter(torch.ones(()))
+        self.head_amp = nn.Parameter(torch.ones(R.NH))
 
 
 def _embed(self, idx):
@@ -71,10 +89,11 @@ def _embed(self, idx):
 
 
 def _logits(self, h):
+    hn = None  # the normalised state, when this call computed it
     if self.tok_mode == "crisp":
         out = R._logits(self, h)
     else:
-        h = self.norm(h)
+        h = hn = self.norm(h)
         mt = _mu(self.emb_t.weight)  # (V-NH, E) memberships of the tail tokens
         lt = (h @ self.tier_up.weight) @ mt.T
         if hasattr(self, "head_proto"):
@@ -88,6 +107,23 @@ def _logits(self, h):
         out[..., self.t_tail_ids] = lt
     if PRIOR:
         out = out + self.prior_alpha * self.tok_logp
+    if GAIN or BIAS or TIER:
+        hi, ti = self.t_head_ids, self.t_tail_ids
+        lh, lt = out[..., hi], out[..., ti]
+        if GAIN:
+            lh = self.out_gain * self.head_amp * lh
+        if BIAS:
+            lh = lh + self.tok_bias
+        if TIER:
+            g = (self.norm(h) if hn is None else hn) @ self.tier_w + self.tier_b
+            lh = (
+                torch.log_softmax(lh, -1) + torch.nn.functional.logsigmoid(g)[..., None]
+            )
+            lt = (
+                torch.log_softmax(lt, -1)
+                + torch.nn.functional.logsigmoid(-g)[..., None]
+            )
+        out = out.index_copy(-1, hi, lh).index_copy(-1, ti, lt)
     return out
 
 
