@@ -1,5 +1,14 @@
 [
  {
+  "id": "flm-allfuzzy-1b",
+  "label": "99K ALL-FUZZY, 1B characters: every block component a fuzzy system, tail token table fuzzy (1B characters, 0.974 bits per character; the strongest all-fuzzy model)",
+  "params": 99019,
+  "ctx": 512,
+  "d": 48,
+  "layers": 2,
+  "tok": "bpe3072"
+ },
+ {
   "id": "flm-allfuzzy",
   "label": "99K ALL-FUZZY: every block component a fuzzy system, tail token table fuzzy (300M characters, 0.987 bits per character)",
   "params": 99019,
