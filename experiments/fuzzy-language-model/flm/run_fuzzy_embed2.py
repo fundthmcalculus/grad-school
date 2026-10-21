@@ -1,7 +1,7 @@
 """GPU screens of head-logit repairs from the literature review (`v56-embed2`, PLAN_FUZZYLOCAL.md stage 6b): 30M characters, seeds 0-4, the stage-5 setting
 (reference 1.0547; `emb_fall` +0.130, the fuzzy head table with convex memberships), FFN x1.35.  Arms add to `emb_fall`: a learned per-token output bias initialised at the
 log unigram (`fall_bias`, +384 parameters), a learned output gain and per-token amplitude (`fall_gain`, +385), a soft tier gate P(tier | h) * P(token | tier) (`fall_tier`, +49),
-and combinations.  ``python -m flm.run_fuzzy_embed2 [arm ...]``.
+and combinations; `fall_tanh_prior` / `fall_tanh_bias` stack the signed-membership head of `v54-embed` (`fall_tanh`, +0.079 over `emb_fall`) with the log-unigram prior (`fall_prior`, +0.067) or the learned per-token bias.  ``python -m flm.run_fuzzy_embed2 [arm ...]``.
 """
 
 import os
@@ -13,6 +13,14 @@ from flm.run_tribble import argv
 
 OUT = Path("outputs/v56-embed2")
 ARMS = {  # name: (env, ffn mult)
+    "fall_tanh_prior": (
+        {"FUZZ_EMB": "all", "FUZZ_TOK_FORM": "tanh", "FUZZ_TOK_PRIOR": "1"},
+        "1.35",
+    ),
+    "fall_tanh_bias": (
+        {"FUZZ_EMB": "all", "FUZZ_TOK_FORM": "tanh", "FUZZ_TOK_BIAS": "head"},
+        "1.35",
+    ),
     "fall_bias": ({"FUZZ_EMB": "all", "FUZZ_TOK_BIAS": "head"}, "1.35"),
     "fall_gain": ({"FUZZ_EMB": "all", "FUZZ_TOK_GAIN": "1"}, "1.35"),
     "fall_tier": ({"FUZZ_EMB": "all", "FUZZ_TOK_TIER": "1"}, "1.35"),
