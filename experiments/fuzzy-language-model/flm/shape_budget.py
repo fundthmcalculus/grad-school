@@ -117,6 +117,13 @@ ARMS = {
     "E7f_hr24": dict(V=3072, NH=384, E=12, d=48, hr=24),
     "E7g_hr16": dict(V=3072, NH=384, E=12, d=48, hr=16),
     "E7h_hr24ortho": dict(V=3072, NH=384, E=12, d=48, hr=24, ortho=1.0),
+    # E8: combinations of the stage 1 signals (a larger vocabulary, a larger head, d 40)
+    "C1_v4096_h512": dict(V=4096, NH=512, E=10, d=48),
+    "C2_v4096_h384_d40": dict(V=4096, NH=384, E=10, d=40),
+    "C3_v4096_h512_d40": dict(V=4096, NH=512, E=10, d=40),
+    "C4_v6144_h384": dict(V=6144, NH=384, E=8, d=48),
+    "C5_v4096_h640_e8": dict(V=4096, NH=640, E=8, d=48),
+    "C6_v6144_h512_d40": dict(V=6144, NH=512, E=8, d=40),
     # E5: three-tier embedding, mid = (tokens in the middle tier, its prototype count)
     "E5a_v4096_m768": dict(V=4096, NH=256, E=6, d=48, mid=[768, 16]),
     "E5b_v4096_m1024": dict(V=4096, NH=192, E=6, d=48, mid=[1024, 16]),

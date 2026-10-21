@@ -144,3 +144,16 @@ Re-run the reversibility measurement on the winning checkpoints (baseline above)
 3. A rank-limited head that saves parameters: E7e (rank 32) is within 0.005 of the reference (45%); E7f (rank 24) beats the reference by 0.005 on four of five seeds (20%); E7g (rank 16) is worse than the reference by 0.005 (65%). The effective rank of 6-11 says the head table is compressible; the earlier factorised-embedding loss says the cost of limiting rank is real.
 4. E7h (rank 24, orthonormal) beats E7f (rank 24, free) (35%).
 5. Round-trip reversibility of the tail (tokens recovered) rises with the orthonormal penalty by at least 0.1 absolute (60%) without a likelihood gain: reversibility by construction is a property, not a lever.
+
+## 9. E8: combinations of the stage 1 signals (registered 2026-10-21 18:10, after seed 0 of the 18 stage 1 arms and before any combination arm ran; seeds 1-2 of stage 1 were still running)
+Seed 0 of stage 1 (provisional, one seed): a larger vocabulary (V4096 tail 10 -0.028, V4096 tail 8 -0.023, V6144 -0.023, V8192 -0.019), a larger head (h512 -0.012, h640 -0.009) and a slightly narrower block (d40 -0.007) each beat the refit reference; head 192-288, tail width 8, d56-64 and V2560 lose. These axes have not been combined. Arms (fitted, `flm/shape_budget.py`):
+| arm | V | head | tail | d | FFN rules L1/L0 | params | embedding share |
+|---|---|---|---|---|---|---|---|
+| C1 | 4096 | 512 | 10 | 48 | 29 / 20 | 99,877 | 0.61 |
+| C2 | 4096 | 384 | 10 | 40 | 73 / 49 | 99,910 | 0.53 |
+| C3 | 4096 | 512 | 10 | 40 | 61 / 41 | 99,890 | 0.57 |
+| C4 | 6144 | 384 | 8 | 48 | 19 / 13 | 99,924 | 0.65 |
+| C5 | 4096 | 640 | 8 | 48 | 34 / 23 | 99,565 | 0.59 |
+| C6 | 6144 | 512 | 8 | 40 | 33 / 22 | 99,939 | 0.66 |
+The large embedding shares push the feed-forward banks to 19-34 rules per layer (the reference has 54), so these arms also test how far rules can be traded for embedding; the stage 10 control (41 rules costs 0.0046) says the trade is not free.
+Predictions: the best combination beats the best single-axis arm of stage 1 by at least 0.005 on the three-seed mean (45%); some combination reaches at least 0.035 better than the reference (30%); C4 (19 rules) is worse than C2 (73 rules) (55%: the feed-forward floor); C3 beats C1 (50%).
