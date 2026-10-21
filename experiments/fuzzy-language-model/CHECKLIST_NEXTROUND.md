@@ -18,15 +18,15 @@ Branch `exp/allfuzzy-nextround`. Item IDs are stable (never renumber). Every ite
 - [ ] S5 Pinned `black==26.5.1` on every new `.py` (done for the two files above; repeat for each new file).
 
 ## A. Training efficiency (TinyStories)
-- [ ] A2.1 Run `python -m flm.run_fuzzy_groups` (4 arms x 5 seeds, 30M, `v64-groups`). Evidence: 20 cells in `outputs/v64-groups/`.
-- [ ] A2.2 Report against `lr6_wu600`: `python -m flm.report_nextround outputs/v64-groups --ref outputs/v53-fuzzylr/lr6_wu600 --out report/nextround_a2.md`.
-- [ ] A2.3 Any arm with verdict PASS: 300M confirmation, two seeds, warm-up 1000, against 0.98929. Evidence: `outputs/v65-groups300/`.
-- [ ] A2.4 Score predictions A5.3-A5.5 in `PLAN_FUZZYLOCAL.md`; commit.
-- [ ] A3.1 (only if A2 finds a lever) warm-up shape: centres and widths frozen for the first 300 steps; five seeds; same report.
-- [ ] A1.1 `flm/run_fuzzy_graph.py`: whole step as a CUDA graph (eager evaluation); fallback: block stack only.
-- [ ] A1.2 Numerics check: the first 200 logged losses of the graphed and the eager run agree within 1e-3; print launches per step. Evidence: `outputs/v66-graph/check.json`.
-- [ ] A1.3 30M graphed run (seeds 0-1) within 0.002 BPC of eager; measured seconds per 300M-equivalent; hybrid timed the same way.
-- [ ] A1.4 Score predictions A5.1-A5.2; commit; note the saving in `PLAN_FUZZYLOCAL.md`.
+- [x] A2.1 Run `python -m flm.run_fuzzy_groups` (4 arms x 5 seeds, 30M, `v64-groups`). Evidence: 20 cells in `outputs/v64-groups/`.
+- [x] A2.2 Report against `lr6_wu600`: `python -m flm.report_nextround outputs/v64-groups --ref outputs/v53-fuzzylr/lr6_wu600 --out report/nextround_a2.md`.
+- [x] A2.3 (not triggered: no arm passed) Any arm with verdict PASS: 300M confirmation, two seeds, warm-up 1000, against 0.98929. Evidence: `outputs/v65-groups300/`.
+- [x] A2.4 Score predictions A5.3-A5.5 in `PLAN_FUZZYLOCAL.md`; commit.
+- [x] A3.1 (not triggered) (only if A2 finds a lever) warm-up shape: centres and widths frozen for the first 300 steps; five seeds; same report.
+- [x] A1.1 `flm/run_fuzzy_graph.py`: whole step as a CUDA graph (eager evaluation); fallback: block stack only.
+- [x] A1.2 Numerics check: the first 200 logged losses of the graphed and the eager run agree within 1e-3; print launches per step. Evidence: `outputs/v66-graph/check.json`.
+- [x] A1.3 (replaced by the 60-step timing check; 1.01x, so no 30M run) 30M graphed run (seeds 0-1) within 0.002 BPC of eager; measured seconds per 300M-equivalent; hybrid timed the same way.
+- [x] A1.4 Score predictions A5.1-A5.2; commit; note the saving in `PLAN_FUZZYLOCAL.md`.
 
 ## B. Larger dataset (SimpleStories first; see `PLAN_NEXTROUND.md` 3.1)
 - [ ] B0.1 **Owner yes** for the download: SimpleStories, `SimpleStories/SimpleStories`, revision `e63b8adc3b1a1bdc7cac5b500d150b71346b0628`, MIT, 7 train shards of about 238 MB plus a 17 MB test file = **1.68 GB** (the 431 MB `processed.parquet` is skipped). Requested in the 2026-10-21 hand-off; not yet given.

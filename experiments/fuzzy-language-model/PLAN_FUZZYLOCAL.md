@@ -432,3 +432,24 @@ Predictions: the seed 1 checkpoint within 1.5 points of the seed 0 checkpoint on
 Pooled over sets 20 and 21 (every 1B text, same raters, 600-character stories at T 0.5): **all-fuzzy 1B 7.67 / 7.50** (24 texts per rater, two checkpoints: 7.50 / 7.25 and 8.00 / 8.00 by checkpoint) against **hybrid 1B 7.88 / 7.97** (32 texts, two checkpoints: 8.50 / 8.44 and 7.25 / 7.50). Difference (all-fuzzy minus hybrid): -0.21 / -0.47 on pooled texts, -0.13 / -0.34 on checkpoint means.
 Predictions: seed 1 within 1.5 points of seed 0 on both raters (60%) - **right, at the limit** (+1.25 / +1.50); pooled 1B all-fuzzy within 1 point of pooled 1B hybrid on both raters (60%) - **right** (-0.21 / -0.47); seed 0 re-rated on fresh texts within 1.5 points of its set 20 rating (65%) - **right, at the limit** (-1.50 / -1.50).
 Reading: **the set 20 result ("as coherent as the hybrid, 8.25 / 8.00 against 7.62 / 7.62") was a favourable draw.** The same seed-0 checkpoint moved by 1.5 points between two draws of 8 fresh texts (8.25 to 6.75 on rater A), the same size as the between-checkpoint spread, so an 8-text rating of one checkpoint has a standard error of about 0.7. With all 1B texts pooled the all-fuzzy model sits 0.2 to 0.5 points below the hybrid (7.5-7.7 against 7.9-8.0 of 15): indistinguishable from the hybrid at this sample size, possibly slightly below, and not above it. The likelihood gap of 0.03 bits per character (3%) is, if anything, a small coherence gap of about 0.3 points, well inside the noise. The set 20 reading and the dashboard and demo text that quoted 8.0-8.3 are superseded by this pooled figure.
+
+## Next-round track A results (recorded 2026-10-21; `PLAN_NEXTROUND.md`, `CHECKLIST_NEXTROUND.md`; branch `exp/allfuzzy-nextround`)
+
+### A2: learning rates and weight decay per parameter group (`v64-groups`, 20 cells, five seeds, 30M characters, warm-up 600; paired with `lr6_wu600` 1.1207; `report/nextround_a2.md`)
+Manipulation check (printed by the runner): `g_c3` / `g_c03` put 34 tensors (10,912 + 10,962 values) at x3 / x0.3; `g_wd0` set weight decay 0 on 58 rule-parameter tensors (20,288 + 11,099 values; the log-widths are decayed toward width 1 in the reference).
+| arm | BPC | change vs reference | per seed (0-4) |
+|---|---|---|---|
+| `g_c03` centres and widths x0.3 | 1.1320 | **+0.0113** (se 0.0025) | +0.0060 +0.0182 +0.0075 +0.0165 +0.0082 |
+| `g_c3` centres and widths x3 | 1.1273 | **+0.0066** (se 0.0012) | +0.0024 +0.0066 +0.0086 +0.0091 +0.0063 |
+| `g_s3` consequents, offsets, gains x3 | 1.1349 | **+0.0142** (se 0.0030) | +0.0092 +0.0186 +0.0235 +0.0130 +0.0068 |
+| `g_wd0` no weight decay on rule parameters | 1.1220 | **+0.0013** (se 0.0003) | +0.0002 +0.0014 +0.0021 +0.0017 +0.0012 |
+Every arm is worse than the reference on all five seeds; none gained 0.005 on any seed, so nothing goes to 300M and A3 (warm-up shape) is not triggered.
+Predictions: at least one arm beats the reference by 0.005 on four of five seeds (30%): **wrong**; gap to the hybrid falls by 0.01 (15%): **wrong** (no change).
+Reading: **the slow start is not the rule parameters' learning rate.** Both directions for centres and widths lose (the current rate is near the optimum), tripling the consequent rate costs 0.014, and weight decay on the rule parameters helps slightly and consistently (removing it costs 0.0013 with a standard error of 0.0003: decaying the log-widths toward 1 is a mild regulariser).
+
+### A1: CUDA-graphed forward and backward (`flm/run_fuzzy_graph.py --check`, 60 steps on identical batches)
+Numerics: max |loss difference| between the eager and the graphed model over 60 steps is **0.0** for the all-fuzzy model and for the hybrid.
+Speed (RTX 4080, 16 x 512 tokens): all-fuzzy step 84.0 ms eager, 83.2 ms graphed (**1.01x**); hybrid 77.5 against 77.4 ms (1.00x). Forward and backward alone: 82.5 ms eager, 77.4 ms graphed (6%); clipping and the AdamW step add nothing measurable.
+**This corrects the earlier figure** (a 19% saving from a whole-step graph, 89.5 to 75.5 ms): the eager baseline of that run was 89.5 ms against 83.5 and 84.0 ms in the two other runs of the same step, so the 19% mixed a speed-up of 6-8% with a noisy baseline. The graphed floor, 75-77 ms, is the same for both models.
+Predictions: graphed and eager losses agree within 1e-3 (85%): **right** (exactly equal); a saving of 12-20% for the all-fuzzy model (70%): **wrong** (1% of the full step, 6% of forward and backward); 2-6% for the hybrid (60%): **wrong** (0%).
+Reading: **the step is GPU-compute-bound at about 75-77 ms for both models**; launch overhead explains at most 7 ms of the fuzzy model's 8 ms excess. The fuzzy layers are built from elementwise operations (the two largest kernels in the profile are multiplies), so the remaining lever is kernel fusion, which needs `torch.compile` (unavailable here: Triton is not installed on this Windows host) or hand-written kernels; CUDA graphs are not worth wiring in.
