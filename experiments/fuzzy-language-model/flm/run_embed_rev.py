@@ -19,6 +19,9 @@ import flm.train as T
 from flm.models import TinyLM
 
 ORTHO = float(os.environ.get("FUZZ_ORTHO", "0"))
+SCALED = (
+    os.environ.get("FUZZ_ORTHO_SCALED") == "1"
+)  # orthonormal up to one learned global scale c: ||W^T W - c I||^2
 CYCLE = float(os.environ.get("FUZZ_CYCLE", "0"))
 holder = {}
 real_init = RA._init
@@ -27,6 +30,8 @@ orig_ce = F.cross_entropy
 
 def init(self, *a, **k):
     real_init(self, *a, **k)
+    if SCALED:
+        self.ortho_c = torch.nn.Parameter(torch.ones(()))
     holder["m"] = self
 
 
@@ -37,10 +42,9 @@ def penalty(m, target):
             mod = getattr(m, name, None)
             if mod is not None:
                 g = mod.weight.T @ mod.weight
-                pen = (
-                    pen
-                    + ORTHO * ((g - torch.eye(g.shape[0], device=g.device)) ** 2).sum()
-                )
+                c = m.ortho_c if SCALED else 1.0
+                eye = c * torch.eye(g.shape[0], device=g.device)
+                pen = pen + ORTHO * ((g - eye) ** 2).sum()
     if CYCLE:
         t = torch.unique(target.reshape(-1))
         if len(t) > 512:

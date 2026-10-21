@@ -404,5 +404,18 @@
   "params": 99939,
   "emb": 65856,
   "share": 0.659
+ },
+ "E7i_ortho_scaled": {
+  "V": 3072,
+  "NH": 384,
+  "E": 12,
+  "d": 48,
+  "ortho": 1.0,
+  "ortho_scaled": 1,
+  "rules": 54,
+  "rules0": 36,
+  "params": 99694,
+  "emb": 51264,
+  "share": 0.514
  }
 }

@@ -117,6 +117,7 @@ ARMS = {
     "E7f_hr24": dict(V=3072, NH=384, E=12, d=48, hr=24),
     "E7g_hr16": dict(V=3072, NH=384, E=12, d=48, hr=16),
     "E7h_hr24ortho": dict(V=3072, NH=384, E=12, d=48, hr=24, ortho=1.0),
+    "E7i_ortho_scaled": dict(V=3072, NH=384, E=12, d=48, ortho=1.0, ortho_scaled=1),
     # E8: combinations of the stage 1 signals (a larger vocabulary, a larger head, d 40)
     "C1_v4096_h512": dict(V=4096, NH=512, E=10, d=48),
     "C2_v4096_h384_d40": dict(V=4096, NH=384, E=10, d=40),

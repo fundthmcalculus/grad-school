@@ -55,6 +55,8 @@ def cell(name, arm, seed, out_dir, smoke):
         env["FUZZ_TOK_MID"] = ",".join(str(x) for x in arm["mid"])
     if arm.get("ortho"):
         env["FUZZ_ORTHO"], mod = str(arm["ortho"]), "flm.run_embed_rev"
+    if arm.get("ortho_scaled"):
+        env["FUZZ_ORTHO_SCALED"] = "1"
     if arm.get("cycle"):
         env["FUZZ_CYCLE"], mod = str(arm["cycle"]), "flm.run_embed_rev"
     with open(out_dir / "logs" / f"{name}_s{seed}.log", "w") as f:
