@@ -453,3 +453,13 @@ Speed (RTX 4080, 16 x 512 tokens): all-fuzzy step 84.0 ms eager, 83.2 ms graphed
 **This corrects the earlier figure** (a 19% saving from a whole-step graph, 89.5 to 75.5 ms): the eager baseline of that run was 89.5 ms against 83.5 and 84.0 ms in the two other runs of the same step, so the 19% mixed a speed-up of 6-8% with a noisy baseline. The graphed floor, 75-77 ms, is the same for both models.
 Predictions: graphed and eager losses agree within 1e-3 (85%): **right** (exactly equal); a saving of 12-20% for the all-fuzzy model (70%): **wrong** (1% of the full step, 6% of forward and backward); 2-6% for the hybrid (60%): **wrong** (0%).
 Reading: **the step is GPU-compute-bound at about 75-77 ms for both models**; launch overhead explains at most 7 ms of the fuzzy model's 8 ms excess. The fuzzy layers are built from elementwise operations (the two largest kernels in the profile are multiplies), so the remaining lever is kernel fusion, which needs `torch.compile` (unavailable here: Triton is not installed on this Windows host) or hand-written kernels; CUDA graphs are not worth wiring in.
+
+### Track B2: SimpleStories at 30M characters (recorded 2026-10-21; `v67-ss30`, 20 cells, five seeds; `report/nextround_b2.md`; data and C0 in `PLAN_NEXTROUND.md` addendum)
+| arm | params | BPC (mean of 5) | per seed (0-4) |
+|---|---|---|---|
+| hybrid, lr 6e-2, warm-up 100 | 98,528 | **1.2443** | 1.2469 / 1.2452 / 1.2441 / 1.2459 / 1.2392 |
+| hybrid, lr 3e-2 | 98,528 | 1.2481 | 1.2519 / 1.2491 / 1.2450 / 1.2522 / 1.2422 |
+| all-fuzzy, lr 6e-2, warm-up 600 | 99,019 | **1.2984** | 1.2987 / 1.2992 / 1.2967 / 1.2976 / 1.3001 |
+| all-fuzzy, lr 3e-2 | 99,019 | 1.3143 | 1.3158 / 1.3125 / 1.3159 / 1.3135 / 1.3135 |
+Gap to the hybrid at the better learning rate (lr 6e-2 for both): **+0.0542** (se 0.0017; per seed +0.0518 to +0.0608, worse on all five). On TinyStories the same comparison (warm-up 600 against 100) is 1.1207 against 1.0547 = +0.066 (0.082 at warm-up 100), so **the 30M gap on SimpleStories is about 0.012 smaller**. lr 6e-2 is the better rate for both models (hybrid 0.0039 better, all-fuzzy 0.016 better): the TinyStories recipe transfers. Trigram baseline 1.0790 (fit on 170M tokens): the hybrid is 0.165 above it, the all-fuzzy model 0.219.
+Predictions: hybrid at 30M between 1.10 and 1.40 (65%): **right** (1.2443); within 0.15 of the trigram baseline (35%): **wrong** (0.165); the all-fuzzy gap at 30M between 0.04 and 0.15 (65%): **right** (0.054). The warm-up prediction (3.4.5) needs a second warm-up at 30M; only 600 was run (`fz_wu` arms are queued after the 300M cells).

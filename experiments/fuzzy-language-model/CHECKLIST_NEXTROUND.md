@@ -29,14 +29,14 @@ Branch `exp/allfuzzy-nextround`. Item IDs are stable (never renumber). Every ite
 - [x] A1.4 Score predictions A5.1-A5.2; commit; note the saving in `PLAN_FUZZYLOCAL.md`.
 
 ## B. Larger dataset (SimpleStories first; see `PLAN_NEXTROUND.md` 3.1)
-- [ ] B0.1 **Owner yes** for the download: SimpleStories, `SimpleStories/SimpleStories`, revision `e63b8adc3b1a1bdc7cac5b500d150b71346b0628`, MIT, 7 train shards of about 238 MB plus a 17 MB test file = **1.68 GB** (the 431 MB `processed.parquet` is skipped). Requested in the 2026-10-21 hand-off; not yet given.
-- [ ] B0.2 Fetch to `$GRAD_SCHOOL_DATA/simplestories/` at the pinned revision; `data/.gitignore` recovery note; nothing over 5 MB committed. Evidence: file list with sizes and checksums.
-- [ ] B0.3 `flm/prep_simplestories.py`: validation split by document; ASCII filter; characters kept and dropped fraction reported; train stream of at least 1B characters if the corpus has them. Evidence: `outputs/prep_simplestories.log`.
-- [ ] B0.4 BPE3072 trained on the new corpus; frequency file for the tiered head (384 head tokens, 12 prototypes); characters per token reported. Evidence: tokenizer and `outputs/freq_simplestories_bpe3072.npz`.
-- [ ] B1.1 C0 baselines: unigram, bigram and trigram BPC on the validation slice; existing TinyStories checkpoints (hybrid and all-fuzzy at 300M and 1B) scored on it. Evidence: `report/nextround_c0.md`.
-- [ ] B2.1 Hybrid reference, 30M, five seeds, lr 3e-2 and 6e-2.
-- [ ] B2.2 All-fuzzy `e2e_tail`, 30M, five seeds, lr 3e-2 and 6e-2, warm-up 600.
-- [ ] B2.3 Report the gap to the hybrid at 30M (both models given the same learning-rate freedom).
+- [x] B0.1 **Owner yes** (given 2026-10-21: "yes, download SimpleStories and start preparation, please complete this without my input") for the download: SimpleStories, `SimpleStories/SimpleStories`, revision `e63b8adc3b1a1bdc7cac5b500d150b71346b0628`, MIT, 7 train shards of about 238 MB plus a 17 MB test file = **1.68 GB** (the 431 MB `processed.parquet` is skipped). Requested in the 2026-10-21 hand-off; not yet given.
+- [x] B0.2 Fetch to `$GRAD_SCHOOL_DATA/simplestories/` at the pinned revision; `data/.gitignore` recovery note; nothing over 5 MB committed. Evidence: file list with sizes and checksums.
+- [x] B0.3 `flm/prep_simplestories.py`: validation split by document; ASCII filter; characters kept and dropped fraction reported; train stream of at least 1B characters if the corpus has them. Evidence: `outputs/prep_simplestories.log`.
+- [x] B0.4 BPE3072 trained on the new corpus; frequency file for the tiered head (384 head tokens, 12 prototypes); characters per token reported. Evidence: tokenizer and `outputs/freq_simplestories_bpe3072.npz`.
+- [x] B1.1 C0 baselines: unigram, bigram and trigram BPC on the validation slice; existing TinyStories checkpoints (hybrid and all-fuzzy at 300M and 1B) scored on it. Evidence: `report/nextround_c0.md`.
+- [x] B2.1 Hybrid reference, 30M, five seeds, lr 3e-2 and 6e-2.
+- [x] B2.2 All-fuzzy `e2e_tail`, 30M, five seeds, lr 3e-2 and 6e-2, warm-up 600.
+- [x] B2.3 Report the gap to the hybrid at 30M (both models given the same learning-rate freedom).
 - [ ] B3.1 300M confirmations: hybrid and all-fuzzy, two seeds, warm-up 1000 for the fuzzy model, checkpoints saved.
 - [ ] B3.2 Decision rule (below 0.015: a TinyStories effect; above 0.04: grows with breadth; between: unchanged); scored predictions 3.4.1-3.4.5.
 - [ ] B4.1 Blind coherence set on story prompts, at least 16 texts per model, two raters, scores before the key.
