@@ -39,9 +39,9 @@ Branch `exp/allfuzzy-nextround`. Item IDs are stable (never renumber). Every ite
 - [x] B2.3 Report the gap to the hybrid at 30M (both models given the same learning-rate freedom).
 - [x] B3.1 300M confirmations: hybrid and all-fuzzy, two seeds, warm-up 1000 for the fuzzy model, checkpoints saved.
 - [x] B3.2 Decision rule (below 0.015: a TinyStories effect; above 0.04: grows with breadth; between: unchanged); scored predictions 3.4.1-3.4.5.
-- [ ] B4.1 Blind coherence set on story prompts, at least 16 texts per model, two raters, scores before the key.
-- [ ] B5.1 (second arm, after B3) TinyStories + SimpleStories mix, evaluated on both validation sets.
-- [ ] B5.2 (far end, optional) Cosmopedia mix from the existing `data/mixed`.
+- [x] B4.1 (set 23; set 22 was invalid, see PLAN_FUZZYLOCAL.md) Blind coherence set on story prompts, at least 16 texts per model, two raters, scores before the key.
+- [ ] B5.1 NOT RUN (deferred: the plan's question is answered without it) (second arm, after B3) TinyStories + SimpleStories mix, evaluated on both validation sets.
+- [ ] B5.2 NOT RUN (optional) (far end, optional) Cosmopedia mix from the existing `data/mixed`.
 
 ## R. Reporting and housekeeping
 - [ ] R1 After each result: PLAN entry, commit, dashboard section updated, push notification.
