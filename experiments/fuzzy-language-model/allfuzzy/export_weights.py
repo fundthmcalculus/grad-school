@@ -2,6 +2,7 @@
 
     python allfuzzy/export_weights.py outputs/v52-e2e/e2e_tail_300M_s0.pt allfuzzy/e2e_tail_300M_s0.npz
     python allfuzzy/export_weights.py outputs/v59-e2e300/e2e_all_tanh_300M_s1.pt allfuzzy/e2e_all_tanh_300M_s1.npz --head-tanh
+    python allfuzzy/export_weights.py outputs/v70-shape300/F7_v6144_h640_d32_s0.pt allfuzzy/F7_300M_s0.npz --vocab 6144    # another vocabulary: its frequency file and tokenizer
 
 A checkpoint whose head table is fuzzy too (``head_proto`` in the state) is exported with the head rows replaced by their effective embeddings, mu(emb_h) @ head_proto.T with
 signed (tanh) memberships mu (``--head-tanh``; the state cannot say which membership function was used) or softmax: the tied output scores of a head token are h . (that row), exactly as for the
@@ -42,11 +43,16 @@ if __name__ == "__main__":
         int(head_tanh)
     )  # the tail memberships use the same function (flm/fuzzy_tokens.py)
     nh = arrays["emb_h.weight"].shape[0]
-    freq = np.load("outputs/freq_bpe3072.npz")["freq"]
+    vocab = (
+        int(sys.argv[sys.argv.index("--vocab") + 1]) if "--vocab" in sys.argv else 3072
+    )  # the vocabulary the checkpoint was trained with: its frequency file decides which tokens are head tokens
+    freq = np.load(f"outputs/freq_bpe{vocab}.npz")["freq"]
     order = np.argsort(-freq, kind="stable")
     arrays["head_ids"], arrays["tail_ids"] = order[:nh], order[nh:]
     for k in ("d_model", "n_layers", "n_heads", "n_rules", "vocab_size", "max_len"):
         arrays["cfg_" + k] = np.array(cfg[k])
     np.savez_compressed(dst, **arrays)
-    shutil.copyfile("../../data/tinystories/bpe3072.json", dst.parent / "bpe3072.json")
+    shutil.copyfile(
+        f"../../data/tinystories/bpe{vocab}.json", dst.parent / f"bpe{vocab}.json"
+    )
     print(f"wrote {dst} ({dst.stat().st_size / 1e3:.0f} KB), {total} parameters")

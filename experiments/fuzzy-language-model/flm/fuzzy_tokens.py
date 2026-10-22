@@ -19,6 +19,8 @@ Stage 6b (`v56-embed2`, from the literature review `literature/04-fuzzy-embeddin
   FUZZ_TOK_UNTIE = 1              the head's input and output prototype matrices are separate (+d*d parameters)
   FUZZ_TOK_MOS = M                 a mixture of M softmaxes (low-rank per-component state shift, rank FUZZ_TOK_MOS_RANK, plus a gate)
   FUZZ_TOK_PQ = G                  product-quantised head: G groups of d/G prototypes, a membership vector per group, prototype matrix G*(d/G)*(d/G)
+  FUZZ_TOK_HEADRANK = K            the crisp head tokens live in K dims and share one up-projection (like the tail): NH*K + K*d parameters instead of NH*d (`PLAN_SHAPE.md` E7: a smaller shared embedding)
+  FUZZ_TOK_MID = "NH2,E1"          a middle tier (`PLAN_SHAPE.md` E5): the NH2 tokens after the head get their own fuzzy sets over E1 prototypes (own up-projection); the tail keeps width TIER_E and shrinks by NH2 rows
   FUZZ_TOK_TIER = 1                a soft tier gate: P(token) = P(tier | h) * P(token | tier), the tier probability a sigmoid of a linear function of h (d + 1 parameters)
 """
 
@@ -41,6 +43,12 @@ UNTIE = os.environ.get("FUZZ_TOK_UNTIE", "") == "1"
 MOS = int(os.environ.get("FUZZ_TOK_MOS", "0"))
 MOS_RANK = int(os.environ.get("FUZZ_TOK_MOS_RANK", "8"))
 PQ = int(os.environ.get("FUZZ_TOK_PQ", "0"))
+HEADRANK = int(os.environ.get("FUZZ_TOK_HEADRANK", "0"))
+MID = (
+    tuple(int(x) for x in os.environ["FUZZ_TOK_MID"].split(","))
+    if os.environ.get("FUZZ_TOK_MID")
+    else ()
+)
 
 
 def _mu(logits):
@@ -67,6 +75,33 @@ def fuzzify_init(self, mode: str):
             self.head_res = nn.Embedding(R.NH, RES)
             self.head_res_up = nn.Parameter(torch.randn(RES, d) * 0.1)
             nn.init.normal_(self.head_res.weight, std=0.1)
+    if (
+        MID and mode == "tail"
+    ):  # three tiers: head (crisp, width d), middle (fuzzy sets over E1 prototypes), tail (over E prototypes)
+        nm, e1 = MID
+        mid_ids = self.t_tail_ids[:nm]
+        tail_ids = self.t_tail_ids[nm:]
+        pos = self.t_pos.clone()
+        pos[mid_ids] = torch.arange(nm)
+        pos[tail_ids] = torch.arange(len(tail_ids))
+        self.t_pos = pos
+        self.t_tail_ids = tail_ids
+        self.register_buffer("t_mid_ids", mid_ids, persistent=False)
+        is_mid = torch.zeros(self.cfg.vocab_size, dtype=torch.bool)
+        is_mid[mid_ids] = True
+        self.register_buffer("t_mid", is_mid, persistent=False)
+        self.emb_t = nn.Embedding(len(tail_ids), self.emb_t.embedding_dim)
+        nn.init.normal_(self.emb_t.weight, std=1.0)
+        self.emb_m = nn.Embedding(nm, e1)
+        self.mid_up = nn.Linear(e1, d, bias=False)
+        nn.init.normal_(self.emb_m.weight, std=1.0)
+    if (
+        HEADRANK and mode != "all"
+    ):  # crisp head tokens through a rank-K bottleneck with their own up-projection
+        self.emb_h = nn.Embedding(R.NH, HEADRANK)
+        self.head_up = nn.Linear(HEADRANK, d, bias=False)
+        nn.init.normal_(self.emb_h.weight, std=0.1)
+        nn.init.normal_(self.head_up.weight, std=HEADRANK**-0.5)
     if PRIOR or BIAS or TIER:
         freq = np.load(os.environ["TIER_FREQ"])["freq"].astype(np.float64)
         logp = np.log((freq + 1.0) / (freq + 1.0).sum())
@@ -110,7 +145,10 @@ def _embed(self, idx):
         if hasattr(self, "head_res"):
             xh = xh + self.head_res(p.clamp(max=R.NH - 1)) @ self.head_res_up
     else:
-        xh = mh
+        xh = self.head_up(mh) if hasattr(self, "head_up") else mh
+    if hasattr(self, "emb_m"):  # the middle tier
+        xm = self.mid_up(_mu(self.emb_m(p.clamp(max=self.emb_m.num_embeddings - 1))))
+        xt = torch.where(self.t_mid[idx][..., None], xm, xt)
     if kind == "pq" and hasattr(self, "head_res"):
         xh = xh + self.head_res(p.clamp(max=R.NH - 1)) @ self.head_res_up
     return torch.where(self.t_head[idx][..., None], xh, xt)
@@ -151,11 +189,17 @@ def _core(self, h):
             lh = (h @ out_proto) @ _mu(self.emb_h.weight).T
             if hasattr(self, "head_res"):
                 lh = lh + (h @ self.head_res_up.T) @ self.head_res.weight.T
+        elif hasattr(self, "head_up"):
+            lh = (h @ self.head_up.weight) @ self.emb_h.weight.T
         else:
             lh = h @ self.emb_h.weight.T
         out = h.new_empty(*h.shape[:-1], self.cfg.vocab_size)
         out[..., self.t_head_ids] = lh
         out[..., self.t_tail_ids] = lt
+        if hasattr(self, "emb_m"):
+            out[..., self.t_mid_ids] = (h @ self.mid_up.weight) @ _mu(
+                self.emb_m.weight
+            ).T
     if PRIOR:
         out = out + self.prior_alpha * self.tok_logp
     if GAIN or BIAS or TIER:
