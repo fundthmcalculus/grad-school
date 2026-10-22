@@ -237,3 +237,19 @@ The combination arms of E8-E10 (C1-C6, D, F) have three seeds each and are the c
 | D8 | 8192 / 384 / 6 / 40 | 43 / 29 | 1.0818 | -0.0390 | -0.0409 -0.0431 -0.0330 |
 Predictions: the best E9 arm beats C4 by 0.005 (35%): **right** (D6, 0.0106 better; none beats C6); D7 beats C4 (45%): **right** (0.0039); D4 beats C4 (40%): **right** (0.0044); D8 (V8192) worse than D4 (V6144) (60%): **right** (0.0084 worse); the best five-seed arm is a V6144 arm (55%): V6144 arms hold every top-six place so far, to be confirmed on five seeds.
 Reading: at vocabulary 6144 the head is the dominant axis (384 -> 448 -> 512 gains 0.0536 - 0.0469 = 0.007 and 0.0587 - 0.0536 = 0.005 per step), the block width 40 beats 48 by about 0.004, and the tail rank trades almost one for one against feed-forward rules (D11 tail 6 / 67 rules against C6 tail 8 / 33 rules: 0.003 apart). V8192 loses to V6144 at equal head and width.
+
+## 16. E10 results (recorded 2026-10-21 22:00; `v69-shape`, three seeds; change against the refit reference, negative is better)
+| arm | V / head / tail / d | rules | BPC | change | per seed |
+|---|---|---|---|---|---|
+| **F7** | 6144 / 640 / 8 / 32 | 61 / 41 | **1.0572** | **-0.0636** | -0.0659 -0.0643 -0.0606 |
+| F6 | 6144 / 768 / 8 / 32 | 49 / 33 | 1.0604 | -0.0604 | -0.0633 -0.0635 -0.0545 |
+| F1 | 6144 / 640 / 8 / 40 | 20 / 13 | 1.0612 | -0.0596 | -0.0584 -0.0663 -0.0540 |
+| (C6) | 6144 / 512 / 8 / 40 | 33 / 22 | 1.0621 | -0.0587 | -0.0622 -0.0642 -0.0497 |
+| F4 | 6144 / 512 / 8 / 32 | 73 / 49 | 1.0691 | -0.0518 | -0.0534 -0.0539 -0.0481 |
+| F13 | 6144 / 512 / 10 / 32 | 29 / 20 | 1.0768 | -0.0441 | -0.0441 -0.0476 -0.0405 |
+| F14 | 8192 / 640 / 8 / 24 | 45 / 30 | 1.0922 | -0.0287 | -0.0299 -0.0331 -0.0230 |
+| F9 | 8192 / 768 / 8 / 24 | 34 / 23 | 1.0902 | -0.0306 | -0.0367 -0.0280 -0.0271 |
+| F11 | 8192 / 512 / 8 / 24 | 55 / 37 | 1.0962 | -0.0246 | -0.0240 -0.0296 -0.0202 |
+Predictions: the best E10 arm beats C6 by 0.005 (50%): **wrong by a hair** (F7 -0.0636 against -0.0587: 0.0049); the best arm is a d32 or d24 arm (55%): **right** (F7, d32); some d24 arm is worse than C6 (60%): **right** (all three, by 0.03-0.034); F1 (20 rules) worse than F7 (61 rules) (55%): **right** (0.004); a V8192 arm beats every V6144 arm of the same head size (35%): **wrong** (every V8192 arm trails by 0.03 or more).
+Reading: a plateau. **F7 (V6144, head 640, tail 8, d32, 61 / 41 rules) leads at 1.0572 (-0.0636, 5.7% better than the reference), with F6, F1 and C6 within 0.005 of it**: head sizes 512-768 and widths 32-40 are equivalent at vocabulary 6144 once the feed-forward bank keeps at least 30-60 rules; d24 and V8192 lose; tail 10 loses to tail 8 when it costs rules.
+Next: seeds 3-4 for F7, F6, F1, C6 and D11 (`chain_shape8`), then the 300M stage with the winners.
