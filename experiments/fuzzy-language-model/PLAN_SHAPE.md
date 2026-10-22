@@ -211,3 +211,16 @@ Predictions: the best E9 arm beats C4 (-0.0430) by 0.005 (35%); D7 beats C4 (45%
 **C6 V6144 head 512 tail 8 d40: BPC 1.0621, -0.0587** (-0.0622 -0.0642 -0.0497; 33 / 22 rules; embedding 66% of the parameters): the best arm by 0.016 over C4 (-0.0430). Prediction scored: C6 had no registered individual prediction; the E8 predictions stand as in section 12. The optimum is still moving: a large head (512) with vocabulary 6144 and a narrow block (40) beats every earlier arm, and the feed-forward bank is down to 33 / 22 rules.
 E10 arms (fitted; blocks narrower than 48 need d divisible by the 8 mixer heads: 40, 32, 24): **F1** V6144 head 640 tail 8 d40 (20 / 13 rules, 99,773; embedding share 0.70); **F4** V6144 head 512 tail 8 d32 (73 / 49, 99,902); **F6** V6144 head 768 tail 8 d32 (49 / 33, 99,862); **F7** V6144 head 640 tail 8 d32 (61 / 41, 99,882); **F9** V8192 head 768 tail 8 d24 (34 / 23, 99,845; share 0.78); **F11** V8192 head 512 tail 8 d24 (55 / 37, 99,816); **F13** V6144 head 512 tail 10 d32 (29 / 20, 99,957); **F14** V8192 head 640 tail 8 d24 (45 / 30, 99,879).
 Predictions: the best E10 arm beats C6 (-0.0587) by 0.005 (50%); the best E10 arm is a d32 or d24 arm (55%); some d24 arm is worse than C6 (60%: the block floor shrinks but the mixer state and the output scores narrow with d); F1 (20 rules) is worse than F7 (61 rules) (55%: the feed-forward floor again, as C4 was not); a V8192 arm beats every V6144 arm of the same head size (35%).
+
+## 14. Stage 2: five seeds for the seven stage 1 survivors (recorded 2026-10-21; `v69-shape`; reference mean 1.1200 over seeds 0-4; `report/shape_stage2.md`; rule: 0.005 better on at least four of five seeds)
+| arm | BPC | change (se) | per seed (0-4) | seeds past 0.005 | verdict |
+|---|---|---|---|---|---|
+| V4096 head 384 tail 10 (E3c) | 1.0941 | **-0.0259** (0.0019) | -0.0276 -0.0320 -0.0222 -0.0263 -0.0214 | 5 | PASS |
+| V4096 head 384 tail 8 (E3b) | 1.0998 | -0.0203 (0.0013) | -0.0232 -0.0230 -0.0167 -0.0185 -0.0200 | 5 | PASS |
+| V6144 head 256 tail 6 (E3d) | 1.1000 | -0.0200 (0.0012) | -0.0230 -0.0207 -0.0216 -0.0177 -0.0169 | 5 | PASS |
+| V8192 head 256 tail 6 (E3f) | 1.1051 | -0.0150 (0.0012) | -0.0190 -0.0138 -0.0162 -0.0124 -0.0135 | 5 | PASS |
+| head 640, V3072 (E1d) | 1.1107 | -0.0093 (0.0014) | -0.0089 -0.0123 -0.0046 -0.0121 -0.0085 | 4 | PASS |
+| head 512, V3072 (E1c) | 1.1114 | -0.0086 (0.0015) | -0.0124 -0.0101 -0.0071 -0.0038 -0.0097 | 4 | PASS |
+| d40, head 448 (E4b) | 1.1168 | -0.0032 (0.0019) | -0.0067 -0.0076 -0.0002 -0.0039 +0.0023 | 2 | no |
+Six of the seven pass; the three-seed estimates held (changes of at most 0.002 between three and five seeds). Predictions: at least one embedding arm beats the reference on four of five seeds (50%): **right** (six arms); no block width beats d48 on four of five seeds (75%): **right** (d40 passes on two); d48 within 0.005 of the best width (70%): **right** (d40 gains 0.0032).
+The combination arms of E8-E10 (C1-C6, D, F) have three seeds each and are the candidates for the 300M stage: C6 (V6144 head 512 tail 8 d40, -0.0587 on three seeds) leads; seeds 3-4 for the best of them follow the end of the E10 round.
