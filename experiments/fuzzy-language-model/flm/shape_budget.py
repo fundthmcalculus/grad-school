@@ -125,6 +125,12 @@ ARMS = {
     "C4_v6144_h384": dict(V=6144, NH=384, E=8, d=48),
     "C5_v4096_h640_e8": dict(V=4096, NH=640, E=8, d=48),
     "C6_v6144_h512_d40": dict(V=6144, NH=512, E=8, d=40),
+    # E9: a second round of combinations around the best arm (a large vocabulary with a large head), fitted
+    "D4_v6144_h384_d40": dict(V=6144, NH=384, E=8, d=40),
+    "D6_v6144_h448_e6": dict(V=6144, NH=448, E=6, d=48),
+    "D7_v6144_h384_e6": dict(V=6144, NH=384, E=6, d=48),
+    "D8_v8192_h384_e6_d40": dict(V=8192, NH=384, E=6, d=40),
+    "D11_v6144_h512_e6_d40": dict(V=6144, NH=512, E=6, d=40),
     # E5: three-tier embedding, mid = (tokens in the middle tier, its prototype count)
     "E5a_v4096_m768": dict(V=4096, NH=256, E=6, d=48, mid=[768, 16]),
     "E5b_v4096_m1024": dict(V=4096, NH=192, E=6, d=48, mid=[1024, 16]),
