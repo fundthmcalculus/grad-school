@@ -117,6 +117,7 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
       <input type="range" id="topk" min="1" max="50" step="1" value="10">
       <label for="seed">Seed</label>
       <input type="number" id="seed" value="0" min="0" step="1">
+      <label><input type="checkbox" id="dry" checked> Discourage repeated phrases (DRY; about half as many repeated word triples, same rated coherence)</label>
       <label><input type="checkbox" id="explain" checked> Show rules behind each token (slower)</label>
       <button class="primary" id="go">Generate</button>
     </section>
@@ -216,7 +217,7 @@ $('go').onclick = async () => {
   try {
     const d = await api.generate({
       model: $('model').value, prompt: $('prompt').value, max_tokens: +$('maxtok').value, temperature: +$('temp').value,
-      top_k: +$('topk').value, seed: +$('seed').value, explain: $('explain').checked });
+      top_k: +$('topk').value, seed: +$('seed').value, explain: $('explain').checked, dry: $('dry').checked });
     current = d; render(d);
     $('info').textContent = `${d.steps.length} word pieces in ${((performance.now() - t0) / 1000).toFixed(1)} s` + (d.explained ? '' : ' (rule view is off for this model)') + `, ${Math.round(100 * d.steps.filter((x) => x.rep).length / d.steps.length)}% of pieces repeat an earlier three-piece run (dotted underline)`;
   } catch (e) { $('err').textContent = /HTTP|Failed to fetch|NetworkError|Load failed/.test(e.message) ? LOAD_HELP : 'Generation failed: ' + e.message; }

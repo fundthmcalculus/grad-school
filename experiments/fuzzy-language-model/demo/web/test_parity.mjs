@@ -27,6 +27,13 @@ for (const v of [3072, 6144]) {
   }
   console.log(`tokenizer-${v}: ` + chk.length + ' strings checked');
 }
+// DRY (PLAN_REPEAT.md): history 1,2,3,1,2 -> the last token 2 also ended position 1, the match runs back two tokens (1,2), so the token that followed it (3) is penalised by 0.8 * 1.75^0
+{
+  const pen = FLM.dryPenalties([1, 2, 3, 1, 2]);
+  if (pen.size !== 1 || Math.abs(pen.get(3) - 0.8) > 1e-9) { bad++; console.log('DRY MISMATCH', [...pen]); }
+  if (FLM.dryPenalties([5, 6, 7]).size !== 0) { bad++; console.log('DRY MISMATCH: a history without a repeat has penalties'); }
+  console.log('dry penalty: 2 cases checked');
+}
 for (const m of J('models/index.json')) {
   const man = J(`models/${m.id}.json`), chk = J(`models/${m.id}.check.json`);
   const model = man.config.allfuzzy ? new FLM.AllFuzzyModel(man, buf(`models/${m.id}.bin`)) : new FLM.Model(man, buf(`models/${m.id}.bin`));

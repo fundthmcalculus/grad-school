@@ -117,6 +117,7 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
       <input type="range" id="topk" min="1" max="50" step="1" value="10">
       <label for="seed">Seed</label>
       <input type="number" id="seed" value="0" min="0" step="1">
+      <label><input type="checkbox" id="dry" checked> Discourage repeated phrases (DRY; about half as many repeated word triples, same rated coherence)</label>
       <label><input type="checkbox" id="explain" checked> Show rules behind each token (slower)</label>
       <button class="primary" id="go">Generate</button>
     </section>
@@ -623,7 +624,7 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
       if (ids.length >= ctx) throw new Error(`prompt is ${ids.length} word pieces; the context is ${ctx}`);
       const nNew = Math.max(1, Math.min(+req.max_tokens || 80, 400, ctx - ids.length));
       const temp = Math.max(0.05, +req.temperature || 0.5), topK = Math.max(1, +req.top_k || 10);
-      const wantExplain = req.explain !== false;
+      const wantExplain = req.explain !== false, useDry = req.dry !== false;
       const rng = mulberry32(+req.seed || 0);
       model.reset();
       let last = null;
@@ -633,8 +634,10 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
       const steps = [], pi = wantExplain ? model.profiles() : null;
       for (let n = 0; n < nNew; n++) {
         const logits = last.logits, pAll = softmax(logits, 1);
-        const order = topIdx(logits, Math.min(topK, logits.length)), kth = logits[order[order.length - 1]];
-        const lg = Array.from(logits, (v) => (v < kth ? -Infinity : v));
+        let lgs = logits;   // the scores the sampler sees: the raw scores minus the DRY penalties (the displayed probabilities stay raw)
+        if (useDry) { lgs = Array.from(logits); for (const [t, p] of dryPenalties(hist)) lgs[t] -= p; }
+        const order = topIdx(lgs, Math.min(topK, lgs.length)), kth = lgs[order[order.length - 1]];
+        const lg = Array.from(lgs, (v) => (v < kth ? -Infinity : v));
         const probs = softmax(lg, temp);
         let u = rng(), tk = order[0], acc = 0;
         for (let i = 0; i < probs.length; i++) { acc += probs[i]; if (u < acc) { tk = i; break; } }
@@ -664,7 +667,22 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
     }
   }
 
-  const FLM = { Tokenizer, Model, AllFuzzyModel, Api, mulberry32, softmax };
+  // DRY ("don't repeat yourself", PLAN_REPEAT.md set 25): a penalty on the token that would extend a sequence already repeated in the history.
+  // For every earlier position j whose token equals the last token, the match length m is how far the history agrees backwards with the end of the text;
+  // if m >= allowed the token that followed it (hist[j + 1]) is penalised by mult * base^(m - allowed). Same rule as flm/decode_sweep.py (S8: 0.8, 1.75, 2).
+  function dryPenalties(hist, mult = 0.8, base = 1.75, allowed = 2, maxLen = 20) {
+    const pen = new Map(), n = hist.length;
+    if (n < 2) return pen;
+    for (let j = 0; j < n - 1; j++) {
+      if (hist[j] !== hist[n - 1]) continue;
+      let m = 1;
+      while (m < maxLen && j - m >= 0 && hist[j - m] === hist[n - 1 - m]) m++;
+      if (m >= allowed) { const p = mult * Math.pow(base, m - allowed), t = hist[j + 1]; if (!(pen.get(t) >= p)) pen.set(t, p); }
+    }
+    return pen;
+  }
+
+  const FLM = { Tokenizer, Model, AllFuzzyModel, Api, mulberry32, softmax, dryPenalties };
   if (typeof module !== 'undefined' && module.exports) module.exports = FLM; else root.FLM = FLM;
 })(typeof window !== 'undefined' ? window : globalThis);
 
@@ -704,7 +722,7 @@ $('go').onclick = async () => {
   try {
     const d = await api.generate({
       model: $('model').value, prompt: $('prompt').value, max_tokens: +$('maxtok').value, temperature: +$('temp').value,
-      top_k: +$('topk').value, seed: +$('seed').value, explain: $('explain').checked });
+      top_k: +$('topk').value, seed: +$('seed').value, explain: $('explain').checked, dry: $('dry').checked });
     current = d; render(d);
     $('info').textContent = `${d.steps.length} word pieces in ${((performance.now() - t0) / 1000).toFixed(1)} s` + (d.explained ? '' : ' (rule view is off for this model)') + `, ${Math.round(100 * d.steps.filter((x) => x.rep).length / d.steps.length)}% of pieces repeat an earlier three-piece run (dotted underline)`;
   } catch (e) { $('err').textContent = /HTTP|Failed to fetch|NetworkError|Load failed/.test(e.message) ? LOAD_HELP : 'Generation failed: ' + e.message; }
