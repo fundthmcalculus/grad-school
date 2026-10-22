@@ -31,9 +31,13 @@ if __name__ == "__main__":
         "--label",
         default="99K ALL-FUZZY: every block component a fuzzy system, tail token table fuzzy (300M characters)",
     )
+    ap.add_argument(
+        "--vocab", type=int, default=3072, help="the vocabulary of the checkpoint"
+    )
     args = ap.parse_args()
     MID = args.id
-    m = AllFuzzyLM(args.npz)
+    V = args.vocab
+    m = AllFuzzyLM(args.npz, tokenizer=ROOT / "allfuzzy" / f"bpe{V}.json")
     d, V = m.d, m.V
     # tensors (float32, flat names as in the checkpoint) + the head / tail id lists
     names = [
@@ -57,7 +61,7 @@ if __name__ == "__main__":
         "id": MID,
         "label": args.label,
         "params": n_params,
-        "tok": "bpe3072",
+        "tok": f"bpe{V}",
         "dtype": "float32",
         "config": {
             "allfuzzy": True,
@@ -76,7 +80,7 @@ if __name__ == "__main__":
     (WEB / "models" / f"{MID}.json").write_text(json.dumps(manifest))
     # rule usage on validation windows
     val = np.fromfile(
-        ROOT.parent.parent / "data" / "tinystories" / "valid_bpe3072.bin",
+        ROOT.parent.parent / "data" / "tinystories" / f"valid_bpe{V}.bin",
         dtype=np.uint16,
     )
     wins = [np.zeros(len(m.W[f"blocks.{l}.ffn.centers"])) for l in range(m.L)]
@@ -149,7 +153,24 @@ if __name__ == "__main__":
     (WEB / "models" / f"{MID}.check.json").write_text(
         json.dumps({"ids": ids, "last_logits": [float(x) for x in last]})
     )
-    shutil.copyfile(ROOT / "allfuzzy" / "bpe3072.json", WEB / "tokenizer-3072.json")
+    shutil.copyfile(ROOT / "allfuzzy" / f"bpe{V}.json", WEB / f"tokenizer-{V}.json")
+    if (
+        V != 3072
+    ):  # reference encodings for the browser tokenizer test (3072 has its own, made earlier)
+        sys.path.insert(0, str(ROOT))
+        from flm.bpe import BPE
+
+        bp = BPE(V)
+        texts = [
+            "Once upon a time",
+            "Lily and Ben went to the park.",
+            "The little dog was sad because",
+            'One day, a girl named Mia found a shiny red ball!\n\nShe said, "Wow, it\'s so big."',
+            "  leading spaces,  double  spaces and a trailing newline\n",
+            "It's they're we've I'm you'll he'd",
+        ]
+        out = [{"text": t, "ids": [int(i) for i in bp.encode(t)]} for t in texts]
+        (WEB / f"tokenizer-{V}.check.json").write_text(json.dumps(out))
     idx = [
         e
         for e in json.loads((WEB / "models" / "index.json").read_text())
@@ -163,7 +184,7 @@ if __name__ == "__main__":
             "ctx": m.max_len,
             "d": d,
             "layers": m.L,
-            "tok": "bpe3072",
+            "tok": f"bpe{V}",
         }
     )
     (WEB / "models" / "index.json").write_text(json.dumps(idx, indent=1))
