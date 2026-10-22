@@ -35,3 +35,8 @@ tinystories/
 # Recover: cd experiments/fuzzy-language-model && PYTHONPATH=. python -m flm.prep_cosmopedia 3e9
 # (pinned revision of HuggingFaceTB/smollm-corpus; licence ODC-By)
 cosmopedia/
+
+# SimpleStories (SimpleStories/SimpleStories, MIT) character stream for experiments/fuzzy-language-model (PLAN_NEXTROUND.md track B): raw parquet shards (1.68 GB) + train.bin / valid.bin + BPE streams.
+# Recover: cd experiments/fuzzy-language-model && PYTHONPATH=. python -m flm.prep_simplestories
+# (pinned revision e63b8adc3b1a1bdc7cac5b500d150b71346b0628)
+simplestories/
