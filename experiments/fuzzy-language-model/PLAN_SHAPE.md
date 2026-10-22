@@ -259,3 +259,13 @@ Arms: **ref** (the refit recipe, V3072 head 384 tail 12 d48, 54 / 36 rules, 99,6
 Reference points: refit reference at 30M 1.1200 (five seeds); F7 at 30M 1.0588 (five seeds, -0.0613; seeds 0-4: -0.0659 -0.0643 -0.0606 -0.0556 -0.0599); the old recipe at 300M 0.98929 (two seeds); the hybrid recipe at 300M 0.95887 (the long-standing target); at 1B the old recipe was 0.97486.
 Predictions: the refit reference at 300M lands between 0.980 and 0.992, central 0.987 (65%); **F7 beats the reference by at least 0.020 at 300M (60%)**; by at least 0.030 (45%); by at least 0.050, i.e. most of its 30M gain (15%: the head repairs of stages 6-9 lost their gain; but this lever is a vocabulary and a head size, which the earlier vocabulary lever kept at 55% of its 30M value, 0.042 to 0.023); C6 is within 0.010 of F7 (65%); **F7 reaches the hybrid recipe's 0.9589 or below (30%)**; F7 below 0.970 (60%).
 Decision: an arm that beats the reference at 300M by at least 0.010 on both seeds is the new recipe; then coherence (two raters, 32 texts per model), the dashboard, the demo (a new model for the browser needs the BPE6144 tokenizer file in the page) and the write-up follow.
+
+## 18. Stage 2 for the top combination arms (recorded 2026-10-21; `v69-shape`, five seeds, reference mean 1.1200; `report/shape_stage2b.md`)
+| arm | V / head / tail / d | rules | BPC | change (se) | per seed (0-4) | verdict |
+|---|---|---|---|---|---|---|
+| **F7** | 6144 / 640 / 8 / 32 | 61 / 41 | **1.0588** | **-0.0613** | -0.0659 -0.0643 -0.0606 -0.0556 -0.0599 | PASS |
+| F6 | 6144 / 768 / 8 / 32 | 49 / 33 | 1.0594 | -0.0606 | -0.0633 -0.0635 -0.0545 -0.0643 -0.0575 | PASS |
+| F1 | 6144 / 640 / 8 / 40 | 20 / 13 | 1.0618 | -0.0582 | -0.0584 -0.0663 -0.0540 -0.0569 -0.0552 | PASS |
+| C6 | 6144 / 512 / 8 / 40 | 33 / 22 | 1.0638 | -0.0562 | -0.0622 -0.0642 -0.0497 -0.0561 -0.0486 | PASS |
+| D11 | 6144 / 512 / 6 / 40 | 67 / 45 | 1.0646 | -0.0554 | -0.0563 -0.0601 -0.0513 -0.0526 -0.0568 | PASS |
+All five pass by a wide margin (every seed gains at least 0.049); the three-seed ranking held except that C6 slipped below F1 and F6 (its seeds 3-4 were weaker). F7 and F6 are tied within 0.001. The registered prediction that the best five-seed arm is a V6144 arm (55%): **right**. At five seeds the best arm is **5.5% better than the reference** (1.0588 against 1.1200).
