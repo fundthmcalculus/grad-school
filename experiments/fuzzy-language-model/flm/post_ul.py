@@ -61,6 +61,12 @@ if __name__ == "__main__":
     ap.add_argument("--lr", type=float, default=3e-3)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument(
+        "--clamp",
+        type=float,
+        default=0.0,
+        help="cap on the per-token unlikelihood -log(1 - p) (0: none)",
+    )
+    ap.add_argument(
         "--hint",
         default="tail",
         help="emb_mode stored in the checkpoint ('' for a hybrid checkpoint)",
@@ -122,6 +128,8 @@ if __name__ == "__main__":
             logits = model(seq[:, :-1]).float()
             p_tok = torch.softmax(logits, -1).gather(-1, seq[:, 1:, None])[..., 0]
             ulv = -torch.log1p(-p_tok.clamp(max=1 - 1e-6))
+            if a.clamp > 0:
+                ulv = ulv.clamp(max=a.clamp)
             n = mask.sum()
             flagged = float(n) / mask.numel() * (seq.shape[1] / (seq.shape[1] - PREFIX))
             if n > 0:
