@@ -224,3 +224,16 @@ Predictions: the best E10 arm beats C6 (-0.0587) by 0.005 (50%); the best E10 ar
 | d40, head 448 (E4b) | 1.1168 | -0.0032 (0.0019) | -0.0067 -0.0076 -0.0002 -0.0039 +0.0023 | 2 | no |
 Six of the seven pass; the three-seed estimates held (changes of at most 0.002 between three and five seeds). Predictions: at least one embedding arm beats the reference on four of five seeds (50%): **right** (six arms); no block width beats d48 on four of five seeds (75%): **right** (d40 passes on two); d48 within 0.005 of the best width (70%): **right** (d40 gains 0.0032).
 The combination arms of E8-E10 (C1-C6, D, F) have three seeds each and are the candidates for the 300M stage: C6 (V6144 head 512 tail 8 d40, -0.0587 on three seeds) leads; seeds 3-4 for the best of them follow the end of the E10 round.
+
+## 15. E9 results (recorded 2026-10-21; `v69-shape`, three seeds; change against the refit reference, negative is better)
+| arm | V / head / tail / d | rules | BPC | change | per seed |
+|---|---|---|---|---|---|
+| C6 (E8) | 6144 / 512 / 8 / 40 | 33 / 22 | 1.0621 | **-0.0587** | -0.0622 -0.0642 -0.0497 |
+| D11 | 6144 / 512 / 6 / 40 | 67 / 45 | 1.0649 | -0.0559 | -0.0563 -0.0601 -0.0513 |
+| D6 | 6144 / 448 / 6 / 48 | 42 / 28 | 1.0673 | -0.0536 | -0.0529 -0.0575 -0.0503 |
+| D7 | 6144 / 384 / 6 / 48 | 49 / 33 | 1.0740 | -0.0469 | -0.0450 -0.0499 -0.0457 |
+| D4 | 6144 / 384 / 8 / 40 | 45 / 30 | 1.0734 | -0.0474 | -0.0439 -0.0504 -0.0479 |
+| C4 (E8) | 6144 / 384 / 8 / 48 | 19 / 13 | 1.0779 | -0.0430 | -0.0441 -0.0433 -0.0415 |
+| D8 | 8192 / 384 / 6 / 40 | 43 / 29 | 1.0818 | -0.0390 | -0.0409 -0.0431 -0.0330 |
+Predictions: the best E9 arm beats C4 by 0.005 (35%): **right** (D6, 0.0106 better; none beats C6); D7 beats C4 (45%): **right** (0.0039); D4 beats C4 (40%): **right** (0.0044); D8 (V8192) worse than D4 (V6144) (60%): **right** (0.0084 worse); the best five-seed arm is a V6144 arm (55%): V6144 arms hold every top-six place so far, to be confirmed on five seeds.
+Reading: at vocabulary 6144 the head is the dominant axis (384 -> 448 -> 512 gains 0.0536 - 0.0469 = 0.007 and 0.0587 - 0.0536 = 0.005 per step), the block width 40 beats 48 by about 0.004, and the tail rank trades almost one for one against feed-forward rules (D11 tail 6 / 67 rules against C6 tail 8 / 33 rules: 0.003 apart). V8192 loses to V6144 at equal head and width.
