@@ -32,3 +32,14 @@ Only the fully-fuzzy model; 300M characters is the maximum budget (no 1B/3B runs
 1. "Pythia 50M": is the target the published 70M row (or 14M), or a custom 50M model sized like Pythia?
 2. May P0 download the two small Pythia checkpoints (about 30 MB and 160 MB)?
 3. Is a 300M-character budget acceptable for a model this large, knowing it is far below Pythia's data?
+
+## Update 2026-10-22
+Owner decisions: the 14M row is the comparison (P0 for Pythia-14M, `flm/score_pythia.py`); the large corpus is the Pile mirror only (`EleutherAI/the_pile_deduplicated`, see `ISSUE_STREAMING.md`); the next machine will probably have a bigger GPU.
+
+## P0 result for Pythia-14M (2026-10-22; `report/pythia_p0.json`, `flm/score_pythia.py`, CPU, first 1M characters of each validation set, 512-token windows)
+| corpus | Pythia-14M (14.07M params, zero-shot) | our all-fuzzy F7 (99,882 params, trained on that corpus) |
+|---|---|---|
+| TinyStories | 1.2481 | 0.9558 (300M, floor 0, seed 0) |
+| SimpleStories | 1.3221 | 1.2369 (30M mean, five seeds; no 300M run) |
+| Cosmopedia | 1.2183 | not scored (no F7 checkpoint trained on Cosmopedia at this shape) |
+Prediction scoring: "Pythia-14M within 0.10 BPC of F7 on TinyStories (35%)": **wrong**, the gap is 0.29 with F7 ahead. Reading: this is not a like-for-like comparison. Pythia-14M never saw these corpora (it is scored zero-shot, on text far narrower than the Pile), while F7 trained on each; and the budgets differ (Pythia-14M: about 300B tokens; F7: 300M characters). The fair next comparisons are (1) F7 and Pythia on the Pile sample, where Pythia is in-distribution and F7 would train on the stream (needs `ISSUE_STREAMING.md`), and (2) a Pythia-14M fine-tuned or trained from scratch on the same 300M characters. Neither has been run. Pythia-70M has not been scored (the 160 MB download was not approved).
