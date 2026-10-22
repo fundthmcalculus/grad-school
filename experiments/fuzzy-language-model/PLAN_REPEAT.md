@@ -80,3 +80,18 @@ Reading: **sequence-level unlikelihood post-training, like the token-level versi
 1. **DRY (multiplier 0.8, base 1.75, allowed length 2) at temperature 0.5, top-k 10 is the repetition fix**: in the demo's sampler (on by default, a checkbox turns it off; JavaScript matches the Python on 40 random histories); recommended for any generation from these models.
 2. **Unlikelihood post-training is not adopted** (token-level in pretraining at 30M: +0.0053 and a coherence loss; sequence-level at 300M: +0.007 to +0.066 against the control).
 3. **A short low-rate cross-entropy phase after the main run improves both models by about 0.010 bits per character** (seeds 0 and 1: F7 0.9660 -> 0.9562 and 0.9686 -> 0.9586; H3 0.9413 -> 0.9319 and 0.9468 -> 0.9361): the fair gap is unchanged (0.0234). Open: whether a longer or differently shaped final phase (a decay to a low floor instead of to zero, a longer main schedule, or a warm-up-stable-decay schedule) gives more; the cheapest test is this control at 800 and 1,600 steps and at lr 1e-3 and 6e-3 on one checkpoint (about two minutes each).
+
+## Re-annealing sweep (registered 2026-10-22 before running; `outputs/v74-ul/reann_*`)
+The cross-entropy-only phase (`flm.post_ul --alpha 0`) gained 0.010 for both models at 400 steps and lr 3e-3. Variants on seed 0 of F7 (`v70-shape300/F7_..._s0`, 0.96596) and of the hybrid H3 (`v72-hybshape300/..._wu1000_s0`, 0.94134), each from the original checkpoint: 400 steps at lr 1e-3 and 6e-3, and 800 and 1,600 steps at lr 3e-3.
+Predictions: 1,600 steps gains more than 400 steps for both models (65%; at least 0.003 more, 45%); lr 1e-3 gains less than lr 3e-3 (55%) and lr 6e-3 gains less than lr 3e-3 (40%: the optimum is near 3e-3); the best variant gains at least 0.015 for F7 (30%); F7 and H3 gain within 0.003 of each other at every setting (70%), so the fair gap stays between 0.020 and 0.027 (75%).
+
+### Re-annealing sweep results (recorded 2026-10-22; seed 0 of each; the cross-entropy-only phase from the original 300M checkpoint, `flm.post_ul --alpha 0`)
+| steps | lr | F7 (0.96596 before) | H3 (0.94134 before) |
+|---|---|---|---|
+| 400 | 1e-3 | 0.95586 (-0.0101) | 0.93155 (-0.0098) |
+| 400 | 3e-3 | 0.95615 (-0.0098) | 0.93193 (-0.0094) |
+| 400 | 6e-3 | 0.95740 (-0.0086) | 0.93329 (-0.0081) |
+| 800 | 3e-3 | 0.95425 (-0.0117) | 0.92975 (-0.0116) |
+| 1,600 | 3e-3 | **0.95242 (-0.0135)** | **0.92771 (-0.0136)** |
+Predictions: 1,600 steps gains more than 400 for both (65%): **right**, by 0.0037 and 0.0042 (45% for at least 0.003: right); lr 1e-3 gains less than lr 3e-3 (55%): **wrong** (equal within 0.0004); lr 6e-3 gains less than lr 3e-3 (40%): **right** (-0.0086 against -0.0098); the best variant gains at least 0.015 for F7 (30%): **wrong** (-0.0135); F7 and H3 gain within 0.003 at every setting (70%): **right** (within 0.0004 everywhere); the fair gap stays between 0.020 and 0.027 (75%): **right** (0.0247 after 1,600 steps, 0.0247 before: 0.9660 - 0.9413 and 0.95242 - 0.92771).
+Reading: **the gain is insensitive to the learning rate (1e-3 to 3e-3), grows slowly with the number of steps (-0.010, -0.012, -0.0135 at 400, 800, 1,600; about 0.0017 per doubling) and is identical for the fuzzy and the hybrid model**, so it is a property of the training schedule, not of either architecture: the main run (cosine from 6e-2 to zero over 9,000 steps) ends before the weights settle, and a further low-rate phase of 1,600 steps (13M tokens, about 4 minutes) is worth 0.0135 for both. The fair gap is unchanged (0.0247 on seed 0). The practical lesson for any new run, and for `PLAN_SCALEUP.md`: end with a longer low-rate phase (or a schedule that decays to a floor) and tune it on both models.
