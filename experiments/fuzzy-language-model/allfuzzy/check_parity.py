@@ -21,7 +21,7 @@ if __name__ == "__main__":
     ck = torch.load(sys.argv[1], map_location="cpu", weights_only=False)
     st = ck["state"]
     R.NH, R.E = st["emb_h.weight"].shape[0], st["emb_t.weight"].shape[1]
-    os.environ["TIER_FREQ"] = "outputs/freq_bpe3072.npz"
+    os.environ["TIER_FREQ"] = f"outputs/freq_bpe{ck['config']['vocab_size']}.npz"
     stem = Path(sys.argv[1]).name
     FT.FORM = "tanh" if "tanh" in stem or "_tp" in stem else "softmax"
     CF._state.update(
