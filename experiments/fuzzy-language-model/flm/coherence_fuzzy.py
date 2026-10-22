@@ -70,48 +70,57 @@ def _init(self, cfg, *a, **k):
         install_from_state(self, _state["state"])
 
 
+def configure(path, ck):
+    """Set up the model classes so that torch rebuilds this checkpoint's architecture (every replacement, token table and head option read from its state dict and file name)."""
+    st = ck["state"]
+    tiered = any(key.startswith("emb_h") for key in st)
+    if tiered:
+        R.NH, R.E = st["emb_h.weight"].shape[0], st["emb_t.weight"].shape[1]
+        v = ck["config"]["vocab_size"]
+        os.environ["TIER_FREQ"] = os.environ.get("COH_TIER_FREQ") or (
+            "outputs/v22-tribble/ppmi_k48_v1024.npz"
+            if v == 1024
+            else f"outputs/freq_bpe{v}.npz"
+        )  # COH_TIER_FREQ: the frequency file the checkpoint was trained with (a different corpus has a different head set)
+    stem = os.path.basename(str(path))
+    FT.FORM = "tanh" if ("tanh" in stem or "_tp" in stem) else "softmax"
+    FT.PRIOR = "prior_alpha" in st
+    FT.BIAS = "head" if "tok_bias" in st else ""
+    FT.TIER = "tier_w" in st
+    FT.GAIN = "out_gain" in st
+    FT.UNTIE = "head_proto_out" in st
+    FT.PQ = st["head_pq"].shape[0] if "head_pq" in st else 0
+    FT.MOS = st["mos_pi"].shape[1] if "mos_pi" in st else 0
+    FT.MOS_RANK = st["mos_down"].shape[2] if "mos_down" in st else FT.MOS_RANK
+    FT.RES = st["head_res.weight"].shape[1] if "head_res.weight" in st else 0
+    tail_names = ("ftail", "e2e_tail", "e2e_prior", "lr6_wu", "fz_lr")
+    # every arm of the shape screens (outputs/v69-shape, v70-shape300) is an e2e_tail model (fuzzy blocks, crisp head tokens, fuzzy tail); the hybrid ones (v71-hybshape, v72-hybshape300) are stock
+    shape_run = "-shape" in str(path).replace(chr(92), "/")
+    emb_mode = (
+        "all"
+        if "head_proto" in st or "head_pq" in st
+        else (
+            "tail"
+            if tiered and (shape_run or any(n in stem for n in tail_names))
+            else ""
+        )
+    )
+    if not emb_mode and (FT.PRIOR or FT.TIER):
+        emb_mode = "crisp"
+    _state.update(tiered=tiered, state=st, emb_mode=emb_mode)
+    TinyLM.__init__ = _init
+    TinyLM.embed = FT._embed if emb_mode else (R._embed if tiered else _stock["embed"])
+    TinyLM.logits = (
+        FT._logits if emb_mode else (R._logits if tiered else _stock["logits"])
+    )
+
+
 if __name__ == "__main__":
     real_load = torch.load
 
     def load(path, *a, **k):
         ck = real_load(path, *a, **k)
-        st = ck["state"]
-        tiered = any(key.startswith("emb_h") for key in st)
-        if tiered:
-            R.NH, R.E = st["emb_h.weight"].shape[0], st["emb_t.weight"].shape[1]
-            v = ck["config"]["vocab_size"]
-            os.environ["TIER_FREQ"] = os.environ.get("COH_TIER_FREQ") or (
-                "outputs/v22-tribble/ppmi_k48_v1024.npz"
-                if v == 1024
-                else f"outputs/freq_bpe{v}.npz"
-            )  # COH_TIER_FREQ: the frequency file the checkpoint was trained with (a different corpus has a different head set)
-        stem = os.path.basename(str(path))
-        FT.FORM = "tanh" if ("tanh" in stem or "_tp" in stem) else "softmax"
-        FT.PRIOR = "prior_alpha" in st
-        FT.BIAS = "head" if "tok_bias" in st else ""
-        FT.TIER = "tier_w" in st
-        FT.GAIN = "out_gain" in st
-        FT.UNTIE = "head_proto_out" in st
-        FT.PQ = st["head_pq"].shape[0] if "head_pq" in st else 0
-        FT.MOS = st["mos_pi"].shape[1] if "mos_pi" in st else 0
-        FT.MOS_RANK = st["mos_down"].shape[2] if "mos_down" in st else FT.MOS_RANK
-        FT.RES = st["head_res.weight"].shape[1] if "head_res.weight" in st else 0
-        tail_names = ("ftail", "e2e_tail", "e2e_prior", "lr6_wu", "fz_lr")
-        emb_mode = (
-            "all"
-            if "head_proto" in st or "head_pq" in st
-            else ("tail" if tiered and any(n in stem for n in tail_names) else "")
-        )
-        if not emb_mode and (FT.PRIOR or FT.TIER):
-            emb_mode = "crisp"
-        _state.update(tiered=tiered, state=st, emb_mode=emb_mode)
-        TinyLM.__init__ = _init
-        TinyLM.embed = (
-            FT._embed if emb_mode else (R._embed if tiered else _stock["embed"])
-        )
-        TinyLM.logits = (
-            FT._logits if emb_mode else (R._logits if tiered else _stock["logits"])
-        )
+        configure(path, ck)
         return ck
 
     torch.load = load
