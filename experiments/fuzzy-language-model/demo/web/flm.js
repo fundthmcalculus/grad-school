@@ -260,11 +260,12 @@
       const W = (this.W = readTensors(manifest, buf));
       const g = (k) => W[k].data;
       this.V = c.vocab_size; this.d = c.d_model; this.H = c.n_heads; this.dh = this.d / this.H; this.R = c.n_rules; this.L = c.n_layers; this.maxLen = c.max_len;
+      // c.tanh: signed (tanh) memberships for the tail table; a fuzzy head table arrives as precomputed effective rows in emb_h.weight
       const headIds = g('head_ids'), tailIds = g('tail_ids'), embH = g('emb_h.weight'), embT = g('emb_t.weight'), up = g('tier_up.weight'), K = W['emb_t.weight'].shape[1], d = this.d;
       this.E = new Float32Array(this.V * d);              // effective embedding of every piece: crisp row, or membership-weighted average of the 12 prototypes
       headIds.forEach((id, i) => this.E.set(embH.subarray(i * d, i * d + d), id * d));
       for (let t = 0; t < tailIds.length; t++) {
-        const mu = softmaxF(embT.subarray(t * K, t * K + K)), id = tailIds[t];
+        const lg = embT.subarray(t * K, t * K + K), mu = c.tanh ? lg.map(Math.tanh) : softmaxF(lg), id = tailIds[t];
         for (let j = 0; j < d; j++) { let a = 0; for (let k = 0; k < K; k++) a += up[j * K + k] * mu[k]; this.E[id * d + j] = a; }
       }
       this.nw = g('norm.weight');

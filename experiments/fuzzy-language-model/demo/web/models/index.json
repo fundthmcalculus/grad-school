@@ -1,35 +1,35 @@
 [
  {
-  "id": "flm96k",
-  "label": "96K, 3B characters (reference recipe)",
-  "params": 96416,
+  "id": "flm-allfuzzy-1b",
+  "label": "99K ALL-FUZZY, 1B characters: every block component a fuzzy system, tail token table fuzzy (1B characters, 0.974 bits per character; the strongest all-fuzzy model)",
+  "params": 99019,
   "ctx": 512,
   "d": 48,
   "layers": 2,
-  "tok": "bpe1024"
+  "tok": "bpe3072"
  },
  {
-  "id": "flm98k-tiered",
-  "label": "98K tiered embedding, 1B characters (best sub-100K likelihood)",
-  "params": 98280,
+  "id": "flm-allfuzzy-1b-s1",
+  "label": "99K ALL-FUZZY, 1B characters, second training run: the same model with another seed (1B characters, 0.976 bits per character)",
+  "params": 99019,
   "ctx": 512,
   "d": 48,
   "layers": 2,
-  "tok": "bpe1024"
- },
- {
-  "id": "flm1m-over-cap",
-  "label": "1.32M, 1B characters (over the 100K cap, for comparison)",
-  "params": 1323904,
-  "ctx": 512,
-  "d": 192,
-  "layers": 4,
-  "tok": "bpe1024"
+  "tok": "bpe3072"
  },
  {
   "id": "flm-allfuzzy",
-  "label": "99K ALL-FUZZY: every block component a fuzzy system, tail token table fuzzy (300M characters)",
+  "label": "99K ALL-FUZZY: every block component a fuzzy system, tail token table fuzzy (300M characters, 0.987 bits per character)",
   "params": 99019,
+  "ctx": 512,
+  "d": 48,
+  "layers": 2,
+  "tok": "bpe3072"
+ },
+ {
+  "id": "flm-allfuzzy-embed",
+  "label": "99K FULLY-FUZZY EMBEDDING: every block component and both token tables fuzzy sets (300M characters, 0.997 bits per character)",
+  "params": 99009,
   "ctx": 512,
   "d": 48,
   "layers": 2,

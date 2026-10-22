@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 1,
+  "heads": 8,
+  "rules": 64,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\b1_mix_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 1,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 64,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99078,
+ "params_nonemb": 47814,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.1415,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05268
+  ],
+  [
+   100,
+   1.53095
+  ],
+  [
+   200,
+   1.36056
+  ],
+  [
+   300,
+   1.29664
+  ],
+  [
+   400,
+   1.25979
+  ],
+  [
+   500,
+   1.22696
+  ],
+  [
+   600,
+   1.19954
+  ],
+  [
+   700,
+   1.17637
+  ],
+  [
+   800,
+   1.15635
+  ],
+  [
+   900,
+   1.14541
+  ],
+  [
+   953,
+   1.1415
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7262
+  ],
+  [
+   50,
+   9.4079
+  ],
+  [
+   100,
+   7.426
+  ],
+  [
+   150,
+   6.2411
+  ],
+  [
+   200,
+   5.6556
+  ],
+  [
+   250,
+   5.3604
+  ],
+  [
+   300,
+   5.1717
+  ],
+  [
+   350,
+   5.0452
+  ],
+  [
+   400,
+   4.9604
+  ],
+  [
+   450,
+   4.8988
+  ],
+  [
+   500,
+   4.8154
+  ],
+  [
+   550,
+   4.7437
+  ],
+  [
+   600,
+   4.6661
+  ],
+  [
+   650,
+   4.6175
+  ],
+  [
+   700,
+   4.5734
+  ],
+  [
+   750,
+   4.5373
+  ],
+  [
+   800,
+   4.5067
+  ],
+  [
+   850,
+   4.4789
+  ],
+  [
+   900,
+   4.438
+  ],
+  [
+   950,
+   4.4214
+  ],
+  [
+   952,
+   4.4225
+  ]
+ ],
+ "train_seconds": 44.97,
+ "wall_seconds": 52.5,
+ "chars_per_sec": 173594,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl at this guard. She liked to play with her ball with her favorite pobbed her toys, but she was bright and beautiful, round, round family said, \"I like a fun game is the other people in your room. Thank you for something special?\"\nThe pare was sad, and they both were very happy. They played fun playing with the toy all day and had lots of fun together. And she played with the best friends in the park every day.\n<|eot|>\nOnce upon a time, in a big town, there was a little girl named Lily. Mia liked to play with her friends in the kitchen. They liked to play together every day.\nOne day, Mia went to the store with her friend, a small, and a big red car. Mia and Mia played in the zoo house. But then, Mia's mom said, \"I have a srew?\"\nThe smile smiled and said, \"Be careful, cake! I can be your friend.\" The nice dog and the dog went inside the picture of the park, but the dog was happy and thanked the dog.\nThey both wanted to play with the pieces and friends. But then, a small girl named Lily picked up the park with her voice to help. They were happy to have a good friend. They played with the dog and played together every day.\n<|eot|>\nOnce upon a time, there was a kicy. After a while, there was a very important",
+ "rule_init": {},
+ "ngram_init": {}
+}

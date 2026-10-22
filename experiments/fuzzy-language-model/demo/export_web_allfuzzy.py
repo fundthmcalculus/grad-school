@@ -1,12 +1,14 @@
 """Export the all-fuzzy model (allfuzzy/e2e_tail_300M_s0.npz) for the in-browser demo: weights, rule views, a parity check; run from the experiment directory.
 
     python demo/export_web_allfuzzy.py
+    python demo/export_web_allfuzzy.py --npz allfuzzy/e2e_all_tanh_300M_s1.npz --id flm-allfuzzy-embed --checkpoint outputs/v59-e2e300/e2e_all_tanh_300M_s1.pt --label "..."
 
 Writes demo/web/models/flm-allfuzzy.{json,bin,rules.json,check.json}, demo/web/tokenizer-3072.json, and appends the model to demo/web/models/index.json.
 The rule views are computed with the numpy model of allfuzzy/allfuzzy_lm.py on 16 validation windows: how often each feed-forward rule is the strongest
 (|strength| x ||consequent x output weight||) at a position, and the word pieces it raises.
 """
 
+import argparse
 import json
 import shutil
 import sys
@@ -19,10 +21,19 @@ sys.path.insert(0, str(ROOT / "allfuzzy"))
 from allfuzzy_lm import AllFuzzyLM  # noqa: E402
 
 WEB = ROOT / "demo" / "web"
-MID = "flm-allfuzzy"
 
 if __name__ == "__main__":
-    m = AllFuzzyLM()
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--npz", default=str(ROOT / "allfuzzy" / "e2e_tail_300M_s0.npz"))
+    ap.add_argument("--id", default="flm-allfuzzy")
+    ap.add_argument("--checkpoint", default="outputs/v52-e2e/e2e_tail_300M_s0.pt")
+    ap.add_argument(
+        "--label",
+        default="99K ALL-FUZZY: every block component a fuzzy system, tail token table fuzzy (300M characters)",
+    )
+    args = ap.parse_args()
+    MID = args.id
+    m = AllFuzzyLM(args.npz)
     d, V = m.d, m.V
     # tensors (float32, flat names as in the checkpoint) + the head / tail id lists
     names = [
@@ -36,11 +47,15 @@ if __name__ == "__main__":
         off += a.nbytes
     (WEB / "models" / f"{MID}.bin").write_bytes(b"".join(chunks))
     n_params = int(
-        sum(np.asarray(m.W[k]).size for k in names if k not in ("head_ids", "tail_ids"))
+        m.W["cfg_params_total"]
+        if "cfg_params_total" in m.W
+        else sum(
+            np.asarray(m.W[k]).size for k in names if k not in ("head_ids", "tail_ids")
+        )
     )
     manifest = {
         "id": MID,
-        "label": "99K ALL-FUZZY: every block component a fuzzy system, tail token table fuzzy (300M characters)",
+        "label": args.label,
         "params": n_params,
         "tok": "bpe3072",
         "dtype": "float32",
@@ -53,9 +68,10 @@ if __name__ == "__main__":
             "n_rules": m.R_mem,
             "max_len": m.max_len,
             "head": int(len(m.head_ids)),
+            "tanh": bool("cfg_tanh" in m.W and int(m.W["cfg_tanh"])),
         },
         "tensors": table,
-        "checkpoint": "outputs/v52-e2e/e2e_tail_300M_s0.pt",
+        "checkpoint": args.checkpoint,
     }
     (WEB / "models" / f"{MID}.json").write_text(json.dumps(manifest))
     # rule usage on validation windows

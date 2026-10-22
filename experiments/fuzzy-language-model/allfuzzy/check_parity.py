@@ -1,5 +1,6 @@
 """Parity check (a script, not a pytest test): allfuzzy_lm.py (plain numpy) against the trained torch model, logits at every position of a prompt.
-PYTHONPATH=. python allfuzzy/check_parity.py outputs/v52-e2e/e2e_tail_300M_s0.pt      (needs torch and the repo; the script itself does not)
+PYTHONPATH=. python allfuzzy/check_parity.py outputs/v52-e2e/e2e_tail_300M_s0.pt [allfuzzy/e2e_tail_300M_s0.npz]      (needs torch and the repo; the script itself does not)
+A fuzzy-head checkpoint (``head_proto`` in the state) is rebuilt with signed memberships when its file name says 'tanh' (as flm/coherence_fuzzy.py does).
 """
 
 import os
@@ -21,12 +22,16 @@ if __name__ == "__main__":
     st = ck["state"]
     R.NH, R.E = st["emb_h.weight"].shape[0], st["emb_t.weight"].shape[1]
     os.environ["TIER_FREQ"] = "outputs/freq_bpe3072.npz"
-    CF._state.update(tiered=True, state=st, emb_mode="tail")
+    stem = Path(sys.argv[1]).name
+    FT.FORM = "tanh" if "tanh" in stem or "_tp" in stem else "softmax"
+    CF._state.update(
+        tiered=True, state=st, emb_mode="all" if "head_proto" in st else "tail"
+    )
     TinyLM.__init__, TinyLM.embed, TinyLM.logits = CF._init, FT._embed, FT._logits
     model = TinyLM(ModelConfig(**ck["config"]))
     model.load_state_dict(st)
     model.eval()
-    lm = AllFuzzyLM()
+    lm = AllFuzzyLM(*(sys.argv[2:3] and [sys.argv[2]]))
     text = "Once upon a time, there was a little girl named Lily. She loved to play in the park with her dog."
     ids = lm.tok.encode(text).ids
     with torch.no_grad():

@@ -110,25 +110,43 @@ class TSKLinear(_DataInit, nn.Module):
     """A first-order TSK map with a shared consequent basis (a drop-in for ``nn.Linear(d_in, d_out, bias=False)``): u = B x (k numbers), R Gaussian
     rules over u give normalised firings w_r, each rule rescales the k basis directions by s_r, and  y = A (g * u)  with  g = sum_r w_r s_r.
     That is  y = sum_r w_r (A diag(s_r) B) x : a fuzzy partition of locally linear maps that share their factors.  With s_r = 1 it is exactly the
-    rank-k linear map A B, which is where it starts."""
+    rank-k linear map A B, which is where it starts.
 
-    def __init__(self, d_in: int, d_out: int, k: int, R: int):
+    ``ante="raw"``: the rules' Gaussian memberships sit on the raw input x (one membership function per input dimension, as in the feed-forward rules) instead of on the
+    learned k-number projection u.  ``bias=True``: every rule also carries a constant output offset (the first-order TSK consequent a_r x + b_r), y += sum_r w_r b_r.
+    """
+
+    def __init__(
+        self,
+        d_in: int,
+        d_out: int,
+        k: int,
+        R: int,
+        ante: str = "u",
+        bias: bool = False,
+    ):
         super().__init__()
         self.B = nn.Linear(d_in, k, bias=False)
         self.A = nn.Linear(k, d_out, bias=False)
-        self.centers = nn.Parameter(torch.randn(R, k) * 0.5)
-        self.log_width = nn.Parameter(torch.zeros(R, k))
+        n_ante = d_in if ante == "raw" else k
+        self.ante = ante
+        self.centers = nn.Parameter(torch.randn(R, n_ante) * 0.5)
+        self.log_width = nn.Parameter(torch.zeros(R, n_ante))
         self.s = nn.Parameter(torch.ones(R, k))
-        self.scale = 1.0 / k
+        if bias:
+            self.b = nn.Parameter(torch.zeros(R, d_out))
+        self.scale = 1.0 / n_ante
 
     def forward(self, x):
         u = self.B(x)
-        self._maybe_init(u)
+        z = x if self.ante == "raw" else u  # the antecedent input
+        self._maybe_init(z)
         a = torch.exp(-2.0 * self.log_width)
         ca = self.centers * a
-        quad = (u * u) @ a.T - 2.0 * (u @ ca.T) + (self.centers * ca).sum(-1)
-        g = torch.softmax(-0.5 * self.scale * quad, dim=-1) @ self.s
-        return self.A(g * u)
+        quad = (z * z) @ a.T - 2.0 * (z @ ca.T) + (self.centers * ca).sum(-1)
+        w = torch.softmax(-0.5 * self.scale * quad, dim=-1)
+        y = self.A((w @ self.s) * u)
+        return y + w @ self.b if hasattr(self, "b") else y
 
 
 class FuzzyFFNRaw(_DataInit, nn.Module):
@@ -188,6 +206,9 @@ def install(
     ffn_rules0: int = 0,
     data_init: bool = False,
     proj_ranks: tuple = (32, 20),
+    proj_rules: int = 8,
+    proj_ante: str = "u",
+    proj_bias: bool = False,
 ):
     """norm: "" (keep RMSNorm), "fuzzy" or "scale"; gate: replace both sigmoid gates of every fuzzy-delta mixer."""
     d = model.cfg.d_model
@@ -221,9 +242,10 @@ def install(
             if proj == "tsk0":
                 m.qkv, m.out = TSKMap(d, 3 * d, 28), TSKMap(d, d, 16)
             else:
-                m.qkv, m.out = TSKLinear(d, 3 * d, proj_ranks[0], 8), TSKLinear(
-                    d, d, proj_ranks[1], 8
+                m.qkv = TSKLinear(
+                    d, 3 * d, proj_ranks[0], proj_rules, proj_ante, proj_bias
                 )
+                m.out = TSKLinear(d, d, proj_ranks[1], proj_rules, proj_ante, proj_bias)
     if (
         data_init
     ):  # place every raw-input / gate / projection rule base from the first batch
