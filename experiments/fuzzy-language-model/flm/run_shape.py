@@ -15,6 +15,9 @@ from flm.run_fuzzy_e2e import ARMS as E2E
 from flm.run_tribble import argv
 
 DATA = Path(__file__).resolve().parents[3] / "data" / "tinystories"
+# optional overrides of the training schedule (PLAN_ANALYSIS.md): learning rate, final-lr floor as a fraction of the peak (train.py's default is 0.1), characters in millions
+OV = {k: os.environ.get("SHAPE_" + k.upper()) for k in ("lr", "floor", "chars")}
+SUFFIX = "".join(f"_{k}{v}" for k, v in OV.items() if v)
 
 
 def ready(v):
@@ -26,7 +29,7 @@ def ready(v):
 
 
 def cell(name, arm, seed, out_dir, smoke, big=False):
-    out = out_dir / f"{name}_s{seed}.json"
+    out = out_dir / f"{name}{SUFFIX}_s{seed}.json"
     envx, over, mult = E2E["e2e_tail"]
     a = argv("random", seed)
     a[a.index("--out") + 1] = str(out)
@@ -42,6 +45,12 @@ def cell(name, arm, seed, out_dir, smoke, big=False):
             i = a.index(flag)
             del a[i : i + (2 if flag == "--eval-every" else 1)]
         a += ["--eval-every", "5000", "--save-model"]
+    if OV["lr"]:
+        a[a.index("--lr") + 1] = OV["lr"]
+    if OV["floor"]:
+        a += ["--lr-floor", OV["floor"]]
+    if OV["chars"]:
+        a[a.index("--chars") + 1] = f"{OV['chars']}e6"
     if smoke:
         a[a.index("--chars") + 1] = "0.4e6"
     for k, v in over.items():
@@ -67,7 +76,7 @@ def cell(name, arm, seed, out_dir, smoke, big=False):
         env["FUZZ_ORTHO_SCALED"] = "1"
     if arm.get("cycle"):
         env["FUZZ_CYCLE"], mod = str(arm["cycle"]), "flm.run_embed_rev"
-    with open(out_dir / "logs" / f"{name}_s{seed}.log", "w") as f:
+    with open(out_dir / "logs" / f"{name}{SUFFIX}_s{seed}.log", "w") as f:
         r = subprocess.run(
             [sys.executable, "-m", mod] + a,
             stdout=f,
@@ -95,7 +104,7 @@ if __name__ == "__main__":
         (n, s)
         for s in seeds
         for n in names
-        if not (out_dir / f"{n}_s{s}.json").exists()
+        if not (out_dir / f"{n}{SUFFIX}_s{s}.json").exists()
     ]
     waited = 0
     while todo:

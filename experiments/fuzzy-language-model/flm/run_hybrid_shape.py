@@ -13,9 +13,13 @@ from pathlib import Path
 
 from flm.run_tribble import argv
 
+# optional overrides of the training schedule (PLAN_ANALYSIS.md): learning rate, final-lr floor as a fraction of the peak (train.py's default is 0.1), characters in millions
+OV = {k: os.environ.get("HYB_" + k.upper()) for k in ("lr", "floor", "chars")}
+EXTRA = "".join(f"_{k}{v}" for k, v in OV.items() if v)
+
 
 def cell(name, arm, seed, out_dir, smoke, big, wu):
-    suffix = "" if wu == "100" else f"_wu{wu}"
+    suffix = ("" if wu == "100" else f"_wu{wu}") + EXTRA
     out = out_dir / f"{name}{suffix}_s{seed}.json"
     a = argv("random", seed)
     a[a.index("--out") + 1] = str(out)
@@ -29,6 +33,12 @@ def cell(name, arm, seed, out_dir, smoke, big, wu):
             i = a.index(flag)
             del a[i : i + (2 if flag == "--eval-every" else 1)]
         a += ["--eval-every", "5000", "--save-model"]
+    if OV["lr"]:
+        a[a.index("--lr") + 1] = OV["lr"]
+    if OV["floor"]:
+        a += ["--lr-floor", OV["floor"]]
+    if OV["chars"]:
+        a[a.index("--chars") + 1] = f"{OV['chars']}e6"
     if smoke:
         a[a.index("--chars") + 1] = "0.4e6"
     env = {
@@ -65,6 +75,6 @@ if __name__ == "__main__":
     ]
     for s in seeds:
         for n in names:
-            suffix = "" if wu == "100" else f"_wu{wu}"
+            suffix = ("" if wu == "100" else f"_wu{wu}") + EXTRA
             if not (out_dir / f"{n}{suffix}_s{s}.json").exists():
                 cell(n, table[n], s, out_dir, smoke, big, wu)
