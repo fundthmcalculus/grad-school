@@ -60,6 +60,11 @@ if __name__ == "__main__":
     ap.add_argument("--steps", type=int, default=400)
     ap.add_argument("--lr", type=float, default=3e-3)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument(
+        "--hint",
+        default="tail",
+        help="emb_mode stored in the checkpoint ('' for a hybrid checkpoint)",
+    )
     a = ap.parse_args()
     torch.manual_seed(a.seed)
     rng = np.random.default_rng(a.seed)
@@ -147,7 +152,7 @@ if __name__ == "__main__":
             config=ck["config"],
             state=model.state_dict(),
             tok=ck["tok"],
-            emb_mode="tail",
+            emb_mode=a.hint,
         ),
         a.out,
     )
