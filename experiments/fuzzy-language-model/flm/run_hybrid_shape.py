@@ -13,6 +13,11 @@ from pathlib import Path
 
 from flm.run_tribble import argv
 
+ROOT_DATA = Path(__file__).resolve().parents[3] / "data"
+CORPUS = os.environ.get(
+    "HYB_CORPUS", ""
+)  # "simplestories": that corpus's tokenizer and frequency files (PLAN_ANALYSIS.md item 3)
+FREQ = lambda v: f"outputs/freq_{CORPUS + '_' if CORPUS else ''}bpe{v}.npz"
 # optional overrides of the training schedule (PLAN_ANALYSIS.md): learning rate, final-lr floor as a fraction of the peak (train.py's default is 0.1), characters in millions
 OV = {k: os.environ.get("HYB_" + k.upper()) for k in ("lr", "floor", "chars")}
 EXTRA = "".join(f"_{k}{v}" for k, v in OV.items() if v)
@@ -45,7 +50,8 @@ def cell(name, arm, seed, out_dir, smoke, big, wu):
         **os.environ,
         "TIER_NH": str(arm["NH"]),
         "TIER_E": str(arm["E"]),
-        "TIER_FREQ": f"outputs/freq_bpe{arm['V']}.npz",
+        "TIER_FREQ": FREQ(arm["V"]),
+        **({"GRAD_SCHOOL_DATA": str(ROOT_DATA / CORPUS)} if CORPUS else {}),
         "PYTHONPATH": ".",
     }
     with open(out_dir / "logs" / f"{name}{suffix}_s{seed}.log", "w") as f:
@@ -65,7 +71,11 @@ if __name__ == "__main__":
     out_dir = Path(
         "outputs/smoke-hybshape"
         if smoke
-        else ("outputs/v72-hybshape300" if big else "outputs/v71-hybshape")
+        else (
+            "outputs/v75-ssshape"
+            if CORPUS
+            else ("outputs/v72-hybshape300" if big else "outputs/v71-hybshape")
+        )
     )
     (out_dir / "logs").mkdir(parents=True, exist_ok=True)
     table = json.load(open("report/hybrid_arms.json"))
