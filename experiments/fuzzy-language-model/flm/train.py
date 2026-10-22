@@ -62,7 +62,10 @@ def get_args(argv=None):
     p.add_argument("--wd", type=float, default=0.01)
     p.add_argument("--warmup", type=int, default=200)
     p.add_argument(
-        "--lr-floor", type=float, default=0.0, help="final lr as a fraction of --lr (0: decay to zero; 0.1 reproduces the runs made before 2026-10-22)"
+        "--lr-floor",
+        type=float,
+        default=0.0,
+        help="final lr as a fraction of --lr (0: decay to zero; 0.1 reproduces the runs made before 2026-10-22)",
     )
     p.add_argument("--beta2", type=float, default=0.98)
     p.add_argument("--clip", type=float, default=1.0, help="grad-norm clip (0 = off)")
