@@ -1,7 +1,7 @@
 """Shape screens of the all-fuzzy model (`PLAN_SHAPE.md`; arms and fitted rule counts in report/shape_arms.json, made by ``python -m flm.shape_budget --table``).
 
 ``python -m flm.run_shape [arm ...]`` runs the arms (default: all) at 30M characters, lr 6e-2, warm-up 600, seeds ``$SEEDS`` (default 0,1,2), into ``outputs/v69-shape/<arm>_s<seed>.json``; seeds outer, arms inner, so a partial run is balanced.
-An arm whose tokenizer stream or frequency file is not ready yet (the vocabulary arms, while ``flm.prep_shape_vocab`` runs) is skipped and retried on the next pass.  ``SMOKE=1`` shrinks every run to 0.4M characters (outputs/smoke-shape).
+An arm whose tokenizer stream or frequency file is not ready yet (the vocabulary arms, while ``flm.prep_shape_vocab`` runs) is skipped and retried on the next pass.  ``SMOKE=1`` shrinks every run to 0.4M characters (outputs/smoke-shape).  ``SHAPE_SCALE=300`` runs the 300M-character confirmation (warm-up 1000, seeds 0-1, checkpoints saved) into ``outputs/v70-shape300``.
 """
 
 import json
@@ -25,15 +25,23 @@ def ready(v):
     )
 
 
-def cell(name, arm, seed, out_dir, smoke):
+def cell(name, arm, seed, out_dir, smoke, big=False):
     out = out_dir / f"{name}_s{seed}.json"
     envx, over, mult = E2E["e2e_tail"]
     a = argv("random", seed)
     a[a.index("--out") + 1] = str(out)
     a[a.index("--ffn-mult") + 1] = mult
     a[a.index("--tok") + 1] = f"bpe{arm['V']}"
-    a[a.index("--warmup") + 1] = "600"
+    a[a.index("--warmup") + 1] = "1000" if big else "600"
     a[a.index("--d") + 1] = str(arm["d"])
+    if (
+        big
+    ):  # the 300M confirmation: warm-up 1000, evaluation every 5000 steps, checkpoints saved
+        a[a.index("--chars") + 1] = "300e6"
+        for flag in ("--eval-every", "--eval-at-start"):
+            i = a.index(flag)
+            del a[i : i + (2 if flag == "--eval-every" else 1)]
+        a += ["--eval-every", "5000", "--save-model"]
     if smoke:
         a[a.index("--chars") + 1] = "0.4e6"
     for k, v in over.items():
@@ -71,11 +79,18 @@ def cell(name, arm, seed, out_dir, smoke):
 
 if __name__ == "__main__":
     smoke = os.environ.get("SMOKE") == "1"
-    out_dir = Path("outputs/smoke-shape" if smoke else "outputs/v69-shape")
+    big = os.environ.get("SHAPE_SCALE") == "300"
+    out_dir = Path(
+        "outputs/smoke-shape"
+        if smoke
+        else ("outputs/v70-shape300" if big else "outputs/v69-shape")
+    )
     (out_dir / "logs").mkdir(parents=True, exist_ok=True)
     table = json.load(open("report/shape_arms.json"))
     names = sys.argv[1:] or list(table)
-    seeds = [int(s) for s in os.environ.get("SEEDS", "0,1,2").split(",")]
+    seeds = [
+        int(s) for s in os.environ.get("SEEDS", "0,1" if big else "0,1,2").split(",")
+    ]
     todo = [
         (n, s)
         for s in seeds
@@ -88,7 +103,7 @@ if __name__ == "__main__":
         for n, s in list(todo):
             if not ready(table[n]["V"]):
                 continue
-            cell(n, table[n], s, out_dir, smoke)
+            cell(n, table[n], s, out_dir, smoke, big)
             todo.remove((n, s))
             ran = True
         if todo and not ran:
