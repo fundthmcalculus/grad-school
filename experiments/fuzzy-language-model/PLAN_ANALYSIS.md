@@ -19,3 +19,28 @@ Decision: a learning rate that beats 6e-2 by at least 0.005 on four of five seed
 
 ## Items 2, 3, 4 (registered when they start, after items 1 and 5)
 2: coherence and repetition of the shipped configuration (re-annealed F7 and H3 with DRY); 3: the 30M screen of the shape on SimpleStories with a BPE6144 trained there; 4: a third seed at 300M for F7 and H3 with the final phase chosen by item 1.
+
+## Results of items 1 and 5 (recorded 2026-10-22; seed 0 for item 1, five seeds for item 5)
+
+### Item 1: the end of the schedule (300M characters, validation bits per character)
+| arm | F7 | change vs floor 0.1 | H3 | change vs floor 0.1 | gap |
+|---|---|---|---|---|---|
+| reference: the original run, floor 0.1 | 0.96596 | | 0.94134 | | 0.0246 |
+| **floor 0 main run (1c)** | **0.95577** | **-0.0102** | **0.93034** | **-0.0110** | 0.0254 |
+| floor 0 + 1,600-step post-hoc phase (1c') | 0.95508 | -0.0109 | 0.92962 | -0.0117 | 0.0255 |
+| 13M extra tokens, floor 0.1 (1b, 353M characters) | 0.96323 | -0.0027 | 0.9398 | -0.0015 | 0.0234 |
+| floor 0.1 + 1,600-step phase (earlier) | 0.95242 | -0.0135 | 0.92771 | -0.0136 | 0.0247 |
+| floor 0.1 + 3,200 steps (1a) | 0.9506 | -0.0154 | 0.9259 | -0.0154 | 0.0247 |
+| floor 0.1 + 6,400 steps (1a) | 0.94861 | -0.0174 | 0.92435 | -0.0170 | 0.0243 |
+Predictions: floor 0 beats floor 0.1 by at least 0.007 for both (65%): **right** (0.0102, 0.0110); it captures at least 60% of the 1,600-step gain (50%): **right** (75% and 81%); the 1,600-step phase on a floor-0 checkpoint adds at most 0.004 (55%): **right** (0.0007 for both); 3,200 steps gain at least 0.0015 more than 1,600 (60%): **right** (0.0019, 0.0018); 6,400 steps at most 0.0025 more than 3,200 (55%): **right** (0.0020, 0.0016); the extra-token control gains 0.001-0.006 (65%): **right** (0.0027, 0.0015) and the post-hoc phase beats it by at least 0.005 (60%): **right** (0.0108, 0.0121); F7 and H3 gain within 0.003 of each other in every arm (70%): **right** (within 0.0008 in every arm); the fair gap stays within 0.003 of 0.0233-0.0247 (75%): **right** (0.0234-0.0255).
+Reading: the 0.010-0.0135 post-hoc gain is **the missing final decay (about 0.0102-0.0110) plus extra tokens (about 0.0015-0.0027)**, which adds up to the observed 0.0129 and 0.0125 within 0.0011; a main run that decays to zero gets the decay for free, after which a further low-rate phase adds less than 0.001. The longer phases (3,200 and 6,400 steps) keep adding about 0.002 per doubling because they add tokens: 6,400 steps is 52M tokens, 70% of the main run. The fair gap is flat at 0.024-0.025 in every row for both models, so no schedule choice moves the comparison.
+**Decision: every future run uses `--lr-floor 0`; the post-hoc phase is not part of the default recipe.** (The demo's F7 models keep their floor-0.1 + 1,600-step checkpoints, which are better than a floor-0 main run: 0.9524 and 0.9547 against 0.9558 for seed 0.)
+
+### Item 5: the learning-rate screen at the new shape (30M characters, five seeds, change against 6e-2)
+| learning rate | F7 (warm-up 600) | per seed | H3 (warm-up 100) | per seed |
+|---|---|---|---|---|
+| 3e-2 | 1.0758 (**+0.0171**) | +0.0204 +0.0173 +0.0203 +0.0138 +0.0135 | 1.0241 (+0.0041) | +0.0020 -0.0015 +0.0016 +0.0089 +0.0097 |
+| **6e-2** | **1.0588** | | **1.0199** | |
+| 1e-1 | 1.0589 (+0.0001) | +0.0046 +0.0006 -0.0004 -0.0059 +0.0017 | 1.0234 (+0.0034) | -0.0017 -0.0004 +0.0051 +0.0082 +0.0059 |
+Predictions: 6e-2 within 0.003 of the best of the three, F7 (60%): **right** (the best is within 0.0001) and H3 (60%): **right** (6e-2 is the best); 3e-2 worse than 6e-2 for F7 by at least 0.003 (60%): **right** (+0.0171, every seed); 1e-1 beats 6e-2 for F7 by 0.003 (25%): **wrong** and for H3 (25%): **wrong**; the best learning rate is the same for both (55%): **right** (6e-2); the gap at each model's best learning rate within 0.004 of 0.0389 (70%): **right** (0.0389); a hybrid run at 1e-1 diverges on at least one seed (20%): **no** (none).
+Decision: no learning rate beats 6e-2 by 0.005 on four of five seeds for either model: **6e-2 stands for both**; nothing goes to a 300M confirmation. The fuzzy model is much more sensitive below 6e-2 (+0.0171 at 3e-2, against +0.0041 for the hybrid) and flat above it; the fairness claim holds on this axis.
