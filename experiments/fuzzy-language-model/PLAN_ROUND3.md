@@ -50,3 +50,13 @@ Prediction scoring: bs8wd05 beats bs8 by at least 0.002 (45%): **right** (0.0049
 ## Stage 1c: how much weight decay at batch 8 (registered 2026-10-22 before any run)
 30M, seeds 0-4, paired with R0 and compared with bs8wd05: `bs8wd10` (--batch 8 --wd 0.1) and `bs8wd20` (--batch 8 --wd 0.2).
 Predictions: wd 0.1 improves on wd 0.05 by at least 0.002 (45%); wd 0.2 is worse than wd 0.1 (60%). Whichever is best at 30M goes forward as the 300M confirmation arm (two seeds, warm-up 1000; I ask first).
+
+## Stage 1c results (recorded 2026-10-22; 30M, seeds 0-4, paired with R0; `report/round3_stage1c.md`)
+| arm (batch 8) | mean BPC | change vs R0 | per seed |
+|---|---|---|---|
+| wd 0.05 | 1.0435 | -0.0144 | all five better |
+| wd 0.10 | 1.0501 | -0.0078 | all five better |
+| wd 0.20 | 1.0743 | +0.0164 | all five worse |
+Weight decay has an optimum near 0.05 at batch 8 (0.01 gives -0.0095, 0.05 -0.0144, 0.10 -0.0078, 0.20 +0.0164). Only 0.01, 0.05, 0.10 and 0.20 were run; the optimum is somewhere in 0.02-0.08, not located more finely.
+Prediction scoring: wd 0.1 beats wd 0.05 by at least 0.002 (45%): **wrong** (worse by 0.0066); wd 0.2 worse than wd 0.1 (60%): **right**.
+Candidate recipe for the 300M confirmation: `--batch 8 --wd 0.05` (warm-up 1000, floor 0), two seeds, against the existing floor-0 F7 300M runs (seed 0: 0.95577; three-seed mean 0.95705). Awaiting the owner's yes.
