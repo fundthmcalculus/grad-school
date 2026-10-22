@@ -69,3 +69,19 @@ Predictions: the floor-0 gain over floor 0.1 holds on seed 1 (F7 against 0.96864
 Per checkpoint (A / B): F7 S0 7.38 / 7.38 and 6.75 / 6.88; F7 S8 6.88 / 6.75 and 7.19 / 7.00; H3 S0 7.56 / 7.69 and 8.06 / 8.12; H3 S8 7.19 / 7.25 and 8.06 / 8.25. DRY effect on the rating (S8 minus S0, A / B): F7 -0.03 / -0.25, H3 -0.19 / -0.16. F7 minus H3 at S0: -0.75 / -0.78; at S8: -0.59 / -0.88. Rater correlation 0.82. (The plausibility judge is the hybrid H3 before the final phase, so its scores for the hybrid's own texts are flattering.)
 Predictions: DRY cuts the repeated-trigram share by at least 40% for both models (75%): **right** (-51%, -52%); DRY changes the rated total by at most 0.5 on both raters for both models (60%): **right** (at most 0.25); F7 within 1.0 of H3 on both raters (75%): **right**; below it on both (55%): **right**; the re-annealed F7 within 0.5 of the same model before the final phase, set 24 (7.12 / 7.12) (65%): **right** (7.06 / 7.12).
 Reading: DRY halves the repeated trigrams of the shipped configuration for both models at no rated cost and about 0.03-0.06 nats of plausibility; it is the right default. The gap in rated coherence between the models widened from 0.2-0.5 (set 24, before the final phase) to about 0.75 here: the final phase raised the hybrid's rating (7.31 / 7.59 to 7.81 / 7.91) and left F7's unchanged (7.12 / 7.12 to 7.06 / 7.12); the difference of the two gaps is about 1.8 standard errors in one set, so it is a lead and not a finding. Repeated word trigrams are *higher* for the hybrid at the baseline sampler (10.3% against 8.8%), so the hybrid's higher rating is not a repetition effect.
+
+## Item 4 results: floor-0 seeds 1 and 2 at 300M (recorded 2026-10-22)
+| seed | F7 | H3 | gap | F7 change vs floor 0.1 | H3 change vs floor 0.1 |
+|---|---|---|---|---|---|
+| 0 | 0.95577 | 0.93034 | 0.0254 | -0.0102 | -0.0110 |
+| 1 | 0.95719 | 0.93450 | 0.0227 | -0.0115 | -0.0123 |
+| 2 | 0.95819 | 0.93029 | 0.0279 | | |
+| mean | 0.95705 | 0.93171 | 0.0253 (sd 0.0026) | | |
+Predictions: the floor-0 gain holds on seed 1 at >= 0.007 for both (65%): **right** (0.0115, 0.0123); three-seed gap mean within 0.003 of 0.0254 (70%): **right** (0.0253); sd at most 0.004 (65%): **right** (0.0026); F7 mean 0.9576 within 0.003 (65%): **right** (0.9571); H3 mean 0.9317 within 0.003 (65%): **right** (0.9317). The fair gap at the floor-0 recipe is 0.0253, about 2.6%.
+
+## Item 3 results: the shape on SimpleStories (30M characters, seeds 0-4, BPE6144 trained there)
+| model | per seed | mean | old-shape (V3072) mean | gain |
+|---|---|---|---|---|
+| F7 shape | 1.2335 1.2383 1.2388 1.2384 1.2358 | 1.2369 | 1.2984 | 0.0615 |
+| H3 shape | 1.2033 1.1987 1.2021 1.2067 1.2015 | 1.2025 | 1.2443 | 0.0418 |
+Gap at the new shapes 0.0344 (0.054 at the old shape). Predictions: F7 gain >= 0.020 (65%): **right** on the mean (per-seed not checked); H3 gain >= 0.015 (55%): **right**; gap between 0.015 and 0.050 (65%): **right**; F7's gain smaller on SimpleStories than on TinyStories (60%): **wrong** (0.0615 against 0.061, the same). The shape generalises to a second corpus and helps the fuzzy model more than the hybrid there too.
