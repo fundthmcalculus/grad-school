@@ -131,6 +131,15 @@ ARMS = {
     "D7_v6144_h384_e6": dict(V=6144, NH=384, E=6, d=48),
     "D8_v8192_h384_e6_d40": dict(V=8192, NH=384, E=6, d=40),
     "D11_v6144_h512_e6_d40": dict(V=6144, NH=512, E=6, d=40),
+    # E10: a third round around C6 (V6144 head 512 tail 8 d40, the best arm): larger heads, narrower blocks (d divisible by the 8 mixer heads), V8192 at d24
+    "F1_v6144_h640_d40": dict(V=6144, NH=640, E=8, d=40),
+    "F4_v6144_h512_d32": dict(V=6144, NH=512, E=8, d=32),
+    "F6_v6144_h768_d32": dict(V=6144, NH=768, E=8, d=32),
+    "F7_v6144_h640_d32": dict(V=6144, NH=640, E=8, d=32),
+    "F9_v8192_h768_d24": dict(V=8192, NH=768, E=8, d=24),
+    "F11_v8192_h512_d24": dict(V=8192, NH=512, E=8, d=24),
+    "F13_v6144_h512_e10_d32": dict(V=6144, NH=512, E=10, d=32),
+    "F14_v8192_h640_d24": dict(V=8192, NH=640, E=8, d=24),
     # E5: three-tier embedding, mid = (tokens in the middle tier, its prototype count)
     "E5a_v4096_m768": dict(V=4096, NH=256, E=6, d=48, mid=[768, 16]),
     "E5b_v4096_m1024": dict(V=4096, NH=192, E=6, d=48, mid=[1024, 16]),
