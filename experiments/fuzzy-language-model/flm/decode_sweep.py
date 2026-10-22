@@ -98,7 +98,21 @@ def sample_batch(model, ids, s, gen):
 
 
 if __name__ == "__main__":
-    names = sys.argv[1:] or list(SETTINGS)
+    args = sys.argv[1:]
+    tag = ""
+    if (
+        "--ckpts" in args
+    ):  # other checkpoints (e.g. the post-trained ones): --ckpts a.pt b.pt --tag ul3 S0 S8 -> texts_ul3_S0.json ...
+        i = args.index("--ckpts")
+        j = next(
+            (k for k in range(i + 1, len(args)) if args[k].startswith("--")), len(args)
+        )
+        CKPTS = args[i + 1 : j]
+        args = args[:i] + args[j:]
+    if "--tag" in args:
+        i = args.index("--tag")
+        tag, args = args[i + 1] + "_", args[:i] + args[i + 2 :]
+    names = args or list(SETTINGS)
     out = Path("outputs/v73-repeat")
     out.mkdir(parents=True, exist_ok=True)
     models = []
@@ -121,5 +135,5 @@ if __name__ == "__main__":
                 for r in range(N_SAMPLES):
                     text = bp.decode(full[r].tolist())[:CHARS]
                     rows.append(dict(ckpt=cname, prompt=prompt, text=text))
-        (out / f"texts_{name}.json").write_text(json.dumps(rows))
+        (out / f"texts_{tag}{name}.json").write_text(json.dumps(rows))
         print(name, len(rows), "texts", flush=True)

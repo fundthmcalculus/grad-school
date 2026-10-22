@@ -95,7 +95,9 @@ def configure(path, ck):
     FT.RES = st["head_res.weight"].shape[1] if "head_res.weight" in st else 0
     tail_names = ("ftail", "e2e_tail", "e2e_prior", "lr6_wu", "fz_lr")
     # every arm of the shape screens (outputs/v69-shape, v70-shape300) is an e2e_tail model (fuzzy blocks, crisp head tokens, fuzzy tail); the hybrid ones (v71-hybshape, v72-hybshape300) are stock
-    shape_run = "-shape" in str(path).replace(chr(92), "/")
+    shape_run = (
+        "-shape" in str(path).replace(chr(92), "/") or ck.get("emb_mode") == "tail"
+    )  # post-trained checkpoints (flm.post_ul) carry the hint
     emb_mode = (
         "all"
         if "head_proto" in st or "head_pq" in st
