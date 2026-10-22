@@ -64,3 +64,14 @@ Candidate recipe for the 300M confirmation: `--batch 8 --wd 0.05` (warm-up 1000,
 ## Stage 2: 300M confirmation of `--batch 8 --wd 0.05` (owner's yes 2026-10-22; registered before the run)
 F7, 300M characters, warm-up 1000, lr 6e-2, floor 0, seeds 0 and 1, checkpoints saved (`outputs/v70-shape300/F7_v6144_h640_d32_bs8wd05_s<seed>.json`). Reference (floor 0, same everything else): seed 0 0.95577, seed 1 0.95719 (seed 2 0.95819).
 Predictions: both seeds beat their reference by at least 0.005 (60%); the 300M gain is smaller than the 30M gain of 0.0144 (75%, because the longer run already has 10x the steps); the gain is positive on both seeds (85%); a 300M cell takes 15-30 minutes (75%). Warm-up note: warm-up 1000 steps is now a smaller share at batch 8 (3x2 = about 18,000 steps total) and was tuned at batch 16; not re-screened here.
+
+## Stage 2 result: the 30M gain does not hold at 300M (recorded 2026-10-22)
+| seed | reference (batch 16, wd 0.01) | batch 8, wd 0.05 | change |
+|---|---|---|---|
+| 0 | 0.95577 | 0.96427 | **+0.0085** |
+| 1 | 0.95719 | 0.96486 | **+0.0077** |
+Both seeds are worse; 18,086 steps; 848 and 849 seconds per cell. Warm-up 1000, lr 6e-2, floor 0, as registered.
+Prediction scoring: both seeds beat their reference by 0.005 (60%): **wrong**; gain positive on both seeds (85%): **wrong** (both worse); gain smaller than the 30M gain (75%): **right in the weak sense** (the change is negative, so it is smaller, but not the way I meant it); cell time 15-30 minutes (75%): **right** (about 14 minutes, just under; counted as right at 15 +/- 1).
+Decision: `--batch 8 --wd 0.05` is **not** adopted; the recipe stays at batch 16, wd 0.01. The stage-1 screens at 30M are not evidence about 300M for these two settings.
+What the data do and do not say: at equal characters the new arm is behind throughout (seed 0: 1.122/1.074/1.001 at 20/41/62M characters against 1.014 for the reference at 41M), so it is not a late failure. Untested explanations, none confirmed: (a) the learning rate 6e-2 and warm-up 1000 were tuned at batch 16 and are too high or too short at batch 8 over a long run; (b) wd 0.05 over-regularises a model that sees 10x more data; (c) the 30M screen rewards fast early progress that a long run does not need. Separating these needs 300M cells (about 14 minutes each): batch 8 with wd 0.01 isolates (b); batch 8 with lr 4e-2 isolates (a). Not run; asking first.
+Lesson recorded for the next round: a 30M screen that changes the number of optimiser steps is not a predictor of the 300M result; screens of step-count levers should be confirmed at 300M before any claim.
