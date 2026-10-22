@@ -60,3 +60,7 @@ Predictions: wd 0.1 improves on wd 0.05 by at least 0.002 (45%); wd 0.2 is worse
 Weight decay has an optimum near 0.05 at batch 8 (0.01 gives -0.0095, 0.05 -0.0144, 0.10 -0.0078, 0.20 +0.0164). Only 0.01, 0.05, 0.10 and 0.20 were run; the optimum is somewhere in 0.02-0.08, not located more finely.
 Prediction scoring: wd 0.1 beats wd 0.05 by at least 0.002 (45%): **wrong** (worse by 0.0066); wd 0.2 worse than wd 0.1 (60%): **right**.
 Candidate recipe for the 300M confirmation: `--batch 8 --wd 0.05` (warm-up 1000, floor 0), two seeds, against the existing floor-0 F7 300M runs (seed 0: 0.95577; three-seed mean 0.95705). Awaiting the owner's yes.
+
+## Stage 2: 300M confirmation of `--batch 8 --wd 0.05` (owner's yes 2026-10-22; registered before the run)
+F7, 300M characters, warm-up 1000, lr 6e-2, floor 0, seeds 0 and 1, checkpoints saved (`outputs/v70-shape300/F7_v6144_h640_d32_bs8wd05_s<seed>.json`). Reference (floor 0, same everything else): seed 0 0.95577, seed 1 0.95719 (seed 2 0.95819).
+Predictions: both seeds beat their reference by at least 0.005 (60%); the 300M gain is smaller than the 30M gain of 0.0144 (75%, because the longer run already has 10x the steps); the gain is positive on both seeds (85%); a 300M cell takes 15-30 minutes (75%). Warm-up note: warm-up 1000 steps is now a smaller share at batch 8 (3x2 = about 18,000 steps total) and was tuned at batch 16; not re-screened here.
