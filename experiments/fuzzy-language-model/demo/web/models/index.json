@@ -1,7 +1,7 @@
 [
  {
   "id": "flm-allfuzzy-f7",
-  "label": "99.9K ALL-FUZZY, new embedding shape (BPE6144, 640 crisp head tokens, width 32; 300M characters, 0.9660 bits per character)",
+  "label": "99.9K ALL-FUZZY, new embedding shape (BPE6144, 640 crisp head tokens, width 32; 300M characters plus a 1,600-step low-rate final phase, 0.9524 bits per character)",
   "params": 99882,
   "ctx": 512,
   "d": 32,
@@ -10,7 +10,7 @@
  },
  {
   "id": "flm-allfuzzy-f7-s1",
-  "label": "99.9K ALL-FUZZY, new embedding shape (BPE6144, 640 crisp head tokens, width 32; 300M characters, 0.9686 bits per character, second run)",
+  "label": "99.9K ALL-FUZZY, new embedding shape (BPE6144, 640 crisp head tokens, width 32; 300M characters plus a 1,600-step low-rate final phase, 0.9547 bits per character, second run)",
   "params": 99882,
   "ctx": 512,
   "d": 32,
