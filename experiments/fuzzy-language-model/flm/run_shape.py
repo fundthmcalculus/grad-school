@@ -23,6 +23,10 @@ FREQ = lambda v: f"outputs/freq_{CORPUS + '_' if CORPUS else ''}bpe{v}.npz"
 # optional overrides of the training schedule (PLAN_ANALYSIS.md): learning rate, final-lr floor as a fraction of the peak (train.py's default is 0.1), characters in millions
 OV = {k: os.environ.get("SHAPE_" + k.upper()) for k in ("lr", "floor", "chars")}
 SUFFIX = "".join(f"_{k}{v}" for k, v in OV.items() if v)
+# PLAN_ROUND3.md: extra train.py flags for one arm of a screen (SHAPE_EXTRA="--batch 16"), named by SHAPE_TAG in the output files
+EXTRA = os.environ.get("SHAPE_EXTRA", "").split()
+if os.environ.get("SHAPE_TAG"):
+    SUFFIX += "_" + os.environ["SHAPE_TAG"]
 
 
 def ready(v):
@@ -56,6 +60,7 @@ def cell(name, arm, seed, out_dir, smoke, big=False):
         a += ["--lr-floor", OV["floor"]]
     if OV["chars"]:
         a[a.index("--chars") + 1] = f"{OV['chars']}e6"
+    a += EXTRA
     if smoke:
         a[a.index("--chars") + 1] = "0.4e6"
     for k, v in over.items():
