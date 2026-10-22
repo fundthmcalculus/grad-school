@@ -35,3 +35,18 @@ Prediction scoring: bs8 passes (45%): **right**; bs32 worse (70%): **right** (+0
 30M characters, seeds 0-4, paired with R0 (and compared with bs8). Arms: `bs4` (--batch 4, 3,618 steps); `bs8wd05` (--batch 8 --wd 0.05); `bs8ctx256` (--batch 8 --ctx 256, also 3,618 steps, half the characters per step of bs4 at batch 8).
 Predictions: bs4 improves on bs8 by at least 0.003 on the mean (50%); bs8wd05 improves on bs8 by at least 0.002 (45%); bs8ctx256 is within 0.003 of bs4 (55%); running time per 30M cell is no more than 2.5x R0's (80%).
 Decision: any arm that beats R0 by 0.005 or more on four of five seeds is a candidate for a 300M confirmation; I will ask before running it (two seeds at warm-up 1000, about 30-60 minutes each at the small batch, to be timed first).
+
+## Stage 1b results (recorded 2026-10-22; 30M characters, seeds 0-4, paired with R0; `report/round3_stage1b.md`)
+| arm | steps | mean BPC | change vs R0 | per-seed change | verdict |
+|---|---|---|---|---|---|
+| bs8wd05 | 1,809 | 1.0435 | **-0.0144** | all five better (-0.0106 to -0.0205) | **PASS** |
+| bs8 (stage 1) | 1,809 | 1.0484 | -0.0095 | all five better | PASS |
+| bs4 | 3,618 | 1.0552 | -0.0027 | mixed (+0.0077 to -0.0089); se 0.0031 | no |
+| bs8ctx256 | 3,618 | 1.0595 | +0.0017 | mixed | no |
+Time per 30M cell: R0 79 s, bs8 90 s, bs8wd05 86 s, bs4 94 s (1.2x R0 at most), so a 300M cell at batch 8 should take about 15-20 minutes.
+Reading: more steps help up to batch 8 and then stop (batch 4 is worse than batch 8 by 0.0068 and noisy across seeds); weight decay 0.05, which did nothing by itself at 905 steps (-0.0030), adds a further -0.0049 on top of batch 8, on all five seeds. The two effects look additive so far (-0.0095 and -0.0030 give -0.0125 expected, -0.0144 observed).
+Prediction scoring: bs8wd05 beats bs8 by at least 0.002 (45%): **right** (0.0049); bs4 beats bs8 by at least 0.003 (50%): **wrong** (worse by 0.0068); bs8ctx256 within 0.003 of bs4 (55%): **wrong** (0.0043 apart); cell time at most 2.5x R0 (80%): **right** (1.2x).
+
+## Stage 1c: how much weight decay at batch 8 (registered 2026-10-22 before any run)
+30M, seeds 0-4, paired with R0 and compared with bs8wd05: `bs8wd10` (--batch 8 --wd 0.1) and `bs8wd20` (--batch 8 --wd 0.2).
+Predictions: wd 0.1 improves on wd 0.05 by at least 0.002 (45%); wd 0.2 is worse than wd 0.1 (60%). Whichever is best at 30M goes forward as the 300M confirmation arm (two seeds, warm-up 1000; I ask first).
