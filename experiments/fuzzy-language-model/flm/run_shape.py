@@ -14,19 +14,27 @@ from pathlib import Path
 from flm.run_fuzzy_e2e import ARMS as E2E
 from flm.run_tribble import argv
 
-DATA = Path(__file__).resolve().parents[3] / "data" / "tinystories"
+ROOT_DATA = Path(__file__).resolve().parents[3] / "data"
+CORPUS = os.environ.get(
+    "SHAPE_CORPUS", ""
+)  # "simplestories": the token streams and frequency files of that corpus (PLAN_ANALYSIS.md item 3)
+DATA = ROOT_DATA / (CORPUS or "tinystories") / ("tinystories" if CORPUS else "")
+FREQ = lambda v: f"outputs/freq_{CORPUS + '_' if CORPUS else ''}bpe{v}.npz"
+# optional overrides of the training schedule (PLAN_ANALYSIS.md): learning rate, final-lr floor as a fraction of the peak (train.py's default is 0.1), characters in millions
+OV = {k: os.environ.get("SHAPE_" + k.upper()) for k in ("lr", "floor", "chars")}
+SUFFIX = "".join(f"_{k}{v}" for k, v in OV.items() if v)
 
 
 def ready(v):
     return (
         (DATA / f"train_bpe{v}.bin").exists()
         and (DATA / f"valid_bpe{v}.bin").exists()
-        and Path(f"outputs/freq_bpe{v}.npz").exists()
+        and Path(FREQ(v)).exists()
     )
 
 
 def cell(name, arm, seed, out_dir, smoke, big=False):
-    out = out_dir / f"{name}_s{seed}.json"
+    out = out_dir / f"{name}{SUFFIX}_s{seed}.json"
     envx, over, mult = E2E["e2e_tail"]
     a = argv("random", seed)
     a[a.index("--out") + 1] = str(out)
@@ -42,6 +50,12 @@ def cell(name, arm, seed, out_dir, smoke, big=False):
             i = a.index(flag)
             del a[i : i + (2 if flag == "--eval-every" else 1)]
         a += ["--eval-every", "5000", "--save-model"]
+    if OV["lr"]:
+        a[a.index("--lr") + 1] = OV["lr"]
+    if OV["floor"]:
+        a += ["--lr-floor", OV["floor"]]
+    if OV["chars"]:
+        a[a.index("--chars") + 1] = f"{OV['chars']}e6"
     if smoke:
         a[a.index("--chars") + 1] = "0.4e6"
     for k, v in over.items():
@@ -50,7 +64,8 @@ def cell(name, arm, seed, out_dir, smoke, big=False):
         **os.environ,
         "TIER_NH": str(arm["NH"]),
         "TIER_E": str(arm["E"]),
-        "TIER_FREQ": f"outputs/freq_bpe{arm['V']}.npz",
+        "TIER_FREQ": FREQ(arm["V"]),
+        **({"GRAD_SCHOOL_DATA": str(ROOT_DATA / CORPUS)} if CORPUS else {}),
         "PYTHONPATH": ".",
         **envx,
         "FUZZ_FFN_R": str(arm["rules"]),
@@ -67,7 +82,7 @@ def cell(name, arm, seed, out_dir, smoke, big=False):
         env["FUZZ_ORTHO_SCALED"] = "1"
     if arm.get("cycle"):
         env["FUZZ_CYCLE"], mod = str(arm["cycle"]), "flm.run_embed_rev"
-    with open(out_dir / "logs" / f"{name}_s{seed}.log", "w") as f:
+    with open(out_dir / "logs" / f"{name}{SUFFIX}_s{seed}.log", "w") as f:
         r = subprocess.run(
             [sys.executable, "-m", mod] + a,
             stdout=f,
@@ -83,7 +98,11 @@ if __name__ == "__main__":
     out_dir = Path(
         "outputs/smoke-shape"
         if smoke
-        else ("outputs/v70-shape300" if big else "outputs/v69-shape")
+        else (
+            "outputs/v75-ssshape"
+            if CORPUS
+            else ("outputs/v70-shape300" if big else "outputs/v69-shape")
+        )
     )
     (out_dir / "logs").mkdir(parents=True, exist_ok=True)
     table = json.load(open("report/shape_arms.json"))
@@ -95,7 +114,7 @@ if __name__ == "__main__":
         (n, s)
         for s in seeds
         for n in names
-        if not (out_dir / f"{n}_s{s}.json").exists()
+        if not (out_dir / f"{n}{SUFFIX}_s{s}.json").exists()
     ]
     waited = 0
     while todo:

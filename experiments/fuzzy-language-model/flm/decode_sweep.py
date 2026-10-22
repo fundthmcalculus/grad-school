@@ -5,6 +5,7 @@ Settings: S0 the baseline of every rated set (temperature 0.5, top-k 10); S1-S3 
 """
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -113,7 +114,7 @@ if __name__ == "__main__":
         i = args.index("--tag")
         tag, args = args[i + 1] + "_", args[:i] + args[i + 2 :]
     names = args or list(SETTINGS)
-    out = Path("outputs/v73-repeat")
+    out = Path(os.environ.get("REPEAT_OUT", "outputs/v73-repeat"))
     out.mkdir(parents=True, exist_ok=True)
     models = []
     for path in CKPTS:
