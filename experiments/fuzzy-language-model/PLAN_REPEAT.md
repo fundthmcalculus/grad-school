@@ -24,3 +24,20 @@ Predictions: ctrl moves validation bits per character by at most 0.002 from the 
 Groups, two checkpoints x 16 texts each (32 per group per rater): **F7 base at S0**, **F7 base at the best decoding setting**, **the best post-trained arm (by the validation-bits guardrail and repeated share) at S0**, **that arm at the best decoding setting**; 128 texts per rater, fresh seeds, two sub-agent raters, scores written before the key is read.
 Predictions: the post-trained model at S0 is rated lower than the base by at least 0.5 on both raters (30%: the earlier -1.6 came from token-level unlikelihood in pretraining), higher by at least 0.5 on both (15%); no group differs from the base by more than 1.0 on both raters (70%: the repeated-trigram share is 7-10% of the trigrams; a change in repetition of that size is small against the rubric's resolution); the combination is not rated higher than the better of its parts by 0.5 (75%).
 Decision rule: an arm that lowers the repeated-trigram share by at least 30% *and* is rated at least as high as the base (within 0.3) *and* costs at most 0.003 validation bits per character is a keeper; otherwise the finding is again that repetition is a symptom, with the sampler as the cheaper lever.
+
+## Part 1 results: the decode sweep (recorded 2026-10-22; `outputs/v73-repeat`, 96 texts per setting from F7 seeds 0 and 1, 600 characters; plausibility = the mean negative log-likelihood per token under the hybrid H3)
+| setting | repeated trigrams | near-repeat | distinct-1 | distinct-2 | plausibility (nats per token) | candidate |
+|---|---|---|---|---|---|---|
+| S0 T0.5 k10 (baseline) | 0.0973 | 0.072 | 0.480 | 0.796 | 1.932 | |
+| S1 T0.7 k10 | 0.0574 (-41%) | 0.065 | 0.507 | 0.842 | 2.115 (+0.183) | yes |
+| S2 T0.8 top-p 0.9 | 0.0473 (-51%) | 0.046 | 0.533 | 0.866 | 2.360 (+0.428) | no |
+| S3 T0.7 min-p 0.05 | 0.0827 (-15%) | 0.064 | 0.491 | 0.815 | 2.047 (+0.115) | no |
+| S4 S0 + no repeated trigram | **0.0074 (-92%)** | 0.051 | 0.518 | 0.885 | 2.153 (+0.222) | yes |
+| S5 S1 + no repeated trigram | 0.0044 (-95%) | 0.051 | 0.541 | 0.903 | 2.302 (+0.370) | no |
+| S6 S0 + frequency penalty 0.5 | 0.0432 (-56%) | 0.030 | 0.567 | 0.884 | 2.102 (+0.170) | yes |
+| S7 S0 + repetition penalty 1.3 | 0.0233 (-76%) | 0.005 | 0.634 | 0.927 | 2.442 (+0.510) | no |
+| **S8 S0 + DRY** | 0.0428 (-56%) | 0.055 | 0.502 | 0.850 | **1.991 (+0.060)** | yes |
+| S9 S1 + DRY | 0.0324 (-67%) | 0.057 | 0.521 | 0.868 | 2.171 (+0.239) | yes |
+Candidate rule (fixed in advance: repeated trigrams at most 0.6 x S0 = 0.0584, plausibility at most S0 + 0.25 = 2.182): five candidates; the three with the lowest repeated share go to the rated set: **S4, S9, S8**.
+Predictions: no-repeat-trigram cuts the repeated share by 90% (95%): **right** (-92%, -95%); at least one candidate (80%): **right** (five); S1 cuts the repeated share by 25% (65%): **right** (-41%) at a plausibility cost of 0.10 nats (60%): **right** (+0.183); S6 and S7 raise the negative log-likelihood by 0.30 nats without halving the repeated share (50%): **wrong** (S6 +0.17 and -56%; S7 +0.51 and -76%: both halve the repeats, S7 at a high plausibility cost); the rating predictions follow with set 25.
+Reading: **the penalties that failed before work here**: a frequency penalty halves the repeated trigrams for +0.17 nats and DRY does it for +0.06 nats (the cheapest of all), and a hard trigram block removes 92% of them for +0.22; plain temperature 0.7 removes 41% for +0.18. The earlier "worst decoder" verdict applied to a plain repetition penalty (S7 here costs +0.51 nats for -76%, still the worst plausibility trade).
