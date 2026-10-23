@@ -339,7 +339,7 @@
       const gf = this.gain(x, 'norm.'), logits = new Float32Array(this.V);
       for (let v = 0; v < this.V; v++) { let a = 0; const r = v * d; for (let i = 0; i < d; i++) a += this.E[r + i] * gf.out[i]; logits[v] = a; }
       this.pos++;
-      return opts && opts.explain ? { logits, gates: strengths, s: Math.exp(gf.gain) } : { logits };
+      return opts && opts.explain ? { logits, gates: strengths, s: Math.exp(gf.gain), xPre: Float64Array.from(x) } : { logits };
     }
     profiles() {                                           // pi_r = (conseq_r * output weight) . E^T: what rule r does to the output scores when it fires positively
       if (this.pi) return this.pi;
