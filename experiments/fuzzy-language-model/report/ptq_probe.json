@@ -1,0 +1,545 @@
+{
+ "ckpt": "outputs/v70-shape300/F7_v6144_h640_d32_floor0_s0.pt",
+ "ref": 0.9647153881994449,
+ "ref_full": 0.9557719318478524,
+ "rows": [
+  {
+   "name": "fp32 (full 1M chars)",
+   "bits": {},
+   "per_row": true,
+   "chars": 1000000,
+   "bpc": 0.9557719318478524,
+   "bytes": 399528,
+   "seconds": 78.4
+  },
+  {
+   "name": "fp32",
+   "bits": {},
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 0.9647153881994449,
+   "bytes": 399528,
+   "seconds": 25.0
+  },
+  {
+   "name": "fp16 weights",
+   "bits": {
+    "emb_head": 16,
+    "emb_tail": 16,
+    "tier_up": 16,
+    "proj": 16,
+    "ffn_ante": 16,
+    "ffn_cons": 16,
+    "mix_other": 16,
+    "norm": 16
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 0.9647204669414322,
+   "bytes": 199764,
+   "seconds": 25.0
+  },
+  {
+   "name": "bf16 weights",
+   "bits": {
+    "emb_head": -16,
+    "emb_tail": -16,
+    "tier_up": -16,
+    "proj": -16,
+    "ffn_ante": -16,
+    "ffn_cons": -16,
+    "mix_other": -16,
+    "norm": -16
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 0.9649358018115886,
+   "bytes": 199764,
+   "seconds": 23.7
+  },
+  {
+   "name": "bf16 weights + bf16 autocast",
+   "error": "Index put requires the source and destination dtypes match, got Float for the destination and BFloat16 for the source."
+  },
+  {
+   "name": "all int8 row",
+   "bits": {
+    "emb_head": 8,
+    "emb_tail": 8,
+    "tier_up": 8,
+    "proj": 8,
+    "ffn_ante": 8,
+    "ffn_cons": 8,
+    "mix_other": 8,
+    "norm": 8
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 0.9655755148461628,
+   "bytes": 114224,
+   "seconds": 23.4
+  },
+  {
+   "name": "all int8 tensor",
+   "bits": {
+    "emb_head": 8,
+    "emb_tail": 8,
+    "tier_up": 8,
+    "proj": 8,
+    "ffn_ante": 8,
+    "ffn_cons": 8,
+    "mix_other": 8,
+    "norm": 8
+   },
+   "per_row": false,
+   "chars": 300000,
+   "bpc": 0.9671286813183219,
+   "bytes": 100030,
+   "seconds": 22.4
+  },
+  {
+   "name": "all int6 row",
+   "bits": {
+    "emb_head": 6,
+    "emb_tail": 6,
+    "tier_up": 6,
+    "proj": 6,
+    "ffn_ante": 6,
+    "ffn_cons": 6,
+    "mix_other": 6,
+    "norm": 6
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 0.9790150884537787,
+   "bytes": 89253,
+   "seconds": 19.8
+  },
+  {
+   "name": "all int6 tensor",
+   "bits": {
+    "emb_head": 6,
+    "emb_tail": 6,
+    "tier_up": 6,
+    "proj": 6,
+    "ffn_ante": 6,
+    "ffn_cons": 6,
+    "mix_other": 6,
+    "norm": 6
+   },
+   "per_row": false,
+   "chars": 300000,
+   "bpc": 1.0130105575713229,
+   "bytes": 75059,
+   "seconds": 19.8
+  },
+  {
+   "name": "all int5 row",
+   "bits": {
+    "emb_head": 5,
+    "emb_tail": 5,
+    "tier_up": 5,
+    "proj": 5,
+    "ffn_ante": 5,
+    "ffn_cons": 5,
+    "mix_other": 5,
+    "norm": 5
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 1.0414035868104312,
+   "bytes": 76768,
+   "seconds": 19.6
+  },
+  {
+   "name": "all int5 tensor",
+   "bits": {
+    "emb_head": 5,
+    "emb_tail": 5,
+    "tier_up": 5,
+    "proj": 5,
+    "ffn_ante": 5,
+    "ffn_cons": 5,
+    "mix_other": 5,
+    "norm": 5
+   },
+   "per_row": false,
+   "chars": 300000,
+   "bpc": 1.167262696676571,
+   "bytes": 62574,
+   "seconds": 24.3
+  },
+  {
+   "name": "all int4 row",
+   "bits": {
+    "emb_head": 4,
+    "emb_tail": 4,
+    "tier_up": 4,
+    "proj": 4,
+    "ffn_ante": 4,
+    "ffn_cons": 4,
+    "mix_other": 4,
+    "norm": 4
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 1.4582088352609484,
+   "bytes": 64283,
+   "seconds": 24.2
+  },
+  {
+   "name": "all int4 tensor",
+   "bits": {
+    "emb_head": 4,
+    "emb_tail": 4,
+    "tier_up": 4,
+    "proj": 4,
+    "ffn_ante": 4,
+    "ffn_cons": 4,
+    "mix_other": 4,
+    "norm": 4
+   },
+   "per_row": false,
+   "chars": 300000,
+   "bpc": 2.5210321301060725,
+   "bytes": 50089,
+   "seconds": 25.2
+  },
+  {
+   "name": "all int3 row",
+   "bits": {
+    "emb_head": 3,
+    "emb_tail": 3,
+    "tier_up": 3,
+    "proj": 3,
+    "ffn_ante": 3,
+    "ffn_cons": 3,
+    "mix_other": 3,
+    "norm": 3
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 2.8665117534930524,
+   "bytes": 51797,
+   "seconds": 32.1
+  },
+  {
+   "name": "all int3 tensor",
+   "bits": {
+    "emb_head": 3,
+    "emb_tail": 3,
+    "tier_up": 3,
+    "proj": 3,
+    "ffn_ante": 3,
+    "ffn_cons": 3,
+    "mix_other": 3,
+    "norm": 3
+   },
+   "per_row": false,
+   "chars": 300000,
+   "bpc": 4.338514470942086,
+   "bytes": 37603,
+   "seconds": 33.1
+  },
+  {
+   "name": "all int2 row",
+   "bits": {
+    "emb_head": 2,
+    "emb_tail": 2,
+    "tier_up": 2,
+    "proj": 2,
+    "ffn_ante": 2,
+    "ffn_cons": 2,
+    "mix_other": 2,
+    "norm": 2
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 3.899744743576617,
+   "bytes": 39312,
+   "seconds": 32.0
+  },
+  {
+   "name": "all int2 tensor",
+   "bits": {
+    "emb_head": 2,
+    "emb_tail": 2,
+    "tier_up": 2,
+    "proj": 2,
+    "ffn_ante": 2,
+    "ffn_cons": 2,
+    "mix_other": 2,
+    "norm": 2
+   },
+   "per_row": false,
+   "chars": 300000,
+   "bpc": 16.38009328206195,
+   "bytes": 25118,
+   "seconds": 26.2
+  },
+  {
+   "name": "only emb_head int4 row",
+   "bits": {
+    "emb_head": 4
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 0.9918065918431771,
+   "bytes": 329128,
+   "seconds": 24.3
+  },
+  {
+   "name": "only emb_tail int4 row",
+   "bits": {
+    "emb_tail": 4
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 1.0240405713144332,
+   "bytes": 256424,
+   "seconds": 24.4
+  },
+  {
+   "name": "only tier_up int4 row",
+   "bits": {
+    "tier_up": 4
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 0.9724324134707311,
+   "bytes": 398696,
+   "seconds": 26.1
+  },
+  {
+   "name": "only proj int4 row",
+   "bits": {
+    "proj": 4
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 0.9999505062240801,
+   "bytes": 362616,
+   "seconds": 25.0
+  },
+  {
+   "name": "only ffn_ante int4 row",
+   "bits": {
+    "ffn_ante": 4
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 1.0289060250888138,
+   "bytes": 367904,
+   "seconds": 24.5
+  },
+  {
+   "name": "only ffn_cons int4 row",
+   "bits": {
+    "ffn_cons": 4
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 0.9962511448753586,
+   "bytes": 376735,
+   "seconds": 22.4
+  },
+  {
+   "name": "only mix_other int4 row",
+   "bits": {
+    "mix_other": 4
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 1.0202395782743758,
+   "bytes": 370808,
+   "seconds": 23.8
+  },
+  {
+   "name": "only norm int4 row",
+   "bits": {
+    "norm": 4
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 1.0193718998415313,
+   "bytes": 398668,
+   "seconds": 22.5
+  },
+  {
+   "name": "only emb_head int3 row",
+   "bits": {
+    "emb_head": 3
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 1.1313750834850091,
+   "bytes": 326568,
+   "seconds": 24.0
+  },
+  {
+   "name": "only emb_tail int3 row",
+   "bits": {
+    "emb_tail": 3
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 1.2532127677484184,
+   "bytes": 250920,
+   "seconds": 24.4
+  },
+  {
+   "name": "only tier_up int3 row",
+   "bits": {
+    "tier_up": 3
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 0.9920834685588701,
+   "bytes": 398664,
+   "seconds": 24.8
+  },
+  {
+   "name": "only proj int3 row",
+   "bits": {
+    "proj": 3
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 1.1288051073857177,
+   "bytes": 361272,
+   "seconds": 25.3
+  },
+  {
+   "name": "only ffn_ante int3 row",
+   "bits": {
+    "ffn_ante": 3
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 1.2905439185972263,
+   "bytes": 366760,
+   "seconds": 23.9
+  },
+  {
+   "name": "only ffn_cons int3 row",
+   "bits": {
+    "ffn_cons": 3
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 1.1561224856026535,
+   "bytes": 375906,
+   "seconds": 23.5
+  },
+  {
+   "name": "only mix_other int3 row",
+   "bits": {
+    "mix_other": 3
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 1.3704692372339689,
+   "bytes": 369768,
+   "seconds": 24.9
+  },
+  {
+   "name": "only norm int3 row",
+   "bits": {
+    "norm": 3
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 1.181949736284822,
+   "bytes": 398635,
+   "seconds": 25.8
+  },
+  {
+   "name": "only emb_head int2 row",
+   "bits": {
+    "emb_head": 2
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 2.3155287758612344,
+   "bytes": 324008,
+   "seconds": 21.0
+  },
+  {
+   "name": "only emb_tail int2 row",
+   "bits": {
+    "emb_tail": 2
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 1.4469395995048644,
+   "bytes": 245416,
+   "seconds": 21.8
+  },
+  {
+   "name": "only tier_up int2 row",
+   "bits": {
+    "tier_up": 2
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 1.1410266167396885,
+   "bytes": 398632,
+   "seconds": 21.2
+  },
+  {
+   "name": "only proj int2 row",
+   "bits": {
+    "proj": 2
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 2.1427195389018094,
+   "bytes": 359928,
+   "seconds": 21.5
+  },
+  {
+   "name": "only ffn_ante int2 row",
+   "bits": {
+    "ffn_ante": 2
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 2.810579132124533,
+   "bytes": 365616,
+   "seconds": 20.4
+  },
+  {
+   "name": "only ffn_cons int2 row",
+   "bits": {
+    "ffn_cons": 2
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 2.136359456841833,
+   "bytes": 375077,
+   "seconds": 21.5
+  },
+  {
+   "name": "only mix_other int2 row",
+   "bits": {
+    "mix_other": 2
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 2.9956880777991626,
+   "bytes": 368728,
+   "seconds": 29.4
+  },
+  {
+   "name": "only norm int2 row",
+   "bits": {
+    "norm": 2
+   },
+   "per_row": true,
+   "chars": 300000,
+   "bpc": 4.633080861888521,
+   "bytes": 398603,
+   "seconds": 32.5
+  }
+ ]
+}
