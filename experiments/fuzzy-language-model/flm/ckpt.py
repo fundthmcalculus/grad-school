@@ -29,6 +29,7 @@ IGNORE = {
     "wandb_artifacts",
     "eval_every",
     "eval_chars",
+    "eval_batch",
     "eval_at_start",
 }
 

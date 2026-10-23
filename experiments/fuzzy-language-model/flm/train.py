@@ -78,6 +78,12 @@ def get_args(argv=None):
     )
     p.add_argument("--eval-chars", type=int, default=1_000_000)
     p.add_argument(
+        "--eval-batch",
+        type=int,
+        default=64,
+        help="windows per evaluation batch (a smaller batch lowers the evaluation's peak GPU memory; the score is the same)",
+    )
+    p.add_argument(
         "--eval-every", type=int, default=0, help="steps between evals (0 = 4 evals)"
     )
     p.add_argument("--out", required=True)
@@ -373,7 +379,17 @@ def main(argv=None):
             evals.append(
                 (
                     0,
-                    round(evaluate(model, val, a.ctx, a.eval_chars, device=device), 5),
+                    round(
+                        evaluate(
+                            model,
+                            val,
+                            a.ctx,
+                            a.eval_chars,
+                            batch=a.eval_batch,
+                            device=device,
+                        ),
+                        5,
+                    ),
                 )
             )
         print(f"step 0 val {evals[-1][1]:.4f}", flush=True)
@@ -467,11 +483,23 @@ def main(argv=None):
                     (
                         s + 1,
                         round(
-                            evaluate(model, val, a.ctx, a.eval_chars, device=device), 5
+                            evaluate(
+                                model,
+                                val,
+                                a.ctx,
+                                a.eval_chars,
+                                batch=a.eval_batch,
+                                device=device,
+                            ),
+                            5,
                         ),
                     )
                 )
             wb.log(s + 1, val_bpc=evals[-1][1], train_seconds=train_time)
+            if (
+                on_gpu
+            ):  # the evaluation's peak blocks would otherwise stay cached and push training into shared memory
+                torch.cuda.empty_cache()
             print(
                 f"step {s + 1}/{steps} train {ema:.4f} val {evals[-1][1]:.4f} t={train_time:.0f}s",
                 flush=True,
@@ -506,13 +534,18 @@ def main(argv=None):
             )
             if a.wandb_artifacts:
                 wb.artifact(path, s + 1)
+            if on_gpu:
+                torch.cuda.empty_cache()
 
     # A diverged run has no final value. Reporting the last finite eval would let a
     # truncated run compete in `best_tune` as if it had finished.
     val_bpc_ema = None
     if ema_model is not None and diverged_step is None:
         val_bpc_ema = round(
-            evaluate(ema_model, val, a.ctx, a.eval_chars, device=device), 5
+            evaluate(
+                ema_model, val, a.ctx, a.eval_chars, batch=a.eval_batch, device=device
+            ),
+            5,
         )
         print(f"EMA({a.ema_decay}) val {val_bpc_ema:.4f}", flush=True)
     final = (
@@ -523,7 +556,10 @@ def main(argv=None):
     val_bpc_fp32 = None
     if a.precision != "fp32" and math.isfinite(final):  # the metric of record is fp32
         val_bpc_fp32 = round(
-            evaluate(model, val, a.ctx, a.eval_chars, device=device), 5
+            evaluate(
+                model, val, a.ctx, a.eval_chars, batch=a.eval_batch, device=device
+            ),
+            5,
         )
         print(
             f"{a.precision} val {final:.5f}, fp32 re-score {val_bpc_fp32:.5f}",
