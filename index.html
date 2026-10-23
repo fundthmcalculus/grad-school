@@ -1272,7 +1272,7 @@ function timeline(d) {
   const R = G[0].length, tot = new Array(R).fill(0);
   for (const g of G) for (let r = 0; r < R; r++) tot[r] += Math.abs(g[r]);
   const rows = tot.map((v, r) => [v, r]).sort((a, b) => b[0] - a[0]).slice(0, 14).map((x) => x[1]);
-  const gmax = Math.max(...G.flat().map(Math.abs), 1e-6);
+  let gmax = 1e-6; for (const g of G) for (const v of g) { const a = Math.abs(v); if (a > gmax) gmax = a; }   // a loop: spreading 60 x 2149 values overflows the call stack
   const n = G.length, cw = Math.max(5, Math.min(14, 640 / n)), lw = 78, rh = 18, W = lw + n * cw + 4, H = rows.length * rh + 8;
   const svg = sv('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Rule firing by piece' });
   rows.forEach((r, i) => {
