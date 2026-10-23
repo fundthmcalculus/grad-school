@@ -10,9 +10,11 @@ from pathlib import Path
 
 import pytest
 
-import flm.ckpt as CK
-import flm.train as T
-from flm.data import data_dir
+pytest.importorskip("torch")  # the CI environment has no torch
+
+import flm.ckpt as CK  # noqa: E402
+import flm.train as T  # noqa: E402
+from flm.data import data_dir  # noqa: E402
 
 pytestmark = pytest.mark.skipif(
     not (data_dir() / "train.bin").exists(), reason="TinyStories stream not present"
