@@ -34,10 +34,37 @@ if __name__ == "__main__":
     ap.add_argument(
         "--vocab", type=int, default=3072, help="the vocabulary of the checkpoint"
     )
+    ap.add_argument(
+        "--web",
+        default=str(WEB),
+        help="the demo folder to write into (default demo/web)",
+    )
+    ap.add_argument(
+        "--valid",
+        default="",
+        help="validation token file for the rule views (default data/tinystories/valid_bpe<V>.bin)",
+    )
+    ap.add_argument(
+        "--tokenizer-json",
+        default="",
+        help="tokenizer file of the checkpoint (default allfuzzy/bpe<V>.json)",
+    )
+    ap.add_argument(
+        "--tok-name",
+        default="",
+        help="tokenizer name in the manifest and the file tokenizer-<name>.json (default bpe<V>)",
+    )
     args = ap.parse_args()
+    WEB = Path(args.web)
+    TOKJSON = (
+        Path(args.tokenizer_json)
+        if args.tokenizer_json
+        else ROOT / "allfuzzy" / f"bpe{args.vocab}.json"
+    )
+    TOKNAME = args.tok_name or f"bpe{args.vocab}"
     MID = args.id
     V = args.vocab
-    m = AllFuzzyLM(args.npz, tokenizer=ROOT / "allfuzzy" / f"bpe{V}.json")
+    m = AllFuzzyLM(args.npz, tokenizer=TOKJSON)
     d, V = m.d, m.V
     # tensors (float32, flat names as in the checkpoint) + the head / tail id lists
     names = [
@@ -61,7 +88,7 @@ if __name__ == "__main__":
         "id": MID,
         "label": args.label,
         "params": n_params,
-        "tok": f"bpe{V}",
+        "tok": TOKNAME,
         "dtype": "float32",
         "config": {
             "allfuzzy": True,
@@ -80,7 +107,7 @@ if __name__ == "__main__":
     (WEB / "models" / f"{MID}.json").write_text(json.dumps(manifest))
     # rule usage on validation windows
     val = np.fromfile(
-        ROOT.parent.parent / "data" / "tinystories" / f"valid_bpe{V}.bin",
+        args.valid or ROOT.parent.parent / "data" / "tinystories" / f"valid_bpe{V}.bin",
         dtype=np.uint16,
     )
     wins = [np.zeros(len(m.W[f"blocks.{l}.ffn.centers"])) for l in range(m.L)]
@@ -153,9 +180,9 @@ if __name__ == "__main__":
     (WEB / "models" / f"{MID}.check.json").write_text(
         json.dumps({"ids": ids, "last_logits": [float(x) for x in last]})
     )
-    shutil.copyfile(ROOT / "allfuzzy" / f"bpe{V}.json", WEB / f"tokenizer-{V}.json")
+    shutil.copyfile(TOKJSON, WEB / f"tokenizer-{TOKNAME.removeprefix('bpe')}.json")
     if (
-        V != 3072
+        V != 3072 and not args.tokenizer_json
     ):  # reference encodings for the browser tokenizer test (3072 has its own, made earlier)
         sys.path.insert(0, str(ROOT))
         from flm.bpe import BPE
@@ -184,7 +211,7 @@ if __name__ == "__main__":
             "ctx": m.max_len,
             "d": d,
             "layers": m.L,
-            "tok": f"bpe{V}",
+            "tok": TOKNAME,
         }
     )
     (WEB / "models" / "index.json").write_text(json.dumps(idx, indent=1))
