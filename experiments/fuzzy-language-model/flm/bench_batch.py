@@ -7,7 +7,7 @@ import json
 import sys
 from pathlib import Path
 
-LIMIT_MB = 10_000  # total card memory the benchmark may project to (the card has 12,282 MB; about 1,500 MB belong to other applications)
+LIMIT_MB = 11_000  # total card memory the benchmark may project to (the card has 12,282 MB; about 1,100-1,500 MB belong to other applications): a projection above this is not run
 OTHER_MB = 1_500
 OVERHEAD = 1.15  # reserved memory over allocated memory
 OUT = Path("outputs/v85-bench")
