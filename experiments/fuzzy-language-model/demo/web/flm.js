@@ -458,7 +458,7 @@
         let u = rng(), tk = order[0], acc = 0;
         for (let i = 0; i < probs.length; i++) { acc += probs[i]; if (u < acc) { tk = i; break; } }
         const step = {
-          text: tok.piece(tk), p: rnd(pAll[tk], 4),
+          text: tok.piece(tk), p: rnd(pAll[tk], 4), id: tk, topIds: topIdx(pAll, 5),
           top: topIdx(pAll, 5).map((i) => ({ text: tok.piece(i), p: rnd(pAll[i], 4) })),
         };
         if (wantExplain && last.gates) {
@@ -472,6 +472,7 @@
             }
           });
         }
+        if (wantExplain && last.gates && last.xPre) step.surg = { x: last.xPre, g: last.gates[last.gates.length - 1] };   // for FLM.Surgery.plan
         const tri = hist.length >= 2 ? hist[hist.length - 2] + ',' + hist[hist.length - 1] + ',' + tk : null;
         step.rep = !!tri && seen.has(tri);
         if (tri) seen.add(tri);

@@ -45,6 +45,20 @@ button:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2p
 #out .t:hover, #out .t.sel { background: var(--tok-hi); }
 #out .t.rep { text-decoration: underline dotted var(--warn); text-underline-offset: 4px; }
 #info { color: var(--muted); font-size: 0.8rem; font-family: var(--mono); }
+.surg { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); display: grid; gap: 10px; }
+.surg h2 { margin: 0; }
+.surg .cands { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.surg .cands button { font-family: var(--mono); white-space: pre; }
+.surg .cands button.on { background: var(--accent-soft); border-color: var(--accent); }
+.surg input[type=text] { font: inherit; font-family: var(--mono); width: 9rem; background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 4px; padding: 5px 7px; }
+.surg select { width: auto; }
+.surg .plan { border: 1px solid var(--line); border-radius: 6px; padding: 10px; display: grid; gap: 8px; }
+.surg .plan.bad { border-color: var(--warn); }
+.surg .acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.surg .acts button.go { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.surg textarea { min-height: 3.5rem; font-family: var(--mono); font-size: 0.75rem; }
+.surg ul { margin: 0; padding-left: 1.1rem; font-size: 0.85rem; }
+.surg .warn { color: var(--warn); }
 .detail { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 16px; }
 h2 { font-size: 0.95rem; margin: 0 0 8px; font-weight: 600; }
 .bar { display: grid; grid-template-columns: 6.5rem 1fr 3.4rem; gap: 8px; align-items: center; font-size: 0.85rem; margin: 3px 0; }
@@ -138,6 +152,18 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
           <p class="note">Effect is the rule's signed share of this token's score. A rule's strongest pushes are the pieces it raises most overall, not necessarily this token: the model's prediction is the sum of many rules.</p>
         </div>
       </div>
+      <div class="surg" id="surg" hidden>
+        <h2>Brain surgery: say what should have come next</h2>
+        <p class="note">Pick the piece that should have followed here. The page finds the smallest change to the strongest rules of the last block that makes it the top choice, shows you exactly what it would change, and applies it only when you press Apply. Undo restores the weights exactly. The change is to this page's copy of the model and is gone when you reload.</p>
+        <div class="cands" id="surg-cands"></div>
+        <div class="cands"><label for="surg-own" style="margin:0">or type one piece (with its leading space)</label><input type="text" id="surg-own" placeholder=" special"><button type="button" id="surg-own-go">Plan</button>
+          <label for="surg-k" style="margin:0 0 0 8px">rules to change</label><select id="surg-k"><option value="1">the strongest 1</option><option value="3" selected>the strongest 3</option><option value="10">the strongest 10</option><option value="0">all of them</option></select></div>
+        <div class="plan" id="surg-plan" hidden></div>
+        <div class="acts"><button type="button" id="surg-undo" disabled>Undo last edit</button><button type="button" id="surg-reset" disabled>Undo all</button></div>
+        <div id="surg-list"></div>
+        <details><summary>Edits as JSON (export, or paste to apply)</summary><textarea id="surg-json" spellcheck="false" aria-label="Edits as JSON"></textarea><div class="acts"><button type="button" id="surg-load">Apply pasted edits</button></div></details>
+        <p class="note">What we measured on the default model (<code>PLAN_SURGERY.md</code>): such an edit fixed 97 of 100 near misses and 56 of 100 far misses, but changed the top prediction at about 2% of other places where the same rules fire (8% to 10% for far misses), and where the same rules fire in other stories 30% of the previously right predictions broke. You can see exactly what you changed and take it back; the edit is not free of side effects.</p>
+      </div>
     </section>
     </div>
   </div>
@@ -183,6 +209,7 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
 </main>
 
 <script src="flm.js"></script>
+<script src="surgery.js"></script>
 <!--EMBED-->
 <script>
 const $ = (id) => document.getElementById(id);
@@ -243,7 +270,7 @@ function render(d) {
 function select(i, el) {
   document.querySelectorAll('#out .t.sel').forEach((e) => e.classList.remove('sel')); el.classList.add('sel');
   const s = current.steps[i], vis = (t) => JSON.stringify(t).slice(1, -1) || ' ';
-  $('detail-card').hidden = false;
+  $('detail-card').hidden = false; surgShow(i);
   $('d-title').textContent = `Piece ${i + 1}: "${s.text}"  (the model gave it ${(s.p * 100).toFixed(1)}%)`;
   $('d-top').textContent = '';
   for (const c of s.top) {
@@ -262,6 +289,70 @@ function select(i, el) {
     body.appendChild(tr);
   }
 }
+
+// ---------- brain surgery (PLAN_SURGERY.md): name the piece that should have come next, edit the rules that fired, undo exactly ----------
+const surg = { edits: {}, cur: null, plan: null };
+const surgModel = () => $('model').value;
+function surgMsg(html, bad) { const p = $('surg-plan'); p.hidden = false; p.className = 'plan' + (bad ? ' bad' : ''); p.innerHTML = html; }
+function surgList() {
+  const es = surg.edits[surgModel()] || [], el = $('surg-list');
+  el.innerHTML = es.length ? '<strong>Edits applied to this model</strong><ul>' + es.map((e) => `<li>${esc(e.label)}</li>`).join('') + '</ul>' : '';
+  $('surg-undo').disabled = !es.length; $('surg-reset').disabled = !es.length;
+  $('surg-json').value = es.length ? JSON.stringify({ model: surgModel(), edits: es.map((e) => ({ label: e.label, ...FLM.Surgery.toJSON(e.plan) })) }) : '';
+}
+function surgShow(i) {
+  const s = current.steps[i]; surg.cur = { i, s }; surg.plan = null;
+  $('surg').hidden = !s.surg || !FLM.Surgery; $('surg-plan').hidden = true;
+  if ($('surg').hidden) return;
+  const box = $('surg-cands'); box.textContent = '';
+  const lab = document.createElement('span'); lab.className = 'note'; lab.textContent = `The model chose "${s.text}". Should have been:`; box.appendChild(lab);
+  s.top.forEach((c, k) => {
+    if (s.topIds[k] === s.id) return;
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = c.text; b.title = `${(c.p * 100).toFixed(1)}% now`;
+    b.onclick = () => { box.querySelectorAll('button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); surgPlan(s.topIds[k], c.text); };
+    box.appendChild(b);
+  });
+  surgList();
+}
+async function surgPlan(targetId, text) {
+  const { model } = await api.load(surgModel()), s = surg.cur.s, k = +$('surg-k').value;
+  if (!s.surg) { surgMsg('Turn on "Show rules behind each token" and generate again.', true); return; }
+  const plan = FLM.Surgery.plan(model, s.surg.x, s.surg.g, targetId, { k: k || s.surg.g.length, margin: 0.5 });
+  plan.text = text; surg.plan = plan;
+  if (plan.noop) { surgMsg(`"${esc(text)}" is already the top choice by a margin; nothing to change.`, false); return; }
+  if (!plan.ok) { surgMsg(`<strong class="warn">No edit of these rules can make "${esc(text)}" the top choice.</strong> ${esc(plan.reason || 'The strongest rules cannot reach it with a small change.')} A rare piece whose score is an average of eight prototypes cannot be reached this way at all.`, true); return; }
+  const rows = plan.rules.map((e) => `<tr class="clk" data-l="${e.layer}" data-r="${e.rule}" title="inspect this rule"><td class="n">${e.layer}</td><td class="n">${e.rule}</td><td class="n">${e.strength.toFixed(2)}</td><td class="n">${(Math.sqrt(e.dC.reduce((a, b) => a + b * b, 0))).toFixed(3)}</td></tr>`).join('');
+  surgMsg(`<div>To make <strong>"${esc(text)}"</strong> the top choice by a margin: its score now trails the best other piece by <span class="mono">${(-plan.before).toFixed(2)}</span> and would lead by <span class="mono">${plan.after.toFixed(2)}</span> (in score units). The edit changes <strong>${plan.rules.length}</strong> rule${plan.rules.length > 1 ? 's' : ''} of the last block by <strong>${(plan.relNorm * 100).toFixed(1)}%</strong> of their size${plan.relNorm > 0.1 ? ' <span class="warn">(a large edit: expect side effects)</span>' : ''}.</div>`
+    + `<div class="tblwrap"><table><thead><tr><th>layer</th><th>rule</th><th>how strongly it fired here</th><th>size of the change</th></tr></thead><tbody>${rows}</tbody></table></div>`
+    + `<div class="acts"><button type="button" class="go" id="surg-apply">Apply and regenerate</button></div>`);
+  document.querySelectorAll('#surg-plan tr.clk').forEach((tr) => { tr.onclick = () => inspect(+tr.dataset.l, +tr.dataset.r); });
+  $('surg-apply').onclick = async () => {
+    FLM.Surgery.apply(model, plan);
+    (surg.edits[surgModel()] = surg.edits[surgModel()] || []).push({ plan, label: `piece ${surg.cur.i + 1}: "${s.text}" \u2192 "${text}" (${plan.rules.length} rules, ${(plan.relNorm * 100).toFixed(1)}%)` });
+    surgList(); surgMsg('Applied. The story is regenerated with the same seed and settings: the change can also alter earlier words, because it affects every place where those rules fire.', false);
+    $('go').click();
+  };
+}
+$('surg-own-go').onclick = async () => {
+  const { man } = await api.load(surgModel()), tok = await api.tok(man.tok), ids = tok.encode($('surg-own').value);
+  if (ids.length !== 1) { surgMsg('That text is not a single word piece. Pieces carry their leading space: try " special" or " dog".', true); return; }
+  surgPlan(ids[0], tok.piece(ids[0]));
+};
+async function surgUndo(all) {
+  const { model } = await api.load(surgModel()), es = surg.edits[surgModel()] || [];
+  while (es.length) { FLM.Surgery.undo(model, es.pop().plan); if (!all) break; }
+  surgList(); $('go').click();
+}
+$('surg-undo').onclick = () => surgUndo(false);
+$('surg-reset').onclick = () => surgUndo(true);
+$('surg-load').onclick = async () => {
+  try {
+    const j = JSON.parse($('surg-json').value), { model } = await api.load(surgModel());
+    if (j.model !== surgModel()) throw new Error('these edits are for ' + j.model);
+    for (const e of j.edits) { const p = FLM.Surgery.fromJSON(e); FLM.Surgery.apply(model, p); (surg.edits[surgModel()] = surg.edits[surgModel()] || []).push({ plan: p, label: e.label || 'imported edit' }); }
+    surgList(); $('go').click();
+  } catch (e) { surgMsg('Could not apply the pasted edits: ' + esc(e.message), true); }
+};
 
 // ---------- structure, rule browser, timeline, inspector ----------
 const SVGNS = 'http://www.w3.org/2000/svg';
