@@ -87,3 +87,15 @@ The optimisation setup is closed for now (batch 16, wd 0.01, lr 6e-2 stay). This
 | `expsqrt` | `--exp-norm sqrt --ffn-exp-norm sqrt` | the Gaussian exponent normalisation of every TSK layer | none |
 Rule: at least 0.005 BPC better on four of five seeds; a pass gets a 300M confirmation (two seeds, warm-up 1000, unchanged steps) before it is quoted; I ask before that run.
 Predictions (pass probability): ema 15% (the floor-0 decay already averages the end of training); l4u2 35% (shared depth helps tiny models in the literature, but these blocks are not tied by design); h4 15%; h16 15%; expsqrt 10%. At most one arm passes (75%). `ema` improves on R0 by any amount (55%).
+
+## Stage 3 results (recorded 2026-10-23; 30M, seeds 0-4, paired with R0 = 1.0579; `report/round3_stage3.md`)
+| arm | params | mean BPC | change vs R0 | seeds worse | verdict |
+|---|---|---|---|---|---|
+| ema (--ema-decay 0.999, score = EMA weights) | 99,882 | 1.0611 | +0.0032 | 5 of 5 | no |
+| l4u2 (4 layers, 2 shared blocks; 1.8x compute) | 99,882 | 1.0619 | +0.0040 | 4 | no |
+| h4 (4 mixer heads) | 99,786 | 1.0616 | +0.0037 | 4 | no |
+| h16 (16 mixer heads) | 100,074 | 1.0606 | +0.0027 | 4 | no |
+| expsqrt (sqrt exponent normalisation) | 99,882 | 1.0591 | +0.0012 | 3 | no |
+Manipulation checks: parameter counts as shown (the head arms change it by -96 and +192); `l4u2` config shows 4 layers and 2 unique blocks; the `ema` arm's plain weights equal R0 exactly (1.05401 on seed 0), so the pairing is sound.
+**No arm beats the reference; every lever is neutral or worse.** Prediction scoring: no arm passes (ema 15%, l4u2 35%, h4 15%, h16 15%, expsqrt 10%): **all right**; at most one passes (75%): **right**; ema improves on R0 by any amount (55%): **wrong** (all five seeds worse by 0.003).
+Reading: the model is at a local optimum in the simple structural knobs (head count, exponent normalisation, shared depth) as well as in the optimisation setup: both of this round's screens find the current F7 recipe at or near the best of what they touch. The only gain found (more steps, stage 1) did not survive 300M. The remaining headroom is not in these knobs; the earlier rounds' gains came from the embedding shape and the learning-rate end, both already taken.
