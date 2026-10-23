@@ -68,7 +68,7 @@
       const cq = model.W['blocks.' + e.layer + '.ffn.conseq'].data, d = model.d;
       for (let i = 0; i < d; i++) cq[e.rule * d + i] += sign * e.dC[i];
     }
-    model.pi = null;                                // the rule profiles are derived from the consequents
+    model.pi = null; model.rows = null;            // the rule profiles are derived from the consequents
   }
   const apply = (model, p) => shift(model, p, +1);
   const undo = (model, p) => shift(model, p, -1);

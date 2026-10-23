@@ -1,0 +1,76 @@
+{
+ "name": "F7_100K",
+ "ckpt": "outputs/v70-shape300/F7_v6144_h640_d32_floor0_s0.pt",
+ "params": 99882,
+ "device": "cuda",
+ "formats": {
+  "fp32": {
+   "bytes": 399528,
+   "bpc": 0.95577,
+   "top1_agreement": 1.0,
+   "kl_bits": 0.0,
+   "max_dlogit": 0.0,
+   "greedy_identical": 1.0,
+   "mean_first_difference": 64.0,
+   "pieces_per_s": 286828,
+   "ms_per_piece_decode": 8.22,
+   "cpu_ms_per_piece_decode": 4.82,
+   "cpu_pieces_per_s": 9283,
+   "cpu_bpc_300k": 0.96472
+  },
+  "fp16": {
+   "bytes": 199764,
+   "bpc": 0.95578,
+   "top1_agreement": 0.99781,
+   "kl_bits": 1.7e-05,
+   "max_dlogit": 0.1393,
+   "greedy_identical": 0.95,
+   "mean_first_difference": 60.8,
+   "pieces_per_s": 291387,
+   "ms_per_piece_decode": 7.5,
+   "cpu_ms_per_piece_decode": 2.99,
+   "cpu_pieces_per_s": 9379,
+   "cpu_bpc_300k": 0.96472
+  },
+  "bf16": {
+   "bytes": 199764,
+   "bpc": 0.95607,
+   "top1_agreement": 0.98303,
+   "kl_bits": 0.001151,
+   "max_dlogit": 1.3862,
+   "greedy_identical": 0.2,
+   "mean_first_difference": 28.0,
+   "pieces_per_s": 292330,
+   "ms_per_piece_decode": 7.75
+  },
+  "int8": {
+   "bytes": 114224,
+   "bpc": 0.95649,
+   "top1_agreement": 0.97001,
+   "kl_bits": 0.003057,
+   "max_dlogit": 3.1097,
+   "greedy_identical": 0.2,
+   "mean_first_difference": 24.6,
+   "pieces_per_s": 288362,
+   "ms_per_piece_decode": 8.79,
+   "cpu_ms_per_piece_decode": 3.82,
+   "cpu_pieces_per_s": 9434,
+   "cpu_bpc_300k": 0.96558
+  },
+  "int8-lazy": {
+   "bytes": 114224,
+   "bpc": 0.95649,
+   "top1_agreement": 0.97001,
+   "kl_bits": 0.003057,
+   "max_dlogit": 3.1097,
+   "greedy_identical": 0.2,
+   "mean_first_difference": 24.6,
+   "pieces_per_s": 210443,
+   "ms_per_piece_decode": 13.07,
+   "cpu_ms_per_piece_decode": 3.03,
+   "cpu_pieces_per_s": 9010,
+   "cpu_bpc_300k": 0.96558
+  }
+ },
+ "cpu_threads": 3
+}

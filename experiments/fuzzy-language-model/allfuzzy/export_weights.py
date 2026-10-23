@@ -46,13 +46,19 @@ if __name__ == "__main__":
     vocab = (
         int(sys.argv[sys.argv.index("--vocab") + 1]) if "--vocab" in sys.argv else 3072
     )  # the vocabulary the checkpoint was trained with: its frequency file decides which tokens are head tokens
-    freq = np.load(f"outputs/freq_bpe{vocab}.npz")["freq"]
+    arg = lambda name, default: (
+        sys.argv[sys.argv.index(name) + 1] if name in sys.argv else default
+    )  # noqa: E731
+    freq = np.load(arg("--freq", f"outputs/freq_bpe{vocab}.npz"))[
+        "freq"
+    ]  # another corpus: its own frequency file
     order = np.argsort(-freq, kind="stable")
     arrays["head_ids"], arrays["tail_ids"] = order[:nh], order[nh:]
     for k in ("d_model", "n_layers", "n_heads", "n_rules", "vocab_size", "max_len"):
         arrays["cfg_" + k] = np.array(cfg[k])
     np.savez_compressed(dst, **arrays)
     shutil.copyfile(
-        f"../../data/tinystories/bpe{vocab}.json", dst.parent / f"bpe{vocab}.json"
+        arg("--tokenizer-json", f"../../data/tinystories/bpe{vocab}.json"),
+        dst.parent / f"bpe{vocab}.json",
     )
     print(f"wrote {dst} ({dst.stat().st_size / 1e3:.0f} KB), {total} parameters")

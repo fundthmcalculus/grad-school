@@ -197,7 +197,7 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
   </section>
   <section class="card expect" aria-label="What to expect">
     <h2>What to expect</h2>
-    <p>These are tiny models (about 100 thousand parameters) trained only on simple children's stories (TinyStories). All three have every block component built from fuzzy inference systems: the causal convolution, the normalisation, the gates, the feed-forward rules and the attention-like projections. The first is the strongest and uses a new embedding shape found by a search over vocabulary size, head size and block width: a vocabulary of 6,144 word pieces, 640 of them with full-width crisp embeddings and the rest as fuzzy sets over eight prototypes, and blocks of width 32. It reaches 0.952 bits per character after 300 million characters of training plus a short low-rate final phase (the better of two training runs), against 0.928 for the hybrid recipe at its own best shape and schedule given the same final phase, about 2.6% worse. The second is the earlier best shape trained on 1 billion characters (0.974, the better of two runs); the third is the same earlier model after 300 million characters (0.987). In blind ratings (two raters, 32 stories each, made before the final phase) the new model scored about 7.1 out of 15 for coherence, the same as the hybrid and the earlier fuzzy models (7.3 to 7.6) within the noise of the ratings. By default the sampler discourages repeated phrases (a rule called DRY: about half as many repeated word triples, the same rated coherence); a checkbox turns it off. They write fluent, short, childlike sentences, then often drift, repeat or lose the plot after a few sentences. They know nothing outside that story world, and nothing here is reviewed for accuracy. The seeded sampler is JavaScript's, so a seed does not reproduce the Python runs in the write-up.</p>
+    <p>The 14M option (140 times larger than the others, 0.668 bits per character) is a separate download of 14 MB the first time you select it. The other models are tiny (about 100 thousand parameters) trained only on simple children's stories (TinyStories). All three have every block component built from fuzzy inference systems: the causal convolution, the normalisation, the gates, the feed-forward rules and the attention-like projections. The first is the strongest and uses a new embedding shape found by a search over vocabulary size, head size and block width: a vocabulary of 6,144 word pieces, 640 of them with full-width crisp embeddings and the rest as fuzzy sets over eight prototypes, and blocks of width 32. It reaches 0.952 bits per character after 300 million characters of training plus a short low-rate final phase (the better of two training runs), against 0.928 for the hybrid recipe at its own best shape and schedule given the same final phase, about 2.6% worse. The second is the earlier best shape trained on 1 billion characters (0.974, the better of two runs); the third is the same earlier model after 300 million characters (0.987). In blind ratings (two raters, 32 stories each, made before the final phase) the new model scored about 7.1 out of 15 for coherence, the same as the hybrid and the earlier fuzzy models (7.3 to 7.6) within the noise of the ratings. By default the sampler discourages repeated phrases (a rule called DRY: about half as many repeated word triples, the same rated coherence); a checkbox turns it off. They write fluent, short, childlike sentences, then often drift, repeat or lose the plot after a few sentences. They know nothing outside that story world, and nothing here is reviewed for accuracy. The seeded sampler is JavaScript's, so a seed does not reproduce the Python runs in the write-up.</p>
     <p>Source, training scripts and results: <code>experiments/fuzzy-language-model</code> in the grad-school repository (<code>WRITEUP.md</code>). Everything on this page runs on your device; nothing you type is sent anywhere.</p>
   </section>
   <section class="card" aria-label="Model architecture diagrams">
@@ -299,7 +299,10 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
     const dv = new DataView(buf);
     for (const t of manifest.tensors) {
       const n = t.shape.reduce((a, b) => a * b, 1), a = new Float32Array(n);
-      for (let i = 0; i < n; i++) a[i] = fp16 ? half(dv.getUint16(t.offset + i * 2, true)) : dv.getFloat32(t.offset + i * 4, true);
+      if (t.q) {                                          // int8: q x one float32 scale per row of a matrix (one per tensor for a vector); see demo/quantize_model.py
+        const rows = t.shape.length >= 2 ? t.shape[0] : 1, per = n / rows, q = new Int8Array(buf, t.offset, n);
+        for (let r = 0; r < rows; r++) { const sc = dv.getFloat32(t.scale_offset + r * 4, true); for (let k = r * per, e = k + per; k < e; k++) a[k] = q[k] * sc; }
+      } else for (let i = 0; i < n; i++) a[i] = fp16 ? half(dv.getUint16(t.offset + i * 2, true)) : dv.getFloat32(t.offset + i * 4, true);
       T[t.name] = { data: a, shape: t.shape };
     }
     return T;
@@ -460,10 +463,122 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
   // table whose tail pieces are fuzzy sets over 12 prototypes.  Same interface as Model (reset, step, profiles, ruleShape, mixerRule).
   function gaussLogits(u, c, a, R, D, scale) {          // FUZZIFY + FIRE: log of each rule's product-t-norm firing strength
     const out = new Float64Array(R);
-    for (let r = 0; r < R; r++) { let q = 0; const b = r * D; for (let j = 0; j < D; j++) { const df = u[j] - c[b + j]; q += a[b + j] * df * df; } out[r] = -0.5 * scale * q; }
+    const D4 = D - (D % 4);
+    for (let r = 0; r < R; r++) {
+      let q0 = 0, q1 = 0, q2 = 0, q3 = 0, j = 0; const b = r * D;
+      for (; j < D4; j += 4) {                         // four independent sums: the engine cannot vectorise, but it can overlap them
+        const d0 = u[j] - c[b + j], d1 = u[j + 1] - c[b + j + 1], d2 = u[j + 2] - c[b + j + 2], d3 = u[j + 3] - c[b + j + 3];
+        q0 += a[b + j] * d0 * d0; q1 += a[b + j + 1] * d1 * d1; q2 += a[b + j + 2] * d2 * d2; q3 += a[b + j + 3] * d3 * d3;
+      }
+      for (; j < D; j++) { const df = u[j] - c[b + j]; q0 += a[b + j] * df * df; }
+      out[r] = -0.5 * scale * (q0 + q1 + q2 + q3);
+    }
     return out;
   }
   function softmaxF(v) { let mx = -Infinity; for (const x of v) if (x > mx) mx = x; let s = 0; const o = new Float64Array(v.length); for (let i = 0; i < v.length; i++) { o[i] = Math.exp(v[i] - mx); s += o[i]; } for (let i = 0; i < o.length; i++) o[i] /= s; return o; }
+  // ------------------------------------------------------------------ SIMD kernels (WebAssembly, hand-assembled: no toolchain, 3 functions)
+  // gauss(u, c, a, R, D, out):  out[r] = sum_j a[r,j] (u[j] - c[r,j])^2           (the rules' squared distances; D a multiple of 4)
+  // matvec(M, v, R, D, out):    out[r] = sum_j M[r,j] v[j]                           (slopes of the rules, the output scores)
+  // wsum(M, s, R, D, out):      out[j] = sum_r s[r] M[r,j]                           (the consequents, weighted by the rule strengths)
+  // All pointers are byte offsets into one shared memory, all numbers float32 (four lanes at a time).  Without SIMD support the model uses its plain loops.
+  const Wasm = (() => {
+    const leb = (n) => { const o = []; do { let b = n & 0x7f; n >>>= 7; if (n) b |= 0x80; o.push(b); } while (n); return o; };
+    const sleb = (n) => { const o = []; for (;;) { const b = n & 0x7f; n >>= 7; if ((n === 0 && !(b & 0x40)) || (n === -1 && (b & 0x40))) { o.push(b); return o; } o.push(b | 0x80); } };
+    const str = (s) => [...leb(s.length), ...[...s].map((c) => c.charCodeAt(0))];
+    const vec = (items) => [...leb(items.length), ...items.flat()];
+    const section = (id, body) => [id, ...leb(body.length), ...body];
+    const GET = (i) => [0x20, ...leb(i)], SET = (i) => [0x21, ...leb(i)], I32C = (n) => [0x41, ...sleb(n)];
+    const ADD = [0x6a], MUL = [0x6c], SUB = [0x6b], GEU = [0x4f], LTU = [0x49];
+    const VLOAD = [0xfd, 0x00, 0x00, 0x00], VSTORE = [0xfd, 0x0b, 0x00, 0x00], VZERO = [0xfd, 0x0c, ...new Array(16).fill(0)];
+    const F32LOAD = [0x2a, 0x02, 0x00], F32STORE = [0x38, 0x02, 0x00];
+    const VADD = [0xfd, 0xe4, 0x01], VSUB = [0xfd, 0xe5, 0x01], VMUL = [0xfd, 0xe6, 0x01], SPLAT = [0xfd, 0x13], LANE = (k) => [0xfd, 0x1f, k], FADD = [0x92];
+    const BLOCK = [0x02, 0x40], LOOP = [0x03, 0x40], END = [0x0b], BR = (i) => [0x0c, i], BRIF = (i) => [0x0d, i];
+    const hsum = (acc) => [...GET(acc), ...LANE(0), ...GET(acc), ...LANE(1), ...FADD, ...GET(acc), ...LANE(2), ...FADD, ...GET(acc), ...LANE(3), ...FADD];
+    function build() {
+      const i32 = 0x7f, v128 = 0x7b;
+      const types = section(1, vec([[0x60, ...vec(new Array(6).fill([i32])), 0x00], [0x60, ...vec(new Array(5).fill([i32])), 0x00]]));
+      const imp = section(2, vec([[...str('env'), ...str('mem'), 0x02, 0x00, 0x01]]));
+      const funcs = section(3, vec([[0], [1], [1]]));
+      const exp = section(7, vec([[...str('gauss'), 0x00, 0], [...str('matvec'), 0x00, 1], [...str('wsum'), 0x00, 2]]));
+      const locals = [[5, i32], [2, v128]];                   // r j rb po Db acc diff -> five i32 then two v128
+      const dotLoop = (np, loadA, loadB, accumulate) => [
+        ...I32C(0), ...SET(np + 1), ...BLOCK, ...LOOP, ...GET(np + 1), ...GET(np + 4), ...GEU, ...BRIF(1),
+        ...accumulate, ...GET(np + 1), ...I32C(16), ...ADD, ...SET(np + 1), ...BR(0), ...END, ...END];
+      // gauss: params u c a R D out = 0..5; locals r=6 j=7 rb=8 po=9 Db=10 acc=11 diff=12
+      const g = (() => {
+        const np = 6, r = 6, j = 7, rb = 8, po = 9, Db = 10, acc = 11, diff = 12;
+        const acc_ = [
+          ...GET(0), ...GET(j), ...ADD, ...VLOAD, ...GET(1), ...GET(rb), ...ADD, ...GET(j), ...ADD, ...VLOAD, ...VSUB, ...SET(diff),
+          ...GET(acc), ...GET(2), ...GET(rb), ...ADD, ...GET(j), ...ADD, ...VLOAD, ...GET(diff), ...VMUL, ...GET(diff), ...VMUL, ...VADD, ...SET(acc)];
+        const row = [...VZERO, ...SET(acc), ...dotLoop(np, 0, 0, acc_), ...GET(po), ...hsum(acc), ...F32STORE];
+        return [...GET(4), ...I32C(4), ...MUL, ...SET(Db), ...GET(5), ...SET(po), ...I32C(0), ...SET(r), ...I32C(0), ...SET(rb),
+          ...BLOCK, ...LOOP, ...GET(r), ...GET(3), ...GEU, ...BRIF(1), ...row,
+          ...GET(r), ...I32C(1), ...ADD, ...SET(r), ...GET(rb), ...GET(Db), ...ADD, ...SET(rb), ...GET(po), ...I32C(4), ...ADD, ...SET(po), ...BR(0), ...END, ...END, ...END];
+      })();
+      // matvec: params M v R D out = 0..4; locals r=5 j=6 rb=7 po=8 Db=9 acc=10 diff=11
+      const m = (() => {
+        const np = 5, r = 5, j = 6, rb = 7, po = 8, Db = 9, acc = 10;
+        const acc_ = [...GET(acc), ...GET(0), ...GET(rb), ...ADD, ...GET(j), ...ADD, ...VLOAD, ...GET(1), ...GET(j), ...ADD, ...VLOAD, ...VMUL, ...VADD, ...SET(acc)];
+        const row = [...VZERO, ...SET(acc), ...dotLoop(np, 0, 0, acc_), ...GET(po), ...hsum(acc), ...F32STORE];
+        return [...GET(3), ...I32C(4), ...MUL, ...SET(Db), ...GET(4), ...SET(po), ...I32C(0), ...SET(r), ...I32C(0), ...SET(rb),
+          ...BLOCK, ...LOOP, ...GET(r), ...GET(2), ...GEU, ...BRIF(1), ...row,
+          ...GET(r), ...I32C(1), ...ADD, ...SET(r), ...GET(rb), ...GET(Db), ...ADD, ...SET(rb), ...GET(po), ...I32C(4), ...ADD, ...SET(po), ...BR(0), ...END, ...END, ...END];
+      })();
+      // wsum: params M s R D out = 0..4; locals r=5 j=6 rb=7 (po=8 unused: the strength pointer) Db=9 acc=10 (the splatted strength) diff=11
+      const w = (() => {
+        const np = 5, r = 5, j = 6, rb = 7, po = 8, Db = 9, acc = 10;
+        const zero = [...I32C(0), ...SET(j), ...BLOCK, ...LOOP, ...GET(j), ...GET(Db), ...GEU, ...BRIF(1), ...GET(4), ...GET(j), ...ADD, ...VZERO, ...VSTORE, ...GET(j), ...I32C(16), ...ADD, ...SET(j), ...BR(0), ...END, ...END];
+        const upd = [...GET(4), ...GET(j), ...ADD, ...GET(4), ...GET(j), ...ADD, ...VLOAD, ...GET(acc), ...GET(0), ...GET(rb), ...ADD, ...GET(j), ...ADD, ...VLOAD, ...VMUL, ...VADD, ...VSTORE];
+        const row = [...GET(po), ...F32LOAD, ...SPLAT, ...SET(acc), ...dotLoop(np, 0, 0, upd)];
+        return [...GET(3), ...I32C(4), ...MUL, ...SET(Db), ...zero, ...GET(1), ...SET(po), ...I32C(0), ...SET(r), ...I32C(0), ...SET(rb),
+          ...BLOCK, ...LOOP, ...GET(r), ...GET(2), ...GEU, ...BRIF(1), ...row,
+          ...GET(r), ...I32C(1), ...ADD, ...SET(r), ...GET(rb), ...GET(Db), ...ADD, ...SET(rb), ...GET(po), ...I32C(4), ...ADD, ...SET(po), ...BR(0), ...END, ...END, ...END];
+      })();
+      const body = (code) => { const b = [...vec(locals), ...code]; return [...leb(b.length), ...b]; };
+      const codes = section(10, vec([body(g), body(m), body(w)]));
+      return new Uint8Array([0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, ...types, ...imp, ...funcs, ...exp, ...codes]);
+    }
+    let cached;
+    function make(memory) {
+      try {
+        if (typeof WebAssembly !== 'object') return null;
+        const bytes = build();
+        if (!WebAssembly.validate(bytes)) return null;
+        const inst = new WebAssembly.Instance(new WebAssembly.Module(bytes), { env: { mem: memory } });
+        return inst.exports;
+      } catch (e) { return null; }
+    }
+    return { make, build, ok: () => { if (cached === undefined) { try { cached = typeof WebAssembly === 'object' && WebAssembly.validate(build()); } catch (e) { cached = false; } } return cached; } };
+  })();
+
+
+  function initKernels(m) {                                // the big weight arrays move into one WebAssembly memory (the model's own arrays become views of it, so in-place edits such as surgery still work)
+    if (!Wasm.ok()) return null;
+    const { V, d, L, W } = m;
+    let floats = V * d + 16 * d + 8 * V + 64;
+    for (let l = 0; l < L; l++) {
+      const fc = W['blocks.' + l + '.ffn.centers'], R = fc.shape[0], D = fc.shape[1];
+      if (D % 4 || d % 4) return null;
+      floats += 2 * R * D + 2 * R * d + 8 * R + 4 * D;
+    }
+    const pages = Math.ceil(((floats + 4096) * 4) / 65536) + 1;
+    let mem; try { mem = new WebAssembly.Memory({ initial: pages }); } catch (e) { return null; }
+    const ex = Wasm.make(mem); if (!ex) return null;
+    let off = 0;
+    const alloc = (n, src) => { const o = off; off += (n + 3) & ~3; const v = new Float32Array(mem.buffer, o * 4, n); if (src) v.set(src); return { o: o * 4, v }; };
+    const E = alloc(V * d, m.E); m.E = E.v;
+    const layers = [];
+    for (let l = 0; l < L; l++) {
+      const b = 'blocks.' + l + '.ffn.', fc = W[b + 'centers'], R = fc.shape[0], D = fc.shape[1];
+      const c = alloc(R * D, fc.data), sw = alloc(R * d, W[b + 'slope.weight'].data), cq = alloc(R * d, W[b + 'conseq'].data), a = alloc(R * D, m.A[l].ffn);
+      fc.data = c.v; W[b + 'slope.weight'].data = sw.v; W[b + 'conseq'].data = cq.v; m.A[l].ffn = a.v;
+      layers.push({ c, sw, cq, a, R, D });
+    }
+    const maxR = Math.max(...layers.map((q) => q.R)), maxD = Math.max(...layers.map((q) => q.D));
+    const buf = { u: alloc(maxD), n2: alloc(d), fl: alloc(maxR), dots: alloc(maxR), st: alloc(maxR), dx: alloc(d), go: alloc(d), logits: alloc(V) };
+    return { ex, mem, E, layers, buf };
+  }
+
   class AllFuzzyModel {
     constructor(manifest, buf) {
       const c = manifest.config;
@@ -480,10 +595,11 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
         for (let j = 0; j < d; j++) { let a = 0; for (let k = 0; k < K; k++) a += up[j * K + k] * mu[k]; this.E[id * d + j] = a; }
       }
       this.nw = g('norm.weight');
-      const wd = (k) => { const x = g(k), o = new Float64Array(x.length); for (let i = 0; i < x.length; i++) o[i] = Math.exp(-2 * x[i]); return o; };
+      const wd = (k) => { const x = g(k), o = x.length > 65536 ? new Float32Array(x.length) : new Float64Array(x.length); for (let i = 0; i < x.length; i++) o[i] = Math.exp(-2 * x[i]); return o; };   // large width arrays in float32: half the memory traffic
       this.A = [];                                         // 1 / s^2 of every membership function
       for (let l = 0; l < this.L; l++) { const b = 'blocks.' + l + '.'; this.A.push({ mem: wd(b + 'mix.log_width'), qkv: wd(b + 'mix.qkv.log_width'), out: wd(b + 'mix.out.log_width'), gate: wd(b + 'mix.gate.log_width'), beta: wd(b + 'mix.beta.log_width'), ffn: wd(b + 'ffn.log_width') }); }
       this.pi = null;
+      this.K = initKernels(this);                           // null where WebAssembly SIMD is missing: the plain loops below then do the work
       this.reset();
     }
     reset() {
@@ -541,16 +657,55 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
         const n2 = this.gain(x, b + 'n2.').out;
         const fc = W[b + 'ffn.centers'], D = fc.shape[1], FR = fc.shape[0];
         let u = n2; if (D === 2 * d) { u = new Float64Array(D); u.set(n2, 0); u.set(this.prevN2[l], d); }
-        const fl = gaussLogits(u, fc.data, A.ffn, FR, D, 1 / D), sw = W[b + 'ffn.slope.weight'].data, sb = W[b + 'ffn.slope.bias'].data, cq = W[b + 'ffn.conseq'].data;
-        const st = new Float64Array(FR);
-        for (let r = 0; r < FR; r++) { let sl = sb[r]; for (let i = 0; i < d; i++) sl += sw[r * d + i] * n2[i]; st[r] = Math.exp(fl[r]) * sl; }
-        for (let r = 0; r < FR; r++) { const s_ = st[r]; for (let i = 0; i < d; i++) x[i] += s_ * cq[r * d + i]; }
+        const K = this.K, sb = W[b + 'ffn.slope.bias'].data, st = new Float64Array(FR);
+        if (K) {                                                // squared distances, slopes and the weighted consequents: four lanes at a time, float32
+          const Kl = K.layers[l], B = K.buf;
+          B.u.v.set(u); B.n2.v.set(n2);
+          K.ex.gauss(B.u.o, Kl.c.o, Kl.a.o, FR, D, B.fl.o);
+          K.ex.matvec(Kl.sw.o, B.n2.o, FR, d, B.dots.o);
+          const q = B.fl.v, dt = B.dots.v, sv = B.st.v, c0 = -0.5 / D;
+          for (let r = 0; r < FR; r++) { const s_ = Math.exp(c0 * q[r]) * (sb[r] + dt[r]); st[r] = s_; sv[r] = s_; }
+          K.ex.wsum(Kl.cq.o, B.st.o, FR, d, B.dx.o);
+          const dx = B.dx.v; for (let i = 0; i < d; i++) x[i] += dx[i];
+          this.prevN2[l] = n2; strengths.push(st);
+          continue;
+        }
+        const fl = gaussLogits(u, fc.data, A.ffn, FR, D, 1 / D), sw = W[b + 'ffn.slope.weight'].data, cq = W[b + 'ffn.conseq'].data;
+        for (let r = 0; r < FR; r++) {
+          let sl = sb[r]; const o = r * d; for (let i = 0; i < d; i++) sl += sw[o + i] * n2[i];
+          const s_ = Math.exp(fl[r]) * sl; st[r] = s_;
+          for (let i = 0; i < d; i++) x[i] += s_ * cq[o + i];
+        }
         this.prevN2[l] = n2; strengths.push(st);
       }
       const gf = this.gain(x, 'norm.'), logits = new Float32Array(this.V);
-      for (let v = 0; v < this.V; v++) { let a = 0; const r = v * d; for (let i = 0; i < d; i++) a += this.E[r + i] * gf.out[i]; logits[v] = a; }
+      const E = this.E, go = gf.out, d4 = d - (d % 4);
+      if (this.K) { const B = this.K.buf; B.go.v.set(go); this.K.ex.matvec(this.K.E.o, B.go.o, this.V, d, B.logits.o); logits.set(B.logits.v); }
+      else for (let v = 0; v < this.V; v++) {
+        let a0 = 0, a1 = 0, a2 = 0, a3 = 0, i = 0; const r = v * d;
+        for (; i < d4; i += 4) { a0 += E[r + i] * go[i]; a1 += E[r + i + 1] * go[i + 1]; a2 += E[r + i + 2] * go[i + 2]; a3 += E[r + i + 3] * go[i + 3]; }
+        for (; i < d; i++) a0 += E[r + i] * go[i];
+        logits[v] = a0 + a1 + a2 + a3;
+      }
       this.pos++;
       return opts && opts.explain ? { logits, gates: strengths, s: Math.exp(gf.gain), xPre: Float64Array.from(x) } : { logits };
+    }
+    profileRow(l, r) {                                      // pi_r over all pieces, computed when first asked for and kept
+      this.rows = this.rows || {};
+      const key = l * 1000003 + r;
+      if (!this.rows[key]) {
+        const { d, V, E } = this, cq = this.W['blocks.' + l + '.ffn.conseq'].data, cw = new Float32Array(d), pi = new Float32Array(V);
+        for (let i = 0; i < d; i++) cw[i] = cq[r * d + i] * this.nw[i];
+        for (let v = 0; v < V; v++) { let a = 0; const o = v * d; for (let i = 0; i < d; i++) a += cw[i] * E[o + i]; pi[v] = a; }
+        this.rows[key] = pi;
+      }
+      return this.rows[key];
+    }
+    profileAt(l, tok) {                                     // pi_r[tok] for every rule r of layer l: one dot product per rule
+      const { d, E, nw } = this, cq = this.W['blocks.' + l + '.ffn.conseq'], R = cq.shape[0], out = new Float32Array(R), o = tok * d, ew = new Float32Array(d);
+      for (let i = 0; i < d; i++) ew[i] = E[o + i] * nw[i];
+      for (let r = 0; r < R; r++) { let a = 0; const b = r * d; for (let i = 0; i < d; i++) a += cq.data[b + i] * ew[i]; out[r] = a; }
+      return out;
     }
     profiles() {                                           // pi_r = (conseq_r * output weight) . E^T: what rule r does to the output scores when it fires positively
       if (this.pi) return this.pi;
@@ -593,10 +748,15 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
     for (let i = 0; i < p.length; i++) p[i] /= s;
     return p;
   }
-  function topIdx(a, k) {                                  // indices of the k largest entries, descending
-    const idx = Array.from({ length: a.length }, (_, i) => i);
-    idx.sort((i, j) => a[j] - a[i]);
-    return idx.slice(0, k);
+  function topIdx(a, k) {                                  // indices of the k largest entries, descending (ties: the lower index first, as a stable sort would)
+    const n = a.length, best = [];
+    if (k >= n) { const idx = Array.from({ length: n }, (_, i) => i); idx.sort((i, j) => a[j] - a[i]); return idx; }
+    for (let i = 0; i < n; i++) {
+      const v = a[i];
+      if (best.length < k) best.push(i); else if (v > a[best[k - 1]]) best[k - 1] = i; else continue;
+      for (let j = best.length - 1; j > 0 && a[best[j - 1]] < a[best[j]]; j--) { const t = best[j]; best[j] = best[j - 1]; best[j - 1] = t; }
+    }
+    return best;
   }
   const rnd = (x, n) => Math.round(x * 10 ** n) / 10 ** n;
 
@@ -658,7 +818,7 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
       for (let i = 0; i < ids.length; i++) last = model.step(ids[i], { explain: wantExplain && i === ids.length - 1 });
       const hist = ids.slice(), seen = new Set();
       for (let i = 0; i + 2 < hist.length; i++) seen.add(hist[i] + ',' + hist[i + 1] + ',' + hist[i + 2]);
-      const steps = [], pi = wantExplain ? model.profiles() : null;
+      const lazy = wantExplain && !!model.profileRow, steps = [], pi = wantExplain && !lazy ? model.profiles() : null;
       for (let n = 0; n < nNew; n++) {
         const logits = last.logits, pAll = softmax(logits, 1);
         let lgs = logits;   // the scores the sampler sees: the raw scores minus the DRY penalties (the displayed probabilities stay raw)
@@ -676,9 +836,10 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
           step.rules = []; step.gates = [];
           last.gates.forEach((g, l) => {
             step.gates.push(Array.from(g, (v) => rnd(v, 2)));
-            const contrib = Array.from(g, (gr, r) => gr * last.s * pi[l][r * model.V + tk]);
+            const col = lazy ? model.profileAt(l, tk) : null;
+            const contrib = Array.from(g, (gr, r) => gr * last.s * (lazy ? col[r] : pi[l][r * model.V + tk]));
             for (const r of topIdx(contrib.map(Math.abs), 3)) {
-              const sign = g[r] >= 0 ? 1 : -1, prof = Array.from({ length: model.V }, (_, v) => pi[l][r * model.V + v] * sign);
+              const sign = g[r] >= 0 ? 1 : -1, row = lazy ? model.profileRow(l, r) : null, prof = Array.from({ length: model.V }, (_, v) => (lazy ? row[v] : pi[l][r * model.V + v]) * sign);
               step.rules.push({ layer: l, rule: r, gate: rnd(g[r], 3), contribution: rnd(contrib[r], 3), raises: topIdx(prof, 5).map((v) => tok.piece(v)) });
             }
           });
@@ -786,7 +947,7 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
       const cq = model.W['blocks.' + e.layer + '.ffn.conseq'].data, d = model.d;
       for (let i = 0; i < d; i++) cq[e.rule * d + i] += sign * e.dC[i];
     }
-    model.pi = null;                                // the rule profiles are derived from the consequents
+    model.pi = null; model.rows = null;            // the rule profiles are derived from the consequents
   }
   const apply = (model, p) => shift(model, p, +1);
   const undo = (model, p) => shift(model, p, -1);
@@ -804,8 +965,11 @@ let current = null;
 const embed = window.FLM_EMBED;
 const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
 const key = (p) => p.replace(/^\.\//, '');
-const fj = embed ? async (p) => JSON.parse(new TextDecoder().decode(b64(embed[key(p)]))) : async (p) => { const r = await fetch(p); if (!r.ok) throw new Error(p + ': HTTP ' + r.status); return r.json(); };
-const fb = embed ? async (p) => b64(embed[key(p)]).buffer : async (p) => { const r = await fetch(p); if (!r.ok) throw new Error(p + ': HTTP ' + r.status); return r.arrayBuffer(); };
+const netJ = async (p) => { const r = await fetch(p); if (!r.ok) throw new Error(p + ': HTTP ' + r.status); return r.json(); };
+const netB = async (p) => { const r = await fetch(p); if (!r.ok) throw new Error(p + ': HTTP ' + r.status); return r.arrayBuffer(); };
+// a file missing from the embedded set (a model that is hosted beside the page, such as the 14M one) is fetched
+const fj = embed ? async (p) => (embed[key(p)] ? JSON.parse(new TextDecoder().decode(b64(embed[key(p)]))) : netJ(p)) : netJ;
+const fb = embed ? async (p) => (embed[key(p)] ? b64(embed[key(p)]).buffer : netB(p)) : netB;
 const api = new FLM.Api('.', fj, fb);
 const LOAD_HELP = 'Could not load the model files. Browsers block this from a file:// address: run "python -m http.server" in the demo/web folder and open http://localhost:8000, or open the standalone page built by demo/build_standalone.py.';
 
@@ -822,7 +986,7 @@ api.models().then((ms) => {
   $('go').click();   // show a story straight away
 }).catch(() => { $('err').textContent = LOAD_HELP; });
 $('model').onchange = showModel;
-function showModel() { const m = (window.MODELS || []).find((x) => x.id === $('model').value); $('minfo').textContent = m ? `${nf(m.params)} parameters, ${m.layers} layers, width ${m.d}, context ${m.ctx} word pieces (${m.tok})` : ''; }
+function showModel() { const m = (window.MODELS || []).find((x) => x.id === $('model').value); $('minfo').textContent = m ? `${nf(m.params)} parameters, ${m.layers} layers, width ${m.d}, context ${m.ctx} word pieces (${m.tok})` + (m.remote ? `. Downloads ${m.mb} MB the first time you generate with it.` : '') : ''; }
 
 $('go').onclick = async () => {
   $('err').textContent = ''; $('go').disabled = true; $('go').textContent = 'Generating...';
@@ -1108,7 +1272,7 @@ function timeline(d) {
   const R = G[0].length, tot = new Array(R).fill(0);
   for (const g of G) for (let r = 0; r < R; r++) tot[r] += Math.abs(g[r]);
   const rows = tot.map((v, r) => [v, r]).sort((a, b) => b[0] - a[0]).slice(0, 14).map((x) => x[1]);
-  const gmax = Math.max(...G.flat().map(Math.abs), 1e-6);
+  let gmax = 1e-6; for (const g of G) for (const v of g) { const a = Math.abs(v); if (a > gmax) gmax = a; }   // a loop: spreading 60 x 2149 values overflows the call stack
   const n = G.length, cw = Math.max(5, Math.min(14, 640 / n)), lw = 78, rh = 18, W = lw + n * cw + 4, H = rows.length * rh + 8;
   const svg = sv('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Rule firing by piece' });
   rows.forEach((r, i) => {
