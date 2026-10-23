@@ -129,3 +129,39 @@ def test_wandb_hook_logs_resumes_and_finishes(tmp_path, monkeypatch):
     calls.clear()
     run(tmp_path, "w2", "--wandb", "proj", "--ckpt-dir", str(ck), "--resume", "auto")
     assert calls[0] == ("init", "proj", "abc123", "allow")
+
+
+def test_real_wandb_offline_logs_and_resumes_the_same_run(tmp_path, monkeypatch):
+    wandb = pytest.importorskip("wandb")  # the real package, no network: offline mode
+    monkeypatch.setenv("WANDB_MODE", "offline")
+    monkeypatch.setenv("WANDB_DIR", str(tmp_path))
+    monkeypatch.setenv("WANDB_SILENT", "true")
+    ck = tmp_path / "ck"
+    run(
+        tmp_path,
+        "r1",
+        "--wandb",
+        "flm-test",
+        "--ckpt-dir",
+        str(ck),
+        "--ckpt-every",
+        "20",
+    )
+    first_id = CK.load(CK.latest(ck), "")["wandb_id"]
+    assert first_id and list((tmp_path / "wandb").glob(f"offline-run-*-{first_id}"))
+    run(
+        tmp_path,
+        "r2",
+        "--wandb",
+        "flm-test",
+        "--ckpt-dir",
+        str(ck),
+        "--ckpt-every",
+        "20",
+        "--resume",
+        "auto",
+    )
+    runs = list((tmp_path / "wandb").glob("offline-run-*"))
+    assert len(runs) == 2 and all(
+        first_id in p.name for p in runs
+    )  # the resume reused the id
