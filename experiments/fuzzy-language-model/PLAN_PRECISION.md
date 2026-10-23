@@ -22,3 +22,6 @@ Decision rule: a precision mode becomes the default for the 14M-and-up work only
 1. Install `wandb` (owner's yes), a real logged-and-resumed 14M run on W&B (30M characters, killed and resumed), and resume from a W&B artifact on another machine.
 2. If bf16 or fp16 passes, rerun the 14M 300M run in that mode and update the Pile cost estimate (`PLAN_M14.md`): the Pile arithmetic is linear in tokens per second.
 3. `torch.compile` and a larger batch are the other two speed levers; a larger batch needs its own learning-rate screen.
+
+## Bug found by the quantisation exploration and fixed (2026-10-23)
+Under autocast, `flm/fuzzy_tokens.py` wrote the bf16 head and tail logits into an fp32 buffer (`out[..., ids] = lh`), so every bf16 or fp16 forward pass of the all-fuzzy model crashed with "Index put requires the source and destination dtypes match"; tf32 was unaffected. The head, tail and mid-tier writes now cast to the buffer dtype (a no-op in fp32, so fp32 runs are unchanged). Check: a one-step CPU bf16 run of F7 now completes (validation 3.18712 under bf16 autocast, 3.18699 re-scored in fp32). Not yet checked: the fp16 path with its loss scaler on the GPU (the scaler only exists on CUDA), which the queued precision screen will exercise first.
