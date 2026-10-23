@@ -22,7 +22,7 @@ def load(batch: int):
     return json.loads(f.read_text()) if f else None
 
 
-def summary(batches=(16, 24, 32, 40, 48, 64)):
+def summary(batches=(16, 20, 24, 28, 32, 40, 48, 64)):
     rows = []
     for b in batches:
         d = load(b)
