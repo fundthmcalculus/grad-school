@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import contextlib
 import math
 import os
 import platform
@@ -21,6 +22,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
+import flm.ckpt as CK
 from flm.data import VOCAB_SIZE, decode, encode, load
 from flm.models import ModelConfig, TinyLM, init_rules_from_data
 
@@ -149,6 +151,33 @@ def get_args(argv=None):
         default="random",
         choices=["random", "data"],
         help="TSK rule centers: random or on data",
+    )
+    p.add_argument(
+        "--precision",
+        default="fp32",
+        choices=["fp32", "tf32", "bf16", "fp16"],
+        help="fp32 (default; exact), tf32 (Ampere+ matrix units), bf16 / fp16 autocast (fp16 uses a loss scaler); validation is also re-scored in fp32 (val_bpc_fp32)",
+    )
+    p.add_argument(
+        "--ckpt-dir", default="", help="directory of resumable training checkpoints"
+    )
+    p.add_argument(
+        "--ckpt-every", type=int, default=0, help="steps between checkpoints (0 = off)"
+    )
+    p.add_argument("--ckpt-keep", type=int, default=2, help="checkpoints kept")
+    p.add_argument(
+        "--resume",
+        default="",
+        help="auto (newest in --ckpt-dir), a checkpoint file or directory, or wandb:<entity>/<project>/<artifact>:latest",
+    )
+    p.add_argument(
+        "--wandb", default="", help="Weights & Biases project to log to (off if empty)"
+    )
+    p.add_argument("--wandb-name", default="", help="Weights & Biases run name")
+    p.add_argument(
+        "--wandb-artifacts",
+        action="store_true",
+        help="also upload every checkpoint as a W&B artifact",
     )
     return p.parse_args(argv)
 
@@ -325,17 +354,56 @@ def main(argv=None):
         )
 
     hi = len(train) - a.ctx - 2
+    amp_dtype = {"bf16": torch.bfloat16, "fp16": torch.float16}.get(a.precision)
+    if a.precision == "tf32":
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+    scaler = torch.amp.GradScaler("cuda") if a.precision == "fp16" and on_gpu else None
+
+    def amp():
+        return (
+            torch.autocast(device.type, dtype=amp_dtype)
+            if amp_dtype
+            else contextlib.nullcontext()
+        )
+
     curve, evals = [], []
     if a.eval_at_start:
-        evals.append(
-            (0, round(evaluate(model, val, a.ctx, a.eval_chars, device=device), 5))
-        )
+        with amp():
+            evals.append(
+                (
+                    0,
+                    round(evaluate(model, val, a.ctx, a.eval_chars, device=device), 5),
+                )
+            )
         print(f"step 0 val {evals[-1][1]:.4f}", flush=True)
     t0 = time.perf_counter()
     train_time = 0.0
     ema = None
     diverged_step = None
-    for s in range(steps):
+    start = 0
+    wb_id = None
+    if a.resume:
+        ck = CK.load(a.resume, a.ckpt_dir)
+        if ck is not None:
+            CK.check_compatible(ck["run_key"], a)
+            model.load_state_dict(ck["model"])
+            opt.load_state_dict(ck["opt"])
+            rng.bit_generator.state = ck["np_rng"]
+            torch.set_rng_state(ck["torch_rng"])
+            if on_gpu and ck.get("cuda_rng") is not None:
+                torch.cuda.set_rng_state(ck["cuda_rng"], device)
+            if ema_model is not None and ck.get("ema_model") is not None:
+                ema_model.load_state_dict(ck["ema_model"])
+            if scaler is not None and ck.get("scaler") is not None:
+                scaler.load_state_dict(ck["scaler"])
+            ema, curve, evals = ck["ema"], ck["curve"], ck["evals"]
+            train_time, start, wb_id = ck["train_time"], ck["step"], ck.get("wandb_id")
+            print(f"resumed from step {start}/{steps}", flush=True)
+        else:
+            print("--resume auto: no checkpoint yet, starting from step 0", flush=True)
+    wb = CK.Logger(a.wandb, a.wandb_name or Path(a.out).stem, vars(a), wb_id)
+    for s in range(start, steps):
         ts = time.perf_counter()
         starts = rng.integers(0, hi, a.batch)
         xb = torch.from_numpy(
@@ -343,10 +411,12 @@ def main(argv=None):
         ).to(device)
         for g in opt.param_groups:
             g["lr"] = lr_at(s)
-        logits = model(xb[:, :-1])
-        loss = F.cross_entropy(
-            logits.reshape(-1, logits.shape[-1]), xb[:, 1:].reshape(-1)
-        )
+        with amp():
+            logits = model(xb[:, :-1])
+            logits = logits.float()
+            loss = F.cross_entropy(
+                logits.reshape(-1, logits.shape[-1]), xb[:, 1:].reshape(-1)
+            )
         if teacher is not None:
             with torch.no_grad():
                 tl = teacher(xb[:, :-1]) / a.kd_temp
@@ -363,10 +433,18 @@ def main(argv=None):
         else:
             loss_opt = loss
         opt.zero_grad(set_to_none=True)
-        loss_opt.backward()
-        if a.clip > 0:
-            torch.nn.utils.clip_grad_norm_(model.parameters(), a.clip)
-        opt.step()
+        if scaler is not None:  # fp16: scale the loss, unscale before clipping
+            scaler.scale(loss_opt).backward()
+            scaler.unscale_(opt)
+            if a.clip > 0:
+                torch.nn.utils.clip_grad_norm_(model.parameters(), a.clip)
+            scaler.step(opt)
+            scaler.update()
+        else:
+            loss_opt.backward()
+            if a.clip > 0:
+                torch.nn.utils.clip_grad_norm_(model.parameters(), a.clip)
+            opt.step()
         if ema_model is not None:
             with torch.no_grad():
                 d_ = min(a.ema_decay, (1 + s) / (10 + s))
@@ -382,17 +460,52 @@ def main(argv=None):
         ema = li if ema is None else 0.98 * ema + 0.02 * li
         if s % 50 == 0 or s == steps - 1:
             curve.append((s, round(ema, 4)))
+            wb.log(s + 1, train_bpc=ema, lr=lr_at(s))
         if (s + 1) % eval_every == 0 or s == steps - 1:
-            evals.append(
-                (
-                    s + 1,
-                    round(evaluate(model, val, a.ctx, a.eval_chars, device=device), 5),
+            with amp():
+                evals.append(
+                    (
+                        s + 1,
+                        round(
+                            evaluate(model, val, a.ctx, a.eval_chars, device=device), 5
+                        ),
+                    )
                 )
-            )
+            wb.log(s + 1, val_bpc=evals[-1][1], train_seconds=train_time)
             print(
                 f"step {s + 1}/{steps} train {ema:.4f} val {evals[-1][1]:.4f} t={train_time:.0f}s",
                 flush=True,
             )
+        if (
+            a.ckpt_every
+            and a.ckpt_dir
+            and (s + 1) % a.ckpt_every == 0
+            and s + 1 < steps
+        ):
+            path = CK.save(
+                a.ckpt_dir,
+                s + 1,
+                dict(
+                    step=s + 1,
+                    run_key=CK.run_key(a),
+                    model=model.state_dict(),
+                    opt=opt.state_dict(),
+                    np_rng=rng.bit_generator.state,
+                    torch_rng=torch.get_rng_state(),
+                    cuda_rng=torch.cuda.get_rng_state(device) if on_gpu else None,
+                    ema_model=ema_model.state_dict() if ema_model is not None else None,
+                    scaler=scaler.state_dict() if scaler is not None else None,
+                    ema=ema,
+                    curve=curve,
+                    evals=evals,
+                    train_time=train_time,
+                    wandb_id=wb.id,
+                    torch=torch.__version__,
+                ),
+                keep=a.ckpt_keep,
+            )
+            if a.wandb_artifacts:
+                wb.artifact(path, s + 1)
 
     # A diverged run has no final value. Reporting the last finite eval would let a
     # truncated run compete in `best_tune` as if it had finished.
@@ -407,6 +520,16 @@ def main(argv=None):
         if evals and diverged_step is None and math.isfinite(evals[-1][1])
         else float("nan")
     )
+    val_bpc_fp32 = None
+    if a.precision != "fp32" and math.isfinite(final):  # the metric of record is fp32
+        val_bpc_fp32 = round(
+            evaluate(model, val, a.ctx, a.eval_chars, device=device), 5
+        )
+        print(
+            f"{a.precision} val {final:.5f}, fp32 re-score {val_bpc_fp32:.5f}",
+            flush=True,
+        )
+    wb.finish(val_bpc=final, val_bpc_fp32=val_bpc_fp32, train_seconds=train_time)
     model.cpu()  # sample and checkpoint on CPU, whatever the training device
     g = torch.Generator().manual_seed(1234)
     enc, dec = (TOK.encode, TOK.decode) if TOK is not None else (encode, decode)
@@ -430,9 +553,13 @@ def main(argv=None):
         "chars_per_token": cpt,
         "val_bpc": final,
         "val_bpc_ema": val_bpc_ema,
+        "val_bpc_fp32": val_bpc_fp32,
         "evals": evals,
         "train_curve": curve,
         "train_seconds": round(train_time, 2),
+        "peak_mem_mb": (
+            round(torch.cuda.max_memory_allocated(device) / 2**20) if on_gpu else None
+        ),
         "wall_seconds": round(time.perf_counter() - t0, 2),
         "chars_per_sec": round(steps * a.batch * a.ctx / max(train_time, 1e-9)),
         "torch": torch.__version__,
