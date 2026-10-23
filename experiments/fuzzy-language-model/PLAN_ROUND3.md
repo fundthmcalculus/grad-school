@@ -121,3 +121,6 @@ To run later: `python -m flm.prep_mix --chars 330e6 --vocab 6144`, then `SHAPE_C
 Registered predictions for that run (30M, five seeds, F7 shape): bits per character on the mixed validation lies between the TinyStories value (1.058) and the SimpleStories value (1.237), closer to SimpleStories (70%); on `valid_ts` the mix costs at most 0.03 against a TinyStories-only model (60%); on `valid_ss` the mix costs at most 0.03 against a SimpleStories-only model (60%); the shape ranking carries over (the F7 shape beats the old 3,072-token shape on the mix by 0.03 or more, 70%).
 
 ## Stage 6: the Pile sample, scaffolded (2026-10-23; not trained): see `PLAN_PILE.md`.
+
+## Round B cancelled (owner, 2026-10-23)
+The allocation search showed no reasonable improvement at round A, so round B (the six best on four more seeds) is not run and stays a background idea to confirm later. Round A completes (24 cells) and is recorded below when it ends; next steps are in `PLAN_FUTURE.md`.
