@@ -9,26 +9,8 @@
   "tok": "bpe6144"
  },
  {
-  "id": "flm-allfuzzy-f7-s1",
-  "label": "99.9K ALL-FUZZY, new embedding shape (BPE6144, 640 crisp head tokens, width 32; 300M characters plus a 1,600-step low-rate final phase, 0.9547 bits per character, second run)",
-  "params": 99882,
-  "ctx": 512,
-  "d": 32,
-  "layers": 2,
-  "tok": "bpe6144"
- },
- {
   "id": "flm-allfuzzy-1b",
   "label": "99K ALL-FUZZY, 1B characters: every block component a fuzzy system, tail token table fuzzy (1B characters, 0.974 bits per character; the strongest all-fuzzy model)",
-  "params": 99019,
-  "ctx": 512,
-  "d": 48,
-  "layers": 2,
-  "tok": "bpe3072"
- },
- {
-  "id": "flm-allfuzzy-1b-s1",
-  "label": "99K ALL-FUZZY, 1B characters, second training run: the same model with another seed (1B characters, 0.976 bits per character)",
   "params": 99019,
   "ctx": 512,
   "d": 48,
