@@ -20,6 +20,7 @@ RUNS = [  # id, label, directory, learning rate, offset (millions of characters 
     ("ext1", "+300M, lr 1e-3 (bf16)", OUT / "v90-m14-ext", 1e-3, 300.0),
     ("ext3", "+300M, lr 3e-3 (bf16)", OUT / "v91-m14-ext3", 3e-3, 300.0),
     ("ext6", "+300M, lr 6e-3 (bf16)", OUT / "v92-m14-ext6", 6e-3, 300.0),
+    ("ext10", "+300M, lr 1e-2 (bf16)", OUT / "v93-m14-ext10", 1e-2, 300.0),
 ]
 START_VAL = 0.6683  # the weights both extensions start from: the base run's final validation
 
@@ -89,6 +90,10 @@ def main(out_dir):
     scored("ext6", "lr 6e-3 ends below the lr 3e-3 run", 0.50, lambda r: (e3["val"] is not None and r["val"] < e3["val"], r["val"]), lambda v: f"{v:.4f}")
     scored("ext6", "lr 6e-3 ends below 0.640", 0.20, lambda r: (r["val"] < 0.64, r["val"]), lambda v: f"{v:.4f}")
     scored("ext6", "lr 6e-3 ends above the lr 1e-3 result", 0.15, lambda r: (e1["val"] is not None and r["val"] > e1["val"], r["val"]), lambda v: f"{v:.4f}")
+    e6 = byid["ext6"]
+    scored("ext10", "lr 1e-2 ends below the lr 6e-3 run", 0.40, lambda r: (e6["val"] is not None and r["val"] < e6["val"], r["val"]), lambda v: f"{v:.4f}")
+    scored("ext10", "lr 1e-2 ends below 0.635", 0.15, lambda r: (r["val"] < 0.635, r["val"]), lambda v: f"{v:.4f}")
+    scored("ext10", "lr 1e-2 ends above the lr 3e-3 result", 0.25, lambda r: (e3["val"] is not None and r["val"] > e3["val"], r["val"]), lambda v: f"{v:.4f}")
     scored("ext3", "lr 3e-3 ends above the starting 0.6683", 0.10, lambda r: (r["val"] > START_VAL, r["val"]), lambda v: f"{v:.4f}")
     stamp = dict(updated=iso(time.time()))
     for name, rows in (("runs", runs), ("curves", curves), ("checkpoints", ckpts), ("predictions", P)):
