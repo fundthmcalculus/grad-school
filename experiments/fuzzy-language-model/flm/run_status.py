@@ -56,14 +56,19 @@ def main():
     a = ap.parse_args()
     log = Path(a.log)
     rows, evals = [], []
-    for line in (
-        log.read_text(encoding="utf-8", errors="replace").splitlines()
-        if log.exists()
-        else []
-    ):
-        m = PAT.match(line)
-        if m:
-            evals.append(tuple(map(float, m.groups())))
+    # a resumed run rewrites its log: the lines of the earlier attempt are kept in "*.log.bak" next to it and merged by step
+    by_step = {}
+    for f in sorted(log.parent.glob("*.bak")) + [log]:
+        for line in (
+            f.read_text(encoding="utf-8", errors="replace").splitlines()
+            if f.exists()
+            else []
+        ):
+            m = PAT.match(line)
+            if m:
+                e = tuple(map(float, m.groups()))
+                by_step[e[0]] = e
+    evals = [by_step[k] for k in sorted(by_step)]
     t_now = time.time()
     for step, total, train, val, secs in evals:
         rows.append(

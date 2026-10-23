@@ -177,6 +177,11 @@ def get_args(argv=None):
         help="auto (newest in --ckpt-dir), a checkpoint file or directory, or wandb:<entity>/<project>/<artifact>:latest",
     )
     p.add_argument(
+        "--resume-ignore",
+        default="",
+        help="comma-separated arguments allowed to differ from the checkpoint's run (e.g. precision); each change is printed",
+    )
+    p.add_argument(
         "--wandb", default="", help="Weights & Biases project to log to (off if empty)"
     )
     p.add_argument("--wandb-name", default="", help="Weights & Biases run name")
@@ -402,7 +407,9 @@ def main(argv=None):
     if a.resume:
         ck = CK.load(a.resume, a.ckpt_dir)
         if ck is not None:
-            CK.check_compatible(ck["run_key"], a)
+            CK.check_compatible(
+                ck["run_key"], a, [k for k in a.resume_ignore.split(",") if k]
+            )
             model.load_state_dict(ck["model"])
             opt.load_state_dict(ck["opt"])
             rng.bit_generator.state = ck["np_rng"]
