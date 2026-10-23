@@ -60,6 +60,10 @@ def cell(name, arm, seed, out_dir, smoke, big=False):
         a += ["--lr-floor", OV["floor"]]
     if OV["chars"]:
         a[a.index("--chars") + 1] = f"{OV['chars']}e6"
+    if arm.get("layers"):  # scaled-up models (PLAN_SCALEUP14M.md)
+        a[a.index("--layers") + 1] = str(arm["layers"])
+    if arm.get("tsk"):
+        a[a.index("--tsk-dim") + 1] = str(arm["tsk"])
     if arm.get("mixrules"):  # mixer rules per head (random_shape.py)
         a[a.index("--rules") + 1] = str(arm["mixrules"])
     if os.environ.get(
