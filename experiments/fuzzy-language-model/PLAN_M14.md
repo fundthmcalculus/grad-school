@@ -61,3 +61,25 @@ Prediction scoring for this estimate waits for the 300M run's measured speed: st
 Validation **0.66833 bits per character** at 300M characters (0.72319 at step 5,000). F7 (100K) at 300M: 0.956; Pythia-14M zero-shot: 1.248. So the 14M all-fuzzy model is 0.288 bits per character better than the 100K model at the same 300M characters, and 0.308 better than at 30M (0.9449): one seed, one learning rate from a 30M screen (not bracketed above; the 1.5e-2 and 2e-2 screens run next). Training 2,350 s (39 minutes): **31,522 tokens per second** (127,700 characters per second at 4.05 characters per token), including the evaluations.
 Prediction scoring: ends below 0.93 (55%): **right** (0.668); below F7's 0.956 by at least 0.02 (65%): **right**; takes 25-50 minutes (75%): **right** (39); at least 130,000 characters per second (70%): **wrong, narrowly** (127,700); steady-state tokens per second within 10% of 35,560 (65%): **wrong, narrowly** (31,522, 11% below: the 30M run was shorter and carried less evaluation time).
 Revised Pile training-time estimate with the measured 31,522 tokens per second (about 94,600 Pile characters per second at 3.0 characters per token; the preliminary table above used 35,560): 300M characters **53 minutes**; the Chinchilla-style 0.84 billion characters **2.5 hours**; 8.4 billion characters **25 hours**; one epoch of the deduplicated Pile (0.77 trillion characters) **about 94 days**; Pythia's 300B tokens (1.1 trillion characters) **about 134 days**. Hardware multipliers as before (a T4 3-4x slower, estimated; unmeasured).
+
+## Upper-side learning-rate screen (14M, 30M characters, seed 0), and the precision screen (recorded 2026-10-23)
+| lr | bits per character |
+|---|---|
+| 1.5e-3 | 1.0957 |
+| 3e-3 | 1.0368 |
+| 6e-3 | 0.9764 |
+| 1e-2 | 0.9449 |
+| 1.5e-2 | 0.9163 |
+| 2e-2 | **0.8915** |
+The curve is still falling at the highest rate tried (2e-2 is 0.053 better than 1e-2), no run diverged, so the optimum is not bracketed and the 300M run (0.668 at lr 1e-2) used a rate well below the best. The 3M-character probe (91 steps, warm-up 20) that ranked 2e-2 and 6e-2 below 6e-3 was misleading: a short probe measures the first steps, not the rate that is best at 905 steps. Prediction scoring: 1.5e-2 beats 1e-2 by 0.005 (40%): **right** (0.0286); 2e-2 beats 1e-2 (25%): **right**; 2e-2 diverges or is worse by 0.02 (45%): **wrong**; the best of the six is 1e-2 or 1.5e-2 (65%): **wrong** (2e-2).
+**Registered now, before it runs:** lr 3e-2, 4e-2 and 6e-2 (the 100K model's rate), 30M characters, seed 0, warm-up 600. Predictions: the best of the three beats 2e-2 by at least 0.01 (55%); the optimum lies between 2e-2 and 6e-2 (70%), i.e. 6e-2 is worse than the best of 3e-2 and 4e-2; 6e-2 diverges (20%). After it, the 300M run is repeated at the best rate (one seed; about 40 minutes), which I ask about first.
+**Precision screen** (`outputs/v83-precision`, lr 1e-2, 30M characters, seed 0; F7 seeds 0-2):
+| 14M | bits per character (fp32 re-score) | tokens per second | peak GPU memory |
+|---|---|---|---|
+| fp32 | 0.94487 (reproduces the earlier run exactly) | 32,781 | 6,360 MB |
+| tf32 | 0.93582 | 37,670 (1.15x) | 6,360 MB |
+| bf16 | 0.93398 | 39,582 (1.21x) | 5,292 MB |
+| fp16 | 0.93573 | 39,835 (1.22x) | 5,292 MB |
+F7 (100K), seeds 0-2: fp32 mean 1.05619, bf16 re-score mean 1.05704 (+0.0009, neutral); training time 76.7 s in both (1.00x), peak memory 4,143 MB in both.
+Prediction scoring: the fp32 rerun reproduces 0.94487 exactly (85%): **right**; bf16 at least 1.3x on the 14M model (55%): **wrong** (1.21x); tf32 at least 1.3x (50%): **wrong** (1.15x); fp16 at least 1.3x (50%): **wrong** (1.22x); bf16 within 0.01 of fp32 (65%): **wrong in the good direction** (0.011 better, one seed); fp16 diverges or loses 0.02 (35%): **wrong** (no loss); F7 gains under 1.15x (70%): **right** (1.00x); bf16 costs F7 at least 0.02 (30%): **wrong** (+0.0009); peak memory drops by at least 25% under bf16 (60%): **wrong** (-17% on the 14M model, none on F7).
+Decision under the registered rule (within 0.005 of fp32 and at least 1.3x faster): **no mode is adopted as the default**, since the best speed-up is 1.22x. The lower-precision runs are not worse; the 0.009-0.011 gain over fp32 is one seed and is not claimed. The small speed-up fits the earlier finding that this GPU runs the model at about 10% of peak: it is launch- and small-kernel-bound, so bigger matrix units help little; a larger batch or kernel fusion is the lever, and a larger batch needs its own learning-rate screen. The fp16 loss-scaler path ran without incident on the GPU.
