@@ -20,3 +20,16 @@ Characters per second at steady state is between 30K and 70K (70%); 30M characte
 
 ## Not in scope
 No 300M run, no Pile data, no comparison claim; those come after this run is read and the owner decides.
+
+## Results (recorded 2026-10-23; `outputs/v81-m14/`)
+**Learning-rate probe** (3M characters, 91 steps, warm-up 20, seed 0): lr 6e-2 2.0966, lr 2e-2 2.2181, lr 6e-3 **1.3978**; none diverged. 6e-3 is the lowest rate tried, so the best rate may be lower; the recipe's 6e-2 is the wrong regime at 14M.
+**Test run** (30M characters, seed 0, lr 6e-3, warm-up 600, floor 0, batch 16, context 512, 905 steps, 14,067,715 parameters): validation **0.9764 bits per character**; curve 3.92 (step 0), 1.31 (200), 1.20 (400), 1.10 (600), 1.00 (800), 0.976 (905); no divergence. Training time 208 s (wall 251 s including evaluation and start-up).
+| | 14M, 30M characters | F7 (100K), 30M characters | F7, 300M characters | Pythia-14M zero-shot |
+|---|---|---|---|---|
+| TinyStories bits per character | **0.976** | 1.058 (five-seed mean) | 0.956 (floor 0, seed 0) | 1.248 |
+Units note: the result file's `chars_per_sec` field (35,560 here, 96,957 for F7) is **tokens** per second (905 steps x 16 x 512 tokens / 208 s); in characters the 14M run is 30.0M / 208 s = **144,000 characters per second**, against about 333,000 for F7 (30M in 90 s). So the 14M model costs about 2.3x F7 per character, not the 3x the GPU smoke suggested (that smoke included start-up).
+Cost extrapolation (same batch, one job at a time): 30M characters 3.5 minutes; **300M characters about 35 minutes**; 1B about 2 hours (a 1B run is outside the standing 300M ceiling). Peak GPU memory was not recorded (no sampling was running); nvidia-smi showed 7.2 GB during an F7 job on the same card, and this run did not spill (no hang).
+Sample at 30M characters: fluent short sentences with name repetition ("Tom ... Tom and his friend ... Lucy"), the usual 100K-model drift but more coherent clause structure; not rated.
+Prediction scoring: characters per second between 30K and 70K (70%): **right as logged** (35.6K, but that is tokens per second; true characters per second 144K, outside the range); 30M characters at most 20 minutes (70%): **right** (3.5 minutes, far under); no divergence (90%): **right**; lr 6e-2 worse than 2e-2 on the probe (55%): **wrong** (6e-2 was better, 2.10 against 2.22; both far worse than 6e-3); below F7 by at least 0.05 (60%): **right** (-0.082); below 0.98 (35%): **right** (0.976); below Pythia-14M zero-shot 1.248 (97%): **right**; peak memory below 8 GB (75%): **not measured**.
+Reading: at 140x the parameters and the same 30M characters, the scaled-up fuzzy model reaches 0.976, 0.082 better than F7 at the same budget and 0.020 away from F7 trained for ten times as long. Time is cheap: a 300M run is about 35 minutes. This is one seed, one untuned learning rate, and the F7 design scaled by hand, so it says "the design scales and is not slow", nothing more. Pythia-14M's 1.248 on TinyStories is zero-shot (it never saw the corpus) and is not a like-for-like comparison.
+Next (needs the owner): a learning-rate screen at 14M (lower than 6e-3; 3M-character probes are 40 seconds each), then a 300M run (about 35 minutes), then the Pile sample on the other machine.
