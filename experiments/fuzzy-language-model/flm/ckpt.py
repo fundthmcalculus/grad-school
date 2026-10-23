@@ -29,6 +29,8 @@ IGNORE = {
     "wandb_artifacts",
     "eval_every",
     "eval_chars",
+    "eval_batch",
+    "resume_ignore",
     "eval_at_start",
 }
 
@@ -37,8 +39,18 @@ def run_key(args) -> dict:
     return {k: v for k, v in vars(args).items() if k not in IGNORE}
 
 
-def check_compatible(saved: dict, args) -> None:
+def check_compatible(saved: dict, args, ignore=()) -> None:
+    """Refuse a resume whose arguments differ from the checkpoint's; ``ignore`` names arguments the owner has chosen to change on purpose (reported, never silent)."""
     now = run_key(args)
+    for k in ignore:
+        if saved.get(k) != now.get(k):
+            print(
+                f"resume: {k} changed from {saved.get(k)!r} to {now.get(k)!r} on purpose (--resume-ignore)",
+                flush=True,
+            )
+        saved, now = {a: b for a, b in saved.items() if a != k}, {
+            a: b for a, b in now.items() if a != k
+        }
     diff = {
         k: (saved.get(k), now.get(k))
         for k in set(saved) | set(now)

@@ -31,8 +31,10 @@ def main():
     emb["models/index.json"] = base64.b64encode(json.dumps(index).encode()).decode()
     html = (WEB / "index.html").read_text(encoding="utf-8")
     js = (WEB / "flm.js").read_text(encoding="utf-8")
+    sjs = (WEB / "surgery.js").read_text(encoding="utf-8")
     html = html.replace(
-        '<script src="flm.js"></script>', "<script>\n" + js + "\n</script>"
+        '<script src="flm.js"></script>\n<script src="surgery.js"></script>',
+        "<script>\n" + js + "\n</script>\n<script>\n" + sjs + "\n</script>",
     )
     html = html.replace(
         "<!--EMBED-->", "<script>window.FLM_EMBED = " + json.dumps(emb) + ";</script>"

@@ -20,6 +20,20 @@ DATA = Path(__file__).resolve().parents[3] / "data"
 EOT = "<|endoftext|>"
 
 
+def folded_docs(folded_dir, chars):
+    """Validation documents of a streamed Pile sample (``flm.prep_pile``: folded text, one file per shard, documents ended by the unit separator)."""
+    out = []
+    for f in sorted(Path(folded_dir).glob("s*.valid.txt")):
+        out += [d for d in f.read_text(encoding="ascii").split("") if d]
+    keep, n = [], 0
+    for d in out:
+        if n >= chars:
+            break
+        keep.append(d)
+        n += len(d) + len(EOT)
+    return keep
+
+
 def docs(name, chars):
     if name == "tinystories":
         raw = (DATA / "tinystories/TinyStoriesV2-GPT4-valid.txt").read_text(
@@ -69,14 +83,27 @@ if __name__ == "__main__":
     ap.add_argument("--ctx", type=int, default=512)
     ap.add_argument("--device", default="cpu")
     ap.add_argument("--out", default="report/pythia_p0.json")
+    ap.add_argument(
+        "--folded-dir",
+        default="",
+        help="score only the folded validation text of a streamed Pile sample (e.g. data/pile6144/text), same characters our model is scored on",
+    )
     a = ap.parse_args()
     tok = AutoTokenizer.from_pretrained(a.model, revision=a.rev)
     model = AutoModelForCausalLM.from_pretrained(a.model, revision=a.rev).eval()
     model.to(a.device)
     n_par = sum(p.numel() for p in model.parameters())
     res = dict(model=a.model, revision=a.rev, params=n_par, ctx=a.ctx, corpora={})
-    for name in ("tinystories", "simplestories", "cosmopedia"):
-        b, nt, nc = score(model, tok, docs(name, a.chars), a.ctx, a.device)
+    names = (
+        ("pile_folded",)
+        if a.folded_dir
+        else ("tinystories", "simplestories", "cosmopedia")
+    )
+    for name in names:
+        texts = (
+            folded_docs(a.folded_dir, a.chars) if a.folded_dir else docs(name, a.chars)
+        )
+        b, nt, nc = score(model, tok, texts, a.ctx, a.device)
         res["corpora"][name] = dict(bpc=b, target_tokens=nt, target_chars=nc)
         print(name, f"{b:.4f} bpc over {nt} tokens / {nc} chars", flush=True)
     Path(a.out).write_text(json.dumps(res, indent=1))
