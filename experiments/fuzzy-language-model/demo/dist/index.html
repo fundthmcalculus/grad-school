@@ -301,7 +301,10 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
       const n = t.shape.reduce((a, b) => a * b, 1), a = new Float32Array(n);
       if (t.q) {                                          // int8: q x one float32 scale per row of a matrix (one per tensor for a vector); see demo/quantize_model.py
         const rows = t.shape.length >= 2 ? t.shape[0] : 1, per = n / rows, q = new Int8Array(buf, t.offset, n);
-        for (let r = 0; r < rows; r++) { const sc = dv.getFloat32(t.scale_offset + r * 4, true); for (let k = r * per, e = k + per; k < e; k++) a[k] = q[k] * sc; }
+        const scale = new Float32Array(rows);
+        for (let r = 0; r < rows; r++) { const sc = (scale[r] = dv.getFloat32(t.scale_offset + r * 4, true)); for (let k = r * per, e = k + per; k < e; k++) a[k] = q[k] * sc; }
+        T[t.name] = { data: a, shape: t.shape, q, scale };
+        continue;
       } else for (let i = 0; i < n; i++) a[i] = fp16 ? half(dv.getUint16(t.offset + i * 2, true)) : dv.getFloat32(t.offset + i * 4, true);
       T[t.name] = { data: a, shape: t.shape };
     }
@@ -492,14 +495,16 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
     const VLOAD = [0xfd, 0x00, 0x00, 0x00], VSTORE = [0xfd, 0x0b, 0x00, 0x00], VZERO = [0xfd, 0x0c, ...new Array(16).fill(0)];
     const F32LOAD = [0x2a, 0x02, 0x00], F32STORE = [0x38, 0x02, 0x00];
     const VADD = [0xfd, 0xe4, 0x01], VSUB = [0xfd, 0xe5, 0x01], VMUL = [0xfd, 0xe6, 0x01], SPLAT = [0xfd, 0x13], LANE = (k) => [0xfd, 0x1f, k], FADD = [0x92];
+    const VLOADO = (o) => [0xfd, 0x00, 0x00, o], VSTOREO = (o) => [0xfd, 0x0b, 0x00, o];   // memarg offset o (< 128: one byte)
+    const X16LO = [0xfd, 0x87, 0x01], X16HI = [0xfd, 0x88, 0x01], X32LO = [0xfd, 0xa7, 0x01], X32HI = [0xfd, 0xa8, 0x01], CVT = [0xfd, 0xfa, 0x01];   // int8 -> int16 -> int32 -> float32, low and high halves
     const BLOCK = [0x02, 0x40], LOOP = [0x03, 0x40], END = [0x0b], BR = (i) => [0x0c, i], BRIF = (i) => [0x0d, i];
     const hsum = (acc) => [...GET(acc), ...LANE(0), ...GET(acc), ...LANE(1), ...FADD, ...GET(acc), ...LANE(2), ...FADD, ...GET(acc), ...LANE(3), ...FADD];
     function build() {
       const i32 = 0x7f, v128 = 0x7b;
-      const types = section(1, vec([[0x60, ...vec(new Array(6).fill([i32])), 0x00], [0x60, ...vec(new Array(5).fill([i32])), 0x00]]));
+      const types = section(1, vec([[0x60, ...vec(new Array(6).fill([i32])), 0x00], [0x60, ...vec(new Array(5).fill([i32])), 0x00], [0x60, ...vec(new Array(7).fill([i32])), 0x00]]));
       const imp = section(2, vec([[...str('env'), ...str('mem'), 0x02, 0x00, 0x01]]));
-      const funcs = section(3, vec([[0], [1], [1]]));
-      const exp = section(7, vec([[...str('gauss'), 0x00, 0], [...str('matvec'), 0x00, 1], [...str('wsum'), 0x00, 2]]));
+      const funcs = section(3, vec([[0], [1], [1], [1], [1], [0], [1], [2]]));
+      const exp = section(7, vec([[...str('gauss'), 0x00, 0], [...str('matvec'), 0x00, 1], [...str('wsum'), 0x00, 2], [...str('matvec8'), 0x00, 3], [...str('wsum8'), 0x00, 4], [...str('gauss16'), 0x00, 5], [...str('matvec16'), 0x00, 6], [...str('gauss8'), 0x00, 7]]));
       const locals = [[5, i32], [2, v128]];                   // r j rb po Db acc diff -> five i32 then two v128
       const dotLoop = (np, loadA, loadB, accumulate) => [
         ...I32C(0), ...SET(np + 1), ...BLOCK, ...LOOP, ...GET(np + 1), ...GET(np + 4), ...GEU, ...BRIF(1),
@@ -534,8 +539,71 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
           ...BLOCK, ...LOOP, ...GET(r), ...GET(2), ...GEU, ...BRIF(1), ...row,
           ...GET(r), ...I32C(1), ...ADD, ...SET(r), ...GET(rb), ...GET(Db), ...ADD, ...SET(rb), ...GET(po), ...I32C(4), ...ADD, ...SET(po), ...BR(0), ...END, ...END, ...END];
       })();
-      const body = (code) => { const b = [...vec(locals), ...code]; return [...leb(b.length), ...b]; };
-      const codes = section(10, vec([body(g), body(m), body(w)]));
+      // int8 weights: sixteen at a time, widened to four float32 vectors (the per-row scale is the caller's: folded into the strengths for wsum8, applied to the dots for matvec8)
+      // The dot-product kernels keep four independent running sums (one per vector of a sixteen-element step): a single sum makes every add wait for the one before it.
+      const hsum4 = (acc) => [...GET(acc), ...GET(acc + 1), ...VADD, ...GET(acc + 2), ...GET(acc + 3), ...VADD, ...VADD, ...SET(acc), ...hsum(acc)];
+      const zero4 = (acc) => [0, 1, 2, 3].flatMap((k) => [...VZERO, ...SET(acc + k)]);
+      const rowsLoop = (r, rb, po, Rp, outP, stride, row) => [...GET(outP), ...SET(po), ...I32C(0), ...SET(r), ...I32C(0), ...SET(rb),
+        ...BLOCK, ...LOOP, ...GET(r), ...GET(Rp), ...GEU, ...BRIF(1), ...row,
+        ...GET(r), ...I32C(1), ...ADD, ...SET(r), ...GET(rb), ...stride, ...ADD, ...SET(rb), ...GET(po), ...I32C(4), ...ADD, ...SET(po), ...BR(0), ...END, ...END, ...END];
+      const jLoop = (j, bound, step, inner) => [...I32C(0), ...SET(j), ...BLOCK, ...LOOP, ...GET(j), ...bound, ...GEU, ...BRIF(1), ...inner, ...GET(j), ...I32C(step), ...ADD, ...SET(j), ...BR(0), ...END, ...END];
+      // gauss16(u, c, a, R, D, out): gauss for D a multiple of 16; params 0..5; locals r=6 j=7 (byte offset) rb=8 po=9 Db=10, v128 acc 11..14, diff 15
+      const g16 = (() => {
+        const r = 6, j = 7, rb = 8, po = 9, Db = 10, acc = 11, diff = 15;
+        const one = (k) => [...GET(0), ...GET(j), ...ADD, ...VLOADO(16 * k), ...GET(1), ...GET(rb), ...ADD, ...GET(j), ...ADD, ...VLOADO(16 * k), ...VSUB, ...SET(diff),
+          ...GET(acc + k), ...GET(2), ...GET(rb), ...ADD, ...GET(j), ...ADD, ...VLOADO(16 * k), ...GET(diff), ...VMUL, ...GET(diff), ...VMUL, ...VADD, ...SET(acc + k)];
+        const row = [...zero4(acc), ...jLoop(j, GET(Db), 64, [0, 1, 2, 3].flatMap(one)), ...GET(po), ...hsum4(acc), ...F32STORE];
+        return [...GET(4), ...I32C(4), ...MUL, ...SET(Db), ...rowsLoop(r, rb, po, 3, 5, GET(Db), row)];
+      })();
+      // matvec16(M, v, R, D, out): matvec for D a multiple of 16; params 0..4; locals r=5 j=6 rb=7 po=8 Db=9, v128 acc 10..13
+      const m16 = (() => {
+        const r = 5, j = 6, rb = 7, po = 8, Db = 9, acc = 10;
+        const one = (k) => [...GET(acc + k), ...GET(0), ...GET(rb), ...ADD, ...GET(j), ...ADD, ...VLOADO(16 * k), ...GET(1), ...GET(j), ...ADD, ...VLOADO(16 * k), ...VMUL, ...VADD, ...SET(acc + k)];
+        const row = [...zero4(acc), ...jLoop(j, GET(Db), 64, [0, 1, 2, 3].flatMap(one)), ...GET(po), ...hsum4(acc), ...F32STORE];
+        return [...GET(3), ...I32C(4), ...MUL, ...SET(Db), ...rowsLoop(r, rb, po, 2, 4, GET(Db), row)];
+      })();
+      // matvec8(Mq, v, R, D, out): out[r] = sum_j q[r,j] v[j] (D a multiple of 16); locals r=5 j=6 (byte in the int8 row) rb=7 po=8 jf=9 (byte in v), v128 acc 10..13, x=14 y=15
+      const m8 = (() => {
+        const r = 5, j = 6, rb = 7, po = 8, jf = 9, acc = 10, x = 14, y = 15;
+        const grp = (k, ext, src) => [...GET(src), ...ext, ...CVT, ...GET(1), ...GET(jf), ...ADD, ...VLOADO(16 * k), ...VMUL, ...GET(acc + k), ...VADD, ...SET(acc + k)];
+        const inner = [...GET(0), ...GET(rb), ...ADD, ...GET(j), ...ADD, ...VLOAD, ...SET(x),
+          ...GET(x), ...X16HI, ...SET(y), ...GET(x), ...X16LO, ...SET(x),
+          ...grp(0, X32LO, x), ...grp(1, X32HI, x), ...grp(2, X32LO, y), ...grp(3, X32HI, y), ...GET(jf), ...I32C(64), ...ADD, ...SET(jf)];
+        const row = [...zero4(acc), ...I32C(0), ...SET(jf), ...jLoop(j, GET(3), 16, inner), ...GET(po), ...hsum4(acc), ...F32STORE];
+        return [...rowsLoop(r, rb, po, 2, 4, GET(3), row)];
+      })();
+      // wsum8(Mq, s, R, D, out): out[j] = sum_r s[r] q[r,j]       (D a multiple of 16); locals r=5 j=6 rb=7 po=8 (strength pointer) jf=9, v128 sp=10 x=11 y=12
+      const w8 = (() => {
+        const r = 5, j = 6, rb = 7, po = 8, jf = 9, sp = 10, x = 11, y = 12;
+        const zero = [...I32C(0), ...SET(jf), ...BLOCK, ...LOOP, ...GET(jf), ...GET(3), ...I32C(4), ...MUL, ...GEU, ...BRIF(1), ...GET(4), ...GET(jf), ...ADD, ...VZERO, ...VSTORE, ...GET(jf), ...I32C(16), ...ADD, ...SET(jf), ...BR(0), ...END, ...END];
+        const grp = (ext, src, off) => [...GET(4), ...GET(jf), ...ADD, ...GET(4), ...GET(jf), ...ADD, ...VLOADO(off), ...GET(src), ...ext, ...CVT, ...GET(sp), ...VMUL, ...VADD, ...VSTOREO(off)];
+        const inner = [
+          ...GET(0), ...GET(rb), ...ADD, ...GET(j), ...ADD, ...VLOAD, ...SET(x),
+          ...GET(x), ...X16HI, ...SET(y), ...GET(x), ...X16LO, ...SET(x),
+          ...grp(X32LO, x, 0), ...grp(X32HI, x, 16), ...grp(X32LO, y, 32), ...grp(X32HI, y, 48)];
+        const row = [...GET(po), ...F32LOAD, ...SPLAT, ...SET(sp), ...I32C(0), ...SET(j), ...I32C(0), ...SET(jf), ...BLOCK, ...LOOP, ...GET(j), ...GET(3), ...GEU, ...BRIF(1),
+          ...inner, ...GET(j), ...I32C(16), ...ADD, ...SET(j), ...GET(jf), ...I32C(64), ...ADD, ...SET(jf), ...BR(0), ...END, ...END];
+        return [...zero, ...GET(1), ...SET(po), ...I32C(0), ...SET(r), ...I32C(0), ...SET(rb),
+          ...BLOCK, ...LOOP, ...GET(r), ...GET(2), ...GEU, ...BRIF(1), ...row,
+          ...GET(r), ...I32C(1), ...ADD, ...SET(r), ...GET(rb), ...GET(3), ...ADD, ...SET(rb), ...GET(po), ...I32C(4), ...ADD, ...SET(po), ...BR(0), ...END, ...END, ...END];
+      })();
+      // gauss8(u, cq, cs, a, R, D, out): gauss with int8 centres (per-row scale at cs) and float widths; params 0..6; locals r=7 j=8 (byte in the int8 row) jf=9 (byte in a float row) rq=10 rf=11 po=12 sp=13, v128 acc 14..17 x=18 y=19 sc=20 diff=21
+      const g8 = (() => {
+        const r = 7, j = 8, jf = 9, rq = 10, rf = 11, po = 12, sp = 13, acc = 14, x = 18, y = 19, sc = 20, diff = 21;
+        const one = (k, ext, src) => [...GET(0), ...GET(jf), ...ADD, ...VLOADO(16 * k), ...GET(src), ...ext, ...CVT, ...GET(sc), ...VMUL, ...VSUB, ...SET(diff),
+          ...GET(acc + k), ...GET(3), ...GET(rf), ...ADD, ...GET(jf), ...ADD, ...VLOADO(16 * k), ...GET(diff), ...VMUL, ...GET(diff), ...VMUL, ...VADD, ...SET(acc + k)];
+        const inner = [...GET(1), ...GET(rq), ...ADD, ...GET(j), ...ADD, ...VLOAD, ...SET(x),
+          ...GET(x), ...X16HI, ...SET(y), ...GET(x), ...X16LO, ...SET(x),
+          ...one(0, X32LO, x), ...one(1, X32HI, x), ...one(2, X32LO, y), ...one(3, X32HI, y), ...GET(jf), ...I32C(64), ...ADD, ...SET(jf)];
+        const row = [...GET(sp), ...F32LOAD, ...SPLAT, ...SET(sc), ...zero4(acc), ...I32C(0), ...SET(jf), ...jLoop(j, GET(5), 16, inner), ...GET(po), ...hsum4(acc), ...F32STORE];
+        return [...GET(6), ...SET(po), ...GET(2), ...SET(sp), ...I32C(0), ...SET(r), ...I32C(0), ...SET(rq), ...I32C(0), ...SET(rf),
+          ...BLOCK, ...LOOP, ...GET(r), ...GET(4), ...GEU, ...BRIF(1), ...row,
+          ...GET(r), ...I32C(1), ...ADD, ...SET(r), ...GET(rq), ...GET(5), ...ADD, ...SET(rq), ...GET(rf), ...GET(5), ...I32C(4), ...MUL, ...ADD, ...SET(rf), ...GET(po), ...I32C(4), ...ADD, ...SET(po), ...GET(sp), ...I32C(4), ...ADD, ...SET(sp), ...BR(0), ...END, ...END, ...END];
+      })();
+      const localsG8 = [[7, i32], [8, v128]];
+      const locals8 = [[5, i32], [3, v128]], localsM8 = [[5, i32], [6, v128]], localsG16 = [[5, i32], [5, v128]], localsM16 = [[5, i32], [4, v128]];
+      const body = (code, loc) => { const b = [...vec(loc || locals), ...code]; return [...leb(b.length), ...b]; };
+      const codes = section(10, vec([body(g), body(m), body(w), body(m8, localsM8), body(w8, locals8), body(g16, localsG16), body(m16, localsM16), body(g8, localsG8)]));
       return new Uint8Array([0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, ...types, ...imp, ...funcs, ...exp, ...codes]);
     }
     let cached;
@@ -555,28 +623,33 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
   function initKernels(m) {                                // the big weight arrays move into one WebAssembly memory (the model's own arrays become views of it, so in-place edits such as surgery still work)
     if (!Wasm.ok()) return null;
     const { V, d, L, W } = m;
-    let floats = V * d + 16 * d + 8 * V + 64;
+    let floats = m.embH.length + 16 * d + 8 * V + 64, q8 = FLM.int8Kernels !== false && d % 16 === 0;   // q8: the slopes and consequents stay int8 in the kernels' memory (a quarter of the bytes to stream)
     for (let l = 0; l < L; l++) {
       const fc = W['blocks.' + l + '.ffn.centers'], R = fc.shape[0], D = fc.shape[1];
       if (D % 4 || d % 4) return null;
-      floats += 2 * R * D + 2 * R * d + 8 * R + 4 * D;
+      if (!(W['blocks.' + l + '.ffn.slope.weight'].q && W['blocks.' + l + '.ffn.conseq'].q)) q8 = false;
+      floats += 2 * R * D + 2 * R * d + 8 * R + 4 * D + (R * d) / 2;
     }
     const pages = Math.ceil(((floats + 4096) * 4) / 65536) + 1;
     let mem; try { mem = new WebAssembly.Memory({ initial: pages }); } catch (e) { return null; }
     const ex = Wasm.make(mem); if (!ex) return null;
     let off = 0;
     const alloc = (n, src) => { const o = off; off += (n + 3) & ~3; const v = new Float32Array(mem.buffer, o * 4, n); if (src) v.set(src); return { o: o * 4, v }; };
-    const E = alloc(V * d, m.E); m.E = E.v;
+    const allocB = (n, src) => { const o = off; off += ((n + 15) >> 4) << 2; const v = new Int8Array(mem.buffer, o * 4, n); if (src) v.set(src); return { o: o * 4, v }; };
+    const Eh = alloc(m.embH.length, m.embH);               // the crisp head rows only: the tail's scores are built from the prototypes (see step)
     const layers = [];
     for (let l = 0; l < L; l++) {
       const b = 'blocks.' + l + '.ffn.', fc = W[b + 'centers'], R = fc.shape[0], D = fc.shape[1];
-      const c = alloc(R * D, fc.data), sw = alloc(R * d, W[b + 'slope.weight'].data), cq = alloc(R * d, W[b + 'conseq'].data), a = alloc(R * D, m.A[l].ffn);
-      fc.data = c.v; W[b + 'slope.weight'].data = sw.v; W[b + 'conseq'].data = cq.v; m.A[l].ffn = a.v;
+      const c = alloc(R * D, fc.data), a = alloc(R * D, m.A[l].ffn);
+      fc.data = c.v; m.A[l].ffn = a.v;
+      if (q8) { const sq = W[b + 'slope.weight'], cqq = W[b + 'conseq']; layers.push({ c, sw: allocB(R * d, sq.q), cq: allocB(R * d, cqq.q), swS: sq.scale, cqS: cqq.scale, a, R, D }); continue; }
+      const sw = alloc(R * d, W[b + 'slope.weight'].data), cq = alloc(R * d, W[b + 'conseq'].data);
+      W[b + 'slope.weight'].data = sw.v; W[b + 'conseq'].data = cq.v;
       layers.push({ c, sw, cq, a, R, D });
     }
     const maxR = Math.max(...layers.map((q) => q.R)), maxD = Math.max(...layers.map((q) => q.D));
     const buf = { u: alloc(maxD), n2: alloc(d), fl: alloc(maxR), dots: alloc(maxR), st: alloc(maxR), dx: alloc(d), go: alloc(d), logits: alloc(V) };
-    return { ex, mem, E, layers, buf };
+    return { ex, mem, Eh, layers, buf, q8 };
   }
 
   class AllFuzzyModel {
@@ -594,12 +667,22 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
         const lg = embT.subarray(t * K, t * K + K), mu = c.tanh ? lg.map(Math.tanh) : softmaxF(lg), id = tailIds[t];
         for (let j = 0; j < d; j++) { let a = 0; for (let k = 0; k < K; k++) a += up[j * K + k] * mu[k]; this.E[id * d + j] = a; }
       }
+      // output scores without the full table: a head row's score is its own dot product; a tail piece's row is up . mu (its memberships over the K prototypes), so its score is mu . (up^T go): K dot products once per step
+      this.embH = embH; this.headIds = headIds; this.tailIds = tailIds; this.up = up; this.KP = K;
+      this.tailMu = new Float32Array(tailIds.length * K);
+      for (let t = 0; t < tailIds.length; t++) { const lg = embT.subarray(t * K, t * K + K), mu = c.tanh ? lg.map(Math.tanh) : softmaxF(lg); this.tailMu.set(mu, t * K); }
       this.nw = g('norm.weight');
       const wd = (k) => { const x = g(k), o = x.length > 65536 ? new Float32Array(x.length) : new Float64Array(x.length); for (let i = 0; i < x.length; i++) o[i] = Math.exp(-2 * x[i]); return o; };   // large width arrays in float32: half the memory traffic
       this.A = [];                                         // 1 / s^2 of every membership function
       for (let l = 0; l < this.L; l++) { const b = 'blocks.' + l + '.'; this.A.push({ mem: wd(b + 'mix.log_width'), qkv: wd(b + 'mix.qkv.log_width'), out: wd(b + 'mix.out.log_width'), gate: wd(b + 'mix.gate.log_width'), beta: wd(b + 'mix.beta.log_width'), ffn: wd(b + 'ffn.log_width') }); }
       this.pi = null;
-      this.K = initKernels(this);                           // null where WebAssembly SIMD is missing: the plain loops below then do the work
+      this.K = initKernels(this);
+      if (this.K && this.K.q8) this.requantRow = (l, r) => {            // surgery edited one consequent row (float32 in W): rebuild its int8 row and scale
+        const Kl = this.K.layers[l], d = this.d, cq = this.W['blocks.' + l + '.ffn.conseq'].data;
+        let mx = 0; for (let i = 0; i < d; i++) mx = Math.max(mx, Math.abs(cq[r * d + i]));
+        const sc = Math.max(mx, 1e-12) / 127; Kl.cqS[r] = sc;
+        const q = Kl.cq.v; for (let i = 0; i < d; i++) q[r * d + i] = Math.max(-127, Math.min(127, Math.round(cq[r * d + i] / sc)));
+      };                           // null where WebAssembly SIMD is missing: the plain loops below then do the work
       this.reset();
     }
     reset() {
@@ -661,11 +744,18 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
         if (K) {                                                // squared distances, slopes and the weighted consequents: four lanes at a time, float32
           const Kl = K.layers[l], B = K.buf;
           B.u.v.set(u); B.n2.v.set(n2);
-          K.ex.gauss(B.u.o, Kl.c.o, Kl.a.o, FR, D, B.fl.o);
-          K.ex.matvec(Kl.sw.o, B.n2.o, FR, d, B.dots.o);
+          (D % 16 ? K.ex.gauss : K.ex.gauss16)(B.u.o, Kl.c.o, Kl.a.o, FR, D, B.fl.o);
           const q = B.fl.v, dt = B.dots.v, sv = B.st.v, c0 = -0.5 / D;
-          for (let r = 0; r < FR; r++) { const s_ = Math.exp(c0 * q[r]) * (sb[r] + dt[r]); st[r] = s_; sv[r] = s_; }
-          K.ex.wsum(Kl.cq.o, B.st.o, FR, d, B.dx.o);
+          if (K.q8) {                                           // int8 slopes and consequents: the row scales are folded into the dots and the strengths
+            K.ex.matvec8(Kl.sw.o, B.n2.o, FR, d, B.dots.o);
+            const ss = Kl.swS, cs = Kl.cqS;
+            for (let r = 0; r < FR; r++) { const s_ = Math.exp(c0 * q[r]) * (sb[r] + dt[r] * ss[r]); st[r] = s_; sv[r] = s_ * cs[r]; }
+            K.ex.wsum8(Kl.cq.o, B.st.o, FR, d, B.dx.o);
+          } else {
+            (d % 16 ? K.ex.matvec : K.ex.matvec16)(Kl.sw.o, B.n2.o, FR, d, B.dots.o);
+            for (let r = 0; r < FR; r++) { const s_ = Math.exp(c0 * q[r]) * (sb[r] + dt[r]); st[r] = s_; sv[r] = s_; }
+            K.ex.wsum(Kl.cq.o, B.st.o, FR, d, B.dx.o);
+          }
           const dx = B.dx.v; for (let i = 0; i < d; i++) x[i] += dx[i];
           this.prevN2[l] = n2; strengths.push(st);
           continue;
@@ -679,14 +769,16 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
         this.prevN2[l] = n2; strengths.push(st);
       }
       const gf = this.gain(x, 'norm.'), logits = new Float32Array(this.V);
-      const E = this.E, go = gf.out, d4 = d - (d % 4);
-      if (this.K) { const B = this.K.buf; B.go.v.set(go); this.K.ex.matvec(this.K.E.o, B.go.o, this.V, d, B.logits.o); logits.set(B.logits.v); }
-      else for (let v = 0; v < this.V; v++) {
-        let a0 = 0, a1 = 0, a2 = 0, a3 = 0, i = 0; const r = v * d;
-        for (; i < d4; i += 4) { a0 += E[r + i] * go[i]; a1 += E[r + i + 1] * go[i + 1]; a2 += E[r + i + 2] * go[i + 2]; a3 += E[r + i + 3] * go[i + 3]; }
-        for (; i < d; i++) a0 += E[r + i] * go[i];
-        logits[v] = a0 + a1 + a2 + a3;
+      const go = gf.out, nh = this.headIds.length, KP = this.KP, up = this.up, tailIds = this.tailIds, tmu = this.tailMu;
+      let hd;
+      if (this.K) { const B = this.K.buf; B.go.v.set(go); (d % 16 ? this.K.ex.matvec : this.K.ex.matvec16)(this.K.Eh.o, B.go.o, nh, d, B.logits.o); hd = B.logits.v; }
+      else {
+        hd = new Float32Array(nh); const eh = this.embH;
+        for (let i = 0; i < nh; i++) { let a0 = 0, a1 = 0, a2 = 0, a3 = 0, j = 0; const r = i * d; for (; j < d - (d % 4); j += 4) { a0 += eh[r + j] * go[j]; a1 += eh[r + j + 1] * go[j + 1]; a2 += eh[r + j + 2] * go[j + 2]; a3 += eh[r + j + 3] * go[j + 3]; } for (; j < d; j++) a0 += eh[r + j] * go[j]; hd[i] = a0 + a1 + a2 + a3; }
       }
+      for (let i = 0; i < nh; i++) logits[this.headIds[i]] = hd[i];
+      const z = new Float64Array(KP); for (let j = 0; j < d; j++) { const gj = go[j], o = j * KP; for (let k = 0; k < KP; k++) z[k] += up[o + k] * gj; }
+      for (let t = 0; t < tailIds.length; t++) { let a = 0; const o = t * KP; for (let k = 0; k < KP; k++) a += tmu[o + k] * z[k]; logits[tailIds[t]] = a; }
       this.pos++;
       return opts && opts.explain ? { logits, gates: strengths, s: Math.exp(gf.gain), xPre: Float64Array.from(x) } : { logits };
     }
@@ -946,6 +1038,7 @@ svg .cellr { fill: var(--accent); } svg .hl { fill: none; stroke: var(--warn); s
     for (const e of plan_.rules) {
       const cq = model.W['blocks.' + e.layer + '.ffn.conseq'].data, d = model.d;
       for (let i = 0; i < d; i++) cq[e.rule * d + i] += sign * e.dC[i];
+      if (model.requantRow) model.requantRow(e.layer, e.rule);   // int8 kernels: rebuild this rule's row
     }
     model.pi = null; model.rows = null;            // the rule profiles are derived from the consequents
   }

@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
-const FLM = require('./flm.js');
+const FLM = require('./flm.js'); if (process.env.FLM_NOQ8) FLM.int8Kernels = false;   // A/B: dequantise at load, float32 kernels
 const here = dirname(fileURLToPath(import.meta.url));
 const web = resolve(process.argv[2] || here), id = process.argv[3] || 'flm-allfuzzy-f7';
 const J = (p) => JSON.parse(readFileSync(join(web, p), 'utf8'));
