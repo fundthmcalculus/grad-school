@@ -75,3 +75,15 @@ Prediction scoring: both seeds beat their reference by 0.005 (60%): **wrong**; g
 Decision: `--batch 8 --wd 0.05` is **not** adopted; the recipe stays at batch 16, wd 0.01. The stage-1 screens at 30M are not evidence about 300M for these two settings.
 What the data do and do not say: at equal characters the new arm is behind throughout (seed 0: 1.122/1.074/1.001 at 20/41/62M characters against 1.014 for the reference at 41M), so it is not a late failure. Untested explanations, none confirmed: (a) the learning rate 6e-2 and warm-up 1000 were tuned at batch 16 and are too high or too short at batch 8 over a long run; (b) wd 0.05 over-regularises a model that sees 10x more data; (c) the 30M screen rewards fast early progress that a long run does not need. Separating these needs 300M cells (about 14 minutes each): batch 8 with wd 0.01 isolates (b); batch 8 with lr 4e-2 isolates (a). Not run; asking first.
 Lesson recorded for the next round: a 30M screen that changes the number of optimiser steps is not a predictor of the 300M result; screens of step-count levers should be confirmed at 300M before any claim.
+
+## Stage 3: different levers (owner, 2026-10-23: "screen different levers; not as worried about a perfect meta-parameter search yet")
+The optimisation setup is closed for now (batch 16, wd 0.01, lr 6e-2 stay). This stage screens levers that **do not change the number of optimiser steps** (the stage-2 lesson), at 30M, five seeds, F7, paired with R0 (1.0579); each arm differs from R0 by the flags shown. The report prints the parameter count of each arm; an arm that changes it is flagged and not called a win without a size-matched comparison.
+| arm | flags | what it tests | cost |
+|---|---|---|---|
+| `ema` | `--ema-decay 0.999` | weight averaging; the score is `val_bpc_ema` | none |
+| `l4u2` | `--layers 4 --n-unique 2` | depth by sharing the two blocks (twice the applications, the same parameters) | about 2x compute |
+| `h4` | `--heads 4` | fewer mixer heads, wider each (parameter count to be read off the result) | none |
+| `h16` | `--heads 16` | more mixer heads | none |
+| `expsqrt` | `--exp-norm sqrt --ffn-exp-norm sqrt` | the Gaussian exponent normalisation of every TSK layer | none |
+Rule: at least 0.005 BPC better on four of five seeds; a pass gets a 300M confirmation (two seeds, warm-up 1000, unchanged steps) before it is quoted; I ask before that run.
+Predictions (pass probability): ema 15% (the floor-0 decay already averages the end of training); l4u2 35% (shared depth helps tiny models in the literature, but these blocks are not tied by design); h4 15%; h16 15%; expsqrt 10%. At most one arm passes (75%). `ema` improves on R0 by any amount (55%).
