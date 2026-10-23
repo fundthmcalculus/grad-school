@@ -62,6 +62,10 @@ def cell(name, arm, seed, out_dir, smoke, big=False):
         a[a.index("--chars") + 1] = f"{OV['chars']}e6"
     if arm.get("mixrules"):  # mixer rules per head (random_shape.py)
         a[a.index("--rules") + 1] = str(arm["mixrules"])
+    if os.environ.get(
+        "SHAPE_DEVICE"
+    ):  # cpu: a smoke run on a machine whose GPU is busy
+        a[a.index("--device") + 1] = os.environ["SHAPE_DEVICE"]
     a += EXTRA
     if smoke:
         a[a.index("--chars") + 1] = "0.4e6"

@@ -40,3 +40,9 @@ cosmopedia/
 # Recover: cd experiments/fuzzy-language-model && PYTHONPATH=. python -m flm.prep_simplestories
 # (pinned revision e63b8adc3b1a1bdc7cac5b500d150b71346b0628)
 simplestories/
+
+# Pile sample (EleutherAI/the_pile_deduplicated at revision fcbfcfde4222cbb1acd1d33bad0be250ee14b1bb, mixed licences; internal comparison only) streamed by experiments/fuzzy-language-model/flm/prep_pile.py, and the mixed TinyStories + SimpleStories corpus of flm/prep_mix.py.
+# Recover: cd experiments/fuzzy-language-model && PYTHONPATH=. python -m flm.prep_pile --name pile6144 --shards 40 --train-chars 330e6 --valid-chars 4e6 --tokenizer bpe:6144
+#          cd experiments/fuzzy-language-model && PYTHONPATH=. python -m flm.prep_mix --chars 330e6 --vocab 6144
+pile*/
+mix*/
