@@ -194,12 +194,14 @@ def _core(self, h):
         else:
             lh = h @ self.emb_h.weight.T
         out = h.new_empty(*h.shape[:-1], self.cfg.vocab_size)
-        out[..., self.t_head_ids] = lh
-        out[..., self.t_tail_ids] = lt
+        out[..., self.t_head_ids] = lh.to(
+            out.dtype
+        )  # autocast: lh is bf16/fp16, the buffer fp32
+        out[..., self.t_tail_ids] = lt.to(out.dtype)
         if hasattr(self, "emb_m"):
-            out[..., self.t_mid_ids] = (h @ self.mid_up.weight) @ _mu(
-                self.emb_m.weight
-            ).T
+            out[..., self.t_mid_ids] = (
+                (h @ self.mid_up.weight) @ _mu(self.emb_m.weight).T
+            ).to(out.dtype)
     if PRIOR:
         out = out + self.prior_alpha * self.tok_logp
     if GAIN or BIAS or TIER:
