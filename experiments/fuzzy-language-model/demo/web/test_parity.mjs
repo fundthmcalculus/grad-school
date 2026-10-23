@@ -5,7 +5,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 const FLM = require('./flm.js');
-const here = dirname(fileURLToPath(import.meta.url));
+const here = process.env.FLM_WEB || dirname(fileURLToPath(import.meta.url));   // FLM_WEB: test another demo folder (a local build with more models)
 const J = (p) => JSON.parse(readFileSync(join(here, p), 'utf8'));
 const buf = (p) => { const b = readFileSync(join(here, p)); return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength); };
 let bad = 0;

@@ -18,13 +18,21 @@ DIST = Path(__file__).resolve().parent / "dist"
 def main():
     everything = "--all" in sys.argv
     index = json.loads((WEB / "models" / "index.json").read_text())
+    remote = None
+    if (
+        "--remote-dir" in sys.argv
+    ):  # models hosted beside the page, not embedded: their index entries (remote: true) and files in <dir>/models
+        remote = Path(sys.argv[sys.argv.index("--remote-dir") + 1])
+        index += json.loads((remote / "models" / "index.json").read_text())
     if not everything:
-        index = [m for m in index if m["params"] < 100_000]
+        index = [m for m in index if m["params"] < 100_000 or m.get("remote")]
     files = {"tokenizer.json": WEB / "tokenizer.json"}
     for tok in sorted({m["tok"] for m in index if m["tok"] != "bpe1024"}):
         name = f"tokenizer-{tok.removeprefix('bpe')}.json"
         files[name] = WEB / name
     for m in index:
+        if m.get("remote"):
+            continue
         for ext in ("json", "bin", "rules.json"):
             files[f"models/{m['id']}.{ext}"] = WEB / "models" / f"{m['id']}.{ext}"
     emb = {k: base64.b64encode(p.read_bytes()).decode() for k, p in files.items()}
@@ -39,10 +47,25 @@ def main():
     html = html.replace(
         "<!--EMBED-->", "<script>window.FLM_EMBED = " + json.dumps(emb) + ";</script>"
     )
-    DIST.mkdir(exist_ok=True)
-    out = DIST / "index.html"
+    if (
+        "--out" in sys.argv
+    ):  # write elsewhere (the gh-pages build with a hosted model keeps the committed dist unchanged)
+        out = Path(sys.argv[sys.argv.index("--out") + 1])
+        out.parent.mkdir(parents=True, exist_ok=True)
+    else:
+        DIST.mkdir(exist_ok=True)
+        out = DIST / "index.html"
     out.write_text(html, encoding="utf-8")
     print(f"{out}  {out.stat().st_size / 1e6:.2f} MB  ({len(index)} models)")
+    if remote:
+        print(
+            "hosted beside the page (publish next to index.html):",
+            [
+                str(p.relative_to(remote))
+                for p in sorted((remote / "models").glob("*"))
+                if p.name != "index.json" and not p.name.endswith(".check.json")
+            ],
+        )
 
 
 if __name__ == "__main__":
