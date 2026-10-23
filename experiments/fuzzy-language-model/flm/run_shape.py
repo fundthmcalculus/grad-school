@@ -60,6 +60,8 @@ def cell(name, arm, seed, out_dir, smoke, big=False):
         a += ["--lr-floor", OV["floor"]]
     if OV["chars"]:
         a[a.index("--chars") + 1] = f"{OV['chars']}e6"
+    if arm.get("mixrules"):  # mixer rules per head (random_shape.py)
+        a[a.index("--rules") + 1] = str(arm["mixrules"])
     a += EXTRA
     if smoke:
         a[a.index("--chars") + 1] = "0.4e6"
@@ -109,8 +111,10 @@ if __name__ == "__main__":
             else ("outputs/v70-shape300" if big else "outputs/v69-shape")
         )
     )
+    if os.environ.get("SHAPE_OUT"):  # random_shape.py: its own results directory
+        out_dir = Path(os.environ["SHAPE_OUT"])
     (out_dir / "logs").mkdir(parents=True, exist_ok=True)
-    table = json.load(open("report/shape_arms.json"))
+    table = json.load(open(os.environ.get("SHAPE_ARMS", "report/shape_arms.json")))
     names = sys.argv[1:] or list(table)
     seeds = [
         int(s) for s in os.environ.get("SEEDS", "0,1" if big else "0,1,2").split(",")
