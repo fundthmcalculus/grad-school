@@ -25,3 +25,15 @@ Predictions: (B) is within 0.01 of (A) (60%); (C) beats (B) by at least 0.005 on
 1. **Context in the logic layer.** A TSK system maps one vector to one vector, so a layer made only of TSK systems cannot see earlier tokens. I propose keeping the fuzzy delta-rule memory mixer (the current all-fuzzy mixer, itself a fuzzy rule system but not strictly order-1 TSK) as the logic layer's routing, with the order-1 TSK feed-forward rules after it. The strict alternative is an order-1 TSK over a window of the last few meaning vectors; it is smaller but sees little history.
 2. **Scale of the first test:** 100K budget (recommended), or straight to the 14M model.
 3. **Go for the 100K screen** (about 40 minutes of GPU in total for four arms and five seeds).
+
+## 10K-parameter first test (owner: "start as small as possible"; registered 2026-10-26 before any run)
+**Setting.** Character-level TinyStories (98 symbols, so the codebook is 98 x 16 = 1,568 parameters; BPE vocabularies would eat the whole budget), d = 16, two blocks, two mixer heads, the all-fuzzy blocks of `run_allfuzzy` (fuzzy norm and gates, rule-gated low-rank projections, raw-input first-order TSK feed-forward rules), context 256, batch 32. Runner `flm/run_bijective.py`, arms by env `BIJ`; F = 2 couplings, 4 rules per TSK system, s_max 0.75 (1,408 parameters at d = 16).
+**Arms, sized to the same total:** `tied` 9,963 parameters (the usual tied dot-product head; feed-forward rules 42 / 29); `ident` 9,964 (codebook with the distance likelihood and F = identity, same rules); `z` and `c` 9,946 each (F in, rules 32 / 21 pay for it). Parameter counts are measured, not estimated; the F arms carry 10 fewer layer-1 rules and 8 fewer layer-0 rules than the control.
+**Protocol.** One learning-rate screen per arm (10M characters, seed 0, lr 1.5e-2 / 4e-2 / 1e-1, warm-up 100, final-lr floor 0.1), then the best rate per arm at 30M characters, seeds 0-4, paired by seed; a gain counts when it is at least 0.005 bits per character on 4 of 5 seeds. If the best rate is an end of the screen's range it is reported as unbracketed. Every log line carries tau and the float32 round-trip recovery of the codebook.
+**Predictions.**
+- `tied` ends between 1.7 and 2.1 bits per character at 30M (70%).
+- `ident` within 0.03 of `tied` (60%).
+- `z` beats `ident` by the gain rule (35%); `c` beats `ident` by the gain rule (30%); `c` is worse than `z` (60%).
+- Round-trip recovery stays 1.0000 on every evaluation of every F arm (80%); tau ends in 0.3-3 (60%).
+- The best lr is the middle value for at least three of the four arms (50%).
+**Reading rule.** If neither F arm beats `ident`, the invertible layer does not pay for its 1,408 parameters at this size, and I say so; if `z` beats `ident` but `c` does not, the geometry helps but the routed-back inverse does not.
