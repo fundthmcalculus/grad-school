@@ -37,3 +37,6 @@ Predictions: (B) is within 0.01 of (A) (60%); (C) beats (B) by at least 0.005 on
 - Round-trip recovery stays 1.0000 on every evaluation of every F arm (80%); tau ends in 0.3-3 (60%).
 - The best lr is the middle value for at least three of the four arms (50%).
 **Reading rule.** If neither F arm beats `ident`, the invertible layer does not pay for its 1,408 parameters at this size, and I say so; if `z` beats `ident` but `c` does not, the geometry helps but the routed-back inverse does not.
+
+## Owner's constraint (2026-10-26): the invertible layer is non-negotiable
+The meaning layer F stays in every arm of the design whatever the 10K numbers say. The reading rule above is therefore not a go/no-go: if F does not beat `ident` at this size, the finding is "this F, at this size and with this training, costs more than it returns", and the next steps vary *how F is built* (more couplings or rules, a different s_max, initialisation as the identity, the codebook's own fuzzy structure, an auxiliary loss on the round trip) rather than whether to have it. The `ident` and `tied` arms stay as controls so any gain or loss is attributable, not as candidates to replace F.
