@@ -67,6 +67,7 @@
     for (const e of plan_.rules) {
       const cq = model.W['blocks.' + e.layer + '.ffn.conseq'].data, d = model.d;
       for (let i = 0; i < d; i++) cq[e.rule * d + i] += sign * e.dC[i];
+      if (model.requantRow) model.requantRow(e.layer, e.rule);   // int8 kernels: rebuild this rule's row
     }
     model.pi = null; model.rows = null;            // the rule profiles are derived from the consequents
   }
