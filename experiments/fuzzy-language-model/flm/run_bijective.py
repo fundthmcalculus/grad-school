@@ -5,6 +5,7 @@ Arms (env ``BIJ``):
   ident  a codebook C (V x d), distance likelihood  logit_v = -|h - C_v|^2 / (2 tau^2)  (the bijection replaced by the identity: the control that isolates what F adds).
   z      embedding z_v = F(C_v); likelihood in meaning space,  logit_v = -|h - F(C_v)|^2 / (2 tau^2).
   c      embedding z_v = F(C_v); the logic layer's output is routed back through the inverse, u = F^-1(h), likelihood in codebook space,  logit_v = -|u - C_v|^2 / (2 tau^2).
+  ci     as c, with the output stage's lossy norm replaced by an exactly invertible gain G (``flm/invertible_gain.py``): embedding G(F(C_v)), output u = F^-1(G^-1(h)), so  F -> G -> blocks -> G^-1 -> F^-1  is exact when the blocks do nothing.
 F is ``flm.bijective_tsk.FuzzyBijection(d, BIJ_R rules, BIJ_L couplings, s_max BIJ_SMAX)``.  The blocks are the all-fuzzy ones of ``run_allfuzzy`` (fuzzy norm, fuzzy gates, rule-gated projections,
 raw-input first-order TSK feed-forward rules).  train.py / models.py are untouched.  The result file's training log carries ``tau`` and, for the bijective arms, the float32 round-trip recovery rate (see ``recovery``).
 """
@@ -17,6 +18,7 @@ import torch.nn as nn
 
 import flm.train as T
 from flm.bijective_tsk import FuzzyBijection
+from flm.invertible_gain import InvertibleGain
 from flm.fuzzy_parts import install
 from flm.models import TinyLM
 
@@ -57,20 +59,29 @@ def _new_init(self, cfg, *a, **k):
     self.log_tau = nn.Parameter(torch.tensor(0.0))
     del self.emb
     self.up = None
-    if BIJ in ("z", "c"):
+    if BIJ in ("z", "c", "ci"):
         self.F = FuzzyBijection(d, R, L, SMAX)
+    if BIJ == "ci":
+        self.G = InvertibleGain(d)
+        del self.norm  # the lossy norm is replaced by G^-1 in the output stage
 
 
 def _embed(self, idx):
     if BIJ == "tied":
         return self.emb(idx)
     c = self.codebook[idx]
+    if BIJ == "ci":
+        return self.G(self.F(c)[0])
     return self.F(c)[0] if BIJ in ("z", "c") else c
 
 
 def _logits(self, h):
     if BIJ == "tied":
         return self.norm(h) @ self.emb.weight.T
+    if BIJ == "ci":
+        h, target = self.F.inverse(self.G.inverse(h)), self.codebook
+        d2 = (h * h).sum(-1, keepdim=True) - 2.0 * h @ target.T + (target * target).sum(-1)
+        return -0.5 * d2 * torch.exp(-2.0 * self.log_tau)
     h = self.norm(h)
     if BIJ == "c":
         h, target = self.F.inverse(h), self.codebook
@@ -85,10 +96,13 @@ def _logits(self, h):
 @torch.no_grad()
 def recovery(self):
     """Fraction of codewords recovered at the nearest-codeword decode after the float32 round trip F^-1(F(C)) (1.0 means the bijection holds in float32)."""
-    if BIJ not in ("z", "c"):
+    if BIJ not in ("z", "c", "ci"):
         return None
     c = self.codebook.detach().float()
-    back = self.F.float().inverse(self.F.float()(c)[0])
+    z = self.F.float()(c)[0]
+    if BIJ == "ci":
+        z = self.G.float().inverse(self.G.float()(z))
+    back = self.F.float().inverse(z)
     return (torch.cdist(back, c).argmin(-1) == torch.arange(c.shape[0], device=c.device)).float().mean().item()
 
 
