@@ -80,7 +80,11 @@ def _logits(self, h):
         return self.norm(h) @ self.emb.weight.T
     if BIJ == "ci":
         h, target = self.F.inverse(self.G.inverse(h)), self.codebook
-        d2 = (h * h).sum(-1, keepdim=True) - 2.0 * h @ target.T + (target * target).sum(-1)
+        d2 = (
+            (h * h).sum(-1, keepdim=True)
+            - 2.0 * h @ target.T
+            + (target * target).sum(-1)
+        )
         return -0.5 * d2 * torch.exp(-2.0 * self.log_tau)
     h = self.norm(h)
     if BIJ == "c":
@@ -103,7 +107,12 @@ def recovery(self):
     if BIJ == "ci":
         z = self.G.float().inverse(self.G.float()(z))
     back = self.F.float().inverse(z)
-    return (torch.cdist(back, c).argmin(-1) == torch.arange(c.shape[0], device=c.device)).float().mean().item()
+    return (
+        (torch.cdist(back, c).argmin(-1) == torch.arange(c.shape[0], device=c.device))
+        .float()
+        .mean()
+        .item()
+    )
 
 
 def _n_params(self, exclude_embedding=False):
@@ -120,7 +129,11 @@ def _evaluate_logged(model, *a, **k):
     out = _evaluate(model, *a, **k)
     if BIJ != "tied":
         rec = model.recovery()
-        print(f"  tau {torch.exp(model.log_tau).item():.4f}" + (f"  float32 round-trip recovery {rec:.4f}" if rec is not None else ""), flush=True)
+        print(
+            f"  tau {torch.exp(model.log_tau).item():.4f}"
+            + (f"  float32 round-trip recovery {rec:.4f}" if rec is not None else ""),
+            flush=True,
+        )
     return out
 
 

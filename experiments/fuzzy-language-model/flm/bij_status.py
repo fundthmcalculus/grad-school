@@ -37,7 +37,9 @@ def chosen(runs):
             if (size, arm) not in best or v < best[(size, arm)][0]:
                 best[(size, arm)] = (v, lr)
     out = {k: v[1] for k, v in best.items()}
-    f = O / "chosen_lr.json"  # the schedule's own choice (phase 1 sweep, neighbour rule for 20K and 70K) wins, so the seeds it ran at that rate are the ones counted
+    f = (
+        O / "chosen_lr.json"
+    )  # the schedule's own choice (phase 1 sweep, neighbour rule for 20K and 70K) wins, so the seeds it ran at that rate are the ones counted
     if f.exists():
         for k, lr in json.loads(f.read_text()).items():
             size, arm = k.split("|")
@@ -52,7 +54,17 @@ def rows():
     for size, arm, seed, lr, p in runs:
         if ch.get((size, arm)) == lr:
             j = json.loads(p.read_text())
-            res.append(dict(size=size, arm=arm, seed=seed, params=j["params_total"], lr=lr, val=round(j["val_bpc"], 5), wall=round(j["train_seconds"], 1)))
+            res.append(
+                dict(
+                    size=size,
+                    arm=arm,
+                    seed=seed,
+                    params=j["params_total"],
+                    lr=lr,
+                    val=round(j["val_bpc"], 5),
+                    wall=round(j["train_seconds"], 1),
+                )
+            )
     return sorted(res, key=lambda r: (r["size"], r["arm"], r["seed"]))
 
 
@@ -60,7 +72,14 @@ def sweep():
     res = []
     for size, arm, seed, lr, p in found():
         if seed == 0:
-            res.append(dict(size=size, arm=arm, lr=lr, val=round(json.loads(p.read_text())["val_bpc"], 5)))
+            res.append(
+                dict(
+                    size=size,
+                    arm=arm,
+                    lr=lr,
+                    val=round(json.loads(p.read_text())["val_bpc"], 5),
+                )
+            )
     return sorted(res, key=lambda r: (r["size"], r["arm"], r["lr"]))
 
 
@@ -72,8 +91,19 @@ def curves():
     for size, arm, seed, lr, p in runs:
         log = p.with_suffix(".log")
         if seed == 0 and ch.get((size, arm)) == lr and log.exists():
-            for m in re.finditer(r"^step (\d+)/(\d+) train [\d.]+ val ([\d.]+)", log.read_text(), re.M):
-                res.append(dict(size=size, arm=arm, seed=seed, step=int(m[1]), total=int(m[2]), val=float(m[3])))
+            for m in re.finditer(
+                r"^step (\d+)/(\d+) train [\d.]+ val ([\d.]+)", log.read_text(), re.M
+            ):
+                res.append(
+                    dict(
+                        size=size,
+                        arm=arm,
+                        seed=seed,
+                        step=int(m[1]),
+                        total=int(m[2]),
+                        val=float(m[3]),
+                    )
+                )
     return res
 
 

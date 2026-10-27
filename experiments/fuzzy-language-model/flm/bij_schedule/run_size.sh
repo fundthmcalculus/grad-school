@@ -10,6 +10,7 @@ case $SIZE in
   70k) D=40; T="181 127"; Z="159 111";;
   80k) D=48; T="171 120"; Z="145 102";;
   100k) D=56; T="186 130"; Z="156 109";;
+  200k) D=72; T="307 215"; Z="269 188";;
 esac
 case $ARM in tied|ident) set -- $T;; z|c|ci) set -- $Z;; esac
 mkdir -p $OUT
