@@ -30,7 +30,30 @@ def rows():
     return sorted(res, key=lambda r: (r["size"], r["arm"], r["seed"]))
 
 
+def curves():
+    """Validation against step for every finished run, from its log (one line per evaluation): ``size, arm, seed, step, total, val``."""
+    out = []
+    for d, size in ((O / "final", 10), (O / "final20", 20)):
+        for p in sorted(d.glob("*.json")):
+            m = re.match(r"(tied|ident|z|c)_lr[\d.e-]+_s(\d+)\.json", p.name)
+            if m:
+                out.append((size, m[1], int(m[2]), p))
+    for p in sorted((O / "sizes").glob("*.json")):
+        m = re.match(r"(\d+)k_(tied|ident|z|c)_lr[\d.e-]+_s(\d+)\.json", p.name)
+        if m:
+            out.append((int(m[1]), m[2], int(m[3]), p))
+    res = []
+    for size, arm, seed, p in out:
+        log = p.with_suffix(".log")
+        if log.exists():
+            for m in re.finditer(r"^step (\d+)/(\d+) train [\d.]+ val ([\d.]+)", log.read_text(), re.M):
+                res.append(dict(size=size, arm=arm, seed=seed, step=int(m[1]), total=int(m[2]), val=float(m[3])))
+    return res
+
+
 if __name__ == "__main__":
     r = rows()
     Path(sys.argv[1]).write_text(json.dumps(r))
-    print(len(r), "runs")
+    c = curves()
+    Path(sys.argv[1]).with_name("curves.json").write_text(json.dumps(c))
+    print(len(r), "runs,", len(c), "curve points")
