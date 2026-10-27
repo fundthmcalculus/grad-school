@@ -10,7 +10,8 @@ from pathlib import Path
 BASH = "C:/Program Files/Git/bin/bash.exe"
 O = Path("outputs/bij10k"); OUT = O / "sizes"; OUT.mkdir(exist_ok=True)
 ARMS = ["tied", "ident", "z", "c", "ci"]
-LRS = ["0.01", "0.02", "0.04", "0.08", "0.16"]
+LRS = ["0.01", "0.05", "0.1"]  # the sweep (owner: fewer samples)
+TRIED = ["0.01", "0.02", "0.04", "0.05", "0.08", "0.1", "0.16"]  # every rate with results, new or earlier
 SWEPT = ["10k", "40k", "100k"]
 ALL = ["10k", "20k", "40k", "70k", "100k"]
 N = {"10k": 10, "20k": 20, "40k": 40, "70k": 70, "100k": 100}
@@ -34,15 +35,15 @@ def run(job):
 def phase(jobs, name):
     todo = [j for j in jobs if result(*j) is None]
     print(f"== {name}: {len(todo)} of {len(jobs)} to run", flush=True)
-    with ThreadPoolExecutor(2) as ex:
+    with ThreadPoolExecutor(int(__import__("os").environ.get("WORKERS", "1"))) as ex:
         list(ex.map(run, todo))
 
 def best(size, arm):
-    rows = [(result(size, arm, lr, 0)["val_bpc"], lr) for lr in LRS if result(size, arm, lr, 0)]
+    rows = [(result(size, arm, lr, 0)["val_bpc"], lr) for lr in TRIED if result(size, arm, lr, 0)]
     return min(rows)[1] if rows else None
 
 def snap(x):
-    return min(LRS, key=lambda l: abs(math.log(float(l)) - math.log(x)))
+    return min(TRIED, key=lambda l: abs(math.log(float(l)) - math.log(x)))
 
 chosen = {}
 phase([(s, a, lr, 0) for s in SWEPT for a in ARMS for lr in LRS], "phase 1: lr sweep")
