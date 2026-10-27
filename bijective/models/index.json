@@ -1,0 +1,14 @@
+[
+ {
+  "id": "bij-100k-ci",
+  "label": "100K routed back through the exact inverse, with the invertible gain (1.398 bits per character)"
+ },
+ {
+  "id": "bij-100k-c",
+  "label": "100K routed back through the exact inverse (lossy norm) (1.383 bits per character)"
+ },
+ {
+  "id": "bij-100k-tied",
+  "label": "100K tied head (no invertible layer) (1.407 bits per character)"
+ }
+]
