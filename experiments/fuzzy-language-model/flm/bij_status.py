@@ -36,7 +36,13 @@ def chosen(runs):
             v = json.loads(p.read_text())["val_bpc"]
             if (size, arm) not in best or v < best[(size, arm)][0]:
                 best[(size, arm)] = (v, lr)
-    return {k: v[1] for k, v in best.items()}
+    out = {k: v[1] for k, v in best.items()}
+    f = O / "chosen_lr.json"  # the schedule's own choice (phase 1 sweep, neighbour rule for 20K and 70K) wins, so the seeds it ran at that rate are the ones counted
+    if f.exists():
+        for k, lr in json.loads(f.read_text()).items():
+            size, arm = k.split("|")
+            out[(int(size.rstrip("k")), arm)] = float(lr)
+    return out
 
 
 def rows():
