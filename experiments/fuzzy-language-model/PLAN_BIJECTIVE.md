@@ -238,3 +238,16 @@ Predictions:
 
 First hand32 results (2026-10-28, partial): the trainable arm matches learned (328 rules: 1.3758 and 1.3680, mean 1.3719 against 1.3700), but the frozen arm is far worse than predicted (328 rules: 1.6342 and 1.6235, about +0.26 against 0.01-0.04 predicted; prediction 1 wrong).  The run is sound (same 99,939 parameters, float32 round trip 1.0000).  Hypothesis: the hand-built dictionary separates the most frequent symbols too little (letters are a 5-bit code at weight 0.5, so two letters can differ by one bit; after standardisation the closest pair is 0.55 apart, against 1.39 for the 64-wide dictionary), and a frozen dictionary cannot fix that while a trainable one can.
 Test (`hand32L`, letter code weight 1.0, `flm/bij_schedule/make_hand32l.py`): frozen, 328 rules, seeds 0 and 1.  Prediction: the frozen cost falls below 0.05 bits against learned (1.3700), which would confirm that letter separation is the cause; if it stays above 0.1 the cause is something else (the dictionary's low rank or the readout) and I will not guess further without a diagnostic.
+
+## Hand-built 32-wide dictionary results (2026-10-28)
+
+ci, width 32, 30M TinyStories characters, fp32, lr 0.01, mean of seeds 0 and 1, validation bits per character.
+
+| rules (parameters) | learned | hand-built, frozen | hand-built, as start | letter weight 1.0, frozen |
+|---|---|---|---|---|
+| 328 (99.9K) | 1.3700 | 1.6289 (+0.259) | 1.3719 (+0.002) | 1.6250 (+0.255) |
+| 706 (200K) | 1.3062 | 1.5300 (+0.224) | 1.2998 (-0.006) | not run |
+
+Scoring: 1 wrong (frozen cost +0.26, not 0.01-0.04).  2 right (as a start it is within 0.01 of learned at both sizes).  3 wrong as written (the frozen cost 0.259 to 0.224 differs by 0.035, not within 0.01; it does not grow).  4 not yet measured (drift of the trained start arms).  The letter-weight test refutes the hypothesis: doubling the letter code weight left the frozen cost at +0.255, above the 0.1 line I set, so letter separation is not the cause and I will not guess further without a diagnostic.
+Note that the frozen cost with this dictionary (about 0.23-0.26) is an order of magnitude above the 64-wide constructed dictionary frozen (+0.017) and the 64-wide trained codebook frozen (+0.014); something in the hand-built layout, not frozenness itself, hurts.
+Next: a diagnostic on the saved checkpoints (bits per character by symbol class, frozen against trained start) to see where the loss is, before changing the dictionary again.
