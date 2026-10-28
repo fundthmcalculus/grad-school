@@ -207,3 +207,19 @@ Predictions:
 3. Width 24 at 456 rules (99.8K parameters) is within 0.02 of width 32 at 328 (1.3700).
 4. At about 100K parameters (the diagonal: 64/124, 32/328, 24/456, 16/706) the best width is 32 or 24, not 64.
 5. At 124 rules, width 64 beats width 32 (the extra parameters are in the dictionary and gain), by more than 0.02.
+
+## Rules against width grid results (2026-10-28)
+
+ci, learned dictionary, 30M TinyStories characters, fp32, lr 0.01, mean of seeds 0 and 1, validation bits per character (parameters in brackets).  Seed spread is about 0.002-0.02.
+
+| width | 124 rules | 328 rules | 706 rules |
+|---|---|---|---|
+| 64 | 1.3978 (99.6K) | 1.3028 (207K) | 1.2511 (406K) |
+| 32 | 1.5242 (46K) | 1.3700 (99.9K) | 1.3062 (200K) |
+| 24 | 1.5723 (33.9K) | 1.4259 (74.4K) | 1.3386 (149K) |
+| 16 | 1.6932 (22.3K) | 1.5274 (49.5K) | 1.4251 (99.6K) |
+| 24, 456 rules | 1.3815 (99.8K) | | |
+
+Scoring: 1 right (more rules always lower; 124 to 328 gains 0.095-0.166, 328 to 706 gains 0.052-0.102, so diminishing).  2 wrong: at 706 rules the widths are 1.2511, 1.3062, 1.3386, 1.4251, a spread of 0.17, not 0.03 (but parameters differ from 406K to 100K).  3 right (width 24 at 456 rules is 0.012 worse than width 32 at 328).  4 right (at about 100K: 64/124 1.3978, 32/328 1.3700, 24/456 1.3815, 16/706 1.4251; best is 32).  5 right (64 beats 32 at 124 rules by 0.126, but with 99.6K against 46K parameters).
+
+Reading: both levers matter and parameters are the common currency.  Rules are the strongest lever; wider is better at fixed rules, but mostly by adding parameters.  At matched parameters width 32 is the efficient shape at 100K (0.028 better than width 64); at about 200K width 32 with 706 rules (1.3062, 200K) and width 64 with 328 rules (1.3028, 207K) are equal within the seed spread; at about 50K width 32 with 124 rules (1.5242, 46K) and width 16 with 328 (1.5274, 49.5K) are equal.  So a narrow dictionary with many rules costs nothing at equal size, which supports the owner's preference, and the width-32 win at 100K is a rule-count effect plus a modest width-efficiency edge.  Width 16 loses at 100K (1.4251).  Larger models (width 32, 706 rules, 200K) improve a lot (1.3062); size, not width, is the remaining lever.
