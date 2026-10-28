@@ -33,7 +33,7 @@ GROUPS = {
 }
 
 
-def build(W=W, digit_step=None):
+def build(W=W, digit_step=None, letter_code=False):
     """digit_step None: thermometer code (distance grows as sqrt of the gap); a number: one linear coordinate, distance = step x gap."""
     C = np.zeros((98, 64), dtype=np.float32)
     symbols = [ch for ch in map(chr, range(33, 127)) if not ch.isalnum()]
@@ -50,7 +50,12 @@ def build(W=W, digit_step=None):
                 C[i, 2], C[i, 60] = W["cls"], W["flag"]
             elif ch.isalpha():
                 C[i, 4 if ch.isupper() else 3] = W["cls"]
-                C[i, 8 + ord(ch.lower()) - 97] = W["letter"]
+                if letter_code:  # 5-bit alphabet position in dims 8-12 instead of one flag per letter
+                    k = ord(ch.lower()) - 97
+                    for b in range(5):
+                        C[i, 8 + b] = W["letter"] * ((k >> b) & 1)
+                else:
+                    C[i, 8 + ord(ch.lower()) - 97] = W["letter"]
                 C[i, 61] = W["letter"]
                 if ch.lower() in "aeiou":
                     C[i, 43] = W["flag"]
