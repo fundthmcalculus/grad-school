@@ -223,3 +223,15 @@ ci, learned dictionary, 30M TinyStories characters, fp32, lr 0.01, mean of seeds
 Scoring: 1 right (more rules always lower; 124 to 328 gains 0.095-0.166, 328 to 706 gains 0.052-0.102, so diminishing).  2 wrong: at 706 rules the widths are 1.2511, 1.3062, 1.3386, 1.4251, a spread of 0.17, not 0.03 (but parameters differ from 406K to 100K).  3 right (width 24 at 456 rules is 0.012 worse than width 32 at 328).  4 right (at about 100K: 64/124 1.3978, 32/328 1.3700, 24/456 1.3815, 16/706 1.4251; best is 32).  5 right (64 beats 32 at 124 rules by 0.126, but with 99.6K against 46K parameters).
 
 Reading: both levers matter and parameters are the common currency.  Rules are the strongest lever; wider is better at fixed rules, but mostly by adding parameters.  At matched parameters width 32 is the efficient shape at 100K (0.028 better than width 64); at about 200K width 32 with 706 rules (1.3062, 200K) and width 64 with 328 rules (1.3028, 207K) are equal within the seed spread; at about 50K width 32 with 124 rules (1.5242, 46K) and width 16 with 328 (1.5274, 49.5K) are equal.  So a narrow dictionary with many rules costs nothing at equal size, which supports the owner's preference, and the width-32 win at 100K is a rule-count effect plus a modest width-efficiency edge.  Width 16 loses at 100K (1.4251).  Larger models (width 32, 706 rules, 200K) improve a lot (1.3062); size, not width, is the remaining lever.
+
+## Hand-built 32-wide dictionary (registered 2026-10-28, before the runs)
+
+Owner's preference: more rules, fewer dictionary entries, for clarity.  `flm/canonical_dictionary32.py` builds a 98 x 32 dictionary with every coordinate named (kind, unknown, newline, upper case, vowel, 5-bit letter code, linear digit value, mark group flags, 6-bit mark code at half weight, four alphabet bands).  Nearest neighbours read sensibly (a: A e E b c; 3: 2 4 1 5 0; ".": ! ? & @ $; "(": [ < { $ &).
+
+Design (`flm/bij_schedule/hand32.py`; ci, 30M TinyStories characters, fp32, lr 0.01, seeds 0 and 1): width 32 at 328 rules (99.9K parameters) and 706 rules (200K), the dictionary frozen (`hand32Frozen`) and as the initial value (`hand32Init`).  Controls from the grid, same shapes: learned 1.3700 (328) and 1.3062 (706); projected start 1.3699 (328).
+
+Predictions:
+1. Frozen costs 0.01-0.04 bits against learned at 328 rules (the width-64 constructed dictionary cost 0.017 frozen).
+2. As the initial value it is within 0.01 of learned at both sizes (the projected start was; the width-64 advantage did not carry).
+3. The frozen cost does not grow at 706 rules (within 0.01 of the 328 cost).
+4. The trained init arm drifts as far as before (distance correlation with the constructed dictionary 0.4-0.7).
