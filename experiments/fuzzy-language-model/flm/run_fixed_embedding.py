@@ -2,7 +2,7 @@
 
     FIXED_C=outputs/embspace/LABEL.npz[:KEY] BIJ=ci FUZZ_FFN_R=156 FUZZ_FFN_R0=109 python -m flm.run_fixed_embedding <the usual train arguments>
 
-``FIXED_C`` names an .npz made by ``flm.embedding_space`` (default key ``C``); its width must equal the model width.  The matrix is centred and rescaled to the entry spread the codebook is initialised with (0.5) and frozen; everything else (F, the gain, the blocks, tau) trains as usual.  The frozen dictionary still counts in the printed parameter total (98 x d, 5,488 at d 56); when one dictionary is shared by every model it is not a per-model cost.
+``FIXED_FG=<checkpoint.pt>`` instead freezes the codebook, F and the gain from that trained ci model (same width).  ``FIXED_C`` names an .npz made by ``flm.embedding_space`` (default key ``C``); its width must equal the model width.  The matrix is centred and rescaled to the entry spread the codebook is initialised with (0.5) and frozen; everything else (F, the gain, the blocks, tau) trains as usual.  The frozen dictionary still counts in the printed parameter total (98 x d, 5,488 at d 56); when one dictionary is shared by every model it is not a per-model cost.
 """
 
 import os
@@ -19,6 +19,19 @@ _init = RB._new_init
 
 def _fixed_init(self, cfg, *a, **k):
     _init(self, cfg, *a, **k)
+    fg = os.environ.get("FIXED_FG")
+    if (
+        fg
+    ):  # codebook, F and the gain all taken from a trained model and frozen: a universal invertible meaning layer
+        sd = torch.load(fg, map_location="cpu", weights_only=False)["state"]
+        keep = {
+            k: v for k, v in sd.items() if k.split(".")[0] in ("codebook", "F", "G")
+        }
+        self.load_state_dict(keep, strict=False)
+        for n_, p_ in self.named_parameters():
+            if n_.split(".")[0] in ("codebook", "F", "G"):
+                p_.requires_grad_(False)
+        return
     path, _, key = os.environ["FIXED_C"].partition(":")
     c = np.load(path)[key or "C"].astype(np.float32)
     assert c.shape == tuple(self.codebook.shape), (c.shape, tuple(self.codebook.shape))
