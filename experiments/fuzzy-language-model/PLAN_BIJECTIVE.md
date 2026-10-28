@@ -286,3 +286,8 @@ Scoring: 1 right (oh48 frozen +0.005, inside 0.04).  2 mostly wrong: squeeze32 f
 
 Reading: a frozen, fully named dictionary of 48 dimensions costs about nothing (+0.005, inside the seed spread) and as a starting value beats learned.  The 32-wide squeeze costs +0.196 frozen: with letters fixed as equal-distance flags, the loss moved to the 6-bit non-letter code, plausibly the same false-similarity mechanism acting on space, digits and marks (space is 19% of positions); that mechanism is not tested here.  The minimum for a frozen readable dictionary is therefore somewhere between 32 and 48 and depends on giving the non-letters equal-distance structure too; trainable dictionaries go much lower (32 at no cost, 24 +0.012, 16 +0.055; the learned ladder).
 Open: a 40-wide dictionary with a flag per letter and equal-distance flags for the frequent non-letters (space, newline, the common marks) would locate the frozen minimum; the drift of the trained oh48 start has not been measured.
+
+## oh48 at 300M characters (registered 2026-10-28, before the runs)
+
+Confirmation at scale of the best named dictionary: `oh48` (width 48, 196/137 rules, 100.1K parameters), learned against frozen against as initial value, 300M TinyStories characters, fp32, lr 0.01, seeds 0-2 (`flm/bij_schedule/oh48_300.py`, `outputs/oh48_300/`).  Controls from the 30M test: frozen +0.005, as start -0.017 against learned.
+Predictions: 1. frozen stays within 0.02 of learned on every seed (a frozen dictionary's cost fell with more data at width 56, +0.014 shared, so it should not grow).  2. As the initial value it beats learned on every seed, by 0.004-0.012 (the width-64 gain halved from 30M to 300M: 0.013 to 0.006).  3. Frozen is not better than learned on any seed.
