@@ -194,3 +194,16 @@ ci, about 100K parameters at each width, 30M TinyStories characters, fp32, lr 0.
 Scoring (3 to 7; 1 and 2 withdrawn): 3 right (56 within 0.01).  4 right, but only just and in the other direction from the worry: 32 is 0.0146 better, not worse.  5 right on the cost (0.039, inside 0.02-0.06); the constructed start is ahead of learned by only 0.002, inside the seed spread (about 0.01 at this width), so "stays ahead" is not established.  6 right (0.25, a cliff between 16 and 8).  7 wrong: the constructed start beats learned by 0.003 at 56, ties at 32, is 0.002 ahead at 16 and 0.004 behind at 8; none of these gaps is outside the seed spread, so the width-64 advantage does not carry to the projected dictionaries.
 
 Reading: width 32 is the best width tested, but it also has 2.6 times the rules of width 64, so the gain may come from the rule count rather than the dictionary width; the two are not separated here.  The projected dictionary has unnamed principal-component coordinates, so it is not the clear dictionary the owner wants; the next step is a hand-built 32-wide dictionary with named coordinates (owner's preference: more rules, fewer dictionary entries).
+
+## Rules against width grid (registered 2026-10-28, before the runs)
+
+Owner's request: test rule count as well as dictionary width, and add width 24.  So far width and rules moved together to hold 100K parameters, so the width-32 win (1.3700 against 1.3978 at width 64) may be a rule-count effect.
+
+Design (`flm/bij_schedule/grid.py`; ci, learned dictionary, 30M TinyStories characters, fp32, lr 0.01, seeds 0 and 1): widths 64, 32, 24, 16 crossed with 124, 328 and 706 rules per system (the per-block second system keeps the ratio 0.7), plus width 24 at its own 100K shape (456 rules).  Parameters: width 64: 99.6K / 207K / 406K; 32: 46K / 99.9K / 200K; 24: 33.9K / 74.4K / 149K (456 rules: 99.8K); 16: 22.3K / 49.5K / 99.6K.  Reused from earlier runs (learned dictionary, same settings): (64, 124), (32, 328), (16, 706); the (64, 124) cell was 125 rules in the earlier run.
+
+Predictions:
+1. At every width more rules gives lower bits per character, with smaller gains from 328 to 706 than from 124 to 328.
+2. At 706 rules the four widths are within 0.03 bits of each other (rule count, not width, explains the width-32 result).
+3. Width 24 at 456 rules (99.8K parameters) is within 0.02 of width 32 at 328 (1.3700).
+4. At about 100K parameters (the diagonal: 64/124, 32/328, 24/456, 16/706) the best width is 32 or 24, not 64.
+5. At 124 rules, width 64 beats width 32 (the extra parameters are in the dictionary and gain), by more than 0.02.
