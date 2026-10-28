@@ -1,4 +1,4 @@
-"""Separation and width tests for the constructed dictionary (see PLAN_BIJECTIVE.md): ci, 100K, 30M TinyStories characters, fp32, lr 0.01, seeds 0 and 1.  python flm/bij_schedule/width.py"""
+"""Width test for the constructed dictionary (see PLAN_BIJECTIVE.md): ci, 100K, 30M TinyStories characters, fp32, lr 0.01, seeds 0 and 1.  python flm/bij_schedule/width.py"""
 
 import os
 import subprocess
@@ -8,8 +8,6 @@ BASH = "C:/Program Files/Git/bin/bash.exe"
 SHAPE = {64: (124, 87), 56: (156, 109), 32: (328, 230), 16: (706, 494), 8: (1443, 1010)}
 JOBS = []
 for s in (0, 1):
-    for v in ("dlin64", "dlin64b", "kind64", "soft64"):
-        JOBS.append((v, 64, f"outputs/embspace/{v}.npz", s))
     for k in (56, 32, 16, 8):
         JOBS.append((f"pca{k}", k, f"outputs/embspace/canonpca{k}.npz", s))
         JOBS.append((f"learned{k}", k, None, s))

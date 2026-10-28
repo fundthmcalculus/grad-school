@@ -170,3 +170,5 @@ Predictions:
 5. Width 16 costs 0.02-0.06 bits against width 64, and the constructed start stays ahead of learned.
 6. Width 8 costs more than 0.06 bits.
 7. The constructed start beats learned at every width (the margin is not a width-64 accident).
+
+Scope change (owner, 2026-10-28): drop the digit coding and the other separation variants; run only the width test.  Predictions 1 and 2 are withdrawn; 3 to 7 stand.  The job list is now 16 runs (widths 56, 32, 16, 8; projected start and learned; seeds 0 and 1).
