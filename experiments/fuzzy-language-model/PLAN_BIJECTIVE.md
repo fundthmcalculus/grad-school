@@ -151,3 +151,22 @@ Predictions: constructed frozen ends within 0.02 of the learned control (50%); c
 The constructed dictionary frozen costs 0.017 bits per character against a learned one (1.2%), 0.027 less than a frozen random dictionary (0.044), and the float32 round trip stays exact (1.0000). Used as the starting point instead of frozen, it is the best arm: 0.013 better than a learned-from-random start, more than three times the seed spread (0.002 to 0.004), and better than the tied head (1.4093 at width 56). So structure in the dictionary helps even when it is allowed to move away: the gain is not from fixing the vectors but from where they begin.
 Prediction scoring: constructed frozen within 0.02 of learned (50%): **right** (0.017). Constructed frozen beats random frozen by at least 0.015 (70%): **right** (0.027). Constructed as initial value within 0.01 of learned (75%): **wrong**, it is better by 0.013. Width-64 control within 0.005 of the width-56 control (60%): **right** (0.0045).
 Reading: a shared canonical dictionary by construction costs about 1.2% frozen (comparable with the 1% of a frozen trained dictionary, and fully readable), and the same construction is a better initialisation than random. If models must share the dictionary exactly, freeze it; if closeness is enough, initialise from it and let it train, then compare the dictionaries afterwards. One seed pair at 30M characters; the initial-value advantage needs a longer run and a third seed before it is trusted.
+
+## Constructed dictionary: relative separations and width (registered 2026-10-28, before the runs)
+
+Owner's questions: do different relative separations (especially digits that map mathematically) help, and how few dimensions can the constructed dictionary use?
+
+Context: the 300M-character confirmation (`flm/bij_schedule/canon300.py`, learned vs constructed initial value, seeds 0-2) is still running.  Its predictions, written after seeing seed 0 at step 26,000 (1.2847 constructed against 1.2938 learned): the constructed start wins on every seed; margin 0.006-0.012 bits; the trained dictionary stays close to the constructed one (pairwise-distance correlation above 0.8).  Only seeds 1 and 2 are a clean test.
+
+Design (`flm/bij_schedule/make_variants.py`, `flm/bij_schedule/width.py`; ci, about 100K parameters, 30M TinyStories characters, fp32, lr 0.01, seeds 0 and 1; dictionary is the initial value and trains, the best arm from the last test).  The codebook is standardised to std 0.5 on load, so only relative separations matter.
+- Separations at width 64: `dlin64` (digit = one linear coordinate, step 0.25, so distance = 0.25 x gap; the thermometer gives 0.5 x sqrt(gap)), `dlin64b` (step 0.5), `kind64` (letter identity weight 2 instead of 1), `soft64` (class, flag, code and digit weights 0.25 instead of 0.5).  Control: `canon64` (seed mean 1.3844 at width 64 from the earlier run).
+- Width: the constructed 64-dimensional dictionary projected to k = 56, 32, 16, 8 (top 3k/4 principal components plus a fixed random projection of the residual, which keeps every symbol distinct; pairwise-distance correlation with the original 1.000, 0.975, 0.858, 0.774 for 56, 32, 16, 8).  Each width is run with the projection as the initial value and with a learned dictionary (control), at the shape that gives about 100K parameters: rules/per-system 156/109 (56), 328/230 (32), 706/494 (16), 1443/1010 (8).
+
+Predictions:
+1. Digit coding makes no measurable difference to total bits per character (within 0.005 of `canon64`) because digits are a tiny share of TinyStories; a difference would show only at digit positions, which this run does not measure (a follow-up on the Pile, which has more digits).
+2. `kind64` and `soft64` land within 0.01 of `canon64`.
+3. Width 56 is within 0.01 of width 64 for both arms.
+4. Width 32 is within 0.015 of width 64 (projected start).
+5. Width 16 costs 0.02-0.06 bits against width 64, and the constructed start stays ahead of learned.
+6. Width 8 costs more than 0.06 bits.
+7. The constructed start beats learned at every width (the margin is not a width-64 accident).

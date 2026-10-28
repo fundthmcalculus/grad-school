@@ -33,7 +33,8 @@ GROUPS = {
 }
 
 
-def build():
+def build(W=W, digit_step=None):
+    """digit_step None: thermometer code (distance grows as sqrt of the gap); a number: one linear coordinate, distance = step x gap."""
     C = np.zeros((98, 64), dtype=np.float32)
     symbols = [ch for ch in map(chr, range(33, 127)) if not ch.isalnum()]
     for i in range(98):
@@ -55,7 +56,10 @@ def build():
                     C[i, 43] = W["flag"]
             elif ch.isdigit():
                 C[i, 5], C[i, 62] = W["cls"], W["letter"]
-                C[i, 34 : 34 + int(ch)] = W["digit"]
+                if digit_step is None:
+                    C[i, 34 : 34 + int(ch)] = W["digit"]
+                else:
+                    C[i, 34] = digit_step * int(ch)
             else:
                 grp = [g for g, s in GROUPS.items() if ch in s]
                 C[i, 6 if grp and grp[0] <= 48 and grp[0] != 49 else 7] = W["cls"]
@@ -66,6 +70,23 @@ def build():
                 for b in range(6):
                     C[i, 52 + b] = W["code"] * ((k >> b) & 1)
     return C
+
+
+def project(C, k, seed=0):
+    """k coordinates: the top principal components of C (scaled by the singular values) for the first 3k/4, then a fixed random projection of the residual for the rest, which keeps near-identical symbols apart."""
+    Z = C - C.mean(0)
+    u, sv, vt = np.linalg.svd(Z, full_matrices=False)
+    kp = k - k // 4
+    res = Z - (u[:, :kp] * sv[:kp]) @ vt[:kp]
+    R = np.random.default_rng(seed).normal(size=(C.shape[1], k - kp)) / np.sqrt(k - kp)
+    return np.concatenate([u[:, :kp] * sv[:kp], res @ R], 1).astype(np.float32)
+
+
+def distortion(C, P):
+    """Correlation of the pairwise distances before and after projection."""
+    iu = np.triu_indices(len(C), 1)
+    d = lambda M: np.linalg.norm(M[:, None] - M[None], axis=-1)[iu]
+    return float(np.corrcoef(d(C), d(P))[0, 1])
 
 
 def main():
