@@ -65,3 +65,40 @@ Gaussian's 3.37 on seed 6 drives its mean.
 - **Part 3 (type-2)**: depends on part 2's definition. Related prior work is in [`experiments/fis-drafter/fisdraft/learned_fou.py`](../fis-drafter/fisdraft/learned_fou.py), which fits a footprint of uncertainty by Winkler interval score.
 
 Reproduce: `python shapes_study.py` (about 15 min, numpy and scipy).
+
+## Part 2: gradient sources (`gradient_study.py`)
+
+Same seeds and model, with four fitting arms. Full table: [`results_gradient.md`](results_gradient.md); per-fit rows: [`results_gradient.csv`](results_gradient.csv).
+
+- **Analytic Jacobian.** Closed-form derivatives of the memberships (knot, centre and width) plus the consequent-solve derivative. Checked against central finite differences at init: max rel. error 5e-6 (gaussian/PL), elliptic excluded from the threshold because its sqrt edge makes the derivative diverge.
+- **Synthetic gradient.** A 64-unit tanh MLP maps θ to dL/dθ. It is trained on true gradients from warm-up steps and every 4th step after that. Its prediction supplies the gradient on the other steps (173 true evals in 600 Adam steps).
+
+Medians, test RMSE:
+
+| shape | trf_fd | trf_analytic | adam_exact | adam_synth |
+|---|---:|---:|---:|---:|
+| triangle | 0.0368 | 0.0338 | 0.1048 | 0.0398 |
+| trapezoid | 0.0368 | 0.0362 | 0.0410 | 0.0368 |
+| pentagon | 0.0355 | 0.0353 | 0.0406 | 0.0779 |
+| hexagon | 0.0345 | 0.0339 | 0.0491 | 0.0632 |
+| heptagon | 0.0353 | 0.0337 | 0.0420 | 0.0748 |
+| gaussian | 0.0332 | 0.0366 | 0.0333 | 0.0294 |
+| elliptic | 0.0587 | 0.0576 | 0.1076 | 0.0733 |
+
+Cost, mean gradient or Jacobian evals and seconds (trf_fd counts residual evals; the others count true gradients):
+
+| arm | evals (range over shapes) | seconds (range) |
+|---|---|---|
+| trf_fd | 508–3276 | 3.1–48.8 |
+| trf_analytic | 26–137 | 0.5–1.8 |
+| adam_exact | 600 | 3.2–13.0 |
+| adam_synth | 173 | 1.8–5.1 |
+
+What this says:
+1. **The analytic Jacobian is the win.** Same accuracy as finite differences (medians match within noise), about 20–50× fewer evals, and 10–30× faster wall clock.
+2. **Synthetic gradients are not a replacement here.** They cut true gradient calls to 29% of the exact-Adam budget. They are not a consistent improvement: they beat exact Adam on triangle, gaussian and elliptic medians, and lose on pentagon, hexagon and heptagon. Predictor accuracy was not measured separately, so the cause is open.
+3. **Adam arms are not tuned** (fixed lr 0.02, 600 steps). Read them as a fixed-budget comparison, not as the best first-order fit.
+4. **Elliptic is the worst shape under every trf arm** (median ≈ 0.058), so the Part 1 ranking holds once fitting is reliable. Gaussian's Part 1 failure was a fitting failure.
+5. Medians here differ slightly from Part 1 (e.g. triangle trf_fd 0.0368 vs 0.0348) because the consequent solve now uses a 1e-6 ridge for numerical stability (gaussian Phi has cond ≈ 1e8).
+
+Run note: the first run was killed by a worker restart after 264 of 280 fits. The remaining 16 fits (seed 9, hexagon onward) were run with the same code path and merged with the logged rows, so the table covers all 280 fits.
