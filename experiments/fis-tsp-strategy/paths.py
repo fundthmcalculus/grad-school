@@ -25,7 +25,7 @@ LEGACY = RESULTS / "legacy"
 EXPERIMENTS = ROOT / "experiments"
 
 #: The published-optimum index and ``.tsp`` files, which already ship in this repository.
-TSPLIB_DIR = ROOT.parent / "ClusteringExperiments" / "tsplib"
+TSPLIB_DIR = ROOT.parents[1] / "ClusteringExperiments" / "tsplib"
 
 #: Fitted per-counter costs for the deterministic time proxy the tuner optimises against.
 COSTMODEL = RESULTS / "costmodel.npz"
