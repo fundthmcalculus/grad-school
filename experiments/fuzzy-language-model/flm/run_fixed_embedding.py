@@ -41,10 +41,29 @@ def _fixed_init(self, cfg, *a, **k):
         "FIXED_TRAIN"
     ):  # FIXED_TRAIN=1: the matrix only initialises the codebook, which then trains
         self.codebook.requires_grad_(False)
+    pull = float(os.environ.get("FIXED_PULL", "0"))
+    if pull and os.environ.get("FIXED_TRAIN"):
+        _PULL.update(cb=self.codebook, c0=self.codebook.data.clone(), k=pull)
+
+
+_PULL = {}
+
+
+def _pull_back(optimizer, args, kwargs):
+    """FIXED_PULL=k (with FIXED_TRAIN=1): after every optimiser step move the codebook the fraction k of the way back to its constructed value, a drift penalty that keeps the dictionary readable while letting it adapt."""
+    if _PULL:
+        cb = _PULL["cb"]
+        with torch.no_grad():
+            c0 = _PULL["c0"].to(cb.device)
+            cb.add_(_PULL["k"] * (c0 - cb))
 
 
 if __name__ == "__main__":
     RB.T.evaluate = RB._evaluate_logged
+    if os.environ.get("FIXED_PULL"):
+        from torch.optim.optimizer import register_optimizer_step_post_hook
+
+        register_optimizer_step_post_hook(_pull_back)
     TinyLM.__init__ = _fixed_init
     TinyLM.embed = RB._embed
     TinyLM.logits = RB._logits

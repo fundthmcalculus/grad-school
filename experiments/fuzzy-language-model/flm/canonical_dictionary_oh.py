@@ -12,6 +12,8 @@ oh48 (48 dimensions, every coordinate its own meaning):
   41-46  mark identity, the 6-bit index among the 33 marks (0.25)
   47     upper case (0.5)
 
+oh40 (40 dimensions): 0-25 letter flag, 26 space, 27 newline, 28-30 kind (digit, mark, special), 31 unknown, 32 upper case, 33 digit value (linear), 34-39 mark identity (6-bit code at 0.5).  Only the marks (4% of text) rely on a binary code.
+
 squeeze32 (32 dimensions, the floor for one flag per letter: 26 letters plus a 6-bit code):
   0-25   letter flag (1.0 for lower case, 0.6 for upper case: a and A are 0.4 apart, any two letters 1.41)
   26-31  non-letter code (0.5): the 6-bit number 1-47 of the symbol among digits (1-10), space (11), newline (12), end of text (13), unknown (14), then the 33 marks grouped by punctuation group (15-47); zero for letters
@@ -77,6 +79,34 @@ def squeeze32():
     return C
 
 
+def oh40():
+    """40 dimensions: a flag per letter, equal-distance flags for space and newline (23% of text), a 6-bit code only for the marks."""
+    C = np.zeros((98, 40), dtype=np.float32)
+    for i in range(98):
+        if i < 2:
+            C[i, 30] = 1.0
+            C[i, 31] = 0.5 * i
+            continue
+        if i == 2:
+            C[i, 27] = 1.0
+            continue
+        ch = chr(i - 3 + 32)
+        if ch == " ":
+            C[i, 26] = 1.0
+        elif ch.isalpha():
+            C[i, ord(ch.lower()) - 97] = 1.0
+            C[i, 32] = 0.5 * ch.isupper()
+        elif ch.isdigit():
+            C[i, 28] = 1.0
+            C[i, 33] = 0.25 * int(ch)
+        else:
+            C[i, 29] = 1.0
+            k = MARKS.index(ch)
+            for b in range(6):
+                C[i, 34 + b] = 0.5 * ((k >> b) & 1)
+    return C
+
+
 def show(C, name):
     d = np.linalg.norm(C[:, None] - C[None], axis=-1)
     assert len({tuple(r) for r in C}) == 98, name
@@ -88,7 +118,7 @@ def show(C, name):
 
 
 def main():
-    for name, f in (("oh48", oh48), ("squeeze32", squeeze32)):
+    for name, f in (("oh48", oh48), ("squeeze32", squeeze32), ("oh40", oh40)):
         C = f()
         np.savez(f"outputs/embspace/{name}.npz", C=C)
         show(C, name)
