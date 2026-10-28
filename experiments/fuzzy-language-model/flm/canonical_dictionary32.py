@@ -18,7 +18,7 @@ import numpy as np
 
 from flm.data import decode
 
-W = dict(kind=1.0, flag=0.5, digit=0.25, mark_code=0.25)
+W = dict(kind=1.0, flag=0.5, digit=0.25, mark_code=0.25, letter=0.5)
 GROUPS = ".!?", ",;:", "\"'`", "([{<", ")]}>", "-_/" + chr(92) + "|", "+=*%^~"
 NAMES = (
     ["special", "whitespace", "letter", "digit", "mark", "unknown", "newline", "upper", "vowel"]
@@ -30,7 +30,7 @@ NAMES = (
 )
 
 
-def build():
+def build(W=W):
     C = np.zeros((98, 32), dtype=np.float32)
     marks = [ch for ch in map(chr, range(33, 127)) if not ch.isalnum()]
     for i in range(98):
@@ -49,7 +49,7 @@ def build():
                 C[i, 7] = W["flag"] * ch.isupper()
                 C[i, 8] = W["flag"] * (ch.lower() in "aeiou")
                 for b in range(5):
-                    C[i, 9 + b] = W["flag"] * ((k >> b) & 1)
+                    C[i, 9 + b] = W["letter"] * ((k >> b) & 1)
                 C[i, 28 + sum(k >= s for s in (6, 13, 19))] = W["flag"]
             elif ch.isdigit():
                 C[i, 3] = W["kind"]
