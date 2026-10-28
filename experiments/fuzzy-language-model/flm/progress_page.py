@@ -85,6 +85,77 @@ def main():
             ]
         )
     t2 = table(["width", "learned", "constructed start (projected)", "start vs width 64", "runs done"], rows)
+    grid = runs("outputs/grid/*/ci_*.log")
+    old = {  # cells already measured (learned dictionary): (width, rules) -> mean of seeds 0 and 1
+        (64, 124): l64,
+        (32, 328): avg(wid, "learned32")[0],
+        (16, 706): avg(wid, "learned16")[0],
+    }
+
+    def gcell(d, r):
+        if (d, r) in old:
+            return f"{old[(d, r)]:.4f}" if old[(d, r)] else ""
+        v = [grid[f"d{d}_r{r}_s{s}"] for s in (0, 1) if f"d{d}_r{r}_s{s}" in grid]
+        fin = [x[3] for x in v if x[3]]
+        if len(fin) == 2:
+            return f"{mean(fin):.4f}"
+        if fin:
+            return f"{fin[0]:.4f} (1 seed)"
+        return "running" if any(x[0] for x in v) else "queued"
+
+    params = {64: ("99.6K", "207K", "406K"), 32: ("46K", "99.9K", "200K"), 24: ("33.9K", "74.4K", "149K"), 16: ("22.3K", "49.5K", "99.6K")}
+    rows = []
+    for d in (64, 32, 24, 16):
+        rows.append([str(d)] + [f"{gcell(d, r)} <small>{params[d][i]}</small>" for i, r in enumerate((124, 328, 706))])
+    rows.append(["24 at its 100K shape", f"{gcell(24, 456)} <small>99.8K, 456 rules</small>", "", ""])
+    t3 = table(["width", "124 rules", "328 rules", "706 rules"], rows)
+    hand = runs("outputs/hand32/*/ci_*.log")
+    ctrl = {328: avg(wid, "learned32")[0], 706: avg(grid, "d32_r706")[0]}
+
+    def hcell(a, r):
+        v = [hand[f"{a}_r{r}_s{s}"] for s in (0, 1) if f"{a}_r{r}_s{s}" in hand]
+        fin = [x[3] for x in v if x[3]]
+        if len(fin) == 2:
+            m = mean(fin)
+            return f"{m:.4f} <small>{m - ctrl[r]:+.4f} vs learned</small>"
+        if fin:
+            return f"{fin[0]:.4f} (1 seed)"
+        return "running" if any(x[0] for x in v) else "queued"
+
+    rows = [
+        [f"{r} rules", f"{ctrl[r]:.4f}" if ctrl[r] else "", hcell("hand32Frozen", r), hcell("hand32Init", r)]
+        for r in (328, 706)
+    ]
+    t4 = table(["width 32", "learned dictionary", "hand-built, frozen", "hand-built, as start"], rows)
+    osq = runs("outputs/ohsq/*/ci_*.log")
+
+    def ocell(tag, ref=None):
+        v = [osq[f"{tag}_s{s}"] for s in (0, 1) if f"{tag}_s{s}" in osq]
+        fin = [x[3] for x in v if x[3]]
+        if len(fin) == 2:
+            m = mean(fin)
+            return f"{m:.4f}" + (f" <small>{m - ref:+.4f}</small>" if ref else "")
+        if fin:
+            return f"{fin[0]:.4f} (1 seed)"
+        return "running" if any(x[0] for x in v) else "queued"
+
+    l48 = avg(osq, "learned48")[0]
+    rows = [
+        ["width 48, 196 rules (100.1K)", ocell("learned48"), ocell("oh48Frozen", l48), ocell("oh48Init", l48)],
+        ["width 32, 328 rules (99.9K)", f"{ctrl[328]:.4f}" if ctrl[328] else "", ocell("squeeze32Frozen", ctrl[328]), ocell("squeeze32Init", ctrl[328])],
+    ]
+    t5 = table(["one flag per letter", "learned dictionary", "frozen", "as starting value"], rows)
+    qrows = []
+    for grp, label in (
+        ("oh48_300", "oh48, 300M TinyStories"),
+        ("oh40", "oh40, 30M"),
+        ("pull", "oh48 drift penalty, 30M"),
+        ("oh48_pile", "oh48, 300M Pile"),
+    ):
+        for name, r in sorted(runs(f"outputs/{grp}/*/ci_*.log").items()):
+            c = cell(r)
+            qrows.append([label, name, c[0], c[1]])
+    t6 = table(["study", "run", "validation", "state"], qrows or [["queued", "", "", ""]])
     now = time.strftime("%Y-%m-%d %H:%M")
     page = f"""<title>Run progress</title>
 <style>
@@ -96,6 +167,7 @@ h1{{font-size:1.4rem;margin:0 0 4px}} h2{{font-size:1.05rem;margin:28px 0 6px}}
 p{{color:var(--mut);margin:4px 0 10px;max-width:65ch}}
 .scroll{{overflow-x:auto}} table{{border-collapse:collapse;width:100%;background:var(--card)}}
 th,td{{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;font-variant-numeric:tabular-nums;white-space:nowrap}}
+small{{color:var(--mut);margin-left:6px}}
 th{{color:var(--mut);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em}}
 </style>
 <h1>Run progress</h1>
@@ -106,6 +178,18 @@ th{{color:var(--mut);font-weight:600;font-size:.8rem;text-transform:uppercase;le
 <h2>How few dimensions?</h2>
 <p>30M characters, two seeds. The constructed dictionary is projected to the width and used as the starting value; the control learns its dictionary. Rule counts grow as the width shrinks to keep 100K parameters.</p>
 {t2}
+<h2>Rules against width</h2>
+<p>Learned dictionary, 30M characters, mean of two seeds. Rules are per feed-forward system; the small figure is the parameter count. This separates the effect of the dictionary width from the effect of the rule count.</p>
+{t3}
+<h2>Hand-built 32-wide dictionary</h2>
+<p>Every coordinate named. Frozen, or used as the starting value; 30M characters, mean of two seeds. The small figure is the difference from the learned dictionary at the same shape (lower is better).</p>
+{t4}
+<h2>Equal-distance letters: how few dimensions?</h2>
+<p>A frozen dictionary lost 0.26 to 0.5 bits when letters were a 5-bit code, because some letters looked alike for no reason. These give each letter its own flag. The 48-wide one has a named coordinate for everything; the 32-wide one squeezes the non-letters into a 6-bit code (the floor for one flag per letter). The small figure is the difference from the learned dictionary at that shape (lower is better).</p>
+{t5}
+<h2>On the GPU now and queued</h2>
+<p>Every run in the current queue, in order of start. Validation is the latest evaluation until the run is done.</p>
+{t6}
 """
     open(sys.argv[1] if len(sys.argv) > 1 else "outputs/progress/index.html", "w", encoding="utf-8").write(page)
 
