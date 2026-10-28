@@ -272,3 +272,17 @@ Predictions:
 1. `oh48` frozen costs at most 0.04 bits against the learned width-48 control (the width-64 constructed dictionary cost 0.017).
 2. `squeeze32` frozen costs more than `oh48` frozen (its non-letter code puts false similarity between space, digits and marks, 27% of positions), but less than 0.1 against learned width 32 (1.3700), and at least 0.15 less than the hand-built 5-bit-letter dictionary (1.6289).
 3. As initial values both are within 0.01 of their learned controls.
+
+## Equal-distance letters, results (2026-10-28)
+
+ci, about 100K parameters, 30M TinyStories characters, fp32, lr 0.01, mean of seeds 0 and 1, validation bits per character.
+
+| shape | learned | frozen | as initial value |
+|---|---|---|---|
+| width 48, 196/137 rules (`oh48`, a flag per letter, every coordinate named) | 1.3800 | 1.3849 (+0.005) | 1.3628 (-0.017) |
+| width 32, 328/230 rules (`squeeze32`, 26 letter flags + 6-bit non-letter code) | 1.3700 | 1.5659 (+0.196) | 1.3739 (+0.004) |
+
+Scoring: 1 right (oh48 frozen +0.005, inside 0.04).  2 mostly wrong: squeeze32 frozen does cost more than oh48 (right), but +0.196 is above 0.1 and only 0.063 better than the 5-bit-letter dictionary (1.6289), not 0.15.  3 half right: squeeze32 as a start is +0.004 (within 0.01), but oh48 as a start is 0.017 better than learned, outside the 0.01 band (the same direction as the width-64 constructed start, -0.013).
+
+Reading: a frozen, fully named dictionary of 48 dimensions costs about nothing (+0.005, inside the seed spread) and as a starting value beats learned.  The 32-wide squeeze costs +0.196 frozen: with letters fixed as equal-distance flags, the loss moved to the 6-bit non-letter code, plausibly the same false-similarity mechanism acting on space, digits and marks (space is 19% of positions); that mechanism is not tested here.  The minimum for a frozen readable dictionary is therefore somewhere between 32 and 48 and depends on giving the non-letters equal-distance structure too; trainable dictionaries go much lower (32 at no cost, 24 +0.012, 16 +0.055; the learned ladder).
+Open: a 40-wide dictionary with a flag per letter and equal-distance flags for the frequent non-letters (space, newline, the common marks) would locate the frozen minimum; the drift of the trained oh48 start has not been measured.
