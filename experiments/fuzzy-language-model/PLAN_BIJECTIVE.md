@@ -172,3 +172,9 @@ Predictions:
 7. The constructed start beats learned at every width (the margin is not a width-64 accident).
 
 Scope change (owner, 2026-10-28): drop the digit coding and the other separation variants; run only the width test.  Predictions 1 and 2 are withdrawn; 3 to 7 stand.  The job list is now 16 runs (widths 56, 32, 16, 8; projected start and learned; seeds 0 and 1).
+
+## 300M confirmation results (2026-10-28)
+
+ci, width 64, 100,202 parameters, 300M TinyStories characters, fp32, lr 0.01, seeds 0-2.  Learned 1.2544 / 1.2577 / 1.2602; constructed as initial value 1.2484 / 1.2513 / 1.2537; gain 0.0060 / 0.0064 / 0.0065 (mean 0.0063, 0.5%).  Prediction "wins on every seed, margin 0.006-0.012": right, at the low edge (the 30M margin was 0.013, so it shrinks with more training).
+
+Drift of the trained codebook from the constructed one (correlation of pairwise distances / share of each symbol's 5 nearest neighbours kept): constructed start 0.57, 0.53, 0.56 / 0.42, 0.38, 0.41; learned-from-random 0.29, 0.31, 0.34 / 0.28, 0.23, 0.25.  Prediction "above 0.8": wrong.  Training moves the dictionary a long way from the constructed geometry, though it stays about twice as close as an unrelated start.  The explainability value therefore needs the dictionary frozen (cost about 1.2%) or a drift penalty; the 0.5% gain from the start alone does not keep the geometry.
