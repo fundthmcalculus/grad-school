@@ -257,3 +257,18 @@ Next: a diagnostic on the saved checkpoints (bits per character by symbol class,
 `flm/diagnose_dictionary.py`, 512 validation windows of 256 characters, checkpoints at width 32, 328 rules, seed 0 (`outputs/hand32/diagnose.json`).  Bits per character by the class of the next character: learned 1.3720; hand-built as start 1.3742; hand-built frozen 1.6326 (letter weight doubled, frozen: 1.6154).  Frozen against learned: lower-case letters (73% of positions) 1.493 to 1.792 bits, adding +0.218 of the +0.26; upper-case +0.027; marks +0.011; space, newline and special about +0.003 together.  Top-1 accuracy falls only from 0.677 to 0.653 on lower-case letters, so the frozen model still picks the right letter about as often; the loss is in how the probability is spread over letters.
 Hypothesis (fits the failed letter-weight test, which scaled distances but kept the structure): the 5-bit letter code makes some letters look similar for no reason (a and b differ in one bit), the likelihood is a softmax over distances, and a frozen dictionary cannot undo the false similarity while a trained one can.  The 64-wide constructed dictionary, with one flag per letter (all letters equally far apart), cost only +0.017 frozen.
 Test (`canon64H`: the 64-wide constructed dictionary with letters as a 5-bit code in dims 8-12, nothing else changed; frozen, 124 rules, seeds 0 and 1; controls: the frozen one-flag version 1.4149, learned 1.3978): prediction: the frozen cost jumps above 0.1 bits against learned.  If it stays below 0.05 the hypothesis is refuted and the cause is elsewhere in the layout (the other features, or the width).
+
+Letter-code test result (2026-10-28): `canon64H` frozen, 124 rules, seeds 0 and 1: 1.9263 and 1.9215 (mean 1.924), against 1.4149 for the one-flag-per-letter dictionary frozen and 1.3978 learned.  Cost +0.51 with only the letter coding changed; prediction (above 0.1) right.  The cause of the hand-built dictionary's frozen cost is the false similarity between letters, not the width or the other features.  A frozen dictionary needs letters that are all equally far apart.
+
+## Minimum dimension with equal-distance letters, three options (registered 2026-10-28, before the runs)
+
+Owner: try all three options and find the minimum dimension space.
+1. Wider frozen dictionary with a flag per letter: `oh48` (48 named dimensions; 196/137 rules, 100.1K parameters).
+2. Narrow and trainable: the dictionary as an initial value that trains (`Init` arms); the learned-dictionary ladder from the grid already answers the narrow-trainable question (100K: width 32 best 1.3700, 24 1.3815, 16 1.4251, 8 1.6297 with the larger rule counts).
+3. Equal-distance letters squeezed into the least room: `squeeze32` (26 letter flags, lower case 1.0 and upper case 0.6, plus a 6-bit code for the 47 non-letters; 328/230 rules, 99.9K parameters).  26 letters plus a 6-bit code is the floor for one flag per letter.
+Builder: `flm/canonical_dictionary_oh.py`; driver `flm/bij_schedule/ohsq.py` (ci, 30M TinyStories characters, fp32, lr 0.01, seeds 0 and 1; each dictionary frozen and as the initial value; new control: learned dictionary at width 48, 196 rules).
+
+Predictions:
+1. `oh48` frozen costs at most 0.04 bits against the learned width-48 control (the width-64 constructed dictionary cost 0.017).
+2. `squeeze32` frozen costs more than `oh48` frozen (its non-letter code puts false similarity between space, digits and marks, 27% of positions), but less than 0.1 against learned width 32 (1.3700), and at least 0.15 less than the hand-built 5-bit-letter dictionary (1.6289).
+3. As initial values both are within 0.01 of their learned controls.
