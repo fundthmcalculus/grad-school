@@ -37,7 +37,10 @@ def _fixed_init(self, cfg, *a, **k):
     assert c.shape == tuple(self.codebook.shape), (c.shape, tuple(self.codebook.shape))
     c = (c - c.mean(0)) / c.std()
     self.codebook.data.copy_(torch.as_tensor(c * 0.5))
-    self.codebook.requires_grad_(False)
+    if not os.environ.get(
+        "FIXED_TRAIN"
+    ):  # FIXED_TRAIN=1: the matrix only initialises the codebook, which then trains
+        self.codebook.requires_grad_(False)
 
 
 if __name__ == "__main__":
