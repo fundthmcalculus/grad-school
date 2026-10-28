@@ -178,3 +178,19 @@ Scope change (owner, 2026-10-28): drop the digit coding and the other separation
 ci, width 64, 100,202 parameters, 300M TinyStories characters, fp32, lr 0.01, seeds 0-2.  Learned 1.2544 / 1.2577 / 1.2602; constructed as initial value 1.2484 / 1.2513 / 1.2537; gain 0.0060 / 0.0064 / 0.0065 (mean 0.0063, 0.5%).  Prediction "wins on every seed, margin 0.006-0.012": right, at the low edge (the 30M margin was 0.013, so it shrinks with more training).
 
 Drift of the trained codebook from the constructed one (correlation of pairwise distances / share of each symbol's 5 nearest neighbours kept): constructed start 0.57, 0.53, 0.56 / 0.42, 0.38, 0.41; learned-from-random 0.29, 0.31, 0.34 / 0.28, 0.23, 0.25.  Prediction "above 0.8": wrong.  Training moves the dictionary a long way from the constructed geometry, though it stays about twice as close as an unrelated start.  The explainability value therefore needs the dictionary frozen (cost about 1.2%) or a drift penalty; the 0.5% gain from the start alone does not keep the geometry.
+
+## Width test results (2026-10-28)
+
+ci, about 100K parameters at each width, 30M TinyStories characters, fp32, lr 0.01, seeds 0 and 1, mean validation bits per character.  Dictionary: the constructed 64-wide one projected to the width and used as the initial value, against a learned one.  Rules per system rise as the width falls (124, 156, 328, 706, 1443 for 64, 56, 32, 16, 8).
+
+| width | learned | projected start | start vs width 64 (1.3844) |
+|---|---|---|---|
+| 64 (earlier run) | 1.3978 | 1.3844 | 0 |
+| 56 | 1.3934 | 1.3905 | +0.0060 |
+| 32 | 1.3700 | 1.3699 | -0.0146 |
+| 16 | 1.4251 | 1.4233 | +0.0389 |
+| 8 | 1.6297 | 1.6340 | +0.2495 |
+
+Scoring (3 to 7; 1 and 2 withdrawn): 3 right (56 within 0.01).  4 right, but only just and in the other direction from the worry: 32 is 0.0146 better, not worse.  5 right on the cost (0.039, inside 0.02-0.06); the constructed start is ahead of learned by only 0.002, inside the seed spread (about 0.01 at this width), so "stays ahead" is not established.  6 right (0.25, a cliff between 16 and 8).  7 wrong: the constructed start beats learned by 0.003 at 56, ties at 32, is 0.002 ahead at 16 and 0.004 behind at 8; none of these gaps is outside the seed spread, so the width-64 advantage does not carry to the projected dictionaries.
+
+Reading: width 32 is the best width tested, but it also has 2.6 times the rules of width 64, so the gain may come from the rule count rather than the dictionary width; the two are not separated here.  The projected dictionary has unnamed principal-component coordinates, so it is not the clear dictionary the owner wants; the next step is a hand-built 32-wide dictionary with named coordinates (owner's preference: more rules, fewer dictionary entries).
