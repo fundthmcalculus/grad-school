@@ -151,6 +151,7 @@ def main():
         ("oh40", "oh40, 30M"),
         ("pull", "oh48 drift penalty, 30M"),
         ("oh48_pile", "oh48, 300M Pile"),
+        ("final100k", "final model, 300M Cosmopedia"),
     ):
         for name, r in sorted(runs(f"outputs/{grp}/*/ci_*.log").items()):
             c = cell(r)
