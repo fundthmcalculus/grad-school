@@ -102,3 +102,26 @@ What this says:
 5. Medians here differ slightly from Part 1 (e.g. triangle trf_fd 0.0368 vs 0.0348) because the consequent solve now uses a 1e-6 ridge for numerical stability (gaussian Phi has cond ≈ 1e8).
 
 Run note: the first run was killed by a worker restart after 264 of 280 fits. The remaining 16 fits (seed 9, hexagon onward) were run with the same code path and merged with the logged rows, so the table covers all 280 fits.
+
+## Part 3: interval type-2 (`type2_study.py`)
+
+Gaussian footprint of uncertainty: upper σ = exp(s+w), lower σ = exp(s−w), w = exp(v). 30 antecedent parameters. Point prediction is Nie-Tan (average firing); output bounds are the lower- and upper-firing TSK outputs with the same consequents, ordered by min/max. Analytic Jacobian verified against central differences (rel. err 8e-6). Full table: [`results_type2.md`](results_type2.md); per-seed rows: [`results_type2.csv`](results_type2.csv).
+
+| arm | test RMSE median | mean ± sd | interval coverage (noise-free test) | mean width | fitted mean w |
+|---|---:|---:|---:|---:|---:|
+| it2_collapse (control, w=0) | 0.0392 | 0.0426 ± 0.0132 | — | — | — |
+| it2_fou | 0.0376 | 0.0382 ± 0.0055 | 0.898 (per seed 0.82–0.99) | 1.91 | 0.71 (init 0.10) |
+
+Pre-registered checks, scored:
+
+| # | Check | Verdict |
+|---|---|---|
+| T1 | Collapse control matches type-1 gaussian | **Pass.** Medians 0.0392 vs 0.0366 (type-1, `gradient_study.py`), within the 0.005 tolerance. |
+| T2 | Free FOU lowers median RMSE vs control | **Weak.** Median −0.0016. The FOU's clearer effect is the tail: sd 0.013 → 0.006, and the control's seed-6-style outliers do not recur. |
+| T3 | Coverage ≥ 90%; width tracks noise | **Coverage: borderline** (mean 0.898). **Width vs noise: not testable as written.** Training noise is homoscedastic (sd 0.05 everywhere), so there is no noise gradient to track. I should have caught that in the pre-registration. |
+| T4 | FOU moves away from init | **Pass.** Fitted w averages 0.71 from init 0.10. |
+
+What this says:
+1. **The FOU helps mainly by making fits more reliable, not by improving the median.** That matches Parts 1–2: fit reliability, not expressive power, is the bottleneck.
+2. **The intervals are too wide to be useful.** Mean width 1.9 on a target spanning about 2.5 units means high coverage is bought with width. Coverage alone does not show a calibrated interval. A proper test would use a calibrated predictive target (e.g. a held-out noisy sample with a width-coverage curve).
+3. **Nie-Tan with min/max bounds is a crude output interval.** Proper Karnik–Mendel type reduction would give tighter, better-founded bounds; it is the next thing to add if interval quality matters.
