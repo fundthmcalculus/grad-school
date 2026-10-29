@@ -29,6 +29,10 @@ th{color:var(--mut);font-size:.78rem;text-transform:uppercase;letter-spacing:.04
 <p>Same model, same size, three corpora at 300M characters. The cost of keeping the named dictionary fixed grows with how varied the text is. The weak pull-back lets the dictionary move a little and keeps it recognisable.</p>
 <div class="scroll"><table id="freeze"></table></div>
 
+<h2>Doubling the size</h2>
+<p>The same model at 200,000 parameters (448 rules per system) on Cosmopedia at 300M characters. Doubling the parameters is the strongest lever; the cost of keeping the named dictionary fixed shrinks as the model grows. Seeds in brackets.</p>
+<div class="scroll"><table id="big"></table></div>
+
 <h2>Across corpora</h2>
 <p>The models trained on Cosmopedia, tested on three corpora (2,000 windows of 256 characters each). They do not transfer well: the Pile-trained model of the same size scores 2.35 on the Pile and the TinyStories-trained one 1.24 on TinyStories.</p>
 <div class="scroll"><table id="cross"></table></div>
@@ -98,7 +102,15 @@ function samples(){
     h+=`<div class="samp"><small>${nm[k]} · prompt: ${e(JSON.stringify(s.prompt))}</small>${e(s.text.replace(/ {8,}/g," …(spaces)… ").slice(0,200))}</div>`;}
   document.getElementById("samples").innerHTML=h;
 }
-function draw(){cards();cosmo();freeze();cross();explain();samples();}
+function big(){
+  const B=D.big||{},L=B["learned dictionary"],C=D.cosmo;
+  const prev={"learned dictionary":C["learned dictionary"],"frozen named dictionary":C["frozen named dictionary"],"named dictionary as starting value":C["named dictionary as starting value"],"pull-back (0.0001 per step)":C["named dictionary, weak pull-back (0.0001 per step)"]};
+  let h="<tr><th>dictionary</th><th>100K</th><th>200K (seeds)</th><th>200K against learned</th></tr>";
+  for(const [k,v] of Object.entries(B)){
+    h+=`<tr><td>${k}</td><td>${prev[k]?f(prev[k].mean):"—"}</td><td>${v?f(v.mean)+" ("+v.seeds.length+")":"pending"}</td><td class="best">${v&&L?sg(v.mean-L.mean):"—"}</td></tr>`;}
+  document.getElementById("big").innerHTML=h;
+}
+function draw(){cards();cosmo();freeze();big();cross();explain();samples();}
 draw();
 fetch("data.json").then(r=>r.ok?r.json():null).then(j=>{if(j){Object.assign(D,j);draw()}}).catch(()=>{});
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change",draw);

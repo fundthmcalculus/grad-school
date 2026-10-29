@@ -69,7 +69,10 @@ def main():
         )
     samples = {k: [dict(prompt=p, text=t) for p, t in list(ci[k]["greedy"].items())[:5]] for k in ("frozen", "init")}
     samples["tied"] = [dict(prompt=p, text=t) for p, t in list(tied["tied"]["greedy"].items())[:5]]
-    data = dict(cosmo=cos, freeze=freeze, cross=cross, explain=ex, samples=samples)
+    big = {}
+    for label, a in (("learned dictionary", "learned"), ("frozen named dictionary", "frozen"), ("named dictionary as starting value", "init"), ("pull-back (0.0001 per step)", "pull0.0001")):
+        big[label] = arm(f"outputs/final200k/{a}_s0/ci_*.log", f"outputs/final200k_s1/{a}_s1/ci_*.log")
+    data = dict(cosmo=cos, freeze=freeze, cross=cross, explain=ex, samples=samples, big=big)
     js = json.dumps(data, ensure_ascii=False)
     open(os.path.join(out, "data.json"), "w", encoding="utf-8").write(js)
     tpl = open("flm/final_report_template.html", encoding="utf-8").read()
