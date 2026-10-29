@@ -480,3 +480,7 @@ Reading: at 200K the frozen named dictionary costs 0.006 bits (0.35%); the train
 Predictions: learned within 0.01 of seed 0 (1.7227); the frozen cost against learned (seed-1 learned) between +0.001 and +0.012, so the shrink from 100K is not a seed accident; the trainable start gains 0.005-0.02; the pull-back within 0.01 of learned.
 
 Paused (owner, 2026-10-29): the 200K second seed (`flm/bij_schedule/final200k_s1.py`) was stopped with learned and frozen at step 16,000 of 36,622 (both checkpoints verified) (checkpoints every 2,000 steps; init and pull-back not started).  Resume: `cd experiments/fuzzy-language-model && nohup python flm/bij_schedule/final200k_s1.py > outputs/final200k_s1/driver.log 2>&1 &` (`--resume auto` continues the two started runs from their last checkpoint).
+
+## Next: the frozen head plan (2026-10-29)
+
+Because the frozen named head costs less at larger sizes (Cosmopedia 0.0179 at 100K to 0.0057 at 200K, two seeds each), the owner asked for a plan for testing 100K and 50K models and for a TRIBBLE hot start of the layers below the head: `PLAN_FROZEN_HEAD.md` (a plan only; nothing registered or run).  New fact recorded there: on the Pile the frozen cost sits mostly in marks (42% of the cost from 7% of positions), lower-case letters (32%), upper case (14%) and digits (8%) (`outputs/final_eval/diagnose_pile.json`, evaluation only).
