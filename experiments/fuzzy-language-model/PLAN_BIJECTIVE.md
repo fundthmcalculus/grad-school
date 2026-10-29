@@ -437,3 +437,14 @@ Reading: the pull-back is a working compromise at 300M.  A pull of 0.0001 per st
 
 `flm/bij_schedule/gaps.py`, `outputs/gaps/`: (a) the tied head on Cosmopedia 300M, seed 1 (the architecture control was one seed); (b) pull 0.00003 on the Pile 300M, seed 0; (c) pull 0.0001 on the Pile 300M, seed 1.
 Predictions: (a) 1.838-1.858 (seed 0: 1.8479), so the invertible model keeps its 0.01-0.03 margin over the tied head on two seeds; (b) between the free start (2.3510) and pull 0.0001 (2.3608): 2.351-2.360; (c) within 0.01 of seed 0 (2.3608).
+
+## Single-seed gaps, results (2026-10-29)
+
+300M characters, fp32, lr 0.01: tied head on Cosmopedia seed 1: 1.8512 (seed 0 1.8479; two-seed mean 1.8496; invertible learned 1.8288, margin 0.0208).  Pile, `oh48` pull 0.00003 seed 0: 2.3550 (+0.0063 against learned 2.3487; free start 2.3510; pull 0.0001 seed 0 2.3608).  Pile, pull 0.0001 seed 1: 2.3571; two-seed mean 2.3590 (+0.0103 against learned; frozen +0.0613).
+Scoring: (a) right (1.8512 inside 1.838-1.858; the invertible model keeps its margin over the tied head on two seeds each: 0.021, inside 0.01-0.03).  (b) right (2.3550 inside 2.351-2.360).  (c) right (seed 1 within 0.004 of seed 0).
+Reading: the 0.0001 pull-back costs +0.010 on the Pile on two seeds (frozen +0.061, free start +0.002 on one seed), and matches the learned dictionary on Cosmopedia (-0.002 on two seeds), while keeping the dictionary 0.81-0.89 correlated with its constructed form.
+
+## Pile second seed (registered 2026-10-29, before the runs)
+
+`flm/bij_schedule/pile_s1.py`, `outputs/pile_s1/`: `oh48` on the Pile 300M seed 1: learned, frozen, trainable start (the Pile arms were one seed).
+Predictions: learned within 0.01 of seed 0 (2.3487); frozen +0.04 to +0.08 against learned (seed 0: +0.0613); trainable start within 0.02 of learned in either direction (seed 0: +0.0023).
