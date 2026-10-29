@@ -459,3 +459,22 @@ Reading: on the Pile the frozen named dictionary costs about 0.059 bits on two s
 
 `oh48` at width 48, 448/314 rules per system, 199,903 parameters, Cosmopedia 300M, fp32, lr 0.01, seed 0 (`flm/bij_schedule/final200k.py`, `outputs/final200k/`): learned, frozen, trainable start, and the 0.0001 pull-back.  The 100K results (seed 0): learned 1.8297, frozen 1.8472 (+0.0175), start 1.8206, pull 1.8292.
 Predictions: 1. Doubling the parameters improves learned by 0.04-0.09 (TinyStories 100K to 200K gained 0.06 at 30M characters).  2. The frozen cost against learned does not grow: within 0.01 of +0.0175.  3. The trainable start still gains, by 0.002-0.015.  4. The pull-back (0.0001 per step) stays within 0.01 of learned.
+
+## The final model at 200K parameters, results (2026-10-29)
+
+`oh48`, width 48, 448/314 rules, 199,903 parameters, Cosmopedia 300M, fp32, lr 0.01, seed 0, validation bits per character (distance correlation of the final dictionary with the constructed one in brackets):
+
+| arm | 100K (seed 0) | 200K (seed 0) | 200K against learned |
+|---|---|---|---|
+| learned | 1.8297 | 1.7227 | 0 |
+| frozen | 1.8472 (+0.0175) | 1.7287 | +0.0060 |
+| trainable start | 1.8206 (-0.0091) | 1.7077 (0.191) | -0.0150 |
+| pull 0.0001 | 1.8292 (-0.0005) | 1.7158 (0.887) | -0.0069 |
+
+Scoring: 1 wrong (doubling the parameters gained 0.107 for the learned model, predicted 0.04-0.09).  2 wrong in the good direction (frozen +0.0060, 0.0115 below the 100K cost; predicted within 0.01 of +0.0175).  3 right at the edge (the trainable start gains 0.0150, inside 0.002-0.015).  4 right (pull-back within 0.01 of learned: -0.0069, and better).
+Reading: at 200K the frozen named dictionary costs 0.006 bits (0.35%); the trainable start gains 0.015; the 0.0001 pull-back, which keeps the dictionary 0.89 correlated with its constructed form, gains 0.007.  The frozen cost fell from 0.0175 to 0.0060 when the model doubled, which suggests the cost of the fixed, named space shrinks as the rest of the model gets more capacity to adapt to it (one seed).
+
+## 200K second seed (registered 2026-10-29, before the runs)
+
+`flm/bij_schedule/final200k_s1.py`, `outputs/final200k_s1/`: the same four arms at seed 1.
+Predictions: learned within 0.01 of seed 0 (1.7227); the frozen cost against learned (seed-1 learned) between +0.001 and +0.012, so the shrink from 100K is not a seed accident; the trainable start gains 0.005-0.02; the pull-back within 0.01 of learned.
