@@ -189,3 +189,47 @@ What this says:
 3. **The pentagon FOU is too narrow to be useful.** It fits w ≈ 0.10, so the interval is 0.25 wide. It covers 88% of the noise-free target but only 71% of noisy targets, and its width does not track noise. Gaussian FOU intervals are wide (1.6–1.8) and also do not track noise.
 4. **Undefined points.** For some seeds the lower firing vanishes for every rule at a few grid points (0.08% overall), so the KM weights are 0/0 there. Those points collapse to the point prediction. This is a real property of shrunk pentagons, not a numerical slip.
 5. **The degenerate pentagon.** On some seeds the fit drives a knot segment to zero width. The membership is clamped to keep the derivative finite, so the failure shows in the metrics rather than as NaN.
+
+## Part 5: calibrated footprint and noise models (`calib_study.py`)
+
+Two changes. Stage 1 fits centres, spreads and consequents as before. Stage 2 re-fits only the footprint parameters to minimise the mean Winkler interval score (α = 0.1) on the noisy training targets, so the intervals become predictive. Two noise models:
+
+- **x_hetero:** sd 0.02 where x₁ < 0.5, else 0.15. Observable from x.
+- **regime:** a hidden 0/1 regime per point, sd 0.02 or 0.15. Not an input, so no footprint of x can see it. Negative control.
+
+Full table: [`results_calib.md`](results_calib.md); per-fit rows: [`results_calib.csv`](results_calib.csv); log: [`calib_run.log`](calib_run.log).
+
+x_hetero, mean over seeds 0–9:
+
+| variant | arm | coverage | width ratio hi/lo | Spearman(width, sd) | Winkler | RMSE (noise-free) |
+|---|---|---:|---:|---:|---:|---:|
+| gauss_global | uncal | 0.940 | 1.16 | +0.08 | 1.714 | 0.062 |
+| gauss_global | cal | 0.811 | 2.17 | +0.47 | 0.681 | 0.082 |
+| gauss_local | uncal | 0.939 | 1.26 | +0.15 | 1.901 | 0.063 |
+| gauss_local | cal | 0.814 | **3.18** | **+0.70** | 0.638 | 0.097 |
+| pent_fou | uncal | 0.710 | 0.98 | −0.04 | 0.806 | 0.047 |
+| pent_fou | cal | 0.803 | 2.71 | +0.59 | **0.589** | 0.050 |
+
+regime (negative control), mean over seeds:
+
+| variant | arm | coverage, low sd | coverage, high sd | Spearman(width, regime) |
+|---|---|---:|---:|---:|
+| gauss_local | cal | 0.937 | 0.705 | −0.01 |
+| pent_fou | cal | 0.972 | 0.701 | −0.01 |
+
+Pre-registered checks:
+
+| # | Check | Verdict |
+|---|---|---|
+| C1 | x_hetero gauss_local calibrated coverage in [0.85, 0.95] | **Fail.** 0.814. Under-covers, and the stage-2 optimiser stopped at its 40-iteration cap on every calibration. |
+| C2 | x_hetero gauss_local calibrated Spearman > 0.5 | **Pass.** +0.70. |
+| C3 | x_hetero gauss_local calibrated width ratio ≥ 1.5 | **Pass.** 3.18. |
+| C4 | regime: \|Spearman(width, regime)\| < 0.2 | **Pass.** −0.01. |
+| C5 | regime: conditional coverage gap > 0.10 | **Pass.** 0.937 vs 0.705 (gap 0.23). |
+| C6 | x_hetero: calibrated Winkler < uncalibrated for every variant | **Pass** on means (0.68/0.64/0.59 vs 1.71/1.90/0.81). Per-seed medians not separately reported. |
+
+What this says:
+1. **Calibration makes the footprint track observable noise.** The local footprint reaches Spearman +0.70 and a 3.2× width ratio, and the pentagon footprint gets to +0.59. Before calibration, none of the variants tracked noise.
+2. **Hidden noise stays hidden.** With regime noise the widths are flat (ρ ≈ 0). Calibration fixes the average coverage but cannot fix the split: low-noise points are over-covered and high-noise points under-covered by about 0.23. That matches the design: a footprint of x cannot learn an unobserved regime.
+3. **Calibration costs point accuracy.** Noise-free RMSE rises from 0.062 to 0.097 for gauss_local. The footprint also sets the Nie–Tan point prediction, so re-fitting it moves the mean. A separate mean-fit would be needed to keep both.
+4. **Under-coverage is real.** Nominal 90% gives about 81% on held-out data. The optimiser hit its cap, so part of the gap may be optimisation, not model error. Raising the cap would test that.
