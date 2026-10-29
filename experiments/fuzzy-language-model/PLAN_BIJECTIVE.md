@@ -370,3 +370,20 @@ Reading: the frozen, fully named model matches the tied head (1.8467 against 1.8
 
 `oh48` with `FIXED_TRAIN=1 FIXED_PULL=0.001` (the dictionary moves 0.1% of the way back to its constructed value after every step; at 30M TinyStories it kept distance correlation 0.957 and gained 0.0054 over learned) on the final-model corpus: Cosmopedia 300M, seeds 0 and 1, and the Pile 300M, seed 0 (`flm/bij_schedule/pull300.py`, `outputs/pull300/`).
 Predictions: 1. Cosmopedia: between frozen (1.8467) and learned (1.8288), closer to learned: 1.822-1.840.  2. Pile: costs at most 0.03 against learned (2.3487), between frozen (+0.061) and the free start (+0.002).  3. The trained dictionary keeps a distance correlation above 0.9 with the constructed one on both corpora.
+
+## Final model evaluation (2026-10-29; seed 0 checkpoints, `outputs/final_eval/`)
+
+Cross-corpus validation bits per character (`flm/eval_cross.py`, 2,000 windows of 256 characters per corpus, same windows for every model), models trained on Cosmopedia v2 at 300M characters:
+
+| model | Cosmopedia | TinyStories | Pile |
+|---|---|---|---|
+| ci `oh48`, learned | 1.8314 | 2.2968 | 2.8402 |
+| ci `oh48`, frozen | 1.8491 | 2.3222 | 2.8814 |
+| ci `oh48`, as initial value | 1.8214 | 2.2588 | 2.8331 |
+| tied head | 1.8487 | 2.2774 | 2.8324 |
+
+For reference the in-domain models: TinyStories-trained ci 1.2435 (oh48 learned, 300M), Pile-trained ci 2.3487.  Prediction 4 right: the Cosmopedia model is worse on the Pile by 0.49 (more than 0.3) and on TinyStories by 1.05 (more than 0.2).  The Cosmopedia-trained models do not transfer well; on the Pile the tied head ties the trainable-start model (2.8324 against 2.8331) and the frozen one trails by 0.04.
+
+Explainability suite on Cosmopedia (256 windows; frozen, trainable-start and tied head): read through its own output stage, the invertible model's state after the embedding reads as the current character (accuracy 0.022, bpc 7.3 frozen, 6.1 start) while the tied head's early readout is uncalibrated (bpc 83); after the last block all reach accuracy about 0.61 and bpc 1.80-1.83.  Rules per block: effective number 50 of 137 (block 0) and 91 of 196 (block 1) for the frozen model; one rule's winning identity tells less about the next character than the previous character does in block 0 (0.69 against 0.94 bits) and about the same in block 1 (0.95 against 0.94 for frozen, 0.88 for the start model; 0.70 for the tied head).  Ablation: silencing the 8 most-used rules costs more than the worst of 10 random 8-rule draws in every cell (frozen: block 0 +0.41 against at most +0.33; block 1 +0.59 against at most +0.18; start model block 1 +0.22 against at most +0.12; tied head block 1 +0.49 against at most +0.18), so the rulebook is causal.
+Round trip (`flm/verify_invertible.py`, frozen final model): exact in float64 and float32 on short text, the pangram, 2,000 held-out symbols and every symbol shuffled (0 wrong; maximum reconstruction error 1e-15 and 5e-07); out-of-vocabulary characters become the unknown symbol and come back as it.
+Greedy continuations (blind coherence set): all models loop under greedy decoding on Cosmopedia (distinct 8-gram share 0.0-0.26; frozen 0.12, 0.15, 0.15, 0.0, 0.11; start model 0.04, 0.21, 0.16, 0.0, 0.04; tied head 0.26, 0.19, 0.25, 0.0, 0.06): "the context of the context of the ...", "American American and Contemporary ...", and a run of spaces for the code prompt.  This is the greedy-decoding failure of a 100K character model, as on the Pile; the invertible models loop more than the tied head.
