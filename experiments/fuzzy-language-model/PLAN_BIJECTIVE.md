@@ -419,3 +419,21 @@ Reading: there is a setting where the dictionary stays recognisable and the scor
 
 `flm/bij_schedule/pull_confirm.py`, `outputs/pull_confirm/`: pull 0.0001 and 0.00003 on Cosmopedia 300M seed 1; pull 0.0001 on the Pile 300M seed 0 (`oh48`, fp32, lr 0.01).
 Predictions: 1. Seed 1 reproduces seed 0 within 0.006 for both strengths (seed-1 learned 1.8279 and trainable start 1.8136 were within 0.008 of seed 0 in the final-model study).  2. On the Pile the pull of 0.0001 costs at most 0.02 against learned (2.3487), between frozen (+0.061) and the free start (+0.002).  3. The distance correlation on the Pile at 0.0001 is within 0.1 of the Cosmopedia value (0.877).
+
+## Pull-back confirmation, results (2026-10-29)
+
+`oh48`, 300M characters, fp32, lr 0.01, validation bits per character (distance correlation of the final dictionary with the constructed one / relative move):
+
+| corpus | pull per step | seed 0 | seed 1 | mean | against learned |
+|---|---|---|---|---|---|
+| Cosmopedia | 0.0001 | 1.8292 (0.877 / 0.53) | 1.8242 (0.887 / 0.52) | 1.8267 | -0.0021 (learned 1.8288) |
+| Cosmopedia | 0.00003 | 1.8189 (0.501 / 0.89) | 1.8167 (0.473 / 0.87) | 1.8178 | -0.0110 (trainable start 1.8171) |
+| Pile | 0.0001 | 2.3608 (0.806 / 0.50) | not run | 2.3608 | +0.0121 (learned 2.3487; frozen +0.0613; free start +0.0023) |
+
+Scoring: 1 right (seed 1 within 0.005 of seed 0 for both strengths: 0.0050 and 0.0022).  2 right (Pile pull 0.0001: +0.0121, inside 0.02).  3 right (Pile correlation 0.806 within 0.1 of Cosmopedia 0.877).
+Reading: the pull-back is a working compromise at 300M.  A pull of 0.0001 per step keeps the dictionary about 0.85-0.89 correlated with its constructed form and scores level with a learned dictionary on Cosmopedia (1.8267 against 1.8288), 0.020 better than frozen; on the Pile it costs 0.012 where frozen costs 0.061.  A pull of 0.00003 gives the trainable start's score on Cosmopedia (1.8178 against 1.8171) with the dictionary about twice as close to its constructed form (0.47-0.50 against 0.18-0.28).  The model to ship for explanation is the 0.0001 pull: readable geometry, no meaningful cost on Cosmopedia, 0.012 on the Pile.
+
+## Closing the single-seed gaps (registered 2026-10-29, before the runs)
+
+`flm/bij_schedule/gaps.py`, `outputs/gaps/`: (a) the tied head on Cosmopedia 300M, seed 1 (the architecture control was one seed); (b) pull 0.00003 on the Pile 300M, seed 0; (c) pull 0.0001 on the Pile 300M, seed 1.
+Predictions: (a) 1.838-1.858 (seed 0: 1.8479), so the invertible model keeps its 0.01-0.03 margin over the tied head on two seeds; (b) between the free start (2.3510) and pull 0.0001 (2.3608): 2.351-2.360; (c) within 0.01 of seed 0 (2.3608).
