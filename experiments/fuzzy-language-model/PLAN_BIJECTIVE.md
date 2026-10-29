@@ -478,3 +478,5 @@ Reading: at 200K the frozen named dictionary costs 0.006 bits (0.35%); the train
 
 `flm/bij_schedule/final200k_s1.py`, `outputs/final200k_s1/`: the same four arms at seed 1.
 Predictions: learned within 0.01 of seed 0 (1.7227); the frozen cost against learned (seed-1 learned) between +0.001 and +0.012, so the shrink from 100K is not a seed accident; the trainable start gains 0.005-0.02; the pull-back within 0.01 of learned.
+
+Paused (owner, 2026-10-29): the 200K second seed (`flm/bij_schedule/final200k_s1.py`) was stopped with learned at step 12,000 and frozen at step 14,000 of 36,622 (checkpoints every 2,000 steps; init and pull-back not started).  Resume: `cd experiments/fuzzy-language-model && nohup python flm/bij_schedule/final200k_s1.py > outputs/final200k_s1/driver.log 2>&1 &` (`--resume auto` continues the two started runs from their last checkpoint).
