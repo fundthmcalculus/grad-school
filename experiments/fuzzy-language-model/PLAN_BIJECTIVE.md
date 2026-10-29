@@ -484,3 +484,9 @@ Paused (owner, 2026-10-29): the 200K second seed (`flm/bij_schedule/final200k_s1
 ## Next: the frozen head plan (2026-10-29)
 
 Because the frozen named head costs less at larger sizes (Cosmopedia 0.0179 at 100K to 0.0057 at 200K, two seeds each), the owner asked for a plan for testing 100K and 50K models and for a TRIBBLE hot start of the layers below the head: `PLAN_FROZEN_HEAD.md` (a plan only; nothing registered or run).  New fact recorded there: on the Pile the frozen cost sits mostly in marks (42% of the cost from 7% of positions), lower-case letters (32%), upper case (14%) and digits (8%) (`outputs/final_eval/diagnose_pile.json`, evaluation only).
+
+## The final model at 200K parameters, second seed, results (2026-10-29)
+
+Cosmopedia 300M, `oh48`, 448/314 rules, 199,903 parameters, fp32, lr 0.01, seed 1: learned 1.7223, frozen 1.7277, trainable start 1.7107, pull 0.0001 1.7166.  Two-seed means: learned 1.7225, frozen 1.7282 (+0.0057), trainable start 1.7092 (-0.0133), pull-back 1.7162 (-0.0063).  The seed-1 run of the learned and frozen arms was paused at step 16,000 and resumed from its checkpoint.
+Scoring (registered before the runs): learned within 0.01 of seed 0 (0.0004): right.  Frozen cost against learned between +0.001 and +0.012 (+0.0054): right.  Trainable start gains 0.005-0.02 (0.0116): right.  Pull-back within 0.01 of learned (-0.0057): right.
+Reading: on two seeds the frozen named dictionary costs +0.0057 at 200K against +0.0179 at 100K (0.3% against 1%); the trainable start gains 0.0133 and the 0.0001 pull-back, which keeps the dictionary about 0.89 correlated with its constructed form, gains 0.0063.  Doubling the parameters gained about 0.107 bits for the learned model on both seeds.
