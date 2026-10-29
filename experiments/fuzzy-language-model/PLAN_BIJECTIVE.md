@@ -365,3 +365,8 @@ ci, width 48, 196/137 rules, 100,114 parameters; the tied head at its 100K shape
 
 Scoring: 1 right (learned 1.8288 inside 1.6-2.2).  2 right (frozen +0.0179 within 0.03; as initial value better by 0.0117, inside 0.003-0.02).  3 right (ci beats the tied head by 0.0191, inside 0.01-0.03; one seed for the tied head).  4 pending (cross-corpus evaluation).
 Reading: the frozen, fully named model matches the tied head (1.8467 against 1.8479) and the trainable-start model beats it by 0.031 (1.8171 against 1.8479).  On the three corpora at 300M the cost of freezing the named dictionary is +0.006 (TinyStories), +0.018 (Cosmopedia), +0.061 (Pile): it grows with the variety of the text.
+
+## Weak pull-back at 300M (registered 2026-10-29, before the runs)
+
+`oh48` with `FIXED_TRAIN=1 FIXED_PULL=0.001` (the dictionary moves 0.1% of the way back to its constructed value after every step; at 30M TinyStories it kept distance correlation 0.957 and gained 0.0054 over learned) on the final-model corpus: Cosmopedia 300M, seeds 0 and 1, and the Pile 300M, seed 0 (`flm/bij_schedule/pull300.py`, `outputs/pull300/`).
+Predictions: 1. Cosmopedia: between frozen (1.8467) and learned (1.8288), closer to learned: 1.822-1.840.  2. Pile: costs at most 0.03 against learned (2.3487), between frozen (+0.061) and the free start (+0.002).  3. The trained dictionary keeps a distance correlation above 0.9 with the constructed one on both corpora.
