@@ -1,0 +1,50 @@
+verify KM vs brute force over switch points: worst |diff| 0.00e+00
+seed 0 km_fou       nie_tan  RMSE 0.0576 cov(nf) 0.813 cov(noisy) 0.723 width 0.702 rho -0.23
+seed 0 km_fou       km       RMSE 0.0576 cov(nf) 0.977 cov(noisy) 0.936 width 1.276 rho -0.17
+seed 0 km_collapse  nie_tan  RMSE 0.0529 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 0 km_collapse  km       RMSE 0.0529 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 1 km_fou       nie_tan  RMSE 0.0624 cov(nf) 0.468 cov(noisy) 0.349 width 0.118 rho +0.20
+seed 1 km_fou       km       RMSE 0.0624 cov(nf) 0.935 cov(noisy) 0.904 width 1.369 rho -0.26
+seed 1 km_collapse  nie_tan  RMSE 0.0608 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 1 km_collapse  km       RMSE 0.0608 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 2 km_fou       nie_tan  RMSE 0.0756 cov(nf) 0.699 cov(noisy) 0.526 width 0.300 rho +0.48
+seed 2 km_fou       km       RMSE 0.0756 cov(nf) 0.984 cov(noisy) 0.948 width 1.516 rho +0.20
+seed 2 km_collapse  nie_tan  RMSE 0.0722 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 2 km_collapse  km       RMSE 0.0722 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 3 km_fou       nie_tan  RMSE 0.0604 cov(nf) 0.542 cov(noisy) 0.409 width 0.106 rho +0.08
+seed 3 km_fou       km       RMSE 0.0604 cov(nf) 0.932 cov(noisy) 0.835 width 0.890 rho -0.10
+seed 3 km_collapse  nie_tan  RMSE 0.0514 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 3 km_collapse  km       RMSE 0.0514 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 4 km_fou       nie_tan  RMSE 0.0910 cov(nf) 0.609 cov(noisy) 0.471 width 0.302 rho +0.08
+seed 4 km_fou       km       RMSE 0.0910 cov(nf) 0.938 cov(noisy) 0.866 width 1.210 rho -0.26
+seed 4 km_collapse  nie_tan  RMSE 0.0534 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 4 km_collapse  km       RMSE 0.0534 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 5 km_fou       nie_tan  RMSE 0.0518 cov(nf) 0.789 cov(noisy) 0.651 width 0.321 rho +0.36
+seed 5 km_fou       km       RMSE 0.0518 cov(nf) 0.981 cov(noisy) 0.914 width 1.256 rho +0.29
+seed 5 km_collapse  nie_tan  RMSE 0.0508 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 5 km_collapse  km       RMSE 0.0508 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 6 km_fou       nie_tan  RMSE 0.0534 cov(nf) 0.652 cov(noisy) 0.507 width 0.310 rho +0.66
+seed 6 km_fou       km       RMSE 0.0534 cov(nf) 0.993 cov(noisy) 0.978 width 2.187 rho +0.18
+seed 6 km_collapse  nie_tan  RMSE 0.0541 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 6 km_collapse  km       RMSE 0.0541 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 7 km_fou       nie_tan  RMSE 0.0562 cov(nf) 0.559 cov(noisy) 0.399 width 0.165 rho +0.55
+seed 7 km_fou       km       RMSE 0.0562 cov(nf) 0.961 cov(noisy) 0.855 width 1.290 rho +0.03
+seed 7 km_collapse  nie_tan  RMSE 0.0653 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 7 km_collapse  km       RMSE 0.0653 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 8 km_fou       nie_tan  RMSE 0.0599 cov(nf) 0.675 cov(noisy) 0.650 width 0.523 rho +0.61
+seed 8 km_fou       km       RMSE 0.0599 cov(nf) 0.999 cov(noisy) 0.995 width 2.707 rho +0.45
+seed 8 km_collapse  nie_tan  RMSE 0.0874 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 8 km_collapse  km       RMSE 0.0874 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 9 km_fou       nie_tan  RMSE 0.0627 cov(nf) 0.795 cov(noisy) 0.639 width 0.332 rho +0.37
+seed 9 km_fou       km       RMSE 0.0627 cov(nf) 0.996 cov(noisy) 0.970 width 1.037 rho +0.44
+seed 9 km_collapse  nie_tan  RMSE 0.0600 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+seed 9 km_collapse  km       RMSE 0.0600 cov(nf) 0.000 cov(noisy) 0.000 width 0.000 rho +0.00
+| arm | bounds | cov. noise-free | cov. noisy | mean width | width (low sd) | width (high sd) | Spearman(width, sd) |
+|---|---|---:|---:|---:|---:|---:|---:|
+| km_collapse | nie_tan | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | +0.00 |
+| km_collapse | km | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | +0.00 |
+| km_fou | nie_tan | 0.660 | 0.532 | 0.318 | 0.228 | 0.407 | +0.32 |
+| km_fou | km | 0.970 | 0.920 | 1.474 | 1.369 | 1.579 | +0.08 |
+
+Seeds 0..9, K=5, N_train=500, heteroscedastic noise sd 0.02 (x1<0.5) / 0.15. Coverage on a 40x40 grid. Spearman computed per seed, averaged.
+

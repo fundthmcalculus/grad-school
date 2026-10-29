@@ -125,3 +125,31 @@ What this says:
 1. **The FOU helps mainly by making fits more reliable, not by improving the median.** That matches Parts 1–2: fit reliability, not expressive power, is the bottleneck.
 2. **The intervals are too wide to be useful.** Mean width 1.9 on a target spanning about 2.5 units means high coverage is bought with width. Coverage alone does not show a calibrated interval. A proper test would use a calibrated predictive target (e.g. a held-out noisy sample with a width-coverage curve).
 3. **Nie-Tan with min/max bounds is a crude output interval.** Proper Karnik–Mendel type reduction would give tighter, better-founded bounds; it is the next thing to add if interval quality matters.
+
+## Part 3b: Karnik–Mendel type reduction and calibration (`km_study.py`)
+
+Output interval by Karnik–Mendel (KM) type reduction, replacing the min/max bounds from Part 3. Heteroscedastic training noise (sd 0.02 where x₁<0.5, 0.15 elsewhere), so width-vs-noise is testable. KM is verified against brute-force switch-point search on 300 random cases (worst diff 0).
+
+**Consequent ridge matters a lot.** At ridge 1e-6, consequent coefficients reach ~120 and KM intervals are ~35 wide, dominated by low-firing rules with ill-determined consequents ([`results_km_ridge1e-6.md`](results_km_ridge1e-6.md)). At ridge 1e-2 the coefficients stay under ~10. The 1e-2 value was chosen after a sweep on seeds 0–1, which are also in the evaluation, so it is tuned rather than held out.
+
+Ridge 1e-2, 10 seeds ([`results_km.md`](results_km.md), [`results_km.csv`](results_km.csv)):
+
+| bounds | cov. noise-free | cov. noisy | mean width | width (low sd) | width (high sd) | Spearman(width, sd) |
+|---|---:|---:|---:|---:|---:|---:|
+| Nie–Tan min/max | 0.660 | 0.532 | 0.32 | 0.23 | 0.41 | +0.32 |
+| Karnik–Mendel | 0.970 | 0.920 | 1.47 | 1.37 | 1.58 | +0.08 |
+
+Pre-registered checks:
+
+| # | Check | Verdict |
+|---|---|---|
+| K1 | KM matches brute force | **Pass** (exact). |
+| K2 | Collapse control has zero width | **Pass.** |
+| K3 | KM width tracks local noise (ρ > 0.3) | **Fail.** ρ = +0.08. Nie–Tan reaches +0.32, but it under-covers. |
+| K4 | KM covers ≥ 90% of noise-free target | **Pass** (0.970). |
+| K5 | KM covers < 50% of noisy targets | **Fail.** Coverage 0.92. The KM intervals are wide enough to act as rough predictive intervals here, which is not what this model is for. |
+
+What this says:
+1. **KM with regularised consequents gives sensible-width intervals**, but they do not track local noise. The FOU here reflects a global spread, not a local one.
+2. **Nie–Tan bounds are narrower and do track noise** (ρ +0.32), but under-cover (0.66). Neither bound is a calibrated predictive interval.
+3. **The interval quality depends on a consequent-regularisation choice** that was not in the pre-registration. Any type-2 interval result should report the ridge alongside it.
