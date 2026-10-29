@@ -330,3 +330,18 @@ Reading: at scale a fully named, frozen 48-wide dictionary costs 0.0057 bits (0.
 ci, width 40, 250/175 rules, 100,134 parameters, 30M TinyStories characters, fp32, lr 0.01, seeds 0 and 1, validation bits per character: learned 1.3676 / 1.3803 (mean 1.3740); frozen 1.4119 / 1.4258 (mean 1.4189, +0.0449); as initial value 1.3583 / 1.3666 (mean 1.3625, -0.0115).
 Scoring: prediction 1 wrong (frozen +0.045, not at most 0.03), but well under the 0.1 line, so the frozen floor is not forced up to 48.  Compared with `oh48` frozen (+0.005, 30M), dropping the named mark-group flags and keeping only a 6-bit mark code costs about 0.04 bits; the learned-dictionary control at width 40 is as expected (between 32 at 1.3700 and 48 at 1.3800, within seed spread).  As an initial value `oh40` again beats learned (-0.0115, the same size as `oh48` at 30M: -0.017).
 Reading: the frozen floor is between 40 and 48 dimensions at a cost of 0.005 (48) to 0.045 (40) bits; below that the binary mark code is what the frozen model pays for, since letters and space are now equal-distance flags.  The named-dictionary advantage as a starting value holds at 40, 48 and 64.
+
+## Drift penalty on oh48, results (2026-10-28)
+
+ci, width 48, 196/137 rules, 30M TinyStories characters, fp32, lr 0.01, seeds 0 and 1, `FIXED_TRAIN=1` with `FIXED_PULL=k` (after every optimiser step the dictionary moves the fraction k of the way back to its constructed value).  Validation bits per character, with the dictionary's drift measured on the final checkpoints (correlation of pairwise distances with the constructed dictionary; relative move = norm of the change over norm of the dictionary):
+
+| arm | seed 0 | seed 1 | mean | against learned (1.3800) | distance correlation | relative move |
+|---|---|---|---|---|---|---|
+| learned | 1.3837 | 1.3762 | 1.3800 | 0 | - | - |
+| frozen | 1.3889 | 1.3809 | 1.3849 | +0.0049 | 1.000 | 0 |
+| initial value, no penalty | 1.3665 | 1.3590 | 1.3628 | -0.0172 | 0.496 | 1.28 |
+| pull 0.001 | 1.3773 | 1.3720 | 1.3747 | -0.0054 | **0.957** | 0.36 |
+| pull 0.01 | 1.3848 | 1.3787 | 1.3818 | +0.0018 | 1.000 | 0.03 |
+
+Scoring: both penalised arms are better than the frozen arm (right, by 0.0103 and 0.0032); the stronger pull keeps the distance correlation above 0.9 (right, 1.000); the weaker pull's correlation was predicted 0.7-0.9 and came out 0.957 (wrong, it keeps more than expected); an unpenalised start about 0.55 (right in range, 0.496).
+Reading: a weak pull (0.001) keeps the dictionary's geometry almost intact (distance correlation 0.957, against 0.496 without a penalty) and still gains 0.0054 over learned, about a third of the unpenalised start's 0.0172 gain and 0.0103 better than frozen.  So "fix the dictionary, but maybe revise it" works: the dictionary can adapt by a third of its own size and stay recognisable.  The 5-nearest-neighbour overlap is not a useful drift measure for these dictionaries (0.66 even at correlation 1.000) because a flag-per-letter layout has many exactly equal distances and any tiny move reorders the ties.
