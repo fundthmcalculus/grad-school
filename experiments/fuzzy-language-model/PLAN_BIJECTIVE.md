@@ -448,3 +448,9 @@ Reading: the 0.0001 pull-back costs +0.010 on the Pile on two seeds (frozen +0.0
 
 `flm/bij_schedule/pile_s1.py`, `outputs/pile_s1/`: `oh48` on the Pile 300M seed 1: learned, frozen, trainable start (the Pile arms were one seed).
 Predictions: learned within 0.01 of seed 0 (2.3487); frozen +0.04 to +0.08 against learned (seed 0: +0.0613); trainable start within 0.02 of learned in either direction (seed 0: +0.0023).
+
+## Pile second seed, results (2026-10-29)
+
+`oh48`, Pile 300M, seed 1, fp32, lr 0.01: learned 2.3427, frozen 2.3993, trainable start 2.3394.  Two-seed means: learned 2.3457 (seed 0 2.3487), frozen 2.4047 (+0.0590), trainable start 2.3452 (-0.0005); pull 0.0001 2.3590 (+0.0133 against the two-seed learned mean).
+Scoring: learned within 0.01 of seed 0 (0.006): right.  Frozen +0.04 to +0.08 against learned (+0.0566): right.  Trainable start within 0.02 of learned (-0.0033): right.
+Reading: on the Pile the frozen named dictionary costs about 0.059 bits on two seeds (2.5%), the trainable start is level with learned (-0.0005), and the 0.0001 pull-back costs 0.013.  On Cosmopedia frozen costs 0.018, the start gains 0.012; on TinyStories 0.006 and 0.008.  So the trainable named start never hurts and helps on simpler text; freezing costs more the more varied the text; the pull-back recovers most of that cost.
