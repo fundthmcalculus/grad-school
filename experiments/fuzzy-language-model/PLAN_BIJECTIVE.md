@@ -454,3 +454,8 @@ Predictions: learned within 0.01 of seed 0 (2.3487); frozen +0.04 to +0.08 again
 `oh48`, Pile 300M, seed 1, fp32, lr 0.01: learned 2.3427, frozen 2.3993, trainable start 2.3394.  Two-seed means: learned 2.3457 (seed 0 2.3487), frozen 2.4047 (+0.0590), trainable start 2.3452 (-0.0005); pull 0.0001 2.3590 (+0.0133 against the two-seed learned mean).
 Scoring: learned within 0.01 of seed 0 (0.006): right.  Frozen +0.04 to +0.08 against learned (+0.0566): right.  Trainable start within 0.02 of learned (-0.0033): right.
 Reading: on the Pile the frozen named dictionary costs about 0.059 bits on two seeds (2.5%), the trainable start is level with learned (-0.0005), and the 0.0001 pull-back costs 0.013.  On Cosmopedia frozen costs 0.018, the start gains 0.012; on TinyStories 0.006 and 0.008.  So the trainable named start never hurts and helps on simpler text; freezing costs more the more varied the text; the pull-back recovers most of that cost.
+
+## The final model at 200K parameters (registered 2026-10-29, before the runs)
+
+`oh48` at width 48, 448/314 rules per system, 199,903 parameters, Cosmopedia 300M, fp32, lr 0.01, seed 0 (`flm/bij_schedule/final200k.py`, `outputs/final200k/`): learned, frozen, trainable start, and the 0.0001 pull-back.  The 100K results (seed 0): learned 1.8297, frozen 1.8472 (+0.0175), start 1.8206, pull 1.8292.
+Predictions: 1. Doubling the parameters improves learned by 0.04-0.09 (TinyStories 100K to 200K gained 0.06 at 30M characters).  2. The frozen cost against learned does not grow: within 0.01 of +0.0175.  3. The trainable start still gains, by 0.002-0.015.  4. The pull-back (0.0001 per step) stays within 0.01 of learned.
