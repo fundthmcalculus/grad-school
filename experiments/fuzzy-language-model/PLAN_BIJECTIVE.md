@@ -398,3 +398,19 @@ Reading: the per-step pull of 0.001 that kept distance correlation 0.957 over 3,
 
 `oh48`, Cosmopedia 300M, seed 0, pull per step 0.0001, 0.00003 and 0.00001 (`flm/bij_schedule/pull_retune.py`, `outputs/pull_retune/`).  A pull of 0.0001 over 36,600 steps has the same time constant relative to training as 0.001 over 3,660.
 Predictions: 1. k = 0.0001 keeps the distance correlation between 0.85 and 0.97 and scores 1.822-1.836 (between the trainable start 1.8171 and frozen 1.8467, nearer learned 1.8288).  2. k = 0.00003 keeps 0.6-0.9 and scores 1.818-1.830.  3. k = 0.00001 keeps 0.4-0.7 and scores within 0.005 of the trainable start.  4. Ordered by strength the scores rise monotonically with k (a stiffer dictionary costs more).
+
+## Pull-back retune, results (2026-10-29)
+
+`oh48`, Cosmopedia 300M, seed 0, fp32, lr 0.01, validation bits per character and the final dictionary's distance correlation with the constructed one (relative move):
+
+| pull per step | validation | against learned (1.8297) | distance correlation | relative move |
+|---|---|---|---|---|
+| frozen | 1.8472 | +0.0175 | 1.000 | 0 |
+| 0.001 | 1.8545 | +0.0248 | 0.999 | 0.07 |
+| 0.0001 | 1.8292 | -0.0005 | 0.877 | 0.53 |
+| 0.00003 | 1.8189 | -0.0108 | 0.501 | 0.89 |
+| 0.00001 | 1.8213 | -0.0084 | 0.353 | 1.04 |
+| none (trainable start) | 1.8206 | -0.0091 | 0.275 | 1.16 |
+
+Scoring: 1 right (k = 0.0001: correlation 0.877 inside 0.85-0.97, score 1.8292 inside 1.822-1.836).  2 half right (k = 0.00003: score 1.8189 inside 1.818-1.830; correlation 0.501, below the predicted 0.6-0.9).  3 right (k = 0.00001: score within 0.005 of the start, +0.0007; correlation 0.353 inside 0.4-0.7 only if rounded down, just below).  4 mostly right: the scores rise with the pull from 0.00003 up (1.8189, 1.8292, 1.8545), but 0.00001 (1.8213) is 0.0024 worse than 0.00003, inside what one seed can hide.  One seed.
+Reading: there is a setting where the dictionary stays recognisable and the score is level with a learned one: a pull of 0.0001 per step over 36,600 steps keeps the distance correlation at 0.88 and scores 1.8292 (0.018 better than frozen, level with learned); a pull of 0.00003 gives the trainable start's score (1.8189 against 1.8206) at correlation 0.50, about twice the unpenalised 0.28.  The pull strength per step should be scaled inversely with the number of steps (0.001 at 3,660 steps and 0.0001 at 36,600 give a comparable geometry: 0.957 and 0.877).
