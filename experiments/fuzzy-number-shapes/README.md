@@ -153,3 +153,39 @@ What this says:
 1. **KM with regularised consequents gives sensible-width intervals**, but they do not track local noise. The FOU here reflects a global spread, not a local one.
 2. **Nie–Tan bounds are narrower and do track noise** (ρ +0.32), but under-cover (0.66). Neither bound is a calibrated predictive interval.
 3. **The interval quality depends on a consequent-regularisation choice** that was not in the pre-registration. Any type-2 interval result should report the ridge alongside it.
+
+## Part 4: local FOU and pentagonal type-2 (`local_pent_study.py`)
+
+Two extensions, same heteroscedastic setup as Part 3b (noise sd 0.02 where x₁<0.5, 0.15 elsewhere), consequent ridge 1e-2, KM output bounds, seeds 0–9:
+
+- **Local FOU (gauss_local).** The Gaussian spread depends on location: w(x) = exp(v₀ + v₁(x−c)). The derivative includes the w(c) dependence on the centre.
+- **Pentagonal type-2 (pent_fou).** Pentagon with knots (peak at the centre) scaled about the peak by exp(±w): upper ≥ lower pointwise (checked).
+- **Controls.** gauss_global (Part 3 model), gauss_collapse and pent_collapse (w = 0, type-1 through the type-2 path).
+
+Analytic Jacobians verified against central differences (rel. err below 1e-7 for all four variants). Full table: [`results_local_pent.md`](results_local_pent.md); per-fit rows: [`results_local_pent.csv`](results_local_pent.csv); log: [`local_pent_run.log`](local_pent_run.log).
+
+| variant | RMSE median | cov. noise-free | cov. noisy | mean width | Spearman(width, sd) | fitted spread |
+|---|---:|---:|---:|---:|---:|---|
+| gauss_collapse (type-1) | 0.0576 | – | – | – | – | – |
+| gauss_global | 0.0644 | 0.979 | 0.940 | 1.60 | +0.08 | w ≈ 0.17 |
+| gauss_local | 0.0635 | 0.973 | 0.940 | 1.79 | +0.15 | mean \|v₁\| = 1.01 |
+| pent_collapse (type-1) | 0.0532 | – | – | – | – | – |
+| pent_fou | **0.0477** | 0.877 | 0.711 | 0.25 | −0.04 | w ≈ 0.10 |
+
+Pre-registered checks:
+
+| # | Check | Verdict |
+|---|---|---|
+| LP1 | gauss_local tracks noise more than global, and ρ > 0.3 | **Partial.** ρ = +0.15, above global's +0.08 but well short of 0.3. |
+| LP2 | Local slope is non-trivial (mean \|v₁\| > 0.1) | **Pass** (1.01). |
+| LP3 | pent_collapse has zero width | **Pass.** |
+| LP4 | pent_fou RMSE no worse than gauss_global | **Pass** (0.048 vs 0.064). |
+| LP5 | pent_fou tracks noise (ρ > 0.3) | **Fail.** ρ = −0.04. |
+| LP6 | pent_fou covers ≥ 90% of noise-free target | **Fail, narrowly.** 0.877. |
+
+What this says:
+1. **Local FOU tilts the interval in the right direction but barely.** Mean width is 2.01 in high-noise regions against 1.57 in low-noise, so the spread follows noise only weakly. It does not clear the ρ > 0.3 bar.
+2. **Pentagons are the better shape here, with and without FOU.** Pentagon type-1 beats Gaussian type-1 (0.053 vs 0.058), and the pentagon FOU is best overall (0.048). The gap between pent_collapse and pent_fou may partly come from the extra parameter changing the optimisation path, not only from the footprint. Gaussian FOU, by contrast, makes the median *worse* than Gaussian type-1 (0.064 vs 0.058).
+3. **The pentagon FOU is too narrow to be useful.** It fits w ≈ 0.10, so the interval is 0.25 wide. It covers 88% of the noise-free target but only 71% of noisy targets, and its width does not track noise. Gaussian FOU intervals are wide (1.6–1.8) and also do not track noise.
+4. **Undefined points.** For some seeds the lower firing vanishes for every rule at a few grid points (0.08% overall), so the KM weights are 0/0 there. Those points collapse to the point prediction. This is a real property of shrunk pentagons, not a numerical slip.
+5. **The degenerate pentagon.** On some seeds the fit drives a knot segment to zero width. The membership is clamped to keep the derivative finite, so the failure shows in the metrics rather than as NaN.
