@@ -351,3 +351,17 @@ Reading: a weak pull (0.001) keeps the dictionary's geometry almost intact (dist
 ci, width 48, 196/137 rules, 100,114 parameters, 300M characters of the Pile sample, fp32, lr 0.01, seed 0, validation bits per character: learned 2.3487; frozen 2.4100 (+0.0613); as initial value 2.3510 (+0.0023).  For reference the width-56 learned ci was 2.3560 and the tied head 2.3783 on the same data.
 Scoring: 1 wrong (frozen was predicted within 0.03 of learned; it is +0.061 on the Pile, against +0.006 on TinyStories at 300M).  2 right (as initial value within 0.02 of learned in either direction: +0.002).  One seed.
 Reading: the frozen named dictionary costs more on harder, more varied text (digits, code, many marks): +0.061 on the Pile.  The trainable start gives no advantage there (+0.002), unlike TinyStories (-0.008).  So the TinyStories result that frozen is nearly free does not carry to the Pile; the weak pull-back arm (distance correlation 0.957 at a small cost on TinyStories) is the candidate for mixed text and has not been run on the Pile.  The learned `oh48` is the best invertible Pile model so far (2.3487).
+
+## Final model on Cosmopedia v2, results (2026-10-29)
+
+ci, width 48, 196/137 rules, 100,114 parameters; the tied head at its 100K shape (width 56, 186/130 rules); 300M characters of Cosmopedia v2 (3.0B available), fp32, lr 0.01, validation bits per character:
+
+| arm | seed 0 | seed 1 | mean | against learned |
+|---|---|---|---|---|
+| learned dictionary | 1.8297 | 1.8279 | 1.8288 | 0 |
+| frozen `oh48` | 1.8472 | 1.8462 | 1.8467 | +0.0179 |
+| `oh48` as initial value | 1.8206 | 1.8136 | 1.8171 | -0.0117 |
+| tied head (seed 0) | 1.8479 | | 1.8479 | +0.0191 |
+
+Scoring: 1 right (learned 1.8288 inside 1.6-2.2).  2 right (frozen +0.0179 within 0.03; as initial value better by 0.0117, inside 0.003-0.02).  3 right (ci beats the tied head by 0.0191, inside 0.01-0.03; one seed for the tied head).  4 pending (cross-corpus evaluation).
+Reading: the frozen, fully named model matches the tied head (1.8467 against 1.8479) and the trainable-start model beats it by 0.031 (1.8171 against 1.8479).  On the three corpora at 300M the cost of freezing the named dictionary is +0.006 (TinyStories), +0.018 (Cosmopedia), +0.061 (Pile): it grows with the variety of the text.
