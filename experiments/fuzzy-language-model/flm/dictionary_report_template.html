@@ -1,0 +1,128 @@
+<title>Dictionary design</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fffdf8;--fg:#1d2420;--mut:#5d675f;--line:#d9d5ca;--good:#2f7d5c;--bad:#c2550a;--neu:#8a8f88;--acc:#2f6b57}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151a17;--card:#1c231f;--fg:#e6ebe6;--mut:#99a49b;--line:#2e3731;--good:#6fcf9f;--bad:#f0914d;--neu:#8b948d;--acc:#7cc4a8;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#151a17;--card:#1c231f;--fg:#e6ebe6;--mut:#99a49b;--line:#2e3731;--good:#6fcf9f;--bad:#f0914d;--neu:#8b948d;--acc:#7cc4a8;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,sans-serif;margin:0 auto;padding-block:24px;padding-inline:16px;max-width:900px}
+h1{font-size:1.5rem;margin:0 0 6px;text-wrap:balance} h2{font-size:1.05rem;margin:34px 0 4px}
+p{color:var(--mut);margin:4px 0 10px;max-width:65ch}
+.lede{color:var(--fg);font-size:1.02rem}
+.leg{display:flex;gap:16px;flex-wrap:wrap;color:var(--mut);font-size:.85rem;margin:6px 0}
+.leg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+svg{width:100%;height:auto;display:block;background:var(--card);border:1px solid var(--line);border-radius:6px}
+.cards{display:flex;gap:14px;flex-wrap:wrap}.cards>div{flex:1 1 380px;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:12px 14px}
+.cards b{display:block;margin-bottom:6px}
+.cards ul{margin:0;padding-left:18px;color:var(--mut);font-size:.9rem}
+.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;background:var(--card)}
+th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;font-size:.9rem;font-variant-numeric:tabular-nums}
+td.m{font-family:ui-monospace,monospace}
+th{color:var(--mut);font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+</style>
+<h1>Dictionary design</h1>
+<p class="lede" id="lede"></p>
+
+<h2>What a frozen dictionary costs</h2>
+<p>How many bits per character worse than a learned dictionary of the same shape, when the dictionary is built by hand and then never trained. Lower is better; each dot is one seed.</p>
+<div class="leg"><span><i style="background:var(--good)"></i>one flag per letter</span><span><i style="background:var(--bad)"></i>letters as a binary code</span><span><i style="background:var(--neu)"></i>random vectors</span></div>
+<div id="frozen"></div>
+
+<h2>Where the loss falls</h2>
+<p>The hand-built 32-wide dictionary with letters as a 5-bit code, frozen against learned: bits per character added by each kind of next character (seed 0). Letters carry almost all of it, even though the model still picks the right letter about as often.</p>
+<div id="diag"></div>
+
+<h2>As a starting value instead</h2>
+<p>The same dictionaries used only as the initial values, then trained with everything else. Bits against the learned dictionary of the same shape.</p>
+<div class="scroll"><table id="start"></table></div>
+
+<h2>How narrow can it go?</h2>
+<p>Learned dictionary, about 100,000 parameters at every width (rules per system rise as the width falls: the rule count is shown). Frozen with a flag per letter, 32 is the floor: 26 letter flags plus a 6-bit code to tell 47 non-letters apart.</p>
+<div id="ladder"></div>
+
+<h2>The layouts</h2>
+<div class="cards">
+ <div><b>oh48 &mdash; 48 dimensions, every coordinate named</b><ul>
+  <li>0&ndash;25 letter flag, one per letter (shared by both cases)</li>
+  <li>26&ndash;29 kind: digit, mark, whitespace, special</li>
+  <li>30 unknown, 31 newline, 32 vowel, 33 digit value (linear)</li>
+  <li>34&ndash;40 mark group: sentence end, pause, quote, open, close, joiner, arithmetic</li>
+  <li>41&ndash;46 mark identity (6-bit), 47 upper case</li></ul><div class="scroll"><table id="nn48"></table></div></div>
+ <div><b>squeeze32 &mdash; 32 dimensions, the floor</b><ul>
+  <li>0&ndash;25 letter flag (1.0 lower case, 0.6 upper case)</li>
+  <li>26&ndash;31 a 6-bit code for the 47 non-letters (digits, space, newline, end of text, unknown, the marks grouped by punctuation group); zero for letters</li></ul><div class="scroll"><table id="nn32"></table></div></div>
+</div>
+
+<script>
+const INLINE=__DATA__;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let D=INLINE;
+const f=(x,n=3)=>x==null?"—":x.toFixed(n);
+const sg=x=>x==null?"pending":(x>=0?"+":"−")+Math.abs(x).toFixed(3);
+const kind=r=>/Random/.test(r.name)?"neu":/5-bit/.test(r.name)?"bad":"good";
+function lede(){
+  const find=s=>D.rows.find(r=>r.name.startsWith(s)&&r.group=="frozen");
+  const a=find("Constructed, one flag"),b=find("Constructed, letters"),o=find("oh48"),q=find("squeeze32");
+  let t=`A frozen character dictionary only works if every letter is as far from every other letter as any other. Coding letters as a binary number instead of one flag each cost <b>${sg(b&&b.vs)}</b> bits per character frozen, against <b>${sg(a&&a.vs)}</b> with a flag each (same model, same everything else).`;
+  if(o&&o.vs!=null)t+=` A 48-wide named dictionary with a flag per letter costs ${sg(o.vs)}`;
+  if(q&&q.vs!=null)t+=`${o&&o.vs!=null?", and":" A"} 32-wide squeezed one ${sg(q.vs)}`;
+  if((o&&o.vs!=null)||(q&&q.vs!=null))t+=". The floor with a flag per letter is 32 dimensions.";
+  document.getElementById("lede").innerHTML=t;
+}
+function frozen(){
+  const R=D.rows.filter(r=>r.group=="frozen"),W=860,rowH=44,m=270,H=R.length*rowH+44;
+  const vals=R.flatMap(r=>r.result?r.result.seeds.map(s=>s-D.controls[{64:"w64",48:"w48",32:"w32"}[r.width]]):[]).filter(v=>!isNaN(v));
+  const M=Math.max(0.06,...vals)*1.1,X=v=>m+v/M*(W-m-30);
+  let g="";
+  const ticks=[0,0.1,0.2,0.3,0.4,0.5].filter(t=>t<=M);
+  for(const t of ticks)g+=`<line x1="${X(t)}" y1="22" x2="${X(t)}" y2="${H-14}" stroke="${css("--line")}"/><text x="${X(t)}" y="${H-2}" text-anchor="middle" font-size="11" fill="${css("--mut")}">${t==0?"0":"+"+t.toFixed(1)}</text>`;
+  R.forEach((r,i)=>{
+    const y=30+i*rowH,c=css("--"+kind(r));
+    g+=`<text x="${m-10}" y="${y+4}" text-anchor="end" font-size="12.5" fill="${css("--fg")}">${r.name}</text><text x="${m-10}" y="${y+19}" text-anchor="end" font-size="10.5" fill="${css("--mut")}">width ${r.width}, ${r.rules} rules</text>`;
+    if(!r.result||r.vs==null){g+=`<text x="${m+6}" y="${y+4}" font-size="12" fill="${css("--mut")}">pending</text>`;return}
+    const ctrl=D.controls[{64:"w64",48:"w48",32:"w32"}[r.width]];
+    g+=`<rect x="${X(0)}" y="${y-9}" width="${Math.max(2,X(r.vs)-X(0))}" height="16" rx="3" fill="${c}" fill-opacity=".85"><title>${r.name}: ${sg(r.vs)} (${f(r.result.mean,4)} against ${f(ctrl,4)})</title></rect>`;
+    r.result.seeds.forEach(s=>{g+=`<circle cx="${X(s-ctrl)}" cy="${y-1}" r="3.5" fill="${css("--card")}" stroke="${css("--fg")}" stroke-width="1.2"/>`});
+    g+=`<text x="${X(r.vs)+8}" y="${y+4}" font-size="12" font-weight="600" fill="${css("--fg")}">${sg(r.vs)}</text>`;
+  });
+  document.getElementById("frozen").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cost of frozen dictionaries">${g}</svg>`;
+}
+function diag(){
+  const L=D.diagnostic.learned,Z=D.diagnostic.frozen;
+  if(!L||!Z){document.getElementById("diag").innerHTML="<p>pending</p>";return}
+  const cl=["lower","upper","mark","space","newline","special"],nm={lower:"lower-case",upper:"upper-case",mark:"marks",space:"space",newline:"newline",special:"end / unknown"};
+  const add=cl.map(c=>Z[c]-L[c]),W=860,m=120,rowH=34,H=cl.length*rowH+34,M=Math.max(...add)*1.15;
+  const X=v=>m+v/M*(W-m-90);
+  let g="";
+  cl.forEach((c,i)=>{const y=24+i*rowH;
+    g+=`<text x="${m-10}" y="${y+4}" text-anchor="end" font-size="12.5" fill="${css("--fg")}">${nm[c]}</text><rect x="${X(0)}" y="${y-9}" width="${Math.max(1.5,X(add[i])-X(0))}" height="16" rx="3" fill="${css("--bad")}" fill-opacity=".85"><title>${nm[c]}: +${add[i].toFixed(3)} bits per character</title></rect><text x="${X(add[i])+8}" y="${y+4}" font-size="12" font-weight="600" fill="${css("--fg")}">+${add[i].toFixed(3)}</text>`;});
+  document.getElementById("diag").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Loss added by each kind of character">${g}</svg>`;
+}
+function start(){
+  let h="<tr><th>dictionary</th><th>shape</th><th>result</th><th>against learned</th></tr>";
+  for(const r of D.rows.filter(r=>r.group=="start"))
+    h+=`<tr><td>${r.name}</td><td>width ${r.width}, ${r.rules} rules</td><td class="m">${r.result?f(r.result.mean,4):"pending"}</td><td class="m">${sg(r.vs)}</td></tr>`;
+  document.getElementById("start").innerHTML=h;
+}
+function ladder(){
+  const L=D.ladder.filter(r=>r.mean),W=860,H=300,m=60,mb=50,mt=24;
+  const lo=1.34,hi=Math.max(...L.map(r=>r.mean))*1.02;
+  const bw=(W-m-20)/L.length,Y=v=>H-mb-(v-lo)/(hi-lo)*(H-mb-mt);
+  let g="";
+  for(const t of [1.4,1.5,1.6])if(t<hi)g+=`<line x1="${m}" y1="${Y(t)}" x2="${W-10}" y2="${Y(t)}" stroke="${css("--line")}"/><text x="${m-8}" y="${Y(t)+4}" text-anchor="end" font-size="11" fill="${css("--mut")}">${t.toFixed(1)}</text>`;
+  L.forEach((r,i)=>{const x=m+i*bw+bw*0.2,w=bw*0.6;
+    g+=`<rect x="${x}" y="${Y(r.mean)}" width="${w}" height="${H-mb-Y(r.mean)}" rx="3" fill="${css("--acc")}" fill-opacity="${r.width==32?1:.65}"><title>width ${r.width}: ${f(r.mean,4)}</title></rect><text x="${x+w/2}" y="${Y(r.mean)-6}" text-anchor="middle" font-size="12" font-weight="600" fill="${css("--fg")}">${f(r.mean,3)}</text><text x="${x+w/2}" y="${H-mb+16}" text-anchor="middle" font-size="12" fill="${css("--fg")}">${r.width} dims</text><text x="${x+w/2}" y="${H-mb+31}" text-anchor="middle" font-size="10.5" fill="${css("--mut")}">${r.rules} rules</text>`;});
+  g+=`<text x="${m}" y="14" font-size="11" fill="${css("--mut")}">bits per character, bars start at ${lo.toFixed(2)}</text>`;
+  document.getElementById("ladder").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Learned dictionary at each width">${g}</svg>`;
+}
+function nn(){
+  for(const [id,key] of [["nn48","oh48"],["nn32","squeeze32"]]){
+    const N=D.neighbours[key];let h="<tr><th>char</th><th>nearest four</th></tr>";
+    for(const c of Object.keys(N))h+=`<tr><td class="m">${c==" "?"␣":c}</td><td class="m">${N[c].map(x=>x==" "?"␣":x).join("  ")}</td></tr>`;
+    document.getElementById(id).innerHTML=h;
+  }
+}
+function draw(){lede();frozen();diag();start();ladder();nn();}
+draw();
+fetch("data.json").then(r=>r.ok?r.json():null).then(j=>{if(j){D=j;draw()}}).catch(()=>{});
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",draw);
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+</script>

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Traditional vs invertible: inference</title>
+<style>
+  :root { --bg: #f6f7f9; --panel: #ffffff; --fg: #1d2330; --muted: #5d6677; --line: #d9dde5; --accent: #2b6cb0; --low: 224, 120, 40; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #14171d; --panel: #1b1f27; --fg: #e6e9ef; --muted: #98a1b3; --line: #2c3340; --accent: #6aa6e8; --low: 232, 150, 70; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 52rem; margin: 0 auto; padding: 1.5rem 1rem 3rem; display: flex; flex-direction: column; gap: 1rem; }
+  h1 { font-size: 1.4rem; margin: 0; font-weight: 600; }
+  .badge { display: inline-block; font-size: .75rem; padding: .1rem .5rem; border: 1px solid var(--line); border-radius: 1rem; color: var(--muted); vertical-align: middle; margin-left: .5rem; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: .75rem; }
+  label { font-size: .8rem; color: var(--muted); display: flex; flex-direction: column; gap: .25rem; }
+  textarea, select, input[type=number] { font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: .5rem; }
+  textarea { min-height: 4.5rem; resize: vertical; }
+  .row { display: flex; flex-wrap: wrap; gap: .75rem; align-items: flex-end; }
+  .row > * { min-width: 0; }
+  button { font: inherit; color: #fff; background: var(--accent); border: 0; border-radius: 6px; padding: .55rem 1.1rem; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  #out { white-space: pre-wrap; font: 15px/1.7 ui-serif, Georgia, serif; min-height: 6rem; }
+  #out .p { color: var(--accent); }
+  #out .g span { border-radius: 2px; }
+  .meta, .note { color: var(--muted); font-size: .8rem; }
+  .err { color: #c0392b; }
+  .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); }
+  .grid .card h2 { font-size: 1rem; margin: 0; font-weight: 600; }
+  .grid .tag { font-size: .72rem; color: var(--muted); margin-left: .4rem; font-weight: 400; }
+  .out { white-space: pre-wrap; font: 15px/1.7 ui-serif, Georgia, serif; min-height: 8rem; overflow-wrap: anywhere; }
+  .out .p { color: var(--accent); }
+  .out .d { text-decoration: underline; text-decoration-color: #c0392b; text-decoration-thickness: 2px; }
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: .15rem .9rem; margin: 0; font-size: .85rem; }
+  dt { color: var(--muted); } dd { margin: 0; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Traditional head vs invertible meaning layer <span class="badge">research preview</span></h1>
+  <p class="note">The same-size character-level TinyStories models (about 100K parameters, each trained for 30 million characters) side by side, all with the highest-likelihood character taken each step (no sampling). The traditional models score characters with the usual tied dot product (tied) or a distance likelihood on a plain codebook (identity control). The reversible models embed through an exactly invertible order-1 TSK map F: c routes the logic space back through F's inverse to score characters (its norm layer is lossy); ci does the same with an exactly invertible gain layer in place of that norm, so the whole chain embedding, logic layers, de-embedding is reversible by construction.</p>
+
+  <div class="card">
+    <label>Start of the story <textarea id="prompt" spellcheck="false">Once upon a time, there was a little girl named Lily.</textarea></label>
+    <div class="row">
+      <label>Characters to write <input id="n" type="number" min="10" max="480" value="240" style="width:7rem"></label>
+      <button id="go" disabled>Write with every model</button>
+      <span class="note" id="status">Loading the models…</span>
+    </div>
+  </div>
+
+  <div id="grid" class="grid"></div>
+  <p class="note">Your text is blue. Each model's characters are shaded orange where it was unsure (one minus the probability it gave the character it chose). A character underlined in red differs from the tied model's character at that position, which is only meaningful until the first difference, since the stories diverge from there; the line under each story says where that happens.</p>
+</main>
+<script src="../web/flm.js"></script>
+<script src="bij.js"></script>
+<script>
+(async function () {
+  const $ = (id) => document.getElementById(id);
+  const go = $('go'), grid = $('grid'), status = $('status');
+  const fj = async (p) => { const r = await fetch(p); if (!r.ok) throw new Error(p + ': ' + r.status); return r.json(); };
+  const NAMES = { tied: ['Tied dot-product head', 'traditional'], ident: ['Identity control', 'traditional, distance likelihood'], ci: ['Invertible F + exact gain, routed back', 'reversible'], c: ['Invertible F, routed back', 'reversible'], z: ['Invertible F, meaning space (z)', 'reversible'] };
+  const ORDER = ['tied', 'ident', 'ci', 'c', 'z'];
+  const fmt = (n) => n.toLocaleString('en');
+  const cards = [];
+
+  function card(model, man) {
+    const bj = man.bij, el = document.createElement('div'); el.className = 'card';
+    const h = document.createElement('h2'); h.textContent = NAMES[bj.arm][0]; const tg = document.createElement('span'); tg.className = 'tag'; tg.textContent = NAMES[bj.arm][1]; h.appendChild(tg);
+    const out = document.createElement('div'); out.className = 'out'; out.textContent = 'Press Write.';
+    const meta = document.createElement('div'); meta.className = 'meta';
+    const facts = document.createElement('div'); facts.className = 'meta';
+    facts.textContent = `${fmt(man.params)} parameters` + (bj.val_bpc ? `, ${bj.val_bpc.toFixed(3)} bits per character on held-out text` : '');
+    el.append(h, out, meta, facts); grid.appendChild(el);
+    return { arm: bj.arm, model, man, out, meta };
+  }
+
+  function write() {
+    const text = $('prompt').value, n = Math.max(10, Math.min(480, +$('n').value || 240)), res = {};
+    for (const c of cards) {
+      const ids = BIJ.Chars.encode(text).slice(0, Math.max(0, c.man.config.max_len - n - 2));
+      const t0 = performance.now(); const r = BIJ.greedy(c.model, ids, n); r.ms = performance.now() - t0; res[c.arm] = r;
+    }
+    const ref = res.tied || res[cards[0].arm];
+    for (const c of cards) {
+      const r = res[c.arm]; c.out.textContent = '';
+      const p = document.createElement('span'); p.className = 'p'; p.textContent = text; c.out.appendChild(p);
+      let first = -1;
+      r.ids.forEach((id, i) => {
+        const s = document.createElement('span'); s.textContent = BIJ.Chars.decode([id]);
+        s.style.background = `rgba(var(--low), ${Math.min(1, (1 - r.probs[i]) * 0.55).toFixed(3)})`;
+        if (c.arm !== 'tied' && ref.ids[i] !== id) { s.className = 'd'; if (first < 0) first = i; }
+        c.out.appendChild(s);
+      });
+      const mean = r.probs.reduce((a, b) => a + b, 0) / Math.max(1, r.probs.length);
+      c.meta.textContent = `${r.ids.length} characters in ${(r.ms / 1000).toFixed(2)} s, mean probability of the chosen character ${mean.toFixed(2)}` + (c.arm === 'tied' ? '' : first < 0 ? ', identical to the tied model throughout' : `, first differs from the tied model at character ${first + 1}`);
+    }
+  }
+
+  try {
+    const idx = await fj('models/index.json'), loaded = [];
+    for (const m of idx) { const [man, b] = await Promise.all([fj(`models/${m.id}.json`), fetch(`models/${m.id}.bin`).then((r) => r.arrayBuffer())]); loaded.push([new BIJ.BijModel(man, b), man]); }
+    loaded.sort((a, b) => ORDER.indexOf(a[1].bij.arm) - ORDER.indexOf(b[1].bij.arm));
+    for (const [m, man] of loaded) cards.push(card(m, man));
+    status.textContent = `${cards.length} models loaded`; go.disabled = false; go.onclick = () => { try { write(); } catch (e) { status.textContent = 'Failed: ' + e.message; } };
+  } catch (e) { status.textContent = 'Could not load the models: ' + e.message; }
+})();
+</script>
+</body>
+</html>
