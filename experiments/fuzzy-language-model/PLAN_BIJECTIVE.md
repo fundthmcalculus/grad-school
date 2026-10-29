@@ -311,3 +311,16 @@ Predictions:
 2. Frozen costs at most 0.03 against learned; as initial value it is better than learned by 0.003-0.02 (the width-64 gain was 0.0063 at 300M).
 3. ci beats the tied head on Cosmopedia by 0.01-0.03 (0.012 on TinyStories, 0.022 on the Pile at 300M).
 4. The Cosmopedia-trained model scores worse on the Pile than the Pile-trained model by more than 0.3 bits, and worse on TinyStories than the TinyStories-trained model by more than 0.2.
+
+## oh48 at 300M characters, results (2026-10-28)
+
+ci, width 48, 196/137 rules, 100,114 parameters, 300M TinyStories characters, fp32, lr 0.01, seeds 0-2, validation bits per character.
+
+| arm | seed 0 | seed 1 | seed 2 | mean | against learned |
+|---|---|---|---|---|---|
+| learned | 1.2455 | 1.2431 | 1.2418 | 1.2435 | 0 |
+| frozen (`oh48`) | 1.2465 | 1.2505 | 1.2506 | 1.2492 | +0.0057 |
+| as initial value | 1.2341 | 1.2332 | 1.2393 | 1.2355 | -0.0080 |
+
+Scoring: 1 right (frozen within 0.02 of learned on every seed: +0.0010, +0.0074, +0.0088).  2 mostly right: the initial value beats learned on every seed (-0.0114, -0.0099, -0.0025), but the seed-2 gain (0.0025) is under the 0.004 floor of the registered band.  3 right (frozen is worse than learned on every seed).
+Reading: at scale a fully named, frozen 48-wide dictionary costs 0.0057 bits (0.5%), inside what the seed spread can hide only on seed 0; as a starting value it gains 0.008 on average (0.6%), with a seed spread of 0.009 in the gain, so the starting-value advantage is real in direction on three seeds but small and variable in size.  For the explainability goal the frozen dictionary is the cheaper-to-defend choice: half a percent for a space that every coordinate of which means something.
