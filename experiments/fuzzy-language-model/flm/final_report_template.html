@@ -72,8 +72,8 @@ function cosmo(){
   document.getElementById("cosmo").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cosmopedia results">${g}</svg>`;
 }
 function freeze(){
-  let h="<tr><th>corpus</th><th>learned</th><th>frozen</th><th>cost of freezing</th><th>weak pull-back</th><th>named start</th></tr>";
-  for(const r of D.freeze)h+=`<tr><td>${r.corpus}</td><td>${f(r.learned)}</td><td>${f(r.frozen)}</td><td class="best">${sg(r.frozen-r.learned)}</td><td>${r.pull!=null?f(r.pull)+" ("+sg(r.pull-r.learned)+")":"running"}</td><td>${f(r.start)} (${sg(r.start-r.learned)})</td></tr>`;
+  let h="<tr><th>corpus (seeds)</th><th>learned</th><th>frozen</th><th>cost of freezing</th><th>pull-back 0.0001 (seeds)</th><th>named start</th></tr>";
+  for(const r of D.freeze)h+=`<tr><td>${r.corpus} (${r.n})</td><td>${f(r.learned)}</td><td>${f(r.frozen)}</td><td class="best">${sg(r.frozen-r.learned)}</td><td>${r.pull!=null?f(r.pull)+" ("+sg(r.pull-r.learned)+", "+r.npull+")":"not run"}</td><td>${f(r.start)} (${sg(r.start-r.learned)})</td></tr>`;
   document.getElementById("freeze").innerHTML=h;
 }
 function cross(){

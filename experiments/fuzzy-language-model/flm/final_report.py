@@ -22,8 +22,8 @@ def finals(pattern):
     return out
 
 
-def arm(pattern):
-    v = finals(pattern)
+def arm(*patterns):
+    v = [x for p in patterns for x in finals(p)]
     return dict(seeds=v, mean=mean(v)) if v else None
 
 
@@ -38,18 +38,20 @@ def main():
         "learned dictionary": arm("outputs/final100k/learned_s*/ci_*.log"),
         "frozen named dictionary": arm("outputs/final100k/frozen_s*/ci_*.log"),
         "named dictionary as starting value": arm("outputs/final100k/init_s*/ci_*.log"),
-        "named dictionary, weak pull-back": arm("outputs/pull300/cosmo_s*/ci_*.log"),
-        "tied head (not invertible)": arm("outputs/final100k/tied_s*/tied_*.log"),
+        "named dictionary, weak pull-back (0.0001 per step)": arm("outputs/pull_retune/k0.0001_s0/ci_*.log", "outputs/pull_confirm/cosmo_k0.0001_s1/ci_*.log"),
+        "tied head (not invertible)": arm("outputs/final100k/tied_s*/tied_*.log", "outputs/gaps/tied_cosmo_s1/tied_*.log"),
     }
+    s1 = all(finals(f"outputs/pile_s1/{a}_s1/ci_*.log") for a in ("learned", "frozen", "init"))
+    ps1 = lambda a: [f"outputs/pile_s1/{a}_s1/ci_*.log"] if s1 else []
     freeze = []
-    for name, ln, fr, st in (
-        ("TinyStories", "outputs/oh48_300/learned_s*/ci_*.log", "outputs/oh48_300/frozen_s*/ci_*.log", "outputs/oh48_300/init_s*/ci_*.log"),
-        ("Cosmopedia", "outputs/final100k/learned_s*/ci_*.log", "outputs/final100k/frozen_s*/ci_*.log", "outputs/final100k/init_s*/ci_*.log"),
-        ("The Pile", "outputs/oh48_pile/learned_s*/ci_*.log", "outputs/oh48_pile/frozen_s*/ci_*.log", "outputs/oh48_pile/init_s*/ci_*.log"),
+    for name, ln, fr, st, pl in (
+        ("TinyStories", ["outputs/oh48_300/learned_s*/ci_*.log"], ["outputs/oh48_300/frozen_s*/ci_*.log"], ["outputs/oh48_300/init_s*/ci_*.log"], []),
+        ("Cosmopedia", ["outputs/final100k/learned_s*/ci_*.log"], ["outputs/final100k/frozen_s*/ci_*.log"], ["outputs/final100k/init_s*/ci_*.log"], ["outputs/pull_retune/k0.0001_s0/ci_*.log", "outputs/pull_confirm/cosmo_k0.0001_s1/ci_*.log"]),
+        ("The Pile", ["outputs/oh48_pile/learned_s*/ci_*.log"] + ps1("learned"), ["outputs/oh48_pile/frozen_s*/ci_*.log"] + ps1("frozen"), ["outputs/oh48_pile/init_s*/ci_*.log"] + ps1("init"), ["outputs/pull_confirm/pile_k0.0001_s0/ci_*.log", "outputs/gaps/pile_k0.0001_s1/ci_*.log"]),
     ):
-        L, F, S = arm(ln), arm(fr), arm(st)
-        pull = arm("outputs/pull300/%s_s*/ci_*.log" % ("cosmo" if name == "Cosmopedia" else "pile")) if name != "TinyStories" else None
-        freeze.append(dict(corpus=name, learned=L["mean"], frozen=F["mean"], start=S["mean"], pull=pull["mean"] if pull else None, n=len(L["seeds"])))
+        L, F, S = arm(*ln), arm(*fr), arm(*st)
+        pull = arm(*pl) if pl else None
+        freeze.append(dict(corpus=name, learned=L["mean"], frozen=F["mean"], start=S["mean"], pull=pull["mean"] if pull else None, n=len(L["seeds"]), npull=len(pull["seeds"]) if pull else 0))
     ci, tied = jload("outputs/final_eval/ci.json"), jload("outputs/final_eval/tied.json")
     cross = []
     for key, label in (("learned", "learned dictionary"), ("frozen", "frozen named dictionary"), ("init", "named dictionary as starting value")):
