@@ -19,7 +19,18 @@ J.append(("tied", "tied", 0, dict(D="56", FFN_R="186", FFN_R0="130")))
 def run(j):
     arm, name, s, e = j
     subprocess.run(
-        [BASH, "flm/bij_schedule/run_full.sh", arm, "0.01", "300", f"outputs/final100k/{name}_s{s}", "--precision", "fp32", "--seed", str(s)],
+        [
+            BASH,
+            "flm/bij_schedule/run_full.sh",
+            arm,
+            "0.01",
+            "300",
+            f"outputs/final100k/{name}_s{s}",
+            "--precision",
+            "fp32",
+            "--seed",
+            str(s),
+        ],
         env=dict(os.environ, DATA_ROOT=ROOT, **e),
     )
 

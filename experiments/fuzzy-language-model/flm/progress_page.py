@@ -41,9 +41,7 @@ def cell(r):
 
 def table(head, rows):
     h = "".join(f"<th>{html.escape(c)}</th>" for c in head)
-    b = "".join(
-        "<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in rows
-    )
+    b = "".join("<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in rows)
     return f'<div class="scroll"><table><tr>{h}</tr>{b}</table></div>'
 
 
@@ -59,17 +57,35 @@ def main():
             continue
         na, nb = num(a), num(b)
         gap = f"{na - nb:+.4f}" if na and nb else ""
-        state = "done" if a[3] and b[3] else f"{100 * min(a[0], b[0]) // max(1, a[1])}% (interim)"
+        state = (
+            "done"
+            if a[3] and b[3]
+            else f"{100 * min(a[0], b[0]) // max(1, a[1])}% (interim)"
+        )
         rows.append([f"seed {s}", cell(a)[0], cell(b)[0], gap, state])
-    t1 = table(["300M characters", "learned", "constructed start", "gain", "state"], rows)
+    t1 = table(
+        ["300M characters", "learned", "constructed start", "gain", "state"], rows
+    )
 
     def avg(d, key, seeds=(0, 1)):
-        v = [d[f"{key}_s{s}"][3] for s in seeds if f"{key}_s{s}" in d and d[f"{key}_s{s}"][3]]
+        v = [
+            d[f"{key}_s{s}"][3]
+            for s in seeds
+            if f"{key}_s{s}" in d and d[f"{key}_s{s}"][3]
+        ]
         return (mean(v), len(v)) if v else (None, 0)
 
     l64, _ = avg(ref, "learned")
     c64, _ = avg(ref, "canonInit")
-    rows = [["64 (earlier run)", f"{l64:.4f}" if l64 else "", f"{c64:.4f}" if c64 else "", "0 (reference)", "2/2"]]
+    rows = [
+        [
+            "64 (earlier run)",
+            f"{l64:.4f}" if l64 else "",
+            f"{c64:.4f}" if c64 else "",
+            "0 (reference)",
+            "2/2",
+        ]
+    ]
     for k in (56, 32, 16, 8):
         l, nl = avg(wid, f"learned{k}")
         p, npr = avg(wid, f"pca{k}")
@@ -84,7 +100,16 @@ def main():
                 f"{nl + npr}/4" + (f", {live} running" if live else ""),
             ]
         )
-    t2 = table(["width", "learned", "constructed start (projected)", "start vs width 64", "runs done"], rows)
+    t2 = table(
+        [
+            "width",
+            "learned",
+            "constructed start (projected)",
+            "start vs width 64",
+            "runs done",
+        ],
+        rows,
+    )
     grid = runs("outputs/grid/*/ci_*.log")
     old = {  # cells already measured (learned dictionary): (width, rules) -> mean of seeds 0 and 1
         (64, 124): l64,
@@ -103,11 +128,29 @@ def main():
             return f"{fin[0]:.4f} (1 seed)"
         return "running" if any(x[0] for x in v) else "queued"
 
-    params = {64: ("99.6K", "207K", "406K"), 32: ("46K", "99.9K", "200K"), 24: ("33.9K", "74.4K", "149K"), 16: ("22.3K", "49.5K", "99.6K")}
+    params = {
+        64: ("99.6K", "207K", "406K"),
+        32: ("46K", "99.9K", "200K"),
+        24: ("33.9K", "74.4K", "149K"),
+        16: ("22.3K", "49.5K", "99.6K"),
+    }
     rows = []
     for d in (64, 32, 24, 16):
-        rows.append([str(d)] + [f"{gcell(d, r)} <small>{params[d][i]}</small>" for i, r in enumerate((124, 328, 706))])
-    rows.append(["24 at its 100K shape", f"{gcell(24, 456)} <small>99.8K, 456 rules</small>", "", ""])
+        rows.append(
+            [str(d)]
+            + [
+                f"{gcell(d, r)} <small>{params[d][i]}</small>"
+                for i, r in enumerate((124, 328, 706))
+            ]
+        )
+    rows.append(
+        [
+            "24 at its 100K shape",
+            f"{gcell(24, 456)} <small>99.8K, 456 rules</small>",
+            "",
+            "",
+        ]
+    )
     t3 = table(["width", "124 rules", "328 rules", "706 rules"], rows)
     hand = runs("outputs/hand32/*/ci_*.log")
     ctrl = {328: avg(wid, "learned32")[0], 706: avg(grid, "d32_r706")[0]}
@@ -123,10 +166,23 @@ def main():
         return "running" if any(x[0] for x in v) else "queued"
 
     rows = [
-        [f"{r} rules", f"{ctrl[r]:.4f}" if ctrl[r] else "", hcell("hand32Frozen", r), hcell("hand32Init", r)]
+        [
+            f"{r} rules",
+            f"{ctrl[r]:.4f}" if ctrl[r] else "",
+            hcell("hand32Frozen", r),
+            hcell("hand32Init", r),
+        ]
         for r in (328, 706)
     ]
-    t4 = table(["width 32", "learned dictionary", "hand-built, frozen", "hand-built, as start"], rows)
+    t4 = table(
+        [
+            "width 32",
+            "learned dictionary",
+            "hand-built, frozen",
+            "hand-built, as start",
+        ],
+        rows,
+    )
     osq = runs("outputs/ohsq/*/ci_*.log")
 
     def ocell(tag, ref=None):
@@ -141,10 +197,23 @@ def main():
 
     l48 = avg(osq, "learned48")[0]
     rows = [
-        ["width 48, 196 rules (100.1K)", ocell("learned48"), ocell("oh48Frozen", l48), ocell("oh48Init", l48)],
-        ["width 32, 328 rules (99.9K)", f"{ctrl[328]:.4f}" if ctrl[328] else "", ocell("squeeze32Frozen", ctrl[328]), ocell("squeeze32Init", ctrl[328])],
+        [
+            "width 48, 196 rules (100.1K)",
+            ocell("learned48"),
+            ocell("oh48Frozen", l48),
+            ocell("oh48Init", l48),
+        ],
+        [
+            "width 32, 328 rules (99.9K)",
+            f"{ctrl[328]:.4f}" if ctrl[328] else "",
+            ocell("squeeze32Frozen", ctrl[328]),
+            ocell("squeeze32Init", ctrl[328]),
+        ],
     ]
-    t5 = table(["one flag per letter", "learned dictionary", "frozen", "as starting value"], rows)
+    t5 = table(
+        ["one flag per letter", "learned dictionary", "frozen", "as starting value"],
+        rows,
+    )
     qrows = []
     for grp, label in (
         ("oh48_300", "oh48, 300M TinyStories"),
@@ -156,7 +225,9 @@ def main():
         for name, r in sorted(runs(f"outputs/{grp}/*/ci_*.log").items()):
             c = cell(r)
             qrows.append([label, name, c[0], c[1]])
-    t6 = table(["study", "run", "validation", "state"], qrows or [["queued", "", "", ""]])
+    t6 = table(
+        ["study", "run", "validation", "state"], qrows or [["queued", "", "", ""]]
+    )
     now = time.strftime("%Y-%m-%d %H:%M")
     page = f"""<title>Run progress</title>
 <style>
@@ -192,7 +263,11 @@ th{{color:var(--mut);font-weight:600;font-size:.8rem;text-transform:uppercase;le
 <p>Every run in the current queue, in order of start. Validation is the latest evaluation until the run is done.</p>
 {t6}
 """
-    open(sys.argv[1] if len(sys.argv) > 1 else "outputs/progress/index.html", "w", encoding="utf-8").write(page)
+    open(
+        sys.argv[1] if len(sys.argv) > 1 else "outputs/progress/index.html",
+        "w",
+        encoding="utf-8",
+    ).write(page)
 
 
 if __name__ == "__main__":

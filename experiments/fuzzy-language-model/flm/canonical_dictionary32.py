@@ -21,7 +21,17 @@ from flm.data import decode
 W = dict(kind=1.0, flag=0.5, digit=0.25, mark_code=0.25, letter=0.5)
 GROUPS = ".!?", ",;:", "\"'`", "([{<", ")]}>", "-_/" + chr(92) + "|", "+=*%^~"
 NAMES = (
-    ["special", "whitespace", "letter", "digit", "mark", "unknown", "newline", "upper", "vowel"]
+    [
+        "special",
+        "whitespace",
+        "letter",
+        "digit",
+        "mark",
+        "unknown",
+        "newline",
+        "upper",
+        "vowel",
+    ]
     + [f"letter bit {b}" for b in range(5)]
     + ["digit value"]
     + ["sentence end", "pause", "quote", "open", "close", "joiner", "arithmetic"]
@@ -76,7 +86,10 @@ def main():
         i = ord(ch) - 29
         nn = np.argsort(d[i])[1:6]
         print(repr(ch), "->", [decode([j]) for j in nn], np.round(d[i][nn], 2))
-    print("min distance between two symbols", round(float(d[np.triu_indices(98, 1)].min()), 2))
+    print(
+        "min distance between two symbols",
+        round(float(d[np.triu_indices(98, 1)].min()), 2),
+    )
 
 
 if __name__ == "__main__":

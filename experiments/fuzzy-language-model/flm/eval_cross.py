@@ -35,17 +35,24 @@ def bpc(model, w, dev):
     for i in range(0, len(w), 100):
         b = torch.as_tensor(w[i : i + 100], device=dev)
         lg = model(b[:, :-1]).float()
-        tot += torch.nn.functional.cross_entropy(lg.reshape(-1, lg.shape[-1]), b[:, 1:].reshape(-1), reduction="sum").item()
+        tot += torch.nn.functional.cross_entropy(
+            lg.reshape(-1, lg.shape[-1]), b[:, 1:].reshape(-1), reduction="sum"
+        ).item()
     return tot / (w.shape[0] * CTX) / math.log(2)
 
 
 @torch.no_grad()
 def greedy(model, dev, n=200):
     out = {}
-    for p in PROMPTS + ["Photosynthesis is the process by which", "Once upon a time, in a small village,"]:
+    for p in PROMPTS + [
+        "Photosynthesis is the process by which",
+        "Once upon a time, in a small village,",
+    ]:
         ids = torch.as_tensor(encode(p)[None], device=dev).long()
         for _ in range(n):
-            ids = torch.cat([ids, model(ids[:, -CTX:])[:, -1].argmax(-1, keepdim=True)], 1)
+            ids = torch.cat(
+                [ids, model(ids[:, -CTX:])[:, -1].argmax(-1, keepdim=True)], 1
+            )
         out[p] = decode(ids[0].cpu().numpy())[len(p) :]
     return out
 
@@ -59,7 +66,10 @@ def main():
     for a in sys.argv[2:]:
         name, path = a.split("=", 1)
         model = build(path, dev)
-        res[name] = dict(bpc={k: bpc(model, w, dev) for k, w in wins.items()}, greedy=greedy(model, dev))
+        res[name] = dict(
+            bpc={k: bpc(model, w, dev) for k, w in wins.items()},
+            greedy=greedy(model, dev),
+        )
         print(name, {k: round(v, 4) for k, v in res[name]["bpc"].items()}, flush=True)
     json.dump(res, open(out, "w"), indent=1, ensure_ascii=False)
 

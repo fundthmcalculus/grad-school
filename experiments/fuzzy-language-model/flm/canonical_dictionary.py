@@ -50,7 +50,9 @@ def build(W=W, digit_step=None, letter_code=False):
                 C[i, 2], C[i, 60] = W["cls"], W["flag"]
             elif ch.isalpha():
                 C[i, 4 if ch.isupper() else 3] = W["cls"]
-                if letter_code:  # 5-bit alphabet position in dims 8-12 instead of one flag per letter
+                if (
+                    letter_code
+                ):  # 5-bit alphabet position in dims 8-12 instead of one flag per letter
                     k = ord(ch.lower()) - 97
                     for b in range(5):
                         C[i, 8 + b] = W["letter"] * ((k >> b) & 1)

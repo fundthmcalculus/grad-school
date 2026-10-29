@@ -13,9 +13,24 @@ def run(j):
     a, s = j
     env = dict(os.environ, D="48", FFN_R="196", FFN_R0="137")
     if ARMS[a] is not None:
-        env.update(FIXED_C="outputs/embspace/oh48.npz", RUN_MODULE="flm.run_fixed_embedding", **ARMS[a])
+        env.update(
+            FIXED_C="outputs/embspace/oh48.npz",
+            RUN_MODULE="flm.run_fixed_embedding",
+            **ARMS[a],
+        )
     subprocess.run(
-        [BASH, "flm/bij_schedule/run_full.sh", "ci", "0.01", "300", f"outputs/oh48_300/{a}_s{s}", "--precision", "fp32", "--seed", str(s)],
+        [
+            BASH,
+            "flm/bij_schedule/run_full.sh",
+            "ci",
+            "0.01",
+            "300",
+            f"outputs/oh48_300/{a}_s{s}",
+            "--precision",
+            "fp32",
+            "--seed",
+            str(s),
+        ],
         env=env,
     )
 

@@ -18,9 +18,24 @@ def run(j):
     d, r, r0 = SHAPE[name]
     env = dict(os.environ, D=str(d), FFN_R=str(r), FFN_R0=str(r0))
     if extra is not None:
-        env.update(FIXED_C=f"outputs/embspace/{name}.npz", RUN_MODULE="flm.run_fixed_embedding", **extra)
+        env.update(
+            FIXED_C=f"outputs/embspace/{name}.npz",
+            RUN_MODULE="flm.run_fixed_embedding",
+            **extra,
+        )
     subprocess.run(
-        [BASH, "flm/bij_schedule/run_full.sh", "ci", "0.01", "30", f"outputs/ohsq/{tag}_s{s}", "--precision", "fp32", "--seed", str(s)],
+        [
+            BASH,
+            "flm/bij_schedule/run_full.sh",
+            "ci",
+            "0.01",
+            "30",
+            f"outputs/ohsq/{tag}_s{s}",
+            "--precision",
+            "fp32",
+            "--seed",
+            str(s),
+        ],
         env=env,
     )
 

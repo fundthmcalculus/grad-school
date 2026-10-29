@@ -40,19 +40,118 @@ def rows(controls):
 
     def add(name, group, width, rules, pattern, ctrl, note=""):
         s = stat(finals(pattern))
-        R.append(dict(name=name, group=group, width=width, rules=rules, control=ctrl, result=s, note=note, vs=(s["mean"] - controls[ctrl]) if s and controls.get(ctrl) else None))
+        R.append(
+            dict(
+                name=name,
+                group=group,
+                width=width,
+                rules=rules,
+                control=ctrl,
+                result=s,
+                note=note,
+                vs=(s["mean"] - controls[ctrl]) if s and controls.get(ctrl) else None,
+            )
+        )
 
-    add("Constructed, one flag per letter", "frozen", 64, 124, "outputs/canon/canonFrozen_s*/ci_*.log", "w64", "26 letter flags, every coordinate named")
-    add("Random vectors", "frozen", 64, 124, "outputs/canon/randFrozen_s*/ci_*.log", "w64", "control: no structure")
-    add("Constructed, letters as a 5-bit code", "frozen", 64, 124, "outputs/hand32/canon64HFrozen_s*/ci_*.log", "w64", "only the letter coding changed")
-    add("Hand-built 32, letters as a 5-bit code", "frozen", 32, 328, "outputs/hand32/hand32Frozen_r328_s*/ci_*.log", "w32", "")
-    add("Same, letter distances doubled", "frozen", 32, 328, "outputs/hand32/hand32LFrozen_r328_s*/ci_*.log", "w32", "scaling does not fix it")
-    add("oh48: a flag per letter, 48 dimensions", "frozen", 48, 196, "outputs/ohsq/oh48Frozen_s*/ci_*.log", "w48", "every coordinate named")
-    add("squeeze32: a flag per letter, 32 dimensions", "frozen", 32, 328, "outputs/ohsq/squeeze32Frozen_s*/ci_*.log", "w32", "26 flags plus a 6-bit code for the rest")
-    add("Constructed (64), as starting value", "start", 64, 124, "outputs/canon/canonInit_s*/ci_*.log", "w64", "trains afterwards")
-    add("Hand-built 32 (5-bit letters), as starting value", "start", 32, 328, "outputs/hand32/hand32Init_r328_s*/ci_*.log", "w32", "")
-    add("oh48, as starting value", "start", 48, 196, "outputs/ohsq/oh48Init_s*/ci_*.log", "w48", "")
-    add("squeeze32, as starting value", "start", 32, 328, "outputs/ohsq/squeeze32Init_s*/ci_*.log", "w32", "")
+    add(
+        "Constructed, one flag per letter",
+        "frozen",
+        64,
+        124,
+        "outputs/canon/canonFrozen_s*/ci_*.log",
+        "w64",
+        "26 letter flags, every coordinate named",
+    )
+    add(
+        "Random vectors",
+        "frozen",
+        64,
+        124,
+        "outputs/canon/randFrozen_s*/ci_*.log",
+        "w64",
+        "control: no structure",
+    )
+    add(
+        "Constructed, letters as a 5-bit code",
+        "frozen",
+        64,
+        124,
+        "outputs/hand32/canon64HFrozen_s*/ci_*.log",
+        "w64",
+        "only the letter coding changed",
+    )
+    add(
+        "Hand-built 32, letters as a 5-bit code",
+        "frozen",
+        32,
+        328,
+        "outputs/hand32/hand32Frozen_r328_s*/ci_*.log",
+        "w32",
+        "",
+    )
+    add(
+        "Same, letter distances doubled",
+        "frozen",
+        32,
+        328,
+        "outputs/hand32/hand32LFrozen_r328_s*/ci_*.log",
+        "w32",
+        "scaling does not fix it",
+    )
+    add(
+        "oh48: a flag per letter, 48 dimensions",
+        "frozen",
+        48,
+        196,
+        "outputs/ohsq/oh48Frozen_s*/ci_*.log",
+        "w48",
+        "every coordinate named",
+    )
+    add(
+        "squeeze32: a flag per letter, 32 dimensions",
+        "frozen",
+        32,
+        328,
+        "outputs/ohsq/squeeze32Frozen_s*/ci_*.log",
+        "w32",
+        "26 flags plus a 6-bit code for the rest",
+    )
+    add(
+        "Constructed (64), as starting value",
+        "start",
+        64,
+        124,
+        "outputs/canon/canonInit_s*/ci_*.log",
+        "w64",
+        "trains afterwards",
+    )
+    add(
+        "Hand-built 32 (5-bit letters), as starting value",
+        "start",
+        32,
+        328,
+        "outputs/hand32/hand32Init_r328_s*/ci_*.log",
+        "w32",
+        "",
+    )
+    add(
+        "oh48, as starting value",
+        "start",
+        48,
+        196,
+        "outputs/ohsq/oh48Init_s*/ci_*.log",
+        "w48",
+        "",
+    )
+    add(
+        "squeeze32, as starting value",
+        "start",
+        32,
+        328,
+        "outputs/ohsq/squeeze32Init_s*/ci_*.log",
+        "w32",
+        "",
+    )
     return R
 
 
@@ -62,7 +161,11 @@ def main():
     c = {
         "w64": mean(finals("outputs/canon/learned_s*/ci_*.log")),
         "w32": mean(finals("outputs/width/learned32_s*/ci_*.log")),
-        "w48": mean(finals("outputs/ohsq/learned48_s*/ci_*.log")) if finals("outputs/ohsq/learned48_s*/ci_*.log") else None,
+        "w48": (
+            mean(finals("outputs/ohsq/learned48_s*/ci_*.log"))
+            if finals("outputs/ohsq/learned48_s*/ci_*.log")
+            else None
+        ),
     }
     ladder = []
     for w, pat, r in (
@@ -75,9 +178,17 @@ def main():
     ):
         v = finals(pat)
         ladder.append(dict(width=w, rules=r, mean=mean(v) if v else None, seeds=v))
-    diag = json.load(open("outputs/hand32/diagnose.json")) if os.path.exists("outputs/hand32/diagnose.json") else {}
+    diag = (
+        json.load(open("outputs/hand32/diagnose.json"))
+        if os.path.exists("outputs/hand32/diagnose.json")
+        else {}
+    )
     classes = ["lower", "upper", "mark", "space", "newline", "special"]
-    dg = {k: {cl: v["next"].get(cl, {}).get("contrib") for cl in classes} for k, v in diag.items() if k in ("learned", "frozen")}
+    dg = {
+        k: {cl: v["next"].get(cl, {}).get("contrib") for cl in classes}
+        for k, v in diag.items()
+        if k in ("learned", "frozen")
+    }
 
     layouts = {}
     for name, f in (("oh48", oh48), ("squeeze32", squeeze32)):
@@ -88,12 +199,18 @@ def main():
             i = ord(ch) - 29
             nn[ch] = [label(int(j)) for j in np.argsort(d[i])[1:5]]
         layouts[name] = nn
-    data = dict(controls=c, rows=rows(c), ladder=ladder, diagnostic=dg, neighbours=layouts)
+    data = dict(
+        controls=c, rows=rows(c), ladder=ladder, diagnostic=dg, neighbours=layouts
+    )
     js = json.dumps(data, ensure_ascii=False)
     open(os.path.join(out, "data.json"), "w", encoding="utf-8").write(js)
     tpl = open("flm/dictionary_report_template.html", encoding="utf-8").read()
-    open(os.path.join(out, "index.html"), "w", encoding="utf-8").write(tpl.replace("__DATA__", js))
-    print("wrote", out, "rows with results:", sum(1 for r in data["rows"] if r["result"]))
+    open(os.path.join(out, "index.html"), "w", encoding="utf-8").write(
+        tpl.replace("__DATA__", js)
+    )
+    print(
+        "wrote", out, "rows with results:", sum(1 for r in data["rows"] if r["result"])
+    )
 
 
 if __name__ == "__main__":

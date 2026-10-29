@@ -68,8 +68,7 @@ def arm_data(c0, t):
         p0=p0.round(3).tolist(),
         p1=p1.round(3).tolist(),
         moved=[
-            round(float(v), 3)
-            for v in np.linalg.norm(a - (c0 - c0.mean(0)), axis=1)
+            round(float(v), 3) for v in np.linalg.norm(a - (c0 - c0.mean(0)), axis=1)
         ],
     )
 

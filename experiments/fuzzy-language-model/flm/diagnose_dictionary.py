@@ -83,11 +83,18 @@ def main():
         name, path = a.split("=", 1)
         res[name] = one(path, dev, x, y)
         r = res[name]
-        print(name, "bpc %.4f tau %.3f codebook min %.2f mean %.2f" % (r["bpc"], r["tau"], r["code_min"], r["code_mean"]))
+        print(
+            name,
+            "bpc %.4f tau %.3f codebook min %.2f mean %.2f"
+            % (r["bpc"], r["tau"], r["code_min"], r["code_mean"]),
+        )
         for k in CLASSES:
             v = r["next"].get(k)
             if v:
-                print("   next %-8s share %.3f bits %.3f acc %.3f contributes %.3f" % (k, v["share"], v["bits"], v["acc"], v["contrib"]))
+                print(
+                    "   next %-8s share %.3f bits %.3f acc %.3f contributes %.3f"
+                    % (k, v["share"], v["bits"], v["acc"], v["contrib"])
+                )
     json.dump(res, open(out, "w"), indent=1)
 
 

@@ -5,7 +5,12 @@ import subprocess
 from concurrent.futures import ThreadPoolExecutor
 
 BASH = "C:/Program Files/Git/bin/bash.exe"
-BASE = dict(D="48", FFN_R="448", FFN_R0="314", DATA_ROOT="C:/personal/grad-school/data/cosmopedia")
+BASE = dict(
+    D="48",
+    FFN_R="448",
+    FFN_R0="314",
+    DATA_ROOT="C:/personal/grad-school/data/cosmopedia",
+)
 FIX = dict(FIXED_C="outputs/embspace/oh48.npz", RUN_MODULE="flm.run_fixed_embedding")
 J = [
     ("learned", dict(BASE)),
@@ -18,7 +23,18 @@ J = [
 def run(j):
     name, e = j
     subprocess.run(
-        [BASH, "flm/bij_schedule/run_full.sh", "ci", "0.01", "300", f"outputs/final200k_s1/{name}_s1", "--precision", "fp32", "--seed", "1"],
+        [
+            BASH,
+            "flm/bij_schedule/run_full.sh",
+            "ci",
+            "0.01",
+            "300",
+            f"outputs/final200k_s1/{name}_s1",
+            "--precision",
+            "fp32",
+            "--seed",
+            "1",
+        ],
         env=dict(os.environ, **e),
     )
 

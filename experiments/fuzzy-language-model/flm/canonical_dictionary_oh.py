@@ -61,7 +61,9 @@ def oh48():
 
 
 def squeeze32():
-    order = [ch for g in GROUPS for ch in g] + [ch for ch in MARKS if not any(ch in g for g in GROUPS)]
+    order = [ch for g in GROUPS for ch in g] + [
+        ch for ch in MARKS if not any(ch in g for g in GROUPS)
+    ]
     code = {}
     for d in range(10):
         code[str(d)] = 1 + d
@@ -70,7 +72,11 @@ def squeeze32():
         code[ch] = 15 + j
     C = np.zeros((98, 32), dtype=np.float32)
     for i in range(98):
-        ch = "EOT" if i == 0 else "UNK" if i == 1 else "\n" if i == 2 else chr(i - 3 + 32)
+        ch = (
+            "EOT"
+            if i == 0
+            else "UNK" if i == 1 else "\n" if i == 2 else chr(i - 3 + 32)
+        )
         if len(ch) == 1 and ch.isalpha():
             C[i, ord(ch.lower()) - 97] = 0.6 if ch.isupper() else 1.0
         else:
@@ -110,7 +116,9 @@ def oh40():
 def show(C, name):
     d = np.linalg.norm(C[:, None] - C[None], axis=-1)
     assert len({tuple(r) for r in C}) == 98, name
-    print(name, C.shape, "min distance", round(float(d[np.triu_indices(98, 1)].min()), 2))
+    print(
+        name, C.shape, "min distance", round(float(d[np.triu_indices(98, 1)].min()), 2)
+    )
     for ch in ["a", "e", "3", ".", "(", " "]:
         i = ord(ch) - 29
         nn = np.argsort(d[i])[1:5]
