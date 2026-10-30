@@ -1,0 +1,189 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Pentagon Footprint Verdict</title>
+<style>
+/* Layout: one reading column with a verdict band on top, the evidence below it.
+   Palette: paper and ink, one ochre accent kept for the method that wins. */
+:root {
+  --bg: #f5f3ee;
+  --surface: #ebe8e0;
+  --fg: #1d1c19;
+  --muted: #6b675d;
+  --rule: #cfcabd;
+  --accent: #a4561c;
+  --accent-ink: #fbf7f0;
+  --bar: #8d887c;
+  --no: #8a2b1f;
+  --yes: #3d6b45;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #16150f;
+    --surface: #211f18;
+    --fg: #ece8de;
+    --muted: #a39d8f;
+    --rule: #3a372e;
+    --accent: #d98a4e;
+    --accent-ink: #16150f;
+    --bar: #5f5b51;
+    --no: #e07a68;
+    --yes: #8fc79a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #16150f;
+  --surface: #211f18;
+  --fg: #ece8de;
+  --muted: #a39d8f;
+  --rule: #3a372e;
+  --accent: #d98a4e;
+  --accent-ink: #16150f;
+  --bar: #5f5b51;
+  --no: #e07a68;
+  --yes: #8fc79a;
+  color-scheme: dark;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.6 "IBM Plex Sans", system-ui, sans-serif;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 56px;
+}
+main { max-width: 760px; margin: 0 auto; }
+h1, h2, h3 { font-family: "Newsreader", Georgia, serif; font-weight: 500; line-height: 1.15; text-wrap: balance; margin: 0 0 12px; }
+h1 { font-size: clamp(2rem, 6vw, 2.9rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.6rem; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--rule); }
+h3 { font-size: 1.15rem; margin-top: 28px; }
+p { max-width: 65ch; margin: 0 0 14px; }
+.kicker { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+.mono, td.num, .num { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+.verdict {
+  background: var(--surface);
+  border-left: 4px solid var(--no);
+  padding: 22px 24px;
+  margin-top: 24px;
+  border-radius: 2px;
+}
+.verdict strong { font-family: "Newsreader", Georgia, serif; font-size: 1.5rem; font-weight: 500; color: var(--no); display: block; margin-bottom: 6px; }
+.lede { font-size: 1.08rem; color: var(--fg); }
+.bars { margin: 14px 0 6px; }
+.bar-row { display: grid; grid-template-columns: minmax(96px, 150px) 1fr 64px; gap: 12px; align-items: center; margin: 9px 0; min-width: 0; }
+.bar-label { font-size: 0.92rem; }
+.bar-track { background: var(--surface); height: 18px; position: relative; min-width: 0; }
+.bar-fill { position: absolute; inset: 0 auto 0 0; background: var(--bar); }
+.bar-row.best .bar-fill { background: var(--accent); }
+.bar-row.best .bar-label { color: var(--accent); font-weight: 600; }
+.bar-val { font-family: "IBM Plex Mono", monospace; font-size: 0.9rem; text-align: right; font-variant-numeric: tabular-nums; }
+.axis { display: flex; justify-content: space-between; font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; color: var(--muted); margin: 4px 0 0 calc(150px + 12px); padding-right: 76px; }
+.note { font-size: 0.9rem; color: var(--muted); }
+.table-wrap { overflow-x: auto; margin: 14px 0; min-width: 0; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+td.num, th.num { text-align: right; }
+tr.hl td { background: var(--surface); }
+.pass { color: var(--yes); font-weight: 600; }
+.fail { color: var(--no); font-weight: 600; }
+ol.steps, ul.plain { padding-left: 1.2em; max-width: 65ch; }
+ol.steps li, ul.plain li { margin: 8px 0; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 16px 0; }
+.card { background: var(--surface); padding: 16px 18px; min-width: 0; }
+.card .big { font-family: "Newsreader", Georgia, serif; font-size: 2rem; line-height: 1; color: var(--fg); margin-bottom: 6px; }
+.card .big.accent { color: var(--accent); }
+.card p { font-size: 0.9rem; margin: 0; color: var(--muted); }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<main>
+  <p class="kicker">Interval type-2 TSK · seeds 0–9 · held-out noisy targets</p>
+  <h1>Pentagon footprint verdict</h1>
+  <p class="lede">Does a pentagonal footprint of uncertainty give better intervals than a simple residual interval?</p>
+
+  <div class="verdict">
+    <strong>No, not in this setup.</strong>
+    <p style="margin:0">The pentagon footprint loses to a kNN residual interval on the same point predictor, on 9 of 10 seeds. Its only edge is a slightly better point prediction, and that does not survive a longer optimiser run.</p>
+  </div>
+
+  <h2>Interval quality on observable noise</h2>
+  <p>Mean Winkler score at α = 0.1 (lower is better). Noise rises with x₁; the footprint is calibrated on training data.</p>
+  <div class="bars" role="img" aria-label="Winkler score by method: B2 0.463, PENT 0.589, B3 0.581, B1 0.592, GAUSS 0.638">
+    <div class="bar-row best"><span class="bar-label">B2 · kNN residual</span><div class="bar-track"><div class="bar-fill" style="width:72.5%"></div></div><span class="bar-val">0.463</span></div>
+    <div class="bar-row"><span class="bar-label">B3 · pentagon point + global</span><div class="bar-track"><div class="bar-fill" style="width:91%"></div></div><span class="bar-val">0.581</span></div>
+    <div class="bar-row"><span class="bar-label">PENT · pentagon footprint</span><div class="bar-track"><div class="bar-fill" style="width:92.3%"></div></div><span class="bar-val">0.589</span></div>
+    <div class="bar-row"><span class="bar-label">B1 · type-1 + global</span><div class="bar-track"><div class="bar-fill" style="width:92.6%"></div></div><span class="bar-val">0.592</span></div>
+    <div class="bar-row"><span class="bar-label">GAUSS · Gaussian footprint</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-val">0.638</span></div>
+  </div>
+  <div class="axis"><span>0</span><span>0.7</span></div>
+
+  <h2>Paired by seed</h2>
+  <p>Per-seed difference in Winkler, row minus column. Negative favours the row.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Comparison</th><th class="num">Mean diff</th><th class="num">Seeds row better</th><th>Read</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td>PENT vs B2</td><td class="num">+0.126</td><td class="num">1 / 10</td><td class="fail">B2 wins</td></tr>
+        <tr><td>PENT vs B1</td><td class="num">−0.003</td><td class="num">7 / 10</td><td>tie</td></tr>
+        <tr><td>PENT vs B3</td><td class="num">+0.008</td><td class="num">7 / 10</td><td>tie</td></tr>
+        <tr><td>PENT vs GAUSS</td><td class="num">−0.050</td><td class="num">7 / 10</td><td class="pass">PENT wins</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Against the Gaussian footprint the pentagon does better, but the Gaussian footprint also loses to the simple baseline, so that win does not establish utility.</p>
+
+  <h2>Where the advantage sits</h2>
+  <div class="cards">
+    <div class="card"><div class="big accent">0.050</div><p>Pentagon footprint point RMSE, against 0.053 for the type-1 point. The one place it is slightly ahead.</p></div>
+    <div class="card"><div class="big">0.581</div><p>A plain global interval on that same calibrated point (B3). Essentially tied with the footprint.</p></div>
+    <div class="card"><div class="big">+0.85</div><p>Correlation of the kNN interval's width with local noise. The footprint reaches +0.59.</p></div>
+  </div>
+  <p>The footprint's small gain comes from its point prediction, not its interval. Its intervals are narrower than the target coverage and under-cover (0.80 against 0.90 nominal).</p>
+
+  <h2>Robustness: longer optimiser</h2>
+  <p>The calibrated pentagon stopped at its 40-iteration cap in the main run. Re-running it with a cap of 200 on seeds 0–2 shows the result is fragile.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Seed</th><th class="num">PENT, cap 200</th><th>Iterations</th><th class="num">B2</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td class="num">0.466</td><td>150, converged</td><td class="num">0.476</td></tr>
+        <tr><td>1</td><td class="num">0.727</td><td>3, stalled</td><td class="num">0.430</td></tr>
+        <tr><td>2</td><td class="num">0.504</td><td>107</td><td class="num">0.454</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Converging the optimiser helps on one seed and hurts on another. On seed 1 it stalls after three iterations. The footprint is both unhelpful and hard to fit reliably.</p>
+
+  <h2>Pre-registered decision rule</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Rule</th><th>Requirement</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td>D1</td><td>PENT lowest on x_hetero and beats B2 on ≥ 8/10 seeds</td><td class="fail">Fail · B2 lowest, PENT beats B2 on 1/10</td></tr>
+        <tr><td>D2</td><td>Hidden regime not tracked by any method (|ρ| &lt; 0.2)</td><td class="pass">Pass · all |ρ| ≤ 0.01</td></tr>
+        <tr><td>D3</td><td>PENT beats GAUSS on ≥ 7/10 seeds</td><td class="pass">Pass · 7/10</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>D1 decides the question, and it fails.</p>
+
+  <h2>Recommendation</h2>
+  <ol class="steps">
+    <li><strong>Do not use the pentagon footprint for intervals</strong> in problems like this one.</li>
+    <li><strong>If an interval is needed,</strong> use a type-1 point and a kNN residual quantile. It is simpler, faster and better calibrated here.</li>
+    <li><strong>Revisit only with a held-out ridge and a fixed optimiser budget,</strong> tuned on separate seeds, with the point and interval effects measured separately.</li>
+  </ol>
+
+  <h2>Caveats</h2>
+  <ul class="plain">
+    <li>One target function, K = 5, 500 training points. Results may differ elsewhere.</li>
+    <li>The consequent ridge (1e-2) was chosen on seeds 0–1, which are also in the evaluation.</li>
+    <li>Calibration hit its iteration cap in the main run, so the pentagon numbers are a lower bound on what calibration can achieve.</li>
+    <li>The baselines use in-sample residuals. A held-out calibration could tighten them slightly, but not by the 0.13 gap observed.</li>
+    <li>The kNN baseline uses x. Where noise is not a function of x it reduces to the global interval, and the ranking could change.</li>
+  </ul>
+</main>
