@@ -74,7 +74,57 @@ dense delta mixer, not a windowed model. The strict version is the restart (wdel
 (T w^2) only beats dense for w < sqrt(T). Dense Gaussian attention is faster than the explicit gather at T <= 1024
 (the gather is memory-bound on CPU); the window attention's win is asymptotic, not at this context length.
 
-## Results (pilot)
+## Results (pilot, complete)
 
-_To be filled after the runs. Each cell: validation BPC at 4M characters, mean of seeds 0 and 1, and the paired difference
-to its dense reference per seed. Two seeds cannot support a ranking under 0.01; the table says so._
+Validation BPC on 500K characters, end of training (step 489 of 4M characters). Seeds 0 and 1. Restarts of the container killed runs twice; each run resumed from its last checkpoint (`--resume auto`), so the curves are continuous but the wall-clock times are not usable.
+
+**Bijective track (PR #289 all-fuzzy model, d 48, lr 0.01):**
+
+| arm | mixer | window | embedding | seed 0 | seed 1 | mean |
+|---|---|---|---|---|---|---|
+| A0 | dense fuzzy delta | 256 | learned | 1.8779 | 1.8802 | 1.8790 |
+| A0f | dense fuzzy delta | 256 | frozen `oh48` | 1.8414 | 1.8383 | 1.8399 |
+| A1 | bsolve | 32 | learned | 1.8860 | 1.8834 | 1.8847 |
+| A1f | bsolve | 32 | frozen `oh48` | 1.8451 | 1.8428 | 1.8439 |
+| A2 | wdelta | 32 | learned | 1.8816 | 1.8842 | 1.8829 |
+| A2f | wdelta | 32 | frozen `oh48` | 1.8388 | 1.8389 | 1.8388 |
+
+**Attention track (plain tied TinyLM, 41,856 params; not comparable with the bijective track):**
+
+| arm | mixer | window | seed 0 | seed 1 | mean |
+|---|---|---|---|---|---|
+| B0 | dense Gaussian attention | 256 | 2.0053 | 1.9985 | 2.0019 |
+| B1 | window Gaussian attention (`wgauss`) | 32 | 1.9816 | 1.9679 | 1.9748 |
+
+**Paired differences (seed by seed):**
+
+| comparison | seed 0 | seed 1 | mean |
+|---|---|---|---|
+| bsolve − dense, learned | +0.0081 | +0.0031 | +0.0056 |
+| wdelta − dense, learned | +0.0037 | +0.0040 | +0.0039 |
+| bsolve − dense, frozen | +0.0037 | +0.0045 | +0.0041 |
+| wdelta − dense, frozen | −0.0027 | +0.0006 | −0.0010 |
+| frozen − learned, dense | −0.0364 | −0.0419 | −0.0392 |
+| frozen − learned, bsolve | −0.0409 | −0.0406 | −0.0408 |
+| frozen − learned, wdelta | −0.0428 | −0.0453 | −0.0441 |
+| window attention − dense attention | −0.0237 | −0.0306 | −0.0271 |
+
+**Predictions, scored**
+
+| # | prediction | outcome |
+|---|---|---|
+| 1 | frozen `oh48` costs 0 to 0.03 BPC against learned | **wrong**: frozen is better by 0.039 to 0.044 on every mixer, both seeds |
+| 2 | window costs ≥ 0.02 BPC for wdelta and wgauss | **wrong**: wdelta is within 0.004 of dense; window attention is 0.027 better than dense |
+| 3 | bsolve within 0.02 of dense | **right**: +0.004 to +0.006 |
+| 4 | seed spread too large to resolve effects under 0.01 | **right**: the window and banded-solve gaps are within 0.01 of zero; the frozen effect is not |
+
+**Checkpoints (codebook geometry, distance correlation with `oh48`):** frozen runs = +1.000 at every checkpoint (manipulation check passes). Learned runs stay unrelated to `oh48` (−0.01 to +0.04) from step 100 to 400.
+
+**Reading (pilot only; two seeds, 4M characters):**
+- Both strict windows are within about 0.005 BPC of the dense fuzzy delta mixer at w = 32, for both embeddings. The window costs little at this scale and context length. A plausible but untested reason is that at this size most of the useful signal is short-range, so 32 characters carry most of it.
+- The banded solve (bsolve) is not a strict window (see Step 1), and it costs about the same as the strict restart. There is no quality reason to prefer the N-diagonal solve over `wdelta`, which gives a true window.
+- The frozen dictionary is clearly better than the learned codebook here, by about 0.04 BPC. This is the opposite of the prediction and of the PR #289 result at 100K/30M (frozen costs +0.018). Candidate explanations to test next: codebook scale (frozen std 0.48 vs learned 0.6), and the learned table being under-trained at 4M characters. Not yet tested.
+- Window attention is 0.027 better than dense attention at this size. A plausible cause is that a softmax over 256 keys learns more slowly; this is a hypothesis, untested.
+- Strict windowing as a *speed* win needs T ≫ 256. The clean CPU benchmark (Step 2) puts the banded solve ahead of dense only from T ≈ 512.
+
+**Not done:** the trained-model receptive-field measurement for `bsolve` (needs a loader for the installed mixer weights); a longer-context run (T = 1024+) where the window's cost advantage would matter; more seeds for any gap under 0.01.
