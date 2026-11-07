@@ -1,0 +1,174 @@
+  calibrated gauss_local in 11s
+/home/user/grad-school/experiments/fuzzy-number-shapes/km_study.py:71: RuntimeWarning: invalid value encountered in divide
+  yc = (w * y).sum(0) / w.sum(0)
+  calibrated pent_fou in 31s
+x_hetero  seed 0 B2_gauss  cov 0.889 width 0.314 rho +0.86 wink 0.449 rmse 0.0503
+x_hetero  seed 0 B2_pent   cov 0.859 width 0.310 rho +0.85 wink 0.476 rmse 0.0542
+x_hetero  seed 0 DEC_gauss cov 0.802 width 0.281 rho +0.84 wink 0.513 rmse 0.0503
+x_hetero  seed 0 DEC_pent  cov 0.818 width 0.326 rho +0.75 wink 0.570 rmse 0.0542
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:98: RuntimeWarning: overflow encountered in exp
+  sig = np.exp(L)
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:99: RuntimeWarning: divide by zero encountered in divide
+  z = dx / sig
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:99: RuntimeWarning: overflow encountered in divide
+  z = dx / sig
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:100: RuntimeWarning: overflow encountered in multiply
+  mu = np.exp(-0.5 * z * z)
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:103: RuntimeWarning: invalid value encountered in multiply
+  dM[k * PG + 0] = z * mu / sig + z * z * mu * dLdc
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:103: RuntimeWarning: overflow encountered in multiply
+  dM[k * PG + 0] = z * mu / sig + z * z * mu * dLdc
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:104: RuntimeWarning: overflow encountered in multiply
+  dM[k * PG + 1] = z * z * mu
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:104: RuntimeWarning: invalid value encountered in multiply
+  dM[k * PG + 1] = z * z * mu
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:105: RuntimeWarning: overflow encountered in multiply
+  dM[k * PG + 2] = z * z * mu * sgn * w
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:105: RuntimeWarning: invalid value encountered in multiply
+  dM[k * PG + 2] = z * z * mu * sgn * w
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:106: RuntimeWarning: overflow encountered in multiply
+  dM[k * PG + 3] = z * z * mu * sgn * w * dx
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:106: RuntimeWarning: invalid value encountered in multiply
+  dM[k * PG + 3] = z * z * mu * sgn * w * dx
+  calibrated gauss_local in 16s
+  calibrated pent_fou in 23s
+x_hetero  seed 1 B2_gauss  cov 0.862 width 0.295 rho +0.85 wink 0.458 rmse 0.0577
+x_hetero  seed 1 B2_pent   cov 0.883 width 0.296 rho +0.85 wink 0.430 rmse 0.0453
+x_hetero  seed 1 DEC_gauss cov 0.816 width 0.278 rho +0.83 wink 0.535 rmse 0.0577
+x_hetero  seed 1 DEC_pent  cov 0.825 width 0.304 rho +0.79 wink 0.584 rmse 0.0453
+  calibrated gauss_local in 10s
+  calibrated pent_fou in 16s
+x_hetero  seed 2 B2_gauss  cov 0.897 width 0.306 rho +0.84 wink 0.438 rmse 0.0496
+x_hetero  seed 2 B2_pent   cov 0.879 width 0.286 rho +0.86 wink 0.454 rmse 0.0521
+x_hetero  seed 2 DEC_gauss cov 0.838 width 0.296 rho +0.41 wink 0.612 rmse 0.0496
+x_hetero  seed 2 DEC_pent  cov 0.791 width 0.418 rho +0.25 wink 0.760 rmse 0.0521
+  calibrated gauss_local in 10s
+  calibrated pent_fou in 12s
+x_hetero  seed 3 B2_gauss  cov 0.845 width 0.262 rho +0.86 wink 0.458 rmse 0.0460
+x_hetero  seed 3 B2_pent   cov 0.855 width 0.293 rho +0.86 wink 0.486 rmse 0.0630
+x_hetero  seed 3 DEC_gauss cov 0.778 width 0.261 rho +0.46 wink 0.628 rmse 0.0460
+x_hetero  seed 3 DEC_pent  cov 0.796 width 0.292 rho +0.70 wink 0.619 rmse 0.0630
+  calibrated gauss_local in 11s
+  calibrated pent_fou in 23s
+x_hetero  seed 4 B2_gauss  cov 0.847 width 0.292 rho +0.85 wink 0.495 rmse 0.0650
+x_hetero  seed 4 B2_pent   cov 0.834 width 0.284 rho +0.85 wink 0.502 rmse 0.0623
+x_hetero  seed 4 DEC_gauss cov 0.784 width 0.296 rho +0.74 wink 0.669 rmse 0.0650
+x_hetero  seed 4 DEC_pent  cov 0.773 width 0.390 rho +0.41 wink 0.820 rmse 0.0623
+  calibrated gauss_local in 12s
+  calibrated pent_fou in 14s
+x_hetero  seed 5 B2_gauss  cov 0.827 width 0.276 rho +0.85 wink 0.522 rmse 0.0576
+x_hetero  seed 5 B2_pent   cov 0.826 width 0.271 rho +0.85 wink 0.502 rmse 0.0499
+x_hetero  seed 5 DEC_gauss cov 0.731 width 0.255 rho +0.62 wink 0.769 rmse 0.0576
+x_hetero  seed 5 DEC_pent  cov 0.642 width 0.226 rho -0.04 wink 0.967 rmse 0.0499
+  calibrated gauss_local in 11s
+  calibrated pent_fou in 44s
+x_hetero  seed 6 B2_gauss  cov 0.835 width 0.297 rho +0.84 wink 0.466 rmse 0.0568
+x_hetero  seed 6 B2_pent   cov 0.864 width 0.303 rho +0.82 wink 0.449 rmse 0.0508
+x_hetero  seed 6 DEC_gauss cov 0.817 width 0.319 rho +0.69 wink 0.591 rmse 0.0568
+x_hetero  seed 6 DEC_pent  cov 0.771 width 0.274 rho +0.72 wink 0.653 rmse 0.0508
+  calibrated gauss_local in 10s
+  calibrated pent_fou in 18s
+x_hetero  seed 7 B2_gauss  cov 0.869 width 0.304 rho +0.87 wink 0.448 rmse 0.0601
+x_hetero  seed 7 B2_pent   cov 0.869 width 0.315 rho +0.86 wink 0.464 rmse 0.0572
+x_hetero  seed 7 DEC_gauss cov 0.772 width 0.285 rho +0.76 wink 0.636 rmse 0.0601
+x_hetero  seed 7 DEC_pent  cov 0.709 width 0.264 rho +0.43 wink 0.724 rmse 0.0572
+  calibrated gauss_local in 16s
+  calibrated pent_fou in 45s
+x_hetero  seed 8 B2_gauss  cov 0.839 width 0.271 rho +0.86 wink 0.501 rmse 0.0761
+x_hetero  seed 8 B2_pent   cov 0.830 width 0.259 rho +0.86 wink 0.469 rmse 0.0550
+x_hetero  seed 8 DEC_gauss cov 0.777 width 0.253 rho +0.83 wink 0.573 rmse 0.0761
+x_hetero  seed 8 DEC_pent  cov 0.742 width 0.275 rho +0.70 wink 0.652 rmse 0.0550
+  calibrated gauss_local in 9s
+  calibrated pent_fou in 20s
+x_hetero  seed 9 B2_gauss  cov 0.858 width 0.283 rho +0.85 wink 0.462 rmse 0.0604
+x_hetero  seed 9 B2_pent   cov 0.862 width 0.284 rho +0.86 wink 0.400 rmse 0.0381
+x_hetero  seed 9 DEC_gauss cov 0.814 width 0.323 rho +0.73 wink 0.587 rmse 0.0604
+x_hetero  seed 9 DEC_pent  cov 0.816 width 0.293 rho +0.78 wink 0.489 rmse 0.0381
+  calibrated gauss_local in 9s
+  calibrated pent_fou in 17s
+regime    seed 0 B2_gauss  cov 0.860 width 0.359 rho +0.01 wink 0.600 rmse 0.0509
+regime    seed 0 B2_pent   cov 0.852 width 0.349 rho +0.02 wink 0.600 rmse 0.0529
+regime    seed 0 DEC_gauss cov 0.822 width 0.356 rho -0.05 wink 0.693 rmse 0.0509
+regime    seed 0 DEC_pent  cov 0.782 width 0.314 rho -0.01 wink 0.692 rmse 0.0529
+  calibrated gauss_local in 10s
+  calibrated pent_fou in 49s
+regime    seed 1 B2_gauss  cov 0.882 width 0.398 rho +0.01 wink 0.601 rmse 0.0641
+regime    seed 1 B2_pent   cov 0.886 width 0.391 rho -0.00 wink 0.576 rmse 0.0528
+regime    seed 1 DEC_gauss cov 0.781 width 0.391 rho +0.02 wink 0.737 rmse 0.0641
+regime    seed 1 DEC_pent  cov 0.854 width 0.405 rho -0.03 wink 0.690 rmse 0.0528
+  calibrated gauss_local in 11s
+  calibrated pent_fou in 15s
+regime    seed 2 B2_gauss  cov 0.836 width 0.334 rho -0.02 wink 0.636 rmse 0.0707
+regime    seed 2 B2_pent   cov 0.845 width 0.336 rho +0.00 wink 0.588 rmse 0.0569
+regime    seed 2 DEC_gauss cov 0.753 width 0.333 rho +0.05 wink 0.797 rmse 0.0707
+regime    seed 2 DEC_pent  cov 0.746 width 0.321 rho -0.01 wink 0.746 rmse 0.0569
+  calibrated gauss_local in 10s
+  calibrated pent_fou in 39s
+regime    seed 3 B2_gauss  cov 0.839 width 0.357 rho -0.01 wink 0.642 rmse 0.0515
+regime    seed 3 B2_pent   cov 0.836 width 0.350 rho +0.00 wink 0.642 rmse 0.0556
+regime    seed 3 DEC_gauss cov 0.823 width 0.352 rho +0.01 wink 0.652 rmse 0.0515
+regime    seed 3 DEC_pent  cov 0.792 width 0.341 rho -0.02 wink 0.729 rmse 0.0556
+  calibrated gauss_local in 13s
+/home/user/grad-school/experiments/fuzzy-number-shapes/km_study.py:62: RuntimeWarning: invalid value encountered in divide
+  yc = (w * y).sum(0) / w.sum(0)
+  calibrated pent_fou in 13s
+regime    seed 4 B2_gauss  cov 0.831 width 0.329 rho +0.02 wink 0.601 rmse 0.0498
+regime    seed 4 B2_pent   cov 0.848 width 0.342 rho +0.03 wink 0.630 rmse 0.0777
+regime    seed 4 DEC_gauss cov 0.796 width 0.337 rho +0.00 wink 0.702 rmse 0.0498
+regime    seed 4 DEC_pent  cov 0.654 width 0.252 rho -0.04 wink 0.877 rmse 0.0777
+  calibrated gauss_local in 10s
+  calibrated pent_fou in 23s
+regime    seed 5 B2_gauss  cov 0.861 width 0.347 rho -0.01 wink 0.596 rmse 0.0558
+regime    seed 5 B2_pent   cov 0.866 width 0.346 rho -0.03 wink 0.572 rmse 0.0453
+regime    seed 5 DEC_gauss cov 0.831 width 0.332 rho +0.03 wink 0.647 rmse 0.0558
+regime    seed 5 DEC_pent  cov 0.787 width 0.322 rho -0.04 wink 0.692 rmse 0.0453
+  calibrated gauss_local in 15s
+  calibrated pent_fou in 18s
+regime    seed 6 B2_gauss  cov 0.891 width 0.365 rho -0.00 wink 0.532 rmse 0.0382
+regime    seed 6 B2_pent   cov 0.866 width 0.349 rho +0.01 wink 0.543 rmse 0.0445
+regime    seed 6 DEC_gauss cov 0.871 width 0.357 rho -0.01 wink 0.569 rmse 0.0382
+regime    seed 6 DEC_pent  cov 0.786 width 0.330 rho +0.03 wink 0.662 rmse 0.0445
+  calibrated gauss_local in 10s
+  calibrated pent_fou in 38s
+regime    seed 7 B2_gauss  cov 0.877 width 0.370 rho -0.04 wink 0.553 rmse 0.0444
+regime    seed 7 B2_pent   cov 0.848 width 0.347 rho -0.03 wink 0.575 rmse 0.0528
+regime    seed 7 DEC_gauss cov 0.843 width 0.362 rho -0.04 wink 0.627 rmse 0.0444
+regime    seed 7 DEC_pent  cov 0.812 width 0.359 rho -0.02 wink 0.687 rmse 0.0528
+  calibrated gauss_local in 10s
+  calibrated pent_fou in 32s
+regime    seed 8 B2_gauss  cov 0.854 width 0.359 rho +0.06 wink 0.582 rmse 0.0604
+regime    seed 8 B2_pent   cov 0.874 width 0.360 rho +0.06 wink 0.552 rmse 0.0437
+regime    seed 8 DEC_gauss cov 0.809 width 0.361 rho +0.02 wink 0.698 rmse 0.0604
+regime    seed 8 DEC_pent  cov 0.820 width 0.347 rho -0.02 wink 0.654 rmse 0.0437
+  calibrated gauss_local in 17s
+  calibrated pent_fou in 12s
+regime    seed 9 B2_gauss  cov 0.875 width 0.340 rho -0.04 wink 0.537 rmse 0.0443
+regime    seed 9 B2_pent   cov 0.874 width 0.340 rho -0.02 wink 0.536 rmse 0.0405
+regime    seed 9 DEC_gauss cov 0.858 width 0.358 rho -0.02 wink 0.609 rmse 0.0443
+regime    seed 9 DEC_pent  cov 0.751 width 0.343 rho -0.02 wink 0.732 rmse 0.0405
+| noise | arm | coverage | cov (low sd) | cov (high sd) | mean width | width ratio hi/lo | Spearman(width, sd) | Winkler | RMSE (noise-free) |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| x_hetero | B2_gauss | 0.857 | 0.909 | 0.804 | 0.290 | 3.01 | +0.85 | 0.470 | 0.0580 |
+| x_hetero | B2_pent | 0.856 | 0.898 | 0.814 | 0.290 | 3.03 | +0.85 | 0.463 | 0.0528 |
+| x_hetero | DEC_gauss | 0.793 | 0.885 | 0.701 | 0.285 | 2.97 | +0.69 | 0.611 | 0.0580 |
+| x_hetero | DEC_pent | 0.768 | 0.860 | 0.677 | 0.306 | 2.20 | +0.55 | 0.684 | 0.0528 |
+| regime | B2_gauss | 0.861 | 0.988 | 0.734 | 0.356 | 1.00 | -0.00 | 0.588 | 0.0530 |
+| regime | B2_pent | 0.859 | 0.993 | 0.725 | 0.351 | 1.00 | +0.00 | 0.581 | 0.0523 |
+| regime | DEC_gauss | 0.819 | 0.956 | 0.681 | 0.354 | 1.00 | +0.00 | 0.673 | 0.0530 |
+| regime | DEC_pent | 0.779 | 0.929 | 0.628 | 0.333 | 0.97 | -0.02 | 0.716 | 0.0523 |
+
+Paired per-seed Winkler difference (row minus column; negative favours the row).
+
+| noise | comparison | mean diff | sd | seeds row better |
+|---|---|---:|---:|---:|
+| x_hetero | DEC_gauss vs B2_gauss | +0.141 | 0.059 | 0/10 |
+| x_hetero | DEC_pent vs B2_pent | +0.221 | 0.118 | 0/10 |
+| x_hetero | DEC_pent vs DEC_gauss | +0.073 | 0.085 | 2/10 |
+| x_hetero | B2_pent vs B2_gauss | -0.007 | 0.030 | 5/10 |
+| regime | DEC_gauss vs B2_gauss | +0.085 | 0.046 | 0/10 |
+| regime | DEC_pent vs B2_pent | +0.135 | 0.051 | 0/10 |
+| regime | DEC_pent vs DEC_gauss | +0.043 | 0.078 | 4/10 |
+| regime | B2_pent vs B2_gauss | -0.007 | 0.024 | 7/10 |
+
+Seeds 0..9, N_train=500. Point is the type-1 centre model for every arm; only the interval differs. Winkler at alpha = 0.1. group = high noise (sd > 0.1).
+

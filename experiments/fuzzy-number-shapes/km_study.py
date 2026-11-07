@@ -118,8 +118,12 @@ def predict_all(theta, beta, X):
     a = (Fl * yhat).sum(0) / (Fl.sum(0) + 1e-12)
     b = (Fu * yhat).sum(0) / (Fu.sum(0) + 1e-12)
     nt_lo, nt_hi = np.minimum(a, b), np.maximum(a, b)
-    km_lo = np.minimum(karnik_mendel(yhat, Fl, Fu, True), karnik_mendel(yhat, Fl, Fu, False))
-    km_hi = np.maximum(karnik_mendel(yhat, Fl, Fu, True), karnik_mendel(yhat, Fl, Fu, False))
+    km_lo = np.minimum(
+        karnik_mendel(yhat, Fl, Fu, True), karnik_mendel(yhat, Fl, Fu, False)
+    )
+    km_hi = np.maximum(
+        karnik_mendel(yhat, Fl, Fu, True), karnik_mendel(yhat, Fl, Fu, False)
+    )
     return point, (nt_lo, nt_hi), (km_lo, km_hi)
 
 
@@ -146,18 +150,32 @@ def run():
             rmse = float(np.sqrt(np.mean((point - yte) ** 2)))
             for name, (lo, hi) in [("nie_tan", nt), ("km", km)]:
                 width = hi - lo
-                rows.append(dict(
-                    arm=arm, bounds=name, seed=seed, rmse_test=rmse,
-                    cov_noisefree=float(np.mean((yte >= lo) & (yte <= hi))),
-                    cov_noisy=float(np.mean((y_noisy_te >= lo) & (y_noisy_te <= hi))),
-                    mean_width=float(np.mean(width)),
-                    rho_width_sd=float(spearmanr(width, sd_te).correlation) if width.std() > 0 else 0.0,
-                    width_lowsd=float(np.mean(width[sd_te < 0.1])),
-                    width_highsd=float(np.mean(width[sd_te > 0.1])),
-                ))
-                print(f"seed {seed} {arm:12s} {name:8s} RMSE {rmse:.4f} cov(nf) {rows[-1]['cov_noisefree']:.3f} "
-                      f"cov(noisy) {rows[-1]['cov_noisy']:.3f} width {rows[-1]['mean_width']:.3f} "
-                      f"rho {rows[-1]['rho_width_sd']:+.2f}", flush=True)
+                rows.append(
+                    dict(
+                        arm=arm,
+                        bounds=name,
+                        seed=seed,
+                        rmse_test=rmse,
+                        cov_noisefree=float(np.mean((yte >= lo) & (yte <= hi))),
+                        cov_noisy=float(
+                            np.mean((y_noisy_te >= lo) & (y_noisy_te <= hi))
+                        ),
+                        mean_width=float(np.mean(width)),
+                        rho_width_sd=(
+                            float(spearmanr(width, sd_te).correlation)
+                            if width.std() > 0
+                            else 0.0
+                        ),
+                        width_lowsd=float(np.mean(width[sd_te < 0.1])),
+                        width_highsd=float(np.mean(width[sd_te > 0.1])),
+                    )
+                )
+                print(
+                    f"seed {seed} {arm:12s} {name:8s} RMSE {rmse:.4f} cov(nf) {rows[-1]['cov_noisefree']:.3f} "
+                    f"cov(noisy) {rows[-1]['cov_noisy']:.3f} width {rows[-1]['mean_width']:.3f} "
+                    f"rho {rows[-1]['rho_width_sd']:+.2f}",
+                    flush=True,
+                )
     return rows
 
 
@@ -166,16 +184,22 @@ def write(rows):
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
         w.writeheader()
         w.writerows(rows)
-    lines = ["| arm | bounds | cov. noise-free | cov. noisy | mean width | width (low sd) | width (high sd) | Spearman(width, sd) |",
-             "|---|---|---:|---:|---:|---:|---:|---:|"]
+    lines = [
+        "| arm | bounds | cov. noise-free | cov. noisy | mean width | width (low sd) | width (high sd) | Spearman(width, sd) |",
+        "|---|---|---:|---:|---:|---:|---:|---:|",
+    ]
     for arm in ["km_collapse", "km_fou"]:
         for b in ["nie_tan", "km"]:
             r = [x for x in rows if x["arm"] == arm and x["bounds"] == b]
             m = lambda k: np.mean([x[k] for x in r])
-            lines.append(f"| {arm} | {b} | {m('cov_noisefree'):.3f} | {m('cov_noisy'):.3f} | {m('mean_width'):.3f} "
-                         f"| {m('width_lowsd'):.3f} | {m('width_highsd'):.3f} | {m('rho_width_sd'):+.2f} |")
-    text = "\n".join(lines) + ("\n\nSeeds 0..9, K=5, N_train=500, heteroscedastic noise sd 0.02 (x1<0.5) / 0.15. "
-                               "Coverage on a 40x40 grid. Spearman computed per seed, averaged.\n")
+            lines.append(
+                f"| {arm} | {b} | {m('cov_noisefree'):.3f} | {m('cov_noisy'):.3f} | {m('mean_width'):.3f} "
+                f"| {m('width_lowsd'):.3f} | {m('width_highsd'):.3f} | {m('rho_width_sd'):+.2f} |"
+            )
+    text = "\n".join(lines) + (
+        "\n\nSeeds 0..9, K=5, N_train=500, heteroscedastic noise sd 0.02 (x1<0.5) / 0.15. "
+        "Coverage on a 40x40 grid. Spearman computed per seed, averaged.\n"
+    )
     (HERE / "results_km.md").write_text(text)
     print(text)
 

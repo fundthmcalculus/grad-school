@@ -87,30 +87,59 @@ def run():
             p_te_gc, lo_gc, hi_gc, und_gc = point_of("gauss", lp.PG, th_gc, X, y, Xte)
 
             cands = {
-                "B1": (p_te_t1, p_te_t1 - global_halfwidth(r_t1, len(Xte)), p_te_t1 + global_halfwidth(r_t1, len(Xte))),
-                "B2": (p_te_t1, p_te_t1 - local_halfwidth(X, r_t1, Xte), p_te_t1 + local_halfwidth(X, r_t1, Xte)),
-                "B3": (p_te_pc, p_te_pc - global_halfwidth(r_pc, len(Xte)), p_te_pc + global_halfwidth(r_pc, len(Xte))),
+                "B1": (
+                    p_te_t1,
+                    p_te_t1 - global_halfwidth(r_t1, len(Xte)),
+                    p_te_t1 + global_halfwidth(r_t1, len(Xte)),
+                ),
+                "B2": (
+                    p_te_t1,
+                    p_te_t1 - local_halfwidth(X, r_t1, Xte),
+                    p_te_t1 + local_halfwidth(X, r_t1, Xte),
+                ),
+                "B3": (
+                    p_te_pc,
+                    p_te_pc - global_halfwidth(r_pc, len(Xte)),
+                    p_te_pc + global_halfwidth(r_pc, len(Xte)),
+                ),
                 "PENT": (p_te_pc, lo_pc, hi_pc),
                 "GAUSS": (p_te_gc, lo_gc, hi_gc),
             }
             for name, (pt, lo, hi) in cands.items():
                 width = hi - lo
                 cov = (yte >= lo) & (yte <= hi)
-                rows.append(dict(
-                    noise=noise, method=name, seed=seed,
-                    coverage=float(cov.mean()),
-                    cov_group0=float(cov[~group].mean()),
-                    cov_group1=float(cov[group].mean()),
-                    mean_width=float(width.mean()),
-                    width_ratio=float(width[group].mean() / max(width[~group].mean(), 1e-12)),
-                    rho_width_sd=float(spearmanr(width, sd).correlation) if width.std() > 0 else 0.0,
-                    rho_width_group=float(spearmanr(width, group).correlation) if width.std() > 0 else 0.0,
-                    winkler=float(cs.winkler(yte, lo, hi).mean()),
-                    rmse_noisefree=float(np.sqrt(np.mean((pt - f) ** 2))),
-                ))
-                print(f"{noise:9s} seed {seed} {name:5s} cov {rows[-1]['coverage']:.3f} "
-                      f"width {rows[-1]['mean_width']:.3f} rho {rows[-1]['rho_width_sd']:+.2f} "
-                      f"wink {rows[-1]['winkler']:.3f} rmse {rows[-1]['rmse_noisefree']:.4f}", flush=True)
+                rows.append(
+                    dict(
+                        noise=noise,
+                        method=name,
+                        seed=seed,
+                        coverage=float(cov.mean()),
+                        cov_group0=float(cov[~group].mean()),
+                        cov_group1=float(cov[group].mean()),
+                        mean_width=float(width.mean()),
+                        width_ratio=float(
+                            width[group].mean() / max(width[~group].mean(), 1e-12)
+                        ),
+                        rho_width_sd=(
+                            float(spearmanr(width, sd).correlation)
+                            if width.std() > 0
+                            else 0.0
+                        ),
+                        rho_width_group=(
+                            float(spearmanr(width, group).correlation)
+                            if width.std() > 0
+                            else 0.0
+                        ),
+                        winkler=float(cs.winkler(yte, lo, hi).mean()),
+                        rmse_noisefree=float(np.sqrt(np.mean((pt - f) ** 2))),
+                    )
+                )
+                print(
+                    f"{noise:9s} seed {seed} {name:5s} cov {rows[-1]['coverage']:.3f} "
+                    f"width {rows[-1]['mean_width']:.3f} rho {rows[-1]['rho_width_sd']:+.2f} "
+                    f"wink {rows[-1]['winkler']:.3f} rmse {rows[-1]['rmse_noisefree']:.4f}",
+                    flush=True,
+                )
     return rows
 
 
@@ -118,8 +147,16 @@ def paired(rows, noise, a, b):
     """Per-seed Winkler difference a - b (negative = a better)."""
     d = []
     for seed in SEEDS:
-        wa = [x["winkler"] for x in rows if x["noise"] == noise and x["method"] == a and x["seed"] == seed][0]
-        wb = [x["winkler"] for x in rows if x["noise"] == noise and x["method"] == b and x["seed"] == seed][0]
+        wa = [
+            x["winkler"]
+            for x in rows
+            if x["noise"] == noise and x["method"] == a and x["seed"] == seed
+        ][0]
+        wb = [
+            x["winkler"]
+            for x in rows
+            if x["noise"] == noise and x["method"] == b and x["seed"] == seed
+        ][0]
         d.append(wa - wb)
     d = np.array(d)
     return d.mean(), d.std(ddof=1), int((d < 0).sum())
@@ -130,23 +167,40 @@ def write(rows):
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
         w.writeheader()
         w.writerows(rows)
-    lines = ["| noise | method | coverage | cov (low sd) | cov (high sd) | mean width | width ratio hi/lo | Spearman(width, sd) | Winkler | RMSE (noise-free) |",
-             "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    lines = [
+        "| noise | method | coverage | cov (low sd) | cov (high sd) | mean width | width ratio hi/lo | Spearman(width, sd) | Winkler | RMSE (noise-free) |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+    ]
     for noise in NOISE_MODELS:
         for m in METHODS:
             r = [x for x in rows if x["noise"] == noise and x["method"] == m]
             mean = lambda k: np.mean([x[k] for x in r])
-            lines.append(f"| {noise} | {m} | {mean('coverage'):.3f} | {mean('cov_group0'):.3f} | {mean('cov_group1'):.3f} "
-                         f"| {mean('mean_width'):.3f} | {mean('width_ratio'):.2f} | {mean('rho_width_sd'):+.2f} "
-                         f"| {mean('winkler'):.3f} | {mean('rmse_noisefree'):.4f} |")
-    lines += ["", "Paired per-seed Winkler difference (row minus column; negative favours the row). Mean, sd over seeds, seeds where row < column.", "",
-              "| noise | comparison | mean diff | sd | seeds row better |", "|---|---|---:|---:|---:|"]
+            lines.append(
+                f"| {noise} | {m} | {mean('coverage'):.3f} | {mean('cov_group0'):.3f} | {mean('cov_group1'):.3f} "
+                f"| {mean('mean_width'):.3f} | {mean('width_ratio'):.2f} | {mean('rho_width_sd'):+.2f} "
+                f"| {mean('winkler'):.3f} | {mean('rmse_noisefree'):.4f} |"
+            )
+    lines += [
+        "",
+        "Paired per-seed Winkler difference (row minus column; negative favours the row). Mean, sd over seeds, seeds where row < column.",
+        "",
+        "| noise | comparison | mean diff | sd | seeds row better |",
+        "|---|---|---:|---:|---:|",
+    ]
     for noise in NOISE_MODELS:
-        for a, b in [("PENT", "B2"), ("PENT", "B1"), ("PENT", "B3"), ("PENT", "GAUSS"), ("B3", "B2")]:
+        for a, b in [
+            ("PENT", "B2"),
+            ("PENT", "B1"),
+            ("PENT", "B3"),
+            ("PENT", "GAUSS"),
+            ("B3", "B2"),
+        ]:
             md, sdv, nb = paired(rows, noise, a, b)
             lines.append(f"| {noise} | {a} vs {b} | {md:+.3f} | {sdv:.3f} | {nb}/10 |")
-    text = "\n".join(lines) + ("\n\nSeeds 0..9, N_train=500. Test: 40x40 grid (x_hetero) or 1600 random points (regime). "
-                               "Winkler at alpha = 0.1. group = high noise (sd > 0.1). B2 uses k = 100 nearest training residuals.\n")
+    text = "\n".join(lines) + (
+        "\n\nSeeds 0..9, N_train=500. Test: 40x40 grid (x_hetero) or 1600 random points (regime). "
+        "Winkler at alpha = 0.1. group = high noise (sd > 0.1). B2 uses k = 100 nearest training residuals.\n"
+    )
     (HERE / "results_utility.md").write_text(text)
     print(text)
 

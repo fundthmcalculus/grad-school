@@ -83,7 +83,11 @@ def make_test(noise, seed):
 
 
 def winkler(y, lo, hi, alpha=ALPHA):
-    return (hi - lo) + (2 / alpha) * (lo - y) * (y < lo) + (2 / alpha) * (y - hi) * (y > hi)
+    return (
+        (hi - lo)
+        + (2 / alpha) * (lo - y) * (y < lo)
+        + (2 / alpha) * (y - hi) * (y > hi)
+    )
 
 
 def footprint_index(variant):
@@ -113,8 +117,9 @@ def calibrate(variant, theta, X, y):
         _, lo, hi, _ = lp.predict_all(kind, P, th, beta, X)
         return float(winkler(y, lo, hi).mean())
 
-    res = minimize(objective, theta[idx], method="L-BFGS-B", bounds=bounds,
-                   options={"maxiter": 40})
+    res = minimize(
+        objective, theta[idx], method="L-BFGS-B", bounds=bounds, options={"maxiter": 40}
+    )
     th = theta.copy()
     th[idx] = res.x
     return th, res.nit, res.fun
@@ -139,23 +144,41 @@ def run():
                     width = hi - lo
                     wk = winkler(yte, lo, hi)
                     covered = (yte >= lo) & (yte <= hi)
-                    rows.append(dict(
-                        noise=noise, variant=variant, seed=seed, arm=arm,
-                        coverage=float(covered.mean()),
-                        cov_group0=float(covered[~group].mean()),
-                        cov_group1=float(covered[group].mean()),
-                        mean_width=float(width.mean()),
-                        width_ratio=float(width[group].mean() / max(width[~group].mean(), 1e-12)),
-                        rho_width_sd=float(spearmanr(width, sd).correlation) if width.std() > 0 else 0.0,
-                        rho_width_group=float(spearmanr(width, group).correlation) if width.std() > 0 else 0.0,
-                        winkler=float(wk.mean()),
-                        rmse_noisefree=float(np.sqrt(np.mean((point - f) ** 2))),
-                        frac_undefined=und,
-                    ))
-                    print(f"{noise:9s} seed {seed} {variant:13s} {arm:5s} cov {rows[-1]['coverage']:.3f} "
-                          f"width {rows[-1]['mean_width']:.3f} ratio {rows[-1]['width_ratio']:.2f} "
-                          f"rho_sd {rows[-1]['rho_width_sd']:+.2f} wink {rows[-1]['winkler']:.3f} "
-                          f"(cal {secs:.0f}s, nit {nit})", flush=True)
+                    rows.append(
+                        dict(
+                            noise=noise,
+                            variant=variant,
+                            seed=seed,
+                            arm=arm,
+                            coverage=float(covered.mean()),
+                            cov_group0=float(covered[~group].mean()),
+                            cov_group1=float(covered[group].mean()),
+                            mean_width=float(width.mean()),
+                            width_ratio=float(
+                                width[group].mean() / max(width[~group].mean(), 1e-12)
+                            ),
+                            rho_width_sd=(
+                                float(spearmanr(width, sd).correlation)
+                                if width.std() > 0
+                                else 0.0
+                            ),
+                            rho_width_group=(
+                                float(spearmanr(width, group).correlation)
+                                if width.std() > 0
+                                else 0.0
+                            ),
+                            winkler=float(wk.mean()),
+                            rmse_noisefree=float(np.sqrt(np.mean((point - f) ** 2))),
+                            frac_undefined=und,
+                        )
+                    )
+                    print(
+                        f"{noise:9s} seed {seed} {variant:13s} {arm:5s} cov {rows[-1]['coverage']:.3f} "
+                        f"width {rows[-1]['mean_width']:.3f} ratio {rows[-1]['width_ratio']:.2f} "
+                        f"rho_sd {rows[-1]['rho_width_sd']:+.2f} wink {rows[-1]['winkler']:.3f} "
+                        f"(cal {secs:.0f}s, nit {nit})",
+                        flush=True,
+                    )
     return rows
 
 
@@ -164,20 +187,32 @@ def write(rows):
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
         w.writeheader()
         w.writerows(rows)
-    lines = ["| noise | variant | arm | coverage | cov (low sd) | cov (high sd) | mean width | width ratio hi/lo | Spearman(width, sd) | Spearman(width, group) | Winkler | RMSE (noise-free) |",
-             "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    lines = [
+        "| noise | variant | arm | coverage | cov (low sd) | cov (high sd) | mean width | width ratio hi/lo | Spearman(width, sd) | Spearman(width, group) | Winkler | RMSE (noise-free) |",
+        "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+    ]
     for noise in NOISE_MODELS:
         for variant in VARIANT_NAMES:
             for arm in ["uncal", "cal"]:
-                r = [x for x in rows if x["noise"] == noise and x["variant"] == variant and x["arm"] == arm]
+                r = [
+                    x
+                    for x in rows
+                    if x["noise"] == noise
+                    and x["variant"] == variant
+                    and x["arm"] == arm
+                ]
                 m = lambda k: np.mean([x[k] for x in r])
-                lines.append(f"| {noise} | {variant} | {arm} | {m('coverage'):.3f} | {m('cov_group0'):.3f} "
-                             f"| {m('cov_group1'):.3f} | {m('mean_width'):.3f} | {m('width_ratio'):.2f} "
-                             f"| {m('rho_width_sd'):+.2f} | {m('rho_width_group'):+.2f} | {m('winkler'):.3f} "
-                             f"| {m('rmse_noisefree'):.4f} |")
-    text = "\n".join(lines) + ("\n\nSeeds 0..9, K=5, N_train=500. Test: 40x40 grid (x_hetero) or 1600 random points (regime), "
-                               "with fresh noisy targets. group = high noise (sd > 0.1). Winkler at alpha = 0.1. "
-                               "Calibration: L-BFGS-B on footprint parameters only, maxiter 40.\n")
+                lines.append(
+                    f"| {noise} | {variant} | {arm} | {m('coverage'):.3f} | {m('cov_group0'):.3f} "
+                    f"| {m('cov_group1'):.3f} | {m('mean_width'):.3f} | {m('width_ratio'):.2f} "
+                    f"| {m('rho_width_sd'):+.2f} | {m('rho_width_group'):+.2f} | {m('winkler'):.3f} "
+                    f"| {m('rmse_noisefree'):.4f} |"
+                )
+    text = "\n".join(lines) + (
+        "\n\nSeeds 0..9, K=5, N_train=500. Test: 40x40 grid (x_hetero) or 1600 random points (regime), "
+        "with fresh noisy targets. group = high noise (sd > 0.1). Winkler at alpha = 0.1. "
+        "Calibration: L-BFGS-B on footprint parameters only, maxiter 40.\n"
+    )
     (HERE / "results_calib.md").write_text(text)
     print(text)
 

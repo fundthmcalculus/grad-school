@@ -233,3 +233,7 @@ What this says:
 2. **Hidden noise stays hidden.** With regime noise the widths are flat (ρ ≈ 0). Calibration fixes the average coverage but cannot fix the split: low-noise points are over-covered and high-noise points under-covered by about 0.23. That matches the design: a footprint of x cannot learn an unobserved regime.
 3. **Calibration costs point accuracy.** Noise-free RMSE rises from 0.062 to 0.097 for gauss_local. The footprint also sets the Nie–Tan point prediction, so re-fitting it moves the mean. A separate mean-fit would be needed to keep both.
 4. **Under-coverage is real.** Nominal 90% gives about 81% on held-out data. The optimiser hit its cap, so part of the gap may be optimisation, not model error. Raising the cap would test that.
+
+## Part 6: decoupled footprint (`decoupled_fou_study.py`)
+
+The footprint sets the interval only; the point is the type-1 centre model, so the point cannot move. Results and the coverage diagnosis are in [`REPORT.md`](REPORT.md#follow-up-decoupled-footprint-decoupled_fou_studypy). Short version: point accuracy is preserved, tracking is partial (ρ = +0.69), and the intervals lose to the kNN residual baseline on every seed. Training coverage is not higher than test, so the shortfall is the footprint family under the current optimiser budget, not overfitting.

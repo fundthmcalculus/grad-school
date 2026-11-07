@@ -148,7 +148,10 @@ def fd_jacobian(shape, theta, X, y, h=1e-5):
     for a in range(theta.size):
         e = np.zeros_like(theta)
         e[a] = h
-        cols.append((model(shape, theta + e, X, y)[0] - model(shape, theta - e, X, y)[0]) / (2 * h))
+        cols.append(
+            (model(shape, theta + e, X, y)[0] - model(shape, theta - e, X, y)[0])
+            / (2 * h)
+        )
     return np.column_stack(cols)
 
 
@@ -163,9 +166,13 @@ def verify():
         Jfd = fd_jacobian(shape, th, X, y)
         rel = np.max(np.abs(J - Jfd)) / max(1e-12, np.max(np.abs(Jfd)))
         print(f"verify {shape:10s} max rel. err analytic vs central FD: {rel:.2e}")
-        if shape != "elliptic":  # sqrt edge: derivative diverges at |z|=1, central FD loses accuracy there
+        if (
+            shape != "elliptic"
+        ):  # sqrt edge: derivative diverges at |z|=1, central FD loses accuracy there
             worst = max(worst, rel)
-    assert worst < 1e-5, f"analytic Jacobian disagrees with finite differences: {worst:.2e}"
+    assert (
+        worst < 1e-5
+    ), f"analytic Jacobian disagrees with finite differences: {worst:.2e}"
     print(f"verify OK (worst excluding elliptic edge {worst:.2e})")
 
 
@@ -268,9 +275,20 @@ def run():
                 beta = model(shape, th, X, y)[2]
                 pred = lambda Z: _predict(shape, th, beta, Z)
                 rmse_te = float(np.sqrt(np.mean((pred(Xte) - yte) ** 2)))
-                rows.append(dict(arm=arm, shape=shape, seed=seed, rmse_test=rmse_te,
-                                 grad_evals=evals, seconds=secs))
-                print(f"seed {seed} {shape:10s} {arm:13s} RMSE {rmse_te:.4f} evals {evals} {secs:.2f}s", flush=True)
+                rows.append(
+                    dict(
+                        arm=arm,
+                        shape=shape,
+                        seed=seed,
+                        rmse_test=rmse_te,
+                        grad_evals=evals,
+                        seconds=secs,
+                    )
+                )
+                print(
+                    f"seed {seed} {shape:10s} {arm:13s} RMSE {rmse_te:.4f} evals {evals} {secs:.2f}s",
+                    flush=True,
+                )
     return rows
 
 
@@ -287,15 +305,22 @@ def write(rows):
         w.writeheader()
         w.writerows(rows)
     arms = ["trf_fd", "trf_analytic", "adam_exact", "adam_synth"]
-    lines = ["| arm | shape | test RMSE median | test RMSE mean ± sd | gradient evals (mean) | seconds (mean) |",
-             "|---|---|---:|---:|---:|---:|"]
+    lines = [
+        "| arm | shape | test RMSE median | test RMSE mean ± sd | gradient evals (mean) | seconds (mean) |",
+        "|---|---|---:|---:|---:|---:|",
+    ]
     for arm in arms:
         for shape in SHAPES:
             r = [x for x in rows if x["arm"] == arm and x["shape"] == shape]
             te = np.array([x["rmse_test"] for x in r])
-            lines.append(f"| {arm} | {shape} | {np.median(te):.4f} | {te.mean():.4f} ± {te.std(ddof=1):.4f} "
-                         f"| {np.mean([x['grad_evals'] for x in r]):.0f} | {np.mean([x['seconds'] for x in r]):.2f} |")
-    text = "\n".join(lines) + f"\n\nSeeds 0..9, K={K}, N_train={N_TRAIN}. Adam: {ADAM_STEPS} steps, lr {ADAM_LR}. Synth: warm-up {SYNTH_WARMUP}, true gradient every {SYNTH_EVERY}th step.\n"
+            lines.append(
+                f"| {arm} | {shape} | {np.median(te):.4f} | {te.mean():.4f} ± {te.std(ddof=1):.4f} "
+                f"| {np.mean([x['grad_evals'] for x in r]):.0f} | {np.mean([x['seconds'] for x in r]):.2f} |"
+            )
+    text = (
+        "\n".join(lines)
+        + f"\n\nSeeds 0..9, K={K}, N_train={N_TRAIN}. Adam: {ADAM_STEPS} steps, lr {ADAM_LR}. Synth: warm-up {SYNTH_WARMUP}, true gradient every {SYNTH_EVERY}th step.\n"
+    )
     (HERE / "results_gradient.md").write_text(text)
     print(text)
 

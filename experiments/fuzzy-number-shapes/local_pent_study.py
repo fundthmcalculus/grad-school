@@ -188,8 +188,12 @@ def predict_all(kind, P, theta, beta, X):
     yhat = beta.reshape(3, R).T @ B
     Fm = 0.5 * (Fu + Fl)
     point = (Fm * yhat).sum(0) / (Fm.sum(0) + 1e-12)
-    lo = np.minimum(karnik_mendel(yhat, Fl, Fu, True), karnik_mendel(yhat, Fl, Fu, False))
-    hi = np.maximum(karnik_mendel(yhat, Fl, Fu, True), karnik_mendel(yhat, Fl, Fu, False))
+    lo = np.minimum(
+        karnik_mendel(yhat, Fl, Fu, True), karnik_mendel(yhat, Fl, Fu, False)
+    )
+    hi = np.maximum(
+        karnik_mendel(yhat, Fl, Fu, True), karnik_mendel(yhat, Fl, Fu, False)
+    )
     # Where the lower firing vanishes for every rule, the KM weights are 0/0 and the output
     # interval is undefined. Such points collapse to the point prediction; the fraction is returned.
     und = np.isnan(lo) | np.isnan(hi)
@@ -260,11 +264,22 @@ def verify():
         for a in range(full0.size):
             e = np.zeros_like(full0)
             e[a] = h
-            cols.append((model(kind, P, full0 + e, X, y)[0] - model(kind, P, full0 - e, X, y)[0]) / (2 * h))
+            cols.append(
+                (
+                    model(kind, P, full0 + e, X, y)[0]
+                    - model(kind, P, full0 - e, X, y)[0]
+                )
+                / (2 * h)
+            )
         Jfd = np.column_stack(cols)
         rel = np.max(np.abs(J - Jfd)) / np.max(np.abs(Jfd))
-        print(f"verify {variant:14s} analytic vs central FD: max rel. err {rel:.2e}", flush=True)
-        assert rel < 1e-5, f"{variant}: Jacobian disagrees with finite differences ({rel:.2e})"
+        print(
+            f"verify {variant:14s} analytic vs central FD: max rel. err {rel:.2e}",
+            flush=True,
+        )
+        assert (
+            rel < 1e-5
+        ), f"{variant}: Jacobian disagrees with finite differences ({rel:.2e})"
     # upper >= lower pointwise for the pentagon FOU
     xg = np.linspace(0, 1, 201)
     th = init_full("pent", 0)
@@ -302,18 +317,29 @@ def run():
                 fitted = float(np.mean(np.abs(vs)))
                 wbar = float(np.mean(np.exp(vs)))
             rho = float(spearmanr(width, sd_te).correlation) if width.std() > 0 else 0.0
-            rows.append(dict(
-                variant=variant, seed=seed, rmse_test=rmse,
-                cov_noisefree=float(np.mean((yte >= lo) & (yte <= hi))),
-                cov_noisy=float(np.mean((y_noisy >= lo) & (y_noisy <= hi))),
-                mean_width=float(np.mean(width)),
-                width_lowsd=float(np.mean(width[sd_te < 0.1])),
-                width_highsd=float(np.mean(width[sd_te > 0.1])),
-                rho_width_sd=rho, abs_v1_or_v=fitted, w_mean=wbar,
-                jacobians=njev, seconds=secs, frac_undefined=und,
-            ))
-            print(f"seed {seed} {variant:14s} RMSE {rmse:.4f} cov(nf) {rows[-1]['cov_noisefree']:.3f} "
-                  f"width {rows[-1]['mean_width']:.3f} rho {rho:+.2f} w {wbar:.3f} {secs:.1f}s", flush=True)
+            rows.append(
+                dict(
+                    variant=variant,
+                    seed=seed,
+                    rmse_test=rmse,
+                    cov_noisefree=float(np.mean((yte >= lo) & (yte <= hi))),
+                    cov_noisy=float(np.mean((y_noisy >= lo) & (y_noisy <= hi))),
+                    mean_width=float(np.mean(width)),
+                    width_lowsd=float(np.mean(width[sd_te < 0.1])),
+                    width_highsd=float(np.mean(width[sd_te > 0.1])),
+                    rho_width_sd=rho,
+                    abs_v1_or_v=fitted,
+                    w_mean=wbar,
+                    jacobians=njev,
+                    seconds=secs,
+                    frac_undefined=und,
+                )
+            )
+            print(
+                f"seed {seed} {variant:14s} RMSE {rmse:.4f} cov(nf) {rows[-1]['cov_noisefree']:.3f} "
+                f"width {rows[-1]['mean_width']:.3f} rho {rho:+.2f} w {wbar:.3f} {secs:.1f}s",
+                flush=True,
+            )
     return rows
 
 
@@ -322,19 +348,25 @@ def write(rows):
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
         w.writeheader()
         w.writerows(rows)
-    lines = ["| variant | RMSE median | RMSE mean ± sd | cov. noise-free | cov. noisy | mean width | width low sd | width high sd | Spearman(width, sd) | mean abs(v1) | mean w | undefined grid points |",
-             "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    lines = [
+        "| variant | RMSE median | RMSE mean ± sd | cov. noise-free | cov. noisy | mean width | width low sd | width high sd | Spearman(width, sd) | mean abs(v1) | mean w | undefined grid points |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+    ]
     for v in VARIANTS:
         r = [x for x in rows if x["variant"] == v]
         m = lambda k: np.mean([x[k] for x in r])
         te = np.array([x["rmse_test"] for x in r])
-        lines.append(f"| {v} | {np.median(te):.4f} | {te.mean():.4f} ± {te.std(ddof=1):.4f} "
-                     f"| {m('cov_noisefree'):.3f} | {m('cov_noisy'):.3f} | {m('mean_width'):.3f} "
-                     f"| {m('width_lowsd'):.3f} | {m('width_highsd'):.3f} | {m('rho_width_sd'):+.2f} "
-                     f"| {m('abs_v1_or_v'):.3f} | {m('w_mean'):.3f} | {m('frac_undefined') * 100:.2f}% |")
-    text = "\n".join(lines) + ("\n\nSeeds 0..9, K=5, N_train=500, heteroscedastic noise sd 0.02 (x1<0.5) / 0.15. "
-                               "Consequent ridge 1e-2. KM output bounds. mean abs(v1) is the fitted local slope for gauss_local "
-                               "and the fitted v for pent variants, averaged over fuzzy numbers.\n")
+        lines.append(
+            f"| {v} | {np.median(te):.4f} | {te.mean():.4f} ± {te.std(ddof=1):.4f} "
+            f"| {m('cov_noisefree'):.3f} | {m('cov_noisy'):.3f} | {m('mean_width'):.3f} "
+            f"| {m('width_lowsd'):.3f} | {m('width_highsd'):.3f} | {m('rho_width_sd'):+.2f} "
+            f"| {m('abs_v1_or_v'):.3f} | {m('w_mean'):.3f} | {m('frac_undefined') * 100:.2f}% |"
+        )
+    text = "\n".join(lines) + (
+        "\n\nSeeds 0..9, K=5, N_train=500, heteroscedastic noise sd 0.02 (x1<0.5) / 0.15. "
+        "Consequent ridge 1e-2. KM output bounds. mean abs(v1) is the fitted local slope for gauss_local "
+        "and the fitted v for pent variants, averaged over fuzzy numbers.\n"
+    )
     (HERE / "results_local_pent.md").write_text(text)
     print(text)
 

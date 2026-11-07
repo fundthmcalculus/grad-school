@@ -170,7 +170,9 @@ def run():
                     seconds=secs,
                 )
             )
-            print(f"seed {seed} {shape:10s} test RMSE {rmse_te:.4f}  nfev {nfev}  {secs:.2f}s")
+            print(
+                f"seed {seed} {shape:10s} test RMSE {rmse_te:.4f}  nfev {nfev}  {secs:.2f}s"
+            )
     return rows
 
 
@@ -197,7 +199,10 @@ def write(rows):
             f"| {np.mean([x['nfev'] for x in r]):.0f} | {np.mean([x['seconds'] for x in r]):.2f} |"
         )
         prev = te
-    text = "\n".join(lines) + f"\n\nSeeds {list(SEEDS)[0]}..{list(SEEDS)[-1]} (n={len(list(SEEDS))}), K={K}, N_train={N_TRAIN}, noise sd={NOISE_SD}.\n"
+    text = (
+        "\n".join(lines)
+        + f"\n\nSeeds {list(SEEDS)[0]}..{list(SEEDS)[-1]} (n={len(list(SEEDS))}), K={K}, N_train={N_TRAIN}, noise sd={NOISE_SD}.\n"
+    )
     (HERE / "results.md").write_text(text)
     print(text)
 

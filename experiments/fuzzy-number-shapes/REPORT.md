@@ -121,3 +121,19 @@ under-tested and does not justify the optimiser fragility seen here.
 
 If the pentagon footprint is revisited, the next test should be a held-out ridge and a fixed
 optimiser budget tuned on separate seeds, with the point and interval effects separated.
+
+## Follow-up: decoupled footprint (`decoupled_fou_study.py`)
+
+The earlier calibrated footprint also moved the point prediction, which cost accuracy (noise-free RMSE 0.062 → 0.097). Here the point comes from the type-1 centres, and the footprint is calibrated for the interval only.
+
+| noise | arm | coverage | Spearman(width, sd) | Winkler | RMSE |
+|---|---|---:|---:|---:|---:|
+| x_hetero | B2 kNN, Gaussian point | 0.857 | +0.85 | **0.470** | 0.0580 |
+| x_hetero | B2 kNN, pentagon point | 0.856 | +0.85 | 0.463 | 0.0528 |
+| x_hetero | DEC, Gaussian footprint | 0.793 | +0.69 | 0.611 | 0.0580 |
+| x_hetero | DEC, pentagon footprint | 0.768 | +0.55 | 0.684 | 0.0528 |
+
+- The point is now unchanged by the footprint (RMSE equals type-1, checked in code).
+- The decoupled footprint still tracks observable noise, but its intervals lose to kNN on every seed (0/10). The gap is about 0.14 Winkler.
+- Under-coverage is not overfitting. On seeds 0–2, training coverage (0.84–0.86) matches test coverage (0.80–0.84). The footprint family, under the current optimiser budget, cannot reach the nominal 90% even on its own training data.
+- Conclusion: decoupling removes the point-accuracy cost, but a parametric footprint still does not beat a non-parametric residual quantile. A useful type-2 result would need a footprint that can reach nominal coverage: a per-rule or nonparametric footprint, or a hybrid with the kNN residual scale.

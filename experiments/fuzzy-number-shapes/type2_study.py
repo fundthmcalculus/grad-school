@@ -191,7 +191,9 @@ def verify():
     for a in range(full0.size):
         e = np.zeros_like(full0)
         e[a] = h
-        cols.append((it2_model(full0 + e, X, y)[0] - it2_model(full0 - e, X, y)[0]) / (2 * h))
+        cols.append(
+            (it2_model(full0 + e, X, y)[0] - it2_model(full0 - e, X, y)[0]) / (2 * h)
+        )
     Jfd = np.column_stack(cols)
     rel = np.max(np.abs(J - Jfd)) / np.max(np.abs(Jfd))
     print(f"verify it2 analytic vs central FD: max rel. err {rel:.2e}")
@@ -216,12 +218,24 @@ def run():
             covered = float(np.mean((yte >= lo) & (yte <= hi)))
             width = float(np.mean(hi - lo))
             w_fit = np.exp(theta[2::P]).tolist() if fou else []
-            rows.append(dict(arm=arm, seed=seed, rmse_test=rmse, coverage=covered,
-                             mean_width=width, njev=njev, seconds=secs,
-                             w_mean=float(np.mean(w_fit)) if fou else 0.0,
-                             w_init=float(np.exp(np.log(0.1))) if fou else 0.0))
-            print(f"seed {seed} {arm:13s} RMSE {rmse:.4f} coverage {covered:.3f} width {width:.3f} "
-                  f"w {rows[-1]['w_mean']:.3f} jac {njev} {secs:.2f}s", flush=True)
+            rows.append(
+                dict(
+                    arm=arm,
+                    seed=seed,
+                    rmse_test=rmse,
+                    coverage=covered,
+                    mean_width=width,
+                    njev=njev,
+                    seconds=secs,
+                    w_mean=float(np.mean(w_fit)) if fou else 0.0,
+                    w_init=float(np.exp(np.log(0.1))) if fou else 0.0,
+                )
+            )
+            print(
+                f"seed {seed} {arm:13s} RMSE {rmse:.4f} coverage {covered:.3f} width {width:.3f} "
+                f"w {rows[-1]['w_mean']:.3f} jac {njev} {secs:.2f}s",
+                flush=True,
+            )
     return rows
 
 
@@ -230,15 +244,22 @@ def write(rows):
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
         w.writeheader()
         w.writerows(rows)
-    lines = ["| arm | test RMSE median | test RMSE mean ± sd | interval coverage (noise-free test) | mean interval width | Jacobians | fitted mean w |",
-             "|---|---:|---:|---:|---:|---:|---:|"]
+    lines = [
+        "| arm | test RMSE median | test RMSE mean ± sd | interval coverage (noise-free test) | mean interval width | Jacobians | fitted mean w |",
+        "|---|---:|---:|---:|---:|---:|---:|",
+    ]
     for arm in ["it2_collapse", "it2_fou"]:
         r = [x for x in rows if x["arm"] == arm]
         te = np.array([x["rmse_test"] for x in r])
-        lines.append(f"| {arm} | {np.median(te):.4f} | {te.mean():.4f} ± {te.std(ddof=1):.4f} "
-                     f"| {np.mean([x['coverage'] for x in r]):.3f} | {np.mean([x['mean_width'] for x in r]):.4f} "
-                     f"| {np.mean([x['njev'] for x in r]):.0f} | {np.mean([x['w_mean'] for x in r]):.3f} |")
-    text = "\n".join(lines) + "\n\nSeeds 0..9, K=5, N_train=500, noise sd=0.05. Gaussian FOU, Nie-Tan point prediction.\n"
+        lines.append(
+            f"| {arm} | {np.median(te):.4f} | {te.mean():.4f} ± {te.std(ddof=1):.4f} "
+            f"| {np.mean([x['coverage'] for x in r]):.3f} | {np.mean([x['mean_width'] for x in r]):.4f} "
+            f"| {np.mean([x['njev'] for x in r]):.0f} | {np.mean([x['w_mean'] for x in r]):.3f} |"
+        )
+    text = (
+        "\n".join(lines)
+        + "\n\nSeeds 0..9, K=5, N_train=500, noise sd=0.05. Gaussian FOU, Nie-Tan point prediction.\n"
+    )
     (HERE / "results_type2.md").write_text(text)
     print(text)
 
