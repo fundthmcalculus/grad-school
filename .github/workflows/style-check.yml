@@ -123,6 +123,11 @@ jobs:
       - name: Add the extra packages the root-level suites need
         run: uv pip install --python tribble-fis/.venv/bin/python pandas scipy h5py
 
+      # The TSPLIB instances are fetched, not vendored (ClusteringExperiments/tsplib/README.md);
+      # fis-tsp-strategy's invariant tests read them and fail without this step.
+      - name: Fetch TSPLIB instances
+        run: python ClusteringExperiments/tsplib/download.py
+
       - name: Run tribble-fis-dependent test suites
         run: |
           tribble-fis/.venv/bin/python -m pytest \
