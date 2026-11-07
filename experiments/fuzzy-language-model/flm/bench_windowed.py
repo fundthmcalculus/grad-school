@@ -36,7 +36,15 @@ def bench(name, mod, x, reps):
 
 def main():
     torch.manual_seed(0)
-    cfg = M.ModelConfig(vocab_size=98, d_model=48, n_heads=2, n_rules=6, decay="data", max_len=2048, mixer="fuzzydelta")
+    cfg = M.ModelConfig(
+        vocab_size=98,
+        d_model=48,
+        n_heads=2,
+        n_rules=6,
+        decay="data",
+        max_len=2048,
+        mixer="fuzzydelta",
+    )
     w = W.window()
     print(f"window w = {w}, batch 32, d 48, 2 heads, 6 rules, 1 thread\n")
     print("| T | mixer | fwd+bwd ms (median) | peak RSS growth MB |")
@@ -57,7 +65,10 @@ def main():
         dense_att = M.GaussianTSKAttention(cfg)
         win_att = W.WindowGaussianAttention(cfg)
         win_att.win = w
-        for name, mod in (("dense Gaussian attention", dense_att), (f"wgauss (window {w})", win_att)):
+        for name, mod in (
+            ("dense Gaussian attention", dense_att),
+            (f"wgauss (window {w})", win_att),
+        ):
             ms, mb = bench(name, mod, x, reps=3)
             print(f"| {T} | {name} | {ms * 1e3:.0f} | {mb:.0f} |")
 

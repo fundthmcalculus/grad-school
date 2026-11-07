@@ -73,7 +73,9 @@ def banded_solve(fq, fk, v, beta, la, w: int) -> torch.Tensor:
     idx, ok = lag_index(T, w, fk.device)
     G, QK, KK = _lag_terms(fq, fk, la, idx, ok)
     strict = ok & (torch.arange(w, device=fk.device)[None, :] > 0)
-    A = beta * G * KK * strict  # (B,H,T,w): coupling of u_t to u_{t-l}, with beta_t on the row
+    A = (
+        beta * G * KK * strict
+    )  # (B,H,T,w): coupling of u_t to u_{t-l}, with beta_t on the row
     bv = beta * v
     U: list[torch.Tensor] = []
     for t in range(T):
@@ -89,24 +91,35 @@ def banded_solve(fq, fk, v, beta, la, w: int) -> torch.Tensor:
 
 def restart_solve(fq, fk, v, beta, la, w: int) -> torch.Tensor:
     """Strict window: for each t, solve the delta system on positions t-w+1..t alone (rows before the window do not
-    exist), then read the last row's query against those local u's. At w >= T this equals the dense recurrence."""
+    exist), then read the last row's query against those local u's. At w >= T this equals the dense recurrence.
+    """
     B, H, T, _ = fk.shape
     off = torch.arange(w, device=fk.device) - (w - 1)
-    P = torch.arange(T, device=fk.device)[:, None] + off[None, :]  # (T,w) window positions, row r = position t-(w-1)+r
+    P = (
+        torch.arange(T, device=fk.device)[:, None] + off[None, :]
+    )  # (T,w) window positions, row r = position t-(w-1)+r
     ok = P >= 0
     Pc = P.clamp(min=0)
     kP, vP = fk[:, :, Pc], v[:, :, Pc]  # (B,H,T,w,F), (B,H,T,w,dh)
     bP = beta[:, :, Pc] * ok[..., None]  # invalid rows get beta 0: u = 0 there
     KKl = kP @ kP.transpose(-1, -2)  # (B,H,T,w,w)
     rows = torch.arange(w, device=fk.device)
-    lower = (rows[:, None] > rows[None, :]) & ok[:, None, :]  # strict lower, valid columns (T,w,w) via broadcast below
+    lower = (rows[:, None] > rows[None, :]) & ok[
+        :, None, :
+    ]  # strict lower, valid columns (T,w,w) via broadcast below
     if la is None:
         Gl = torch.ones_like(KKl)
     else:
         LP = la.cumsum(-1)[:, :, Pc]  # (B,H,T,w)
-        Gl = torch.exp((LP[..., :, None] - LP[..., None, :]).masked_fill(~lower, -float("inf")))
-    Mloc = torch.eye(w, dtype=fk.dtype, device=fk.device) + (bP * Gl * KKl).masked_fill(~lower, 0.0)
-    Uloc = torch.linalg.solve_triangular(Mloc, bP * vP, upper=False, unitriangular=True)  # (B,H,T,w,dh)
+        Gl = torch.exp(
+            (LP[..., :, None] - LP[..., None, :]).masked_fill(~lower, -float("inf"))
+        )
+    Mloc = torch.eye(w, dtype=fk.dtype, device=fk.device) + (bP * Gl * KKl).masked_fill(
+        ~lower, 0.0
+    )
+    Uloc = torch.linalg.solve_triangular(
+        Mloc, bP * vP, upper=False, unitriangular=True
+    )  # (B,H,T,w,dh)
     # query t against the window: Gamma[t, P_r] and q_t . k_{P_r}
     QK = (fq[:, :, :, None, :] * kP).sum(-1)  # (B,H,T,w)
     if la is None:

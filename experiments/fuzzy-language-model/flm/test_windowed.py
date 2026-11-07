@@ -18,7 +18,13 @@ torch.set_default_dtype(torch.float64)
 
 def cfg(decay="data", T=12):
     return M.ModelConfig(
-        vocab_size=98, d_model=16, n_heads=2, n_rules=4, decay=decay, max_len=T, mixer="fuzzydelta"
+        vocab_size=98,
+        d_model=16,
+        n_heads=2,
+        n_rules=4,
+        decay=decay,
+        max_len=T,
+        mixer="fuzzydelta",
     )
 
 
@@ -39,7 +45,11 @@ def random_core_inputs(B=2, H=2, T=12, F=5, dh=3, decay=True, seed=0):
     fk = torch.rand(B, H, T, F, generator=g)
     v = torch.randn(B, H, T, dh, generator=g)
     beta = torch.sigmoid(torch.randn(B, H, T, 1, generator=g))
-    la = torch.nn.functional.logsigmoid(torch.randn(B, H, T, generator=g)) if decay else None
+    la = (
+        torch.nn.functional.logsigmoid(torch.randn(B, H, T, generator=g))
+        if decay
+        else None
+    )
     return fq, fk, v, beta, la
 
 
@@ -82,8 +92,16 @@ def test_banded_solve_matches_dense_masked_solve():
         lag = idx[:, None] - idx[None, :]
         band = (lag >= 0) & (lag < w)
         strict = (lag >= 1) & (lag < w)
-        G = M._RecurrentMixerBase.gamma_matrix(la, T, fk.device) if decay else band.double()[None, None]
-        Gs = M._RecurrentMixerBase.gamma_matrix(la, T, fk.device, strict=True) if decay else (strict.double())[None, None]
+        G = (
+            M._RecurrentMixerBase.gamma_matrix(la, T, fk.device)
+            if decay
+            else band.double()[None, None]
+        )
+        Gs = (
+            M._RecurrentMixerBase.gamma_matrix(la, T, fk.device, strict=True)
+            if decay
+            else (strict.double())[None, None]
+        )
         G, Gs = G * band, Gs * strict
         KK = (fk @ fk.transpose(-1, -2)) * Gs
         Lm = torch.eye(T)[None, None] + beta * KK
@@ -102,7 +120,9 @@ def test_restart_matches_dense_recurrence_on_each_window():
             s0 = max(0, t - w + 1)
             sl = slice(s0, t + 1)
             la_s = la[:, :, sl] if decay else None
-            y = dense_delta_core(fq[:, :, sl], fk[:, :, sl], v[:, :, sl], beta[:, :, sl], la_s)
+            y = dense_delta_core(
+                fq[:, :, sl], fk[:, :, sl], v[:, :, sl], beta[:, :, sl], la_s
+            )
             rows.append(y[:, :, -1])
         want = torch.stack(rows, dim=2)
         assert torch.allclose(got, want, atol=1e-10), decay
@@ -111,7 +131,11 @@ def test_restart_matches_dense_recurrence_on_each_window():
 def test_restart_full_window_equals_dense_core():
     fq, fk, v, beta, la = random_core_inputs()
     T = fq.shape[2]
-    assert torch.allclose(W.restart_solve(fq, fk, v, beta, la, T), dense_delta_core(fq, fk, v, beta, la), atol=1e-10)
+    assert torch.allclose(
+        W.restart_solve(fq, fk, v, beta, la, T),
+        dense_delta_core(fq, fk, v, beta, la),
+        atol=1e-10,
+    )
 
 
 # ---------------------------------------------------------------- 3. receptive field
@@ -149,5 +173,10 @@ def test_receptive_field_banded_solve_leaks_past_the_window():
     torch.manual_seed(3)
     prof = _receptive_field(W.WindowFuzzyDeltaSolve(cfg(T=24)).double(), w=w)
     beyond = max(prof[w:])
-    print("bsolve receptive-field profile (lag: |dy|):", [f"{k}:{p:.2e}" for k, p in enumerate(prof) if p > 0][:24])
-    assert beyond > 1e-6, "banded solve should leak past the window; if this fails the premise is wrong"
+    print(
+        "bsolve receptive-field profile (lag: |dy|):",
+        [f"{k}:{p:.2e}" for k, p in enumerate(prof) if p > 0][:24],
+    )
+    assert (
+        beyond > 1e-6
+    ), "banded solve should leak past the window; if this fails the premise is wrong"

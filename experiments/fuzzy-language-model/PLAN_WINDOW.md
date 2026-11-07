@@ -128,3 +128,52 @@ Validation BPC on 500K characters, end of training (step 489 of 4M characters). 
 - Strict windowing as a *speed* win needs T ≫ 256. The clean CPU benchmark (Step 2) puts the banded solve ahead of dense only from T ≈ 512.
 
 **Not done:** the trained-model receptive-field measurement for `bsolve` (needs a loader for the installed mixer weights); a longer-context run (T = 1024+) where the window's cost advantage would matter; more seeds for any gap under 0.01.
+
+## Handoff: the T = 2048 run (for a local compute machine)
+
+The question this run answers: at a context where the window should matter, does the strict window (wdelta) keep up
+with dense, and how much does the window size matter? The pilot was 256 characters of context, where it cannot.
+
+**Setup on the machine**
+```bash
+cd experiments/fuzzy-language-model
+pip install -r requirements.lock          # torch 2.14.1 (CPU wheel pinned; use a CUDA build on a GPU host)
+export GRAD_SCHOOL_DATA=<repo>/data
+python -m flm.data                        # fetch TinyStories and write data/tinystories/{train,valid}.bin (~2.2 GB)
+python -m flm.canonical_dictionary_oh     # writes outputs/embspace/oh48.npz (frozen named dictionary)
+python -m pytest flm/test_windowed.py -q  # 7 exactness and receptive-field checks; must pass before any run
+```
+
+**Arms** (bijective model as in the pilot, frozen `oh48`, d 48, lr 0.01, warm-up 100, 4M characters, seeds 0 and 1):
+
+| arm | mixer | WIN | ctx | batch |
+|---|---|---|---|---|
+| T2048-dense | fuzzydelta | (unused) | 2048 | 8 |
+| T2048-w32 | wdelta | 32 | 2048 | 8 |
+| T2048-w128 | wdelta | 128 | 2048 | 8 (needs a GPU; est. ~10 GB on CPU) |
+
+Batch 8 (not the pilot's 32) keeps the dense T² attention tensors in memory at T = 2048. Steps are then 4× as many per
+character, so the lr schedule is per step at a different scale than the pilot. Record the batch in every JSON.
+
+**Command, one arm** (repeat per arm and seed; `--ckpt-every 100 --resume auto` lets an interrupted run continue):
+```bash
+BIJ=ci WIN=32 FIXED_C=outputs/embspace/oh48.npz FUZZ_FFN_R=196 FUZZ_FFN_R0=137 \
+python -m flm.run_window --mixer wdelta --decay data --exp-norm mean --ffn-exp-norm mean \
+  --heads 2 --ffn tsk --ffn-order 1 --ffn-norm none --tsk-dim 8 --ffn-mult 1.5 \
+  --d 48 --layers 2 --rules 6 --shortconv 0 --ctx 2048 --batch 8 --chars 4e6 \
+  --device cpu --threads 4 --eval-chars 500000 --eval-every 0 --warmup 100 \
+  --lr 0.01 --lr-floor 0.02 --seed 0 \
+  --out outputs/window_t2048/T2048-w32_s0.json \
+  --ckpt-dir outputs/window_t2048/ckpt/T2048-w32_s0 --ckpt-every 100 --resume auto
+```
+For the dense arm, use `--mixer fuzzydelta` and drop `WIN`. For w128, set `WIN=128`. The results land in
+`outputs/window_t2048/*.json` (git-ignored); the `val_bpc` field is the number to compare.
+
+**Predictions (registered now, before the run):**
+1. Dense beats w32 at T = 2048 by at least 0.01 BPC on both seeds (longer context helps the dense mixer).
+2. w128 closes at least half of that gap.
+3. Per step, w32 is at least 2× faster than dense at T = 2048 (the T² term dominates dense; the benchmark at T = 1024 was 1.3×).
+
+**Known limits:** the restarts on the sandbox killed runs repeatedly; checkpoints every 100 steps are the recovery
+path. The bsolve arm is left out: at T = 2048 its per-token Python loop makes it impractical on CPU. The frozen-versus-
+learned effect from the pilot (about 0.04 BPC) is not explained yet and is not part of this run's design.
