@@ -1,0 +1,118 @@
+<title>Final invertible fuzzy model</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fffdf8;--fg:#1d2420;--mut:#5d675f;--line:#d9d5ca;--good:#2f7d5c;--bad:#c2550a;--neu:#8a8f88;--acc:#2f6b57}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151a17;--card:#1c231f;--fg:#e6ebe6;--mut:#99a49b;--line:#2e3731;--good:#6fcf9f;--bad:#f0914d;--neu:#8b948d;--acc:#7cc4a8;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#151a17;--card:#1c231f;--fg:#e6ebe6;--mut:#99a49b;--line:#2e3731;--good:#6fcf9f;--bad:#f0914d;--neu:#8b948d;--acc:#7cc4a8;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,sans-serif;margin:0 auto;padding-block:24px;padding-inline:16px;max-width:900px}
+h1{font-size:1.5rem;margin:0 0 6px;text-wrap:balance} h2{font-size:1.05rem;margin:34px 0 4px}
+p{color:var(--mut);margin:4px 0 10px;max-width:65ch}
+.lede{color:var(--fg);font-size:1.02rem}
+svg{width:100%;height:auto;display:block;background:var(--card);border:1px solid var(--line);border-radius:6px}
+.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;background:var(--card)}
+th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;font-size:.9rem;font-variant-numeric:tabular-nums}
+th{color:var(--mut);font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+.cards{display:flex;gap:14px;flex-wrap:wrap}.cards>div{flex:1 1 260px;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:12px 14px}
+.cards b{display:block;margin-bottom:4px}
+.samp{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:6px 0;font:12.5px/1.45 ui-monospace,monospace;white-space:pre-wrap;word-break:break-word;color:var(--fg)}
+.samp small{display:block;color:var(--mut);font:11px system-ui}
+.best{font-weight:700}
+</style>
+<h1>Final invertible fuzzy model</h1>
+<p class="lede">A 100,000-parameter character model in which the embedding is an exactly invertible fuzzy map that is also the de-embedding, every layer is a first-order fuzzy rule system, and the dictionary of characters is built by hand with every coordinate named. Trained on 300 million characters of Cosmopedia v2 (a 3-billion-character corpus; the run sees a tenth of it, no text repeated).</p>
+<div class="cards" id="cards"></div>
+
+<h2>On Cosmopedia</h2>
+<p>Validation bits per character, mean of two seeds (dots are seeds). Lower is better. The tied head is the same model without the invertible layer, at its own 100K shape.</p>
+<div id="cosmo"></div>
+
+<h2>What freezing the named dictionary costs, by corpus</h2>
+<p>Same model, same size, three corpora at 300M characters. The cost of keeping the named dictionary fixed grows with how varied the text is. The weak pull-back lets the dictionary move a little and keeps it recognisable.</p>
+<div class="scroll"><table id="freeze"></table></div>
+
+<h2>Doubling the size</h2>
+<p>The same model at 200,000 parameters (448 rules per system) on Cosmopedia at 300M characters. Doubling the parameters is the strongest lever; the cost of keeping the named dictionary fixed shrinks as the model grows. Seeds in brackets.</p>
+<div class="scroll"><table id="big"></table></div>
+
+<h2>Across corpora</h2>
+<p>The models trained on Cosmopedia, tested on three corpora (2,000 windows of 256 characters each). They do not transfer well: the Pile-trained model of the same size scores 2.35 on the Pile and the TinyStories-trained one 1.24 on TinyStories.</p>
+<div class="scroll"><table id="cross"></table></div>
+
+<h2>Can it be explained?</h2>
+<p>Each block's rules, read out directly (Cosmopedia text). Silencing the eight most-used rules always costs more than the worst of ten random eight-rule draws, so the rulebook is causal. One rule's identity tells less about the next character than the previous character does in the first block (bits of mutual information, previous character: <span id="prevmi"></span>).</p>
+<div class="scroll"><table id="explain"></table></div>
+
+<h2>Exactness</h2>
+<p>Text in, the same text out through the embedding and its inverse: 0 wrong symbols in float64 and float32, on short text, a pangram, 2,000 held-out symbols and every symbol shuffled twenty times (largest reconstruction error 1e-15 in float64, 5e-7 in float32). Characters outside the 98-symbol vocabulary become one unknown symbol and come back as it.</p>
+
+<h2>Greedy text, honestly</h2>
+<p>Greedy decoding loops on all of these models; the invertible ones loop more than the tied head. This is the known failure of a 100,000-parameter character model decoding greedily, not an explanation of anything.</p>
+<div id="samples"></div>
+
+<script>
+const D=__DATA__;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const f=(x,n=4)=>x==null?"—":x.toFixed(n);
+const sg=x=>(x>=0?"+":"−")+Math.abs(x).toFixed(4);
+function cards(){
+  const c=D.cosmo,L=c["learned dictionary"].mean,Z=c["frozen named dictionary"].mean,S=c["named dictionary as starting value"].mean,T=c["tied head (not invertible)"].mean;
+  document.getElementById("cards").innerHTML=
+   `<div><b>${f(Z,3)} bits/char</b>frozen named dictionary: ${sg(T-Z)} vs the tied head, readable at every coordinate</div>`+
+   `<div><b>${f(S,3)} bits/char</b>named dictionary as the starting value: ${sg(T-S)} vs the tied head</div>`+
+   `<div><b>0 wrong</b>symbols through the embedding and back, float64 and float32</div>`;
+}
+function cosmo(){
+  const R=Object.entries(D.cosmo).filter(([k,v])=>v),W=860,m=300,rowH=42,H=R.length*rowH+40;
+  const all=R.flatMap(([k,v])=>v.seeds),lo=Math.floor(Math.min(...all)*50)/50-0.01,hi=Math.max(...all)+0.012;
+  const X=v=>m+(v-lo)/(hi-lo)*(W-m-60);
+  let g="";
+  for(let t=Math.ceil(lo*50)/50;t<=hi;t+=0.02)g+=`<line x1="${X(t)}" y1="22" x2="${X(t)}" y2="${H-18}" stroke="${css("--line")}"/><text x="${X(t)}" y="${H-4}" text-anchor="middle" font-size="11" fill="${css("--mut")}">${t.toFixed(2)}</text>`;
+  const best=Math.min(...R.map(([k,v])=>v.mean));
+  R.forEach(([k,v],i)=>{const y=30+i*rowH,col=css(k.startsWith("tied")?"--neu":k.includes("frozen")?"--good":k.includes("starting")||k.includes("pull")?"--acc":"--mut");
+    g+=`<text x="${m-10}" y="${y+4}" text-anchor="end" font-size="12.5" fill="${css("--fg")}" ${v.mean==best?'font-weight="700"':''}>${k}</text>`;
+    g+=`<rect x="${X(lo)}" y="${y-9}" width="${X(v.mean)-X(lo)}" height="16" rx="3" fill="${col}" fill-opacity=".85"><title>${k}: ${f(v.mean)}</title></rect>`;
+    v.seeds.forEach(s=>{g+=`<circle cx="${X(s)}" cy="${y-1}" r="3.5" fill="${css("--card")}" stroke="${css("--fg")}" stroke-width="1.2"/>`});
+    g+=`<text x="${X(Math.max(...v.seeds))+10}" y="${y+4}" font-size="12" font-weight="600" fill="${css("--fg")}">${f(v.mean,3)}</text>`;});
+  g+=`<text x="${m}" y="14" font-size="11" fill="${css("--mut")}">bars start at ${lo.toFixed(2)}</text>`;
+  document.getElementById("cosmo").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cosmopedia results">${g}</svg>`;
+}
+function freeze(){
+  let h="<tr><th>corpus (seeds)</th><th>learned</th><th>frozen</th><th>cost of freezing</th><th>pull-back 0.0001 (seeds)</th><th>named start</th></tr>";
+  for(const r of D.freeze)h+=`<tr><td>${r.corpus} (${r.n})</td><td>${f(r.learned)}</td><td>${f(r.frozen)}</td><td class="best">${sg(r.frozen-r.learned)}</td><td>${r.pull!=null?f(r.pull)+" ("+sg(r.pull-r.learned)+", "+r.npull+")":"not run"}</td><td>${f(r.start)} (${sg(r.start-r.learned)})</td></tr>`;
+  document.getElementById("freeze").innerHTML=h;
+}
+function cross(){
+  let h="<tr><th>model (trained on Cosmopedia)</th><th>Cosmopedia</th><th>TinyStories</th><th>The Pile</th></tr>";
+  const cols=["cosmopedia","tinystories","pile"],best=cols.map(c=>Math.min(...D.cross.map(r=>r[c])));
+  for(const r of D.cross)h+=`<tr><td>${r.model}</td>${cols.map((c,i)=>`<td class="${r[c]==best[i]?"best":""}">${f(r[c])}</td>`).join("")}</tr>`;
+  document.getElementById("cross").innerHTML=h;
+}
+function explain(){
+  const nm={frozen:"frozen named dictionary",init:"named dictionary as starting value",tied:"tied head"};
+  document.getElementById("prevmi").textContent=D.explain.frozen.mi_prev.toFixed(2);
+  let h="<tr><th>model</th><th>block</th><th>rules in use</th><th>rule → next character (bits)</th><th>silence top 8 rules</th><th>worst of 10 random 8</th></tr>";
+  for(const k of ["frozen","init","tied"]){const e=D.explain[k];
+    for(let b=0;b<2;b++)h+=`<tr><td>${b==0?nm[k]:""}</td><td>${b}</td><td>${e.effective[b]} of ${e.rules[b]}</td><td>${e.mi_rule[b].toFixed(2)}</td><td class="best">+${e.ablate[b].top.toFixed(2)}</td><td>+${e.ablate[b].rand.toFixed(2)}</td></tr>`;}
+  document.getElementById("explain").innerHTML=h;
+}
+function samples(){
+  const nm={frozen:"frozen named dictionary",init:"named dictionary as starting value",tied:"tied head"};
+  let h="";
+  for(const k of ["frozen","tied"])for(const s of D.samples[k].slice(0,3)){
+    const e=x=>x.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+    h+=`<div class="samp"><small>${nm[k]} · prompt: ${e(JSON.stringify(s.prompt))}</small>${e(s.text.replace(/ {8,}/g," …(spaces)… ").slice(0,200))}</div>`;}
+  document.getElementById("samples").innerHTML=h;
+}
+function big(){
+  const B=D.big||{},L=B["learned dictionary"],C=D.cosmo;
+  const prev={"learned dictionary":C["learned dictionary"],"frozen named dictionary":C["frozen named dictionary"],"named dictionary as starting value":C["named dictionary as starting value"],"pull-back (0.0001 per step)":C["named dictionary, weak pull-back (0.0001 per step)"]};
+  let h="<tr><th>dictionary</th><th>100K</th><th>200K (seeds)</th><th>200K against learned</th></tr>";
+  for(const [k,v] of Object.entries(B)){
+    h+=`<tr><td>${k}</td><td>${prev[k]?f(prev[k].mean):"—"}</td><td>${v?f(v.mean)+" ("+v.seeds.length+")":"pending"}</td><td class="best">${v&&L?sg(v.mean-L.mean):"—"}</td></tr>`;}
+  document.getElementById("big").innerHTML=h;
+}
+function draw(){cards();cosmo();freeze();big();cross();explain();samples();}
+draw();
+fetch("data.json").then(r=>r.ok?r.json():null).then(j=>{if(j){Object.assign(D,j);draw()}}).catch(()=>{});
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",draw);
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+</script>

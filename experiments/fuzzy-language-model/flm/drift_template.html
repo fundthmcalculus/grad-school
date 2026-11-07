@@ -1,0 +1,141 @@
+<title>Dictionary drift</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fffdf8;--fg:#1d2420;--mut:#5d675f;--line:#d9d5ca;--acc:#2f6b57;--g0:#7a6f9b;--g1:#0072b2;--g2:#d55e00;--g3:#2f7d5c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151a17;--card:#1c231f;--fg:#e6ebe6;--mut:#99a49b;--line:#2e3731;--acc:#7cc4a8;--g0:#b3a6d6;--g1:#56b4e9;--g2:#f0914d;--g3:#6fcf9f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#151a17;--card:#1c231f;--fg:#e6ebe6;--mut:#99a49b;--line:#2e3731;--acc:#7cc4a8;--g0:#b3a6d6;--g1:#56b4e9;--g2:#f0914d;--g3:#6fcf9f;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,sans-serif;margin:0 auto;padding-block:24px;padding-inline:16px;max-width:900px}
+h1{font-size:1.5rem;margin:0 0 4px;text-wrap:balance} h2{font-size:1.05rem;margin:32px 0 4px}
+p{color:var(--mut);margin:4px 0 10px;max-width:65ch}
+.row{display:flex;gap:16px;flex-wrap:wrap}.row>div{flex:1 1 340px;min-width:0}
+.big{display:flex;gap:28px;flex-wrap:wrap;margin:14px 0}.big b{font-size:2rem;display:block;line-height:1.1;font-variant-numeric:tabular-nums}.big span{color:var(--mut);font-size:.85rem}
+svg{width:100%;height:auto;display:block;background:var(--card);border:1px solid var(--line);border-radius:6px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:3px}
+.t{border-radius:4px;padding:3px 0;text-align:center;font:600 13px/1.2 ui-monospace,monospace;color:var(--fg)}
+.t{cursor:pointer}
+.t small{display:block;font:10px/1.2 system-ui;color:var(--mut)}
+.leg{display:flex;gap:14px;flex-wrap:wrap;color:var(--mut);font-size:.85rem;margin:6px 0}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;background:var(--card)}
+th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;font-family:ui-monospace,monospace;font-size:.9rem}
+th{font-family:system-ui;color:var(--mut);font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+td.k{font-weight:700}
+</style>
+<h1>Dictionary drift</h1>
+<p>The constructed 64-dimensional character dictionary, and where each symbol ends up after the model trains it for 300 million characters (invertible model, 100K parameters, seed 0). If training left the geometry alone, every dot in the first charts would sit on the diagonal.</p>
+<div class="big" id="big"></div>
+
+<h2>Do distances between characters survive training?</h2>
+<p>Each dot is a pair of characters: its distance in the constructed dictionary (across) and after training (up), each divided by its own average. Left: trained from the constructed start. Right: control, trained from a random start, which the constructed dictionary has no reason to resemble.</p>
+<div class="row"><div id="sc1"></div><div id="sc2"></div></div>
+
+<h2>Which characters moved?</h2>
+<p>Each tile is one character. The number is how well its distances to all other characters are preserved (1.00 means unchanged); a darker tile is better kept. Under it, how many of its five nearest neighbours are the same before and after.</p>
+<div class="leg" id="leg"></div>
+<div id="tiles"></div>
+
+<h2>Inside one character</h2>
+<p>All 64 coordinates of the chosen character, as the model started with them (hollow bars) and after training (filled bars), in the same frame. Click any tile above, or a letter here. The blocks are the layout: class, letter identity, digit value, vowel, punctuation group, symbol code, special, whitespace, kind.</p>
+<div class="leg" id="pick"></div>
+<div id="inside"></div>
+
+<h2>The map, and the move</h2>
+<p>The constructed dictionary flattened to its two main directions. Each arrow goes from a character's constructed position to where training put it (rotated and scaled into the same frame). The flattening hides the other 62 directions, so the arrows understate the movement.</p>
+<div id="map"></div>
+
+<h2>Nearest neighbours, before and after</h2>
+<div class="scroll"><table id="nn"></table></div>
+<p>Hover a tile, dot or arrow to see which character it is.</p>
+
+<script>
+const D=__DATA__;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const names=["special / space","letters","digits","punctuation"];
+const gcol=g=>css("--g"+g);
+function f(x){return x.toFixed(2)}
+function big(){
+  const s=D.start,r=D.random;
+  const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
+  document.getElementById("big").innerHTML=
+   `<div><b>${f(s.corr)}</b><span>distance correlation, constructed start</span></div>`+
+   `<div><b>${f(r.corr)}</b><span>control, random start</span></div>`+
+   `<div><b>${(mean(s.keep)/5*100).toFixed(0)}%</b><span>nearest neighbours kept (control ${(mean(r.keep)/5*100).toFixed(0)}%)</span></div>`;
+}
+function scatter(id,a,title){
+  const W=420,H=420,m=40,M=Math.max(...a.x,...a.y)*1.05;
+  const X=v=>m+v/M*(W-m-12),Y=v=>H-m-v/M*(H-m-12);
+  let g=`<line x1="${X(0)}" y1="${Y(0)}" x2="${X(M)}" y2="${Y(M)}" stroke="${css("--mut")}" stroke-dasharray="4 4"/>`;
+  for(const t of [0,1,2]) if(t<M) g+=`<text x="${X(t)}" y="${H-m+16}" fill="${css("--mut")}" font-size="11" text-anchor="middle">${t}</text><text x="${m-8}" y="${Y(t)+4}" fill="${css("--mut")}" font-size="11" text-anchor="end">${t}</text>`;
+  let pts="";for(let i=0;i<a.x.length;i++)pts+=`<circle cx="${X(a.x[i]).toFixed(1)}" cy="${Y(a.y[i]).toFixed(1)}" r="2" fill="${css("--g1")}" fill-opacity=".35"/>`;
+  document.getElementById(id).innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${title}"><text x="${m}" y="18" fill="${css("--fg")}" font-size="13" font-weight="600">${title}  (r = ${f(a.corr)})</text>${g}${pts}<text x="${W/2}" y="${H-6}" fill="${css("--mut")}" font-size="11" text-anchor="middle">constructed distance</text><text transform="translate(12 ${H/2}) rotate(-90)" fill="${css("--mut")}" font-size="11" text-anchor="middle">after training</text></svg>`;
+}
+function tiles(){
+  const s=D.start;
+  document.getElementById("leg").innerHTML=names.map((n,g)=>`<span><i style="background:${gcol(g)}"></i>${n}</span>`).join("");
+  let h="";
+  for(let g=0;g<4;g++){
+    h+=`<p style="margin-top:14px"><b style="color:var(--fg)">${names[g]}</b></p><div class="tiles">`;
+    for(let i=0;i<98;i++) if(D.groups[i]==g){
+      const v=Math.max(0,Math.min(1,s.prof[i])),a=15+85*v;
+      h+=`<div class="t" data-i="${i}" onclick="pick(${i})" title="${D.labels[i]}: profile ${f(s.prof[i])}, ${s.keep[i]}/5 neighbours kept" style="background:color-mix(in srgb,var(--acc) ${a.toFixed(0)}%,var(--card));border-bottom:3px solid ${gcol(g)}">${D.labels[i]}<small>${f(s.prof[i])} · ${s.keep[i]}/5</small></div>`;
+    }
+    h+="</div>";
+  }
+  document.getElementById("tiles").innerHTML=h;
+}
+function map(){
+  const s=D.start,W=760,H=520,m=24;
+  const all=s.p0.concat(s.p1),xs=all.map(p=>p[0]),ys=all.map(p=>p[1]);
+  const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  const sc=Math.min((W-2*m)/(x1-x0),(H-2*m)/(y1-y0));
+  const X=v=>m+(v-x0)*sc,Y=v=>H-m-(v-y0)*sc;
+  let h=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Constructed dictionary positions with arrows to trained positions"><defs><marker id="ar" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L6 3L0 6z" fill="${css("--mut")}"/></marker></defs>`;
+  for(let i=0;i<98;i++){const a=s.p0[i],b=s.p1[i];
+    h+=`<line x1="${X(a[0])}" y1="${Y(a[1])}" x2="${X(b[0])}" y2="${Y(b[1])}" stroke="${css("--mut")}" stroke-opacity=".55" marker-end="url(#ar)"><title>${D.labels[i]}</title></line>`;}
+  for(let i=0;i<98;i++){const a=s.p0[i];
+    h+=`<circle cx="${X(a[0])}" cy="${Y(a[1])}" r="9" fill="${gcol(D.groups[i])}"><title>${D.labels[i]}: moved ${f(s.moved[i])}</title></circle><text x="${X(a[0])}" y="${Y(a[1])+4}" font-size="11" font-weight="700" text-anchor="middle" fill="#fff" pointer-events="none">${D.labels[i]}</text>`;}
+  document.getElementById("map").innerHTML=h+"</svg>";
+}
+function nn(){
+  const s=D.start,show=[..."aetn3.,(+"],idx=show.map(c=>D.labels.indexOf(c));
+  const nm=a=>a.map(j=>D.labels[j]).join(" ");
+  let h="<tr><th>character</th><th>constructed</th><th>after training</th><th>kept</th></tr>";
+  for(const i of idx) if(i>=0) h+=`<tr><td class="k">${D.labels[i]}</td><td>${nm(s.nn0[i])}</td><td>${nm(s.nn1[i])}</td><td>${s.keep[i]}/5</td></tr>`;
+  document.getElementById("nn").innerHTML=h;
+}
+const CN=["special","newline","space","lower","upper","digit","punct","symbol",
+ ..."abcdefghijklmnopqrstuvwxyz".split("").map(c=>"letter "+c),
+ ...[1,2,3,4,5,6,7,8,9].map(v=>"digit ≥"+v),"vowel",
+ "sentence end","pause","quote","open","close","joiner","arithmetic","other mark",
+ ...[0,1,2,3,4,5].map(b=>"code bit "+b),"EOT","UNK","whitespace","kind: letter","kind: digit","kind: mark"];
+const BL=[[0,8,"class"],[8,34,"letter identity"],[34,43,"digit value"],[43,44,"vowel"],[44,52,"punctuation group"],[52,58,"symbol code"],[58,60,"special"],[60,61,"space"],[61,64,"kind"]];
+let sel=D.labels.indexOf("a");
+function pick(i){sel=i;inside();}
+function inside(){
+  const b=D.before[sel],a=D.after[sel],n=64,W=900,H=230,m=34,bw=(W-m-8)/n;
+  const M=Math.max(0.2,...b.map(Math.abs),...a.map(Math.abs))*1.08;
+  const Y=v=>H/2-v/M*(H/2-34),X=i=>m+i*bw;
+  let g=`<line x1="${m}" y1="${Y(0)}" x2="${W-8}" y2="${Y(0)}" stroke="${css("--line")}"/>`;
+  for(const [s,e,nm] of BL){g+=`<line x1="${X(s)}" y1="22" x2="${X(s)}" y2="${H-14}" stroke="${css("--line")}" stroke-dasharray="2 3"/><text x="${X(s)+2}" y="14" font-size="10" fill="${css("--mut")}">${e-s>2?nm:""}</text>`;}
+  for(let i=0;i<n;i++){
+    g+=`<rect x="${X(i)+1}" y="${Math.min(Y(0),Y(b[i]))}" width="${bw-2}" height="${Math.abs(Y(b[i])-Y(0))}" fill="none" stroke="${css("--mut")}" stroke-width="1.2"><title>${CN[i]}: ${b[i].toFixed(2)} → ${a[i].toFixed(2)}</title></rect>`;
+    g+=`<rect x="${X(i)+bw*0.25}" y="${Math.min(Y(0),Y(a[i]))}" width="${bw*0.5}" height="${Math.abs(Y(a[i])-Y(0))}" fill="${css("--acc")}"><title>${CN[i]}: ${b[i].toFixed(2)} → ${a[i].toFixed(2)}</title></rect>`;
+  }
+  g+=`<text x="${m-4}" y="${Y(M*0.8)+4}" font-size="10" fill="${css("--mut")}" text-anchor="end">+${(M*0.8).toFixed(1)}</text><text x="${m-4}" y="${Y(-M*0.8)+4}" font-size="10" fill="${css("--mut")}" text-anchor="end">−${(M*0.8).toFixed(1)}</text>`;
+  const d=b.map((v,i)=>[i,v,a[i],a[i]-v]).sort((p,q)=>Math.abs(q[3])-Math.abs(p[3]));
+  const dist=Math.sqrt(d.reduce((s,r)=>s+r[3]*r[3],0)), nrm=Math.sqrt(b.reduce((s,v)=>s+v*v,0));
+  const rows=d.map(r=>`<tr><td>${CN[r[0]]}</td><td>${r[1].toFixed(2)}</td><td>${r[2].toFixed(2)}</td><td>${r[3]>=0?"+":"−"}${Math.abs(r[3]).toFixed(2)}</td></tr>`).join("");
+  document.getElementById("inside").innerHTML=
+   `<p style="color:var(--fg)"><b style="font-size:1.1rem;font-family:ui-monospace,monospace">${D.labels[sel]}</b> &nbsp;moved ${dist.toFixed(2)} in total, against a length of ${nrm.toFixed(2)}.</p>`+
+   `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Coordinates of ${D.labels[sel]} before and after training">${g}</svg>`+
+   `<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--mut)">All 64 numbers, largest change first</summary><div class="scroll"><table><tr><th>coordinate</th><th>start</th><th>after</th><th>change</th></tr>${rows}</table></div></details>`;
+  document.querySelectorAll("#pick button").forEach(x=>x.style.outline=(+x.dataset.i===sel)?"2px solid var(--acc)":"none");
+  document.querySelectorAll(".t").forEach(x=>x.style.outline=(+x.dataset.i===sel)?"2px solid var(--acc)":"none");
+}
+function picker(){
+  document.getElementById("pick").innerHTML=[..."aetnos3.,(+"].concat([" ","\n"]).map(c=>{const i=D.labels.indexOf(c==" "?"␣":c==="\n"?"⏎":c);return i<0?"":`<button data-i="${i}" onclick="pick(${i})" style="font:600 14px ui-monospace,monospace;background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:4px;padding:3px 9px;cursor:pointer">${D.labels[i]}</button>`}).join("");
+}
+function draw(){big();scatter("sc1",D.start,"Constructed start");scatter("sc2",D.random,"Random start (control)");tiles();picker();inside();map();nn();}
+draw();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",draw);
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+</script>
