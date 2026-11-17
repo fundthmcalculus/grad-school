@@ -278,11 +278,12 @@ def fig_runtime(raw, feasible):
         if xs:
             ax.errorbar(xs, ys, yerr=es, marker="o", capsize=3, label=name)
     ax.set_xscale("log"); ax.set_yscale("log")
-    for N in LADDER:
-        if not feasible[N]:
-            ax.axvline(N, color="grey", ls=":", lw=1)
-            ax.text(N, 0.98, " IVATMeans infeasible\n (predicted peak > 80% RAM)", color="grey",
-                    fontsize=8, va="top", transform=ax.get_xaxis_transform())
+    infeas = [N for N in LADDER if not feasible[N]]
+    for N in infeas:
+        ax.axvline(N, color="grey", ls=":", lw=1)
+    if infeas:
+        ax.text(infeas[0] * 0.92, 0.04, f"IVATMeans infeasible\nat N ≥ {infeas[0]:,}\n(predicted peak > 80% RAM)",
+                color="grey", fontsize=8, ha="right", va="bottom", transform=ax.get_xaxis_transform())
     ax.set_xlabel("N (shuttle subsample)"); ax.set_ylabel("wall clock, seconds (mean ± std, 10 seeds)")
     ax.set_title("G9 performance: CPU wall clock, k = 7")
     ax.grid(True, which="both", alpha=0.3); ax.legend(fontsize=8)
@@ -295,7 +296,7 @@ def fig_quality(ari):
     names = [n for _, n, _ in QUALITY_ARMS]
     keys = [k for k, _, _ in QUALITY_ARMS]
     dnames = [d for d, _, _ in AE.DATASETS]
-    fig, ax = plt.subplots(figsize=(10, 4.8))
+    fig, ax = plt.subplots(figsize=(10, 5.4))
     w = 0.8 / len(keys)
     for i, (key, name) in enumerate(zip(keys, names)):
         mu = [np.mean(ari[(d, key)]) for d in dnames]
@@ -304,7 +305,8 @@ def fig_quality(ari):
     ax.set_xticks(range(len(dnames))); ax.set_xticklabels(dnames, rotation=0)
     ax.set_ylabel("ARI (mean ± std, 10 seeds)"); ax.set_ylim(-0.05, 1.05)
     ax.set_title("G9 quality: ARI on the Table 3.5 constructions (bridge points excluded)")
-    ax.legend(fontsize=7, ncol=2, loc="lower left"); ax.grid(axis="y", alpha=0.3)
+    ax.legend(fontsize=7, ncol=4, loc="upper center", bbox_to_anchor=(0.5, -0.1), frameon=False)
+    ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
     C.save_figure(fig, "fig_g9_quality")
     plt.close(fig)
@@ -471,6 +473,16 @@ def main():
     fig_partitions(scatter, ari)
 
     v = verdicts(raw, ari, dist, feasible)
+    import json
+    raw_path = os.path.join(C.OUTPUT_DIR, "g9_raw.json")
+    with open(raw_path, "w") as fh:
+        json.dump({
+            "ladder": {str(N): {k: (v_ if isinstance(v_, str) else [float(x) for x in v_]) for k, v_ in d.items()}
+                       for N, d in raw.items()},
+            "quality_ari": {f"{d}|{a}": [float(x) for x in vals] for (d, a), vals in ari.items()},
+            "distinct_labelings": {f"{d}|{a}": int(n) for (d, a), n in dist.items()},
+        }, fh, indent=1)
+    print("raw:", raw_path, flush=True)
 
     C.emit("table_g9_performance", "G9 performance: CPU wall clock on the shuttle N ladder, k = 7 (mean ± std, 10 seeds)",
            header_perf, rows_perf, note="CPU only. Infeasible IVATMeans rungs are marked, not dropped.", seeds=SEEDS)
