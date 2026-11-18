@@ -143,7 +143,7 @@ def main():
             raw[key] = res
             a = {m: np.mean(res[m]["ari"]) for m in res}
             print(f"{corp:14s} {name:46s} km={a['k-means']:.3f} em={a['E-means (5 ep)']:.3f} "
-                  f"fcm={a['FCM (m=2)']:.3f} ivat={a['IVATMeans (medoid)']['ari']:.3f}", flush=True)
+                  f"fcm={a['FCM (m=2)']:.3f} ivat={res['IVATMeans (medoid)']['ari']:.3f}", flush=True)
             rows.append([corp, name,
                          f"{a['k-means']:.3f} ± {np.std(res['k-means']['ari'], ddof=1):.3f}",
                          f"{a['E-means (5 ep)']:.3f} ± {np.std(res['E-means (5 ep)']['ari'], ddof=1):.3f}",
