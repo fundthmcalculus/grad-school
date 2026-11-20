@@ -18,6 +18,83 @@ as having no generator yet.
 
 ---
 
+## 2026-11-20 — `tribble-fis` pin `d97d6b8` → `14b4942` (tribble-fis #239, #241)
+
+**Status: no archived table moved. Nothing below is a citable run.** A whole-document
+sweep was *not* run at the new pin; this section records a targeted bump check
+(AGENTS.md non-negotiable 5) and what it does and does not license.
+
+**What the bump brings.** #239 adds the `higher_order` feature scorer
+(`method="higher_order"`: moment distance through skewness and kurtosis), an optional
+user feature ranking with Pareto-optimal top-`n` selection (`tribblefis.feature_selection`),
+and `scoring_method` / `user_ranking` / `pareto_choice` on `TribbleClassifier` and
+`TribbleRegressor` (defaults unchanged). #241 builds the optional compiled kernel with
+`-ffp-contract=off`; it was absent (NumPy kernel) in both arms of the check below, so
+it is untested here.
+
+**The check.** Same generators, same environment, same seeds, submodule at `d97d6b8`
+then `14b4942`, outputs redirected with `REPRO_OUTPUT_DIR` (the canonical outputs were not
+touched). Compiled kernel absent in both. Every column of every table diffed:
+
+| Table | Seeds | Result |
+|---|---|---|
+| 4.1 | 0–9 | MoG accuracy/R², GA-FIS and tree/RF columns **identical**, every row. Train-time cells moved (expected). ANFIS / Bike Sharing std `0.087 → 0.088`: see below |
+| 6.1 | 0–9 | **byte-identical** |
+| A.7 | 0–9 | identical except the two `fit (s)` wall-clock rows |
+| G.5 | 0–9 | **byte-identical** |
+| A.1 / A.2 | 0,1 | pin effect **zero**: 27 A.2 accuracy cells and the A.1 rankings identical across `d97d6b8` / `14b4942` with the *old* generator |
+
+*The ANFIS cell.* The ANFIS baseline is hand-rolled NumPy/scikit-learn and imports nothing
+from `tribblefis` (manipulation check: `tribblefis in sys.modules` is `False` after the
+fits), so the bump cannot have moved it — which makes it the thing that "should not have
+moved" and did. Two same-pin, same-seed repeats of ANFIS on Bike Sharing differ by up to
+**0.049 in per-seed R²**: the baseline is **not deterministic run to run**. Its cells
+are therefore not byte-reproducible, independent of any pin.
+
+**Table A.1/A.2 generator change** (same commit, kept separable). The sweep now passes
+`scoring_method=` to the estimator instead of monkeypatching
+`calculate_gaussian_correlation`, and `higher_order` joins the default `REPRO_SCORERS`.
+Attribution: old generator at the new pin vs new generator at the new pin — shared-scorer
+accuracies and rankings **identical**, so the edit changed nothing for the existing
+columns. At ten seeds (`REPRO_PHIUSIIL_N=20000`) the Wasserstein and Bhattacharyya A.2
+accuracy cells at all nine feature counts **equal the archived
+`phiusiil-leakfree-2026-08-30` values**.
+
+**New column, not yet in the proposal:** `higher_order` on PhiUSIIL (ten seeds, leak-free
+set). Accuracy by features kept, with the other scorers for scale:
+
+| k | wasserstein | bhattacharyya | composite | higher_order |
+|---|---|---|---|---|
+| 1 | 0.5733 | 0.7924 | 0.7924 | 0.6364 |
+| 3 | 0.5733 | 0.8106 | 0.7924 | 0.8603 |
+| 5 | 0.4401 | 0.8181 | 0.9186 | 0.9261 |
+| 10 | 0.7204 | 0.9575 | 0.9761 | 0.9373 |
+| 20 | 0.9700 | 0.9799 | 0.9827 | 0.9767 |
+
+It is mixed, not dominant: best at k = 3–5, behind Bhattacharyya at k = 1–2 and
+from k = 10, and behind `composite` from k = 7. One dataset, one split protocol; **not a result**, and the
+appendix (`prose/appendix.md`) is deliberately **not** changed. Fit time is ~2–3× the
+others at k = 1 (0.22 s vs 0.07–0.10 s).
+
+**Why none of this is citable.** `preflight.py --suite fis` **fails PIN-MATCH**:
+`optimizers` imports `10d8300` (the `tribble-fis` lock) while the submodule pin is
+`c21d543`. This is **not** caused by the bump — the lock names `10d8300` at both
+`d97d6b8` and `14b4942`. It is the lock-vs-pin gap AGENTS.md rule 5 describes, open until
+the lock and the `tribble-opt` pin are brought into step (the dependency-sync PR,
+tribble-fis #232, is the likely route). It does not threaten the *comparison* above
+(neither arm exercises `optimizers`; the version is identical on both sides), but it stamps
+any archive made in this environment **NOT CITABLE**. `INSTALL-FRESH` passes.
+`--suite cluster` passes.
+
+**Dataset note.** `data/PhiUSIIL_Phishing_URL_Dataset.csv` was absent and was recovered
+from `tribble-fis` history with the command in `data/.gitignore` (git-ignored, 56,854,345
+bytes, 235,795 rows). The generator announces the three leak columns it drops.
+
+**Still owed.** A whole-document sweep at this pin once PIN-MATCH is clear (the run of
+record is still `full-2026-08-22`, at `tribble-fis` `141596e`); `check_prose.py` against it.
+
+---
+
 ## 2026-08-22 — whole-document status against latest `main` + latest submodules
 
 A full ten-seed sweep ran on the current pins (`full-2026-08-22`, 16/16 generators

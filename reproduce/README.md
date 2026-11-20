@@ -46,7 +46,16 @@ Check it before citing any table, and update it when a generator changes.
 
 ## The `tribble-fis` pin, and how the last bump was checked
 
-Currently `141596e`. The previous pin, `058501f`, was 22 commits behind it; the bump
+Currently `14b4942` (bumped 2026-11-20 for tribble-fis #239/#241: the `higher_order`
+scorer and Pareto feature selection). **That bump was checked the same way** — Tables 4.1,
+6.1, A.7, G.5 diffed column by column at `d97d6b8` vs `14b4942`, plus a separate
+old-vs-new-generator control for Table A.1 — and nothing the proposal quotes moved; the
+record, including the one cell that did (ANFIS, a nondeterministic baseline), is the
+2026-11-20 section of `PROVENANCE_MAP.md`. `preflight.py --suite fis` currently fails
+PIN-MATCH (`optimizers` lock vs `tribble-opt` pin) at *both* ends of that bump, so
+archives made here are NOT CITABLE until that is cleared.
+
+The earlier bump to `141596e`: the previous pin, `058501f`, was 22 commits behind it; the bump
 was made to pick up
 [#170](https://github.com/fundthmcalculus/tribble-fis/pull/170), which changes
 `trapz_math_fast.fit_trapezoids_fast`'s geometry and lowers its default `n_bins`
