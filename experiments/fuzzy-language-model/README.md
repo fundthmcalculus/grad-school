@@ -98,6 +98,8 @@ VIRTUAL_ENV=.venv uv pip install numpy pandas pyarrow huggingface_hub tokenizers
 
 ### On a GPU host (the ten-seed headline grids)
 
+Keep a separate CUDA environment (`.venv-cuda`, torch 2.14.1+cu130, the rest of `requirements.lock`) so the CPU `.venv` is untouched, and check it with the parity smoke test before any GPU sweep: `bash flm/gpu_smoke.sh` (CPU and CUDA, same seed; passes when the validation BPC agrees within 0.01). It needs a loaded NVIDIA driver; `torch.cuda.is_available()` must be True.
+
 ```bash
 VIRTUAL_ENV=.venv uv pip install torch --index-url https://download.pytorch.org/whl/cu130   # CUDA wheel instead of CPU
 .venv/bin/python -m flm.data

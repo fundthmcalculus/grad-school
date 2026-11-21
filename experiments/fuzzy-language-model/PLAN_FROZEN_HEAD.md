@@ -118,3 +118,34 @@ Owner decisions: whether the dictionary counts toward the parameter budget at 50
 - Do the named group classes beat finer classes as rule answers, or is the useful granularity the single character?
 - At 50K, does the named dictionary move the tied-head crossover (now near 40K to 70K for the learned dictionary)?
 - Does a redesigned dictionary (item 1) make the pull-back unnecessary on the Pile?
+
+## 7. Results: the 50K donor and the B1 gate (2026-11-07, CPU)
+
+Run on CPU (no GPU driver on the host; see the note at the end). Code: `flm/tribble_head/` (`donor.sh`, `common.sh`, `construct.py`). Outputs: `outputs/tribble50k/` (git-ignored).
+
+**Donors (50K shape: width 48, rules 68/48, 49,689 parameters; TinyStories 30M characters, fp32, lr 0.01, seed 0, 3,663 steps; validation on 1M characters):**
+
+| donor | validation bits per character |
+|---|---|
+| learned codebook | 1.5146 |
+| frozen `oh48` (C fixed, F and G trained) | 1.5521 |
+
+Freezing the named dictionary costs +0.038 at 50K on this corpus, one seed. This is above the 100K and 200K Cosmopedia figures and is a 30M-character, one-seed number; it is not compared against the 300M results above.
+
+**B1 construction gate (no training after construction).** Head: the frozen donor's C, F, G and log_tau. Blocks: re-initialised, then constructed by `flm/tribble_head/construct.py`: antecedents as k-means inside each next-character class (layer 0 reads two tokens), widths from the per-dimension data spread, consequents by closed-form ridge onto each block's share of the displacement from `embed(x_t)` to `embed(y_t)`, order-1 slope fixed to 1 during construction. Validation: 199,946 characters, 2,000 construction windows of 256 from the training slice.
+
+| model | bits per character |
+|---|---|
+| same head, random blocks | 16.98 |
+| constructed blocks, no training | **4.97** |
+| constructed, mixers' output projections zeroed first (`--zero-mix`) | 4.93 |
+| unigram character model (add-one) | 4.42 |
+| bigram character model (add-one) | 3.30 |
+
+Gate (registered in section 4.5): beats random by at least 1 bit: **passes** (12.0 bits). Beats the unigram by at least 0.3 bits: **fails** (the constructed model is 0.55 bits worse than the unigram).
+
+Diagnostic, not part of the gate: a sweep of the readout temperature on the constructed model gives its best at log_tau = 0 (4.74 bits), still 0.32 above the unigram. The donor's log_tau (0.20) is not the cause. The construction's ridge fit explains about 40% of the displacement (R² 0.38 to 0.42 per block), and every rule fires on every position (active fraction 1.00), so the rules are diffuse rather than grouped. Those two facts are the likely reason the construction stays above the unigram; this has not been tested further.
+
+**Verdict under the plan's kill rule.** "B1 fails" is a kill criterion in section 4.5. The consequent-first construction does not reach the unigram at 50K under this head, so B2 and B3 are not run. This is the third closure of the consequent-first line, and it holds for the frozen named head, which the plan expected to remove two of the four earlier failure causes. The result does not rule out other constructions (for example, grouping by the named coordinates rather than classes, or a sparser firing rule); those would need a new registered gate.
+
+**Note on hardware.** The host has an NVIDIA RTX 4060 Max-Q, but the driver is not installed (no `nvidia-smi`, no `/dev/nvidia*`), and the venv has the pinned CPU-only torch. CPU is what this section used. The GPU runs in section 3 would need the driver and a CUDA torch build.
