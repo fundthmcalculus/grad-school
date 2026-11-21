@@ -53,7 +53,9 @@ from sklearn.metrics import accuracy_score, f1_score  # noqa: E402
 from tribblefis import gauss_math as G  # noqa: E402
 from tribblefis.gaussian_classifier import TribbleClassifier  # noqa: E402
 
-CACHE = os.environ.get("REPRO_EMBED_CACHE", os.path.expanduser("~/.cache/grad-school/embeddings"))
+CACHE = os.environ.get(
+    "REPRO_EMBED_CACHE", os.path.expanduser("~/.cache/grad-school/embeddings")
+)
 CORPORA = ["ag_news", "emotion", "newsgroups20"]
 PCA_DIMS = [16, 32]
 TOP_NS = [4, 8, 16, 32]
@@ -85,9 +87,12 @@ def main():
             lr_acc, lr_f1 = [], []
             for s in SEEDS:
                 idx = np.random.default_rng(s).choice(len(Zb), len(Zb), replace=True)
-                lr = LogisticRegression(max_iter=2000, random_state=s).fit(Zb[idx], yb[idx])
+                lr = LogisticRegression(max_iter=2000, random_state=s).fit(
+                    Zb[idx], yb[idx]
+                )
                 p = lr.predict(Zq)
-                lr_acc.append(accuracy_score(yq, p)); lr_f1.append(f1_score(yq, p, average="macro"))
+                lr_acc.append(accuracy_score(yq, p))
+                lr_f1.append(f1_score(yq, p, average="macro"))
             raw[corp][key]["lr"] = {"acc": lr_acc, "macro_f1": lr_f1}
             print(f"  {key} LR acc={np.mean(lr_acc):.3f}", flush=True)
 
@@ -96,23 +101,44 @@ def main():
                     continue
                 accs, f1s, fits, sels = [], [], [], []
                 for s in SEEDS:
-                    idx = np.random.default_rng(s).choice(len(Zb), len(Zb), replace=True)
+                    idx = np.random.default_rng(s).choice(
+                        len(Zb), len(Zb), replace=True
+                    )
                     df = pd.DataFrame(Zb[idx], columns=cols)
                     dq = pd.DataFrame(Zq, columns=cols)
                     t0 = time.perf_counter()
-                    m = TribbleClassifier(top_n=tn, correlation_threshold=0.0, random_state=s).fit(
-                        df, pd.Series(yb[idx]))
+                    m = TribbleClassifier(
+                        top_n=tn, correlation_threshold=0.0, random_state=s
+                    ).fit(df, pd.Series(yb[idx]))
                     fits.append(time.perf_counter() - t0)
                     p = np.asarray(m.predict(dq))
-                    accs.append(accuracy_score(yq, p)); f1s.append(f1_score(yq, p, average="macro"))
+                    accs.append(accuracy_score(yq, p))
+                    f1s.append(f1_score(yq, p, average="macro"))
                     sels.append(sorted(str(f) for f in m.top_features_))
-                raw[corp][key]["fis"][f"top_n={tn}"] = {"acc": accs, "macro_f1": f1s, "fit_sec": fits, "selected": sels}
+                raw[corp][key]["fis"][f"top_n={tn}"] = {
+                    "acc": accs,
+                    "macro_f1": f1s,
+                    "fit_sec": fits,
+                    "selected": sels,
+                }
                 distinct = len({tuple(x) for x in sels})
-                rows.append([corp, key, str(tn), f"{np.mean(accs):.3f} ± {np.std(accs, ddof=1):.3f}",
-                             f"{np.mean(f1s):.3f}", f"{np.mean(fits):.2f}", str(distinct),
-                             f"{np.mean(lr_acc):.3f}"])
-                print(f"  {key} top_n={tn:2d} FIS acc={np.mean(accs):.3f} ± {np.std(accs, ddof=1):.3f} "
-                      f"macroF1={np.mean(f1s):.3f} fit={np.mean(fits):.2f}s distinct-selections={distinct}", flush=True)
+                rows.append(
+                    [
+                        corp,
+                        key,
+                        str(tn),
+                        f"{np.mean(accs):.3f} ± {np.std(accs, ddof=1):.3f}",
+                        f"{np.mean(f1s):.3f}",
+                        f"{np.mean(fits):.2f}",
+                        str(distinct),
+                        f"{np.mean(lr_acc):.3f}",
+                    ]
+                )
+                print(
+                    f"  {key} top_n={tn:2d} FIS acc={np.mean(accs):.3f} ± {np.std(accs, ddof=1):.3f} "
+                    f"macroF1={np.mean(f1s):.3f} fit={np.mean(fits):.2f}s distinct-selections={distinct}",
+                    flush=True,
+                )
 
             # which original MiniLM coordinates matter: map Wasserstein scores through PCA loadings
             V = pca.components_  # (d, 384)
@@ -127,25 +153,61 @@ def main():
             imp_runs = np.array(imp_runs)
             mean_imp = imp_runs.mean(axis=0)
             top10 = np.argsort(-mean_imp)[:10]
-            in_top10 = np.mean([np.isin(np.arange(384), np.argsort(-r)[:10]) for r in imp_runs], axis=0)
-            raw[corp][key]["importance"] = {"mean": mean_imp.tolist(), "top10": top10.tolist(),
-                                            "top10_stability": in_top10[top10].tolist()}
+            in_top10 = np.mean(
+                [np.isin(np.arange(384), np.argsort(-r)[:10]) for r in imp_runs], axis=0
+            )
+            raw[corp][key]["importance"] = {
+                "mean": mean_imp.tolist(),
+                "top10": top10.tolist(),
+                "top10_stability": in_top10[top10].tolist(),
+            }
             for rank_, j in enumerate(top10, 1):
-                dim_rows.append([corp, key, str(rank_), f"MiniLM coord {int(j)}", f"{mean_imp[j]:.4f}", f"{in_top10[j]:.2f}"])
+                dim_rows.append(
+                    [
+                        corp,
+                        key,
+                        str(rank_),
+                        f"MiniLM coord {int(j)}",
+                        f"{mean_imp[j]:.4f}",
+                        f"{in_top10[j]:.2f}",
+                    ]
+                )
 
     os.makedirs(C.OUTPUT_DIR, exist_ok=True)
     with open(RAW_JSON, "w") as fh:
         json.dump(raw, fh)
-    C.emit("table_fis_pca_accuracy", "Embedding -> PCA -> TRIBBLE fuzzy classifier: held-out accuracy and fit time",
-           ["corpus", "PCA", "top_n", "FIS accuracy (mean ± std)", "FIS macro-F1", "fit seconds", "distinct selections", "LR accuracy (all PCA dims)"],
-           rows,
-           note="Ten seeds (bootstrap resample of the base set per seed). Evaluated on the 500 held-out test queries. distinct selections > 1 means the bootstrap changes the selected features (manipulation check C2).",
-           seeds=SEEDS)
-    C.emit("table_fis_pca_dimensions", "Which original MiniLM coordinates matter: importance through PCA loadings",
-           ["corpus", "PCA", "rank", "original coordinate", "mean importance", "top-10 stability (fraction of seeds)"],
-           dim_rows,
-           note="importance_j = sum_i Wasserstein score_i * |loading_ij|, normalised. Stability = fraction of the ten bootstrap seeds in which the coordinate is in the top 10.",
-           seeds=SEEDS)
+    C.emit(
+        "table_fis_pca_accuracy",
+        "Embedding -> PCA -> TRIBBLE fuzzy classifier: held-out accuracy and fit time",
+        [
+            "corpus",
+            "PCA",
+            "top_n",
+            "FIS accuracy (mean ± std)",
+            "FIS macro-F1",
+            "fit seconds",
+            "distinct selections",
+            "LR accuracy (all PCA dims)",
+        ],
+        rows,
+        note="Ten seeds (bootstrap resample of the base set per seed). Evaluated on the 500 held-out test queries. distinct selections > 1 means the bootstrap changes the selected features (manipulation check C2).",
+        seeds=SEEDS,
+    )
+    C.emit(
+        "table_fis_pca_dimensions",
+        "Which original MiniLM coordinates matter: importance through PCA loadings",
+        [
+            "corpus",
+            "PCA",
+            "rank",
+            "original coordinate",
+            "mean importance",
+            "top-10 stability (fraction of seeds)",
+        ],
+        dim_rows,
+        note="importance_j = sum_i Wasserstein score_i * |loading_ij|, normalised. Stability = fraction of the ten bootstrap seeds in which the coordinate is in the top 10.",
+        seeds=SEEDS,
+    )
 
     # figure: accuracy vs top_n against the LR baseline
     fig, axes = plt.subplots(len(CORPORA), len(PCA_DIMS), figsize=(9, 9), sharey="row")
@@ -155,9 +217,17 @@ def main():
             key = f"d={pd_}"
             tns = [t for t in TOP_NS if f"top_n={t}" in raw[corp][key]["fis"]]
             mu = [np.mean(raw[corp][key]["fis"][f"top_n={t}"]["acc"]) for t in tns]
-            sd = [np.std(raw[corp][key]["fis"][f"top_n={t}"]["acc"], ddof=1) for t in tns]
+            sd = [
+                np.std(raw[corp][key]["fis"][f"top_n={t}"]["acc"], ddof=1) for t in tns
+            ]
             ax.errorbar(tns, mu, yerr=sd, marker="o", capsize=3, label="TRIBBLE FIS")
-            ax.axhline(np.mean(raw[corp][key]["lr"]["acc"]), color="k", ls="--", lw=1, label="logistic regression (all dims)")
+            ax.axhline(
+                np.mean(raw[corp][key]["lr"]["acc"]),
+                color="k",
+                ls="--",
+                lw=1,
+                label="logistic regression (all dims)",
+            )
             ax.set_title(f"{corp}, PCA-{pd_}", fontsize=9)
             ax.set_xlabel("features selected (top_n)", fontsize=8)
             ax.set_xticks(tns)
@@ -165,7 +235,10 @@ def main():
             if c == 0:
                 ax.set_ylabel("held-out accuracy", fontsize=8)
     axes[0, 0].legend(fontsize=7, loc="lower right")
-    fig.suptitle("Embedding -> PCA -> TRIBBLE fuzzy classifier (MiniLM): accuracy vs features kept", fontsize=10)
+    fig.suptitle(
+        "Embedding -> PCA -> TRIBBLE fuzzy classifier (MiniLM): accuracy vs features kept",
+        fontsize=10,
+    )
     fig.tight_layout()
     C.save_figure(fig, "fig_fis_pca_accuracy")
     plt.close(fig)
@@ -174,10 +247,14 @@ def main():
     fig, axes = plt.subplots(1, len(CORPORA), figsize=(13, 4))
     for ax, corp in zip(axes, CORPORA):
         imp = raw[corp]["d=16"]["importance"]
-        top = imp["top10"]; mean = np.array(imp["mean"]); stab = imp["top10_stability"]
+        top = imp["top10"]
+        mean = np.array(imp["mean"])
+        stab = imp["top10_stability"]
         ax.barh([f"coord {j}" for j in top][::-1], mean[top][::-1], color="tab:blue")
         for i, st in enumerate(stab[::-1]):
-            ax.text(mean[top][::-1][i], i, f" stability {st:.1f}", va="center", fontsize=7)
+            ax.text(
+                mean[top][::-1][i], i, f" stability {st:.1f}", va="center", fontsize=7
+            )
         ax.set_title(f"{corp}, PCA-16: top-10 MiniLM coordinates", fontsize=9)
         ax.set_xlabel("normalised importance", fontsize=8)
     fig.tight_layout()

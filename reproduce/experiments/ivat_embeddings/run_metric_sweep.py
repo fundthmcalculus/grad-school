@@ -53,7 +53,10 @@ import matplotlib  # noqa: E402
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 from scipy.spatial.distance import cdist  # noqa: E402
-from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score  # noqa: E402
+from sklearn.metrics import (
+    adjusted_rand_score,
+    normalized_mutual_info_score,
+)  # noqa: E402
 import tribbleclustering.ivatmeans as IVM  # noqa: E402
 from tribbleclustering import IVATMeans  # noqa: E402
 
@@ -116,10 +119,19 @@ def main():
             lab0, cen0 = fit_default(Xb, k)
             sec0 = time.perf_counter() - t0
             ari0 = adjusted_rand_score(yb, lab0)
-            prev = baseline.get(key, {}).get("IVATMeans (medoid)", {}).get("ari", [None])
+            prev = (
+                baseline.get(key, {}).get("IVATMeans (medoid)", {}).get("ari", [None])
+            )
             prev = prev[0] if isinstance(prev, list) else prev
-            print(f"  default (unpatched)  ARI={ari0:.3f}  previous run={prev}  sec={sec0:.2f}", flush=True)
-            raw[key]["default_unpatched"] = {"ari": ari0, "sec": sec0, "labels": lab0.tolist()}
+            print(
+                f"  default (unpatched)  ARI={ari0:.3f}  previous run={prev}  sec={sec0:.2f}",
+                flush=True,
+            )
+            raw[key]["default_unpatched"] = {
+                "ari": ari0,
+                "sec": sec0,
+                "labels": lab0.tolist(),
+            }
             label_store[(key, "default")] = lab0
 
             for mname in METRICS:
@@ -132,17 +144,44 @@ def main():
                 nmi = normalized_mutual_info_score(yb, lab)
                 pur = RE.purity(yb, lab)
                 search = RE.search_metrics(Xb, yb, Xq, yq, lab, cen)
-                raw[key][mname] = {"ari": ari, "nmi": nmi, "purity": pur, "sec": sec,
-                                   "nan_replaced": nan_n, "labels": lab.tolist(), "search": search}
+                raw[key][mname] = {
+                    "ari": ari,
+                    "nmi": nmi,
+                    "purity": pur,
+                    "sec": sec,
+                    "nan_replaced": nan_n,
+                    "labels": lab.tolist(),
+                    "search": search,
+                }
                 if nan_n:
-                    print(f"  NOTE {mname}: {nan_n} undefined distance entries set to 1 (zero-vector rows)", flush=True)
+                    print(
+                        f"  NOTE {mname}: {nan_n} undefined distance entries set to 1 (zero-vector rows)",
+                        flush=True,
+                    )
                 label_store[(key, mname)] = lab
-                clus_rows.append([corp, emb, mname, f"{ari:.3f}", f"{nmi:.3f}", f"{pur:.3f}", f"{sec:.2f}"])
-                srch_rows.append([corp, emb, mname, f"{search['exact_precision']:.3f}"] + [
-                    f"{search[f'nprobe{p}']['recall']:.3f} / {search[f'nprobe{p}']['scan']:.3f}" for p in RE.NPROBES])
-                print(f"  {mname:10s} ARI={ari:.3f} NMI={nmi:.3f} sec={sec:.2f} "
-                      f"recall@10 nprobe1={search['nprobe1']['recall']:.3f} scan={search['nprobe1']['scan']:.3f}",
-                      flush=True)
+                clus_rows.append(
+                    [
+                        corp,
+                        emb,
+                        mname,
+                        f"{ari:.3f}",
+                        f"{nmi:.3f}",
+                        f"{pur:.3f}",
+                        f"{sec:.2f}",
+                    ]
+                )
+                srch_rows.append(
+                    [corp, emb, mname, f"{search['exact_precision']:.3f}"]
+                    + [
+                        f"{search[f'nprobe{p}']['recall']:.3f} / {search[f'nprobe{p}']['scan']:.3f}"
+                        for p in RE.NPROBES
+                    ]
+                )
+                print(
+                    f"  {mname:10s} ARI={ari:.3f} NMI={nmi:.3f} sec={sec:.2f} "
+                    f"recall@10 nprobe1={search['nprobe1']['recall']:.3f} scan={search['nprobe1']['scan']:.3f}",
+                    flush=True,
+                )
 
             # C3: patched euclidean vs unpatched default
             c3 = adjusted_rand_score(lab0, label_store[(key, "euclidean")])
@@ -154,9 +193,17 @@ def main():
     for corp in RE.CORPORA:
         for emb in RE.EMBEDS:
             key = f"{corp}|{emb}"
-            pairs = [("euclidean", "manhattan"), ("euclidean", "cosine"), ("manhattan", "cosine")]
-            agree = {f"{a} vs {b}": adjusted_rand_score(label_store[(key, a)], label_store[(key, b)])
-                     for a, b in pairs}
+            pairs = [
+                ("euclidean", "manhattan"),
+                ("euclidean", "cosine"),
+                ("manhattan", "cosine"),
+            ]
+            agree = {
+                f"{a} vs {b}": adjusted_rand_score(
+                    label_store[(key, a)], label_store[(key, b)]
+                )
+                for a, b in pairs
+            }
             raw[key]["check_C2_ari_between_metrics"] = agree
             changed.append((key, agree))
 
@@ -164,15 +211,23 @@ def main():
     with open(RAW_JSON, "w") as fh:
         json.dump(raw, fh)
 
-    C.emit("table_ivat_metric_clustering", "IVATMeans under different distance metrics: clustering quality (N = 10,000)",
-           ["corpus", "embedding", "metric", "ARI", "NMI", "purity", "seconds"], clus_rows,
-           note="Distance stage replaced by the named scipy metric for each fit; one run per metric (IVATMeans has no random state). Default unpatched library run in ivat_metric_raw.json.",
-           seeds=[0])
-    C.emit("table_ivat_metric_search", "IVATMeans under different distance metrics: IVF search (recall@10 / scan share, nprobe 1-3)",
-           ["corpus", "embedding", "metric", "exact precision@10"] + [f"nprobe{p} recall / scan" for p in RE.NPROBES],
-           srch_rows,
-           note="Routing uses Euclidean distance to the medoids (as in run_embedding_comparison); only the cell construction varies with the metric.",
-           seeds=[0])
+    C.emit(
+        "table_ivat_metric_clustering",
+        "IVATMeans under different distance metrics: clustering quality (N = 10,000)",
+        ["corpus", "embedding", "metric", "ARI", "NMI", "purity", "seconds"],
+        clus_rows,
+        note="Distance stage replaced by the named scipy metric for each fit; one run per metric (IVATMeans has no random state). Default unpatched library run in ivat_metric_raw.json.",
+        seeds=[0],
+    )
+    C.emit(
+        "table_ivat_metric_search",
+        "IVATMeans under different distance metrics: IVF search (recall@10 / scan share, nprobe 1-3)",
+        ["corpus", "embedding", "metric", "exact precision@10"]
+        + [f"nprobe{p} recall / scan" for p in RE.NPROBES],
+        srch_rows,
+        note="Routing uses Euclidean distance to the medoids (as in run_embedding_comparison); only the cell construction varies with the metric.",
+        seeds=[0],
+    )
 
     # figure: ARI by metric
     combos = [(c, e) for c in RE.CORPORA for e in RE.EMBEDS]
@@ -181,12 +236,20 @@ def main():
     w = 0.8 / len(names)
     for i, mname in enumerate(names):
         vals = [raw[f"{c}|{e}"][mname]["ari"] for c, e in combos]
-        ax.bar(np.arange(len(combos)) + (i - len(names) / 2 + 0.5) * w, vals, w, label=f"IVATMeans, {mname}")
+        ax.bar(
+            np.arange(len(combos)) + (i - len(names) / 2 + 0.5) * w,
+            vals,
+            w,
+            label=f"IVATMeans, {mname}",
+        )
     ax.set_xticks(range(len(combos)))
     ax.set_xticklabels([f"{c}\n{e}" for c, e in combos], fontsize=8)
-    ax.set_ylabel("ARI vs document labels"); ax.set_ylim(-0.05, 0.5)
+    ax.set_ylabel("ARI vs document labels")
+    ax.set_ylim(-0.05, 0.5)
     ax.set_title("IVATMeans by distance metric (N = 10,000, k = classes)")
-    ax.legend(fontsize=8, frameon=False); ax.grid(axis="y", alpha=0.3); fig.tight_layout()
+    ax.legend(fontsize=8, frameon=False)
+    ax.grid(axis="y", alpha=0.3)
+    fig.tight_layout()
     C.save_figure(fig, "fig_ivat_metric_ari")
     plt.close(fig)
     print("raw:", RAW_JSON, flush=True)

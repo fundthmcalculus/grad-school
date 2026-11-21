@@ -70,7 +70,9 @@ def replay_tfidf():
         iq = [int(v) for v in rng.choice(len(te_text), BE.N_QUERY, replace=False)]
         vec, tf_b, tf_q, ib, iq, _ = BE.select_nonempty(rng, tr_text, te_text, ib, iq)
         cache = np.load(os.path.join(RE.CACHE, f"{name}.npz"))
-        assert np.array_equal(tr_y[ib], cache["y_base"]), f"{name}: replayed labels do not match the cache"
+        assert np.array_equal(
+            tr_y[ib], cache["y_base"]
+        ), f"{name}: replayed labels do not match the cache"
         out[name] = tf_b
     return out
 
@@ -113,7 +115,10 @@ def main():
             raw[key] = {}
             rc, _ = relative_contrast(X, rng)
             raw[key]["median_relative_contrast"] = rc
-            print(f"== {corp} / {ename}: d={X.shape[1]} median relative contrast={rc:.3f}", flush=True)
+            print(
+                f"== {corp} / {ename}: d={X.shape[1]} median relative contrast={rc:.3f}",
+                flush=True,
+            )
 
             # baselines: ten seeds
             for meth in ["k-means", "E-means (5 ep)", "FCM (m=2)"]:
@@ -122,7 +127,9 @@ def main():
                     if meth == "k-means":
                         lab = np.asarray(RE.m_kmeans(X, k, s)[0])
                     elif meth == "E-means (5 ep)":
-                        _, lab = NumpyEmeans(X.shape[1], k, seed=s).train(np.ascontiguousarray(X, np.float32))
+                        _, lab = NumpyEmeans(X.shape[1], k, seed=s).train(
+                            np.ascontiguousarray(X, np.float32)
+                        )
                         lab = np.asarray(lab).ravel()
                     else:
                         f = FuzzyCMeans(k, m=2.0, random_state=s).fit(X)
@@ -131,9 +138,17 @@ def main():
                             maxm = np.asarray(f.membership_matrix_).max(axis=1)
                     ari.append(adjusted_rand_score(yb, lab))
                     sz = np.bincount(lab, minlength=k)
-                    sizes_min.append(int(sz.min())); sizes_max.append(int(sz.max()))
-                raw[key][meth] = {"ari": ari, "min_size": sizes_min, "max_size": sizes_max}
-                print(f"  {meth:16s} ARI={np.mean(ari):.3f} ± {np.std(ari, ddof=1):.3f} sizes(min/max)={np.mean(sizes_min):.0f}/{np.mean(sizes_max):.0f}", flush=True)
+                    sizes_min.append(int(sz.min()))
+                    sizes_max.append(int(sz.max()))
+                raw[key][meth] = {
+                    "ari": ari,
+                    "min_size": sizes_min,
+                    "max_size": sizes_max,
+                }
+                print(
+                    f"  {meth:16s} ARI={np.mean(ari):.3f} ± {np.std(ari, ddof=1):.3f} sizes(min/max)={np.mean(sizes_min):.0f}/{np.mean(sizes_max):.0f}",
+                    flush=True,
+                )
                 if meth == "FCM (m=2)":
                     diag.setdefault("fcm", {})[key] = {"maxm": maxm, "k": k}
 
@@ -144,31 +159,63 @@ def main():
             lab = np.asarray(ivm.labels_)
             ari_i = adjusted_rand_score(yb, lab)
             sz = np.bincount(lab, minlength=k)
-            raw[key]["IVATMeans (medoid)"] = {"ari": ari_i, "min_size": int(sz.min()), "max_size": int(sz.max()), "sec": sec}
-            print(f"  IVATMeans        ARI={ari_i:.3f} sizes(min/max)={int(sz.min())}/{int(sz.max())} sec={sec:.2f}", flush=True)
+            raw[key]["IVATMeans (medoid)"] = {
+                "ari": ari_i,
+                "min_size": int(sz.min()),
+                "max_size": int(sz.max()),
+                "sec": sec,
+            }
+            print(
+                f"  IVATMeans        ARI={ari_i:.3f} sizes(min/max)={int(sz.min())}/{int(sz.max())} sec={sec:.2f}",
+                flush=True,
+            )
 
-            rows.append([corp, ename, str(X.shape[1]), f"{rc:.2f}"]
-                        + [f"{np.mean(raw[key][m]['ari']):.3f} ± {np.std(raw[key][m]['ari'], ddof=1):.3f}"
-                           for m in ["k-means", "E-means (5 ep)", "FCM (m=2)"]]
-                        + [f"{raw[key]['IVATMeans (medoid)']['ari']:.3f}"])
+            rows.append(
+                [corp, ename, str(X.shape[1]), f"{rc:.2f}"]
+                + [
+                    f"{np.mean(raw[key][m]['ari']):.3f} ± {np.std(raw[key][m]['ari'], ddof=1):.3f}"
+                    for m in ["k-means", "E-means (5 ep)", "FCM (m=2)"]
+                ]
+                + [f"{raw[key]['IVATMeans (medoid)']['ari']:.3f}"]
+            )
 
-            if corp in ("ag_news", "newsgroups20") and ename in ("MiniLM 384 (original)", "TF-IDF SVD-16 (direct)"):
-                idx = np.random.default_rng(2).choice(len(X), IVAT_SAMPLE, replace=False)
+            if corp in ("ag_news", "newsgroups20") and ename in (
+                "MiniLM 384 (original)",
+                "TF-IDF SVD-16 (direct)",
+            ):
+                idx = np.random.default_rng(2).choice(
+                    len(X), IVAT_SAMPLE, replace=False
+                )
                 Z = X[idx]
                 Dz = cdist(Z, Z)
                 ivat_img, _, order = compute_ivat(Dz.copy(), inplace=False)
-                diag.setdefault("ivat", {})[key] = {"image": np.asarray(ivat_img), "super": np.diag(np.asarray(ivat_img), 1).copy(), "k": k}
+                diag.setdefault("ivat", {})[key] = {
+                    "image": np.asarray(ivat_img),
+                    "super": np.diag(np.asarray(ivat_img), 1).copy(),
+                    "k": k,
+                }
 
     os.makedirs(C.OUTPUT_DIR, exist_ok=True)
     with open(RAW_JSON, "w") as fh:
         json.dump(raw, fh)
 
-    C.emit("table_direct16_comparison",
-           "Direct 16-dimensional embedding and diagnostics: ARI and relative contrast",
-           ["corpus", "embedding", "dim", "median relative contrast", "k-means", "E-means 5 ep", "FCM (m=2)", "IVATMeans"],
-           rows,
-           note="Baselines: mean ± std over 10 seeds. IVATMeans: one run. Relative contrast = (dmax - dmin) / dmin, median over 2,000 sampled documents; near 0 means distances barely separate neighbours from strangers.",
-           seeds=SEEDS)
+    C.emit(
+        "table_direct16_comparison",
+        "Direct 16-dimensional embedding and diagnostics: ARI and relative contrast",
+        [
+            "corpus",
+            "embedding",
+            "dim",
+            "median relative contrast",
+            "k-means",
+            "E-means 5 ep",
+            "FCM (m=2)",
+            "IVATMeans",
+        ],
+        rows,
+        note="Baselines: mean ± std over 10 seeds. IVATMeans: one run. Relative contrast = (dmax - dmin) / dmin, median over 2,000 sampled documents; near 0 means distances barely separate neighbours from strangers.",
+        seeds=SEEDS,
+    )
 
     # A1: distance contrast
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.2))
@@ -179,9 +226,12 @@ def main():
             labels_rc.append(f"{corp}\n{ename.split(' (')[0]}")
             vals_rc.append(raw[f"{corp}|{ename}"]["median_relative_contrast"])
     ax.bar(range(len(vals_rc)), vals_rc)
-    ax.set_xticks(range(len(vals_rc))); ax.set_xticklabels(labels_rc, fontsize=7)
+    ax.set_xticks(range(len(vals_rc)))
+    ax.set_xticklabels(labels_rc, fontsize=7)
     ax.set_ylabel("median relative contrast (dmax - dmin)/dmin")
-    ax.set_title("Distance contrast: how much nearest and farthest neighbours differ", fontsize=9)
+    ax.set_title(
+        "Distance contrast: how much nearest and farthest neighbours differ", fontsize=9
+    )
     ax.grid(axis="y", alpha=0.3)
     ax = axes[1]
     for corp in ["newsgroups20", "ag_news"]:
@@ -189,10 +239,18 @@ def main():
         idx = np.random.default_rng(3).choice(len(X), 1000, replace=False)
         D = cdist(X[idx], X[idx])
         pair = D[np.triu_indices(len(idx), 1)]
-        ax.hist(pair / np.median(pair), bins=80, density=True, alpha=0.5, label=f"{corp} (MiniLM)")
-    ax.set_xlabel("pairwise distance / median"); ax.set_ylabel("density")
+        ax.hist(
+            pair / np.median(pair),
+            bins=80,
+            density=True,
+            alpha=0.5,
+            label=f"{corp} (MiniLM)",
+        )
+    ax.set_xlabel("pairwise distance / median")
+    ax.set_ylabel("density")
     ax.set_title("MiniLM pairwise distances concentrate near the median", fontsize=9)
-    ax.legend(fontsize=8); ax.grid(alpha=0.3)
+    ax.legend(fontsize=8)
+    ax.grid(alpha=0.3)
     fig.tight_layout()
     C.save_figure(fig, "fig_diag_distance_contrast")
     plt.close(fig)
@@ -201,14 +259,17 @@ def main():
     keys = list(diag["fcm"].keys())
     fig, axes = plt.subplots(2, 5, figsize=(16, 6))
     for ax, key in zip(axes.ravel(), keys):
-        mm = diag["fcm"][key]["maxm"]; k = diag["fcm"][key]["k"]
+        mm = diag["fcm"][key]["maxm"]
+        k = diag["fcm"][key]["k"]
         ax.hist(mm, bins=60, range=(0, 1), color="tab:orange")
         ax.axvline(1.0 / k, color="k", ls="--", lw=1)
         ax.set_title(key.replace("|", "\n"), fontsize=7)
         ax.set_xlabel("largest membership", fontsize=7)
-    for ax in axes.ravel()[len(keys):]:
+    for ax in axes.ravel()[len(keys) :]:
         ax.axis("off")
-    fig.suptitle("FCM (m=2): largest membership per document; dashed = uniform 1/k", fontsize=10)
+    fig.suptitle(
+        "FCM (m=2): largest membership per document; dashed = uniform 1/k", fontsize=10
+    )
     fig.tight_layout()
     C.save_figure(fig, "fig_diag_fcm_membership")
     plt.close(fig)
@@ -217,17 +278,28 @@ def main():
     ikeys = list(diag["ivat"].keys())
     fig, axes = plt.subplots(2, len(ikeys), figsize=(4.2 * len(ikeys), 7.5))
     for col, key in enumerate(ikeys):
-        ivat = diag["ivat"][key]["image"]; sup = diag["ivat"][key]["super"]; k = diag["ivat"][key]["k"]
+        ivat = diag["ivat"][key]["image"]
+        sup = diag["ivat"][key]["super"]
+        k = diag["ivat"][key]["k"]
         ax = axes[0, col]
         ax.imshow(ivat, cmap="viridis", aspect="auto")
-        ax.set_title(key.replace("|", "\n"), fontsize=7); ax.set_xticks([]); ax.set_yticks([])
+        ax.set_title(key.replace("|", "\n"), fontsize=7)
+        ax.set_xticks([])
+        ax.set_yticks([])
         ax = axes[1, col]
         ax.plot(sup, lw=0.8)
         top = np.argsort(-sup)[: k - 1]
-        ax.scatter(top, sup[top], color="red", s=14, zorder=3, label=f"{k-1} largest jumps")
-        ax.set_xlabel("position in VAT order", fontsize=7); ax.set_ylabel("link distance", fontsize=7)
-        ax.legend(fontsize=7); ax.grid(alpha=0.3)
-    fig.suptitle("iVAT image (top) and link-distance profile along the VAT order (bottom); 1,500-document subsample", fontsize=10)
+        ax.scatter(
+            top, sup[top], color="red", s=14, zorder=3, label=f"{k-1} largest jumps"
+        )
+        ax.set_xlabel("position in VAT order", fontsize=7)
+        ax.set_ylabel("link distance", fontsize=7)
+        ax.legend(fontsize=7)
+        ax.grid(alpha=0.3)
+    fig.suptitle(
+        "iVAT image (top) and link-distance profile along the VAT order (bottom); 1,500-document subsample",
+        fontsize=10,
+    )
     fig.tight_layout()
     C.save_figure(fig, "fig_diag_ivat_profile")
     plt.close(fig)

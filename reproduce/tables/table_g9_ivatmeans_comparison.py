@@ -83,7 +83,12 @@ from tribbleclustering import FuzzyCMeans, IVATMeans, KMeans  # noqa: E402
 import adversarial_eval as AE  # noqa: E402  (Table 3.5 constructions)
 
 SEEDS = list(C.SEEDS)
-LADDER = [int(v) for v in os.environ.get("REPRO_G9_LADDER", "1000,2000,5000,16000,32000,58000").split(",")]
+LADDER = [
+    int(v)
+    for v in os.environ.get(
+        "REPRO_G9_LADDER", "1000,2000,5000,16000,32000,58000"
+    ).split(",")
+]
 SKIP_LADDER = os.environ.get("REPRO_G9_SKIP_LADDER") == "1"
 LADDER_K = 7
 MEM_BUDGET_FRAC = 0.8
@@ -106,7 +111,9 @@ def fit_ivat(X, k, s):
 
 
 def fit_ivat_rel(X, k, s):
-    return np.asarray(IVATMeans(n_clusters=k, refine="relational", random_state=s).fit(X).labels_)
+    return np.asarray(
+        IVATMeans(n_clusters=k, refine="relational", random_state=s).fit(X).labels_
+    )
 
 
 def fit_fcm(X, k, s):
@@ -119,7 +126,9 @@ def fit_km(X, k, s):
 
 def fit_em_default(X, k, s):
     X32 = np.ascontiguousarray(X, np.float32)
-    _, lab = NumpyEmeans(X.shape[1], k, seed=s).train(X32)  # faiss default: 5 epochs, its own init
+    _, lab = NumpyEmeans(X.shape[1], k, seed=s).train(
+        X32
+    )  # faiss default: 5 epochs, its own init
     return np.asarray(lab).ravel()
 
 
@@ -166,7 +175,10 @@ def run_ladder(X_all):
         for key, _, fn in PERF_ARMS:
             if key == "ivat" and not ivat_ok:
                 raw[N][key] = "INFEASIBLE"
-                print(f"  N={N:6d} ivat INFEASIBLE: predicted peak {ivat_bytes/1e9:.1f} GB > budget {budget/1e9:.1f} GB", flush=True)
+                print(
+                    f"  N={N:6d} ivat INFEASIBLE: predicted peak {ivat_bytes/1e9:.1f} GB > budget {budget/1e9:.1f} GB",
+                    flush=True,
+                )
                 continue
             times = []
             for s in SEEDS:
@@ -186,7 +198,15 @@ def ivat_ok_map(ram):
 
 
 def perf_table(raw):
-    header = ["N", "IVATMeans (s)", "FCM (s)", "k-means (s)", "E-means 5ep (s)", "E-means 25ep kpp (s)", "IVATMeans / FCM"]
+    header = [
+        "N",
+        "IVATMeans (s)",
+        "FCM (s)",
+        "k-means (s)",
+        "E-means 5ep (s)",
+        "E-means 25ep kpp (s)",
+        "IVATMeans / FCM",
+    ]
     rows = []
     for N in LADDER:
         cells, means = [], {}
@@ -199,7 +219,9 @@ def perf_table(raw):
                 means[key] = float(np.mean(v))
                 cells.append(f"{np.mean(v):.3f} ± {np.std(v, ddof=1):.3f}")
         ratio = (
-            f"{means['ivat'] / means['fcm']:.2f}×" if means.get("ivat") and means.get("fcm") else "N/A (infeasible)"
+            f"{means['ivat'] / means['fcm']:.2f}×"
+            if means.get("ivat") and means.get("fcm")
+            else "N/A (infeasible)"
         )
         rows.append([str(N)] + cells + [ratio])
     return header, rows
@@ -227,7 +249,10 @@ def run_quality():
                     scatter[dname][key] = lab
             ari[(dname, key)] = vals
             dist[(dname, key)] = len({np.asarray(l).tobytes() for l in labs})
-            print(f"  {dname:15s} {key:9s} ARI={np.mean(vals):.3f} ± {np.std(vals, ddof=1):.3f}  distinct={dist[(dname, key)]}", flush=True)
+            print(
+                f"  {dname:15s} {key:9s} ARI={np.mean(vals):.3f} ± {np.std(vals, ddof=1):.3f}  distinct={dist[(dname, key)]}",
+                flush=True,
+            )
         # determinism on a fixed dataset, IVATMeans across the seed set
         labs_fixed = [fit_ivat(X0, k, s) for s in SEEDS]
         dist[(dname, "ivat_fixed")] = len({l.tobytes() for l in labs_fixed})
@@ -248,18 +273,26 @@ def quality_table(ari, dist):
 
 
 def determinism_table(dist):
-    header = ["dataset", "IVATMeans distinct labelings (10 seeds, fixed data)",
-              "FCM distinct", "k-means distinct", "E-means 5ep distinct", "E-means 25ep kpp distinct"]
+    header = [
+        "dataset",
+        "IVATMeans distinct labelings (10 seeds, fixed data)",
+        "FCM distinct",
+        "k-means distinct",
+        "E-means 5ep distinct",
+        "E-means 25ep kpp distinct",
+    ]
     rows = []
     for dname, _, _ in AE.DATASETS:
-        rows.append([
-            dname,
-            str(dist[(dname, "ivat_fixed")]),
-            str(dist[(dname, "fcm")]),
-            str(dist[(dname, "kmeans")]),
-            str(dist[(dname, "em5")]),
-            str(dist[(dname, "em25")]),
-        ])
+        rows.append(
+            [
+                dname,
+                str(dist[(dname, "ivat_fixed")]),
+                str(dist[(dname, "fcm")]),
+                str(dist[(dname, "kmeans")]),
+                str(dist[(dname, "em5")]),
+                str(dist[(dname, "em25")]),
+            ]
+        )
     return header, rows
 
 
@@ -274,19 +307,32 @@ def fig_runtime(raw, feasible):
             v = raw[N][key]
             if isinstance(v, str):
                 continue
-            xs.append(N); ys.append(np.mean(v)); es.append(np.std(v, ddof=1))
+            xs.append(N)
+            ys.append(np.mean(v))
+            es.append(np.std(v, ddof=1))
         if xs:
             ax.errorbar(xs, ys, yerr=es, marker="o", capsize=3, label=name)
-    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.set_xscale("log")
+    ax.set_yscale("log")
     infeas = [N for N in LADDER if not feasible[N]]
     for N in infeas:
         ax.axvline(N, color="grey", ls=":", lw=1)
     if infeas:
-        ax.text(infeas[0] * 0.92, 0.04, f"IVATMeans infeasible\nat N ≥ {infeas[0]:,}\n(predicted peak > 80% RAM)",
-                color="grey", fontsize=8, ha="right", va="bottom", transform=ax.get_xaxis_transform())
-    ax.set_xlabel("N (shuttle subsample)"); ax.set_ylabel("wall clock, seconds (mean ± std, 10 seeds)")
+        ax.text(
+            infeas[0] * 0.92,
+            0.04,
+            f"IVATMeans infeasible\nat N ≥ {infeas[0]:,}\n(predicted peak > 80% RAM)",
+            color="grey",
+            fontsize=8,
+            ha="right",
+            va="bottom",
+            transform=ax.get_xaxis_transform(),
+        )
+    ax.set_xlabel("N (shuttle subsample)")
+    ax.set_ylabel("wall clock, seconds (mean ± std, 10 seeds)")
     ax.set_title("G9 performance: CPU wall clock, k = 7")
-    ax.grid(True, which="both", alpha=0.3); ax.legend(fontsize=8)
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend(fontsize=8)
     fig.tight_layout()
     C.save_figure(fig, "fig_g9_runtime")
     plt.close(fig)
@@ -301,11 +347,28 @@ def fig_quality(ari):
     for i, (key, name) in enumerate(zip(keys, names)):
         mu = [np.mean(ari[(d, key)]) for d in dnames]
         sd = [np.std(ari[(d, key)], ddof=1) for d in dnames]
-        ax.bar(np.arange(len(dnames)) + (i - len(keys) / 2 + 0.5) * w, mu, w, yerr=sd, capsize=2, label=name)
-    ax.set_xticks(range(len(dnames))); ax.set_xticklabels(dnames, rotation=0)
-    ax.set_ylabel("ARI (mean ± std, 10 seeds)"); ax.set_ylim(-0.05, 1.05)
-    ax.set_title("G9 quality: ARI on the Table 3.5 constructions (bridge points excluded)")
-    ax.legend(fontsize=7, ncol=4, loc="upper center", bbox_to_anchor=(0.5, -0.1), frameon=False)
+        ax.bar(
+            np.arange(len(dnames)) + (i - len(keys) / 2 + 0.5) * w,
+            mu,
+            w,
+            yerr=sd,
+            capsize=2,
+            label=name,
+        )
+    ax.set_xticks(range(len(dnames)))
+    ax.set_xticklabels(dnames, rotation=0)
+    ax.set_ylabel("ARI (mean ± std, 10 seeds)")
+    ax.set_ylim(-0.05, 1.05)
+    ax.set_title(
+        "G9 quality: ARI on the Table 3.5 constructions (bridge points excluded)"
+    )
+    ax.legend(
+        fontsize=7,
+        ncol=4,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.1),
+        frameon=False,
+    )
     ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
     C.save_figure(fig, "fig_g9_quality")
@@ -316,14 +379,17 @@ def fig_partitions(scatter, ari):
     dnames = [d for d, _, _ in AE.DATASETS]
     keys = [k for k, _, _ in PERF_ARMS]
     names = {k: n for k, n, _ in PERF_ARMS}
-    fig, axes = plt.subplots(len(dnames), len(keys), figsize=(2.6 * len(keys), 2.4 * len(dnames)))
+    fig, axes = plt.subplots(
+        len(dnames), len(keys), figsize=(2.6 * len(keys), 2.4 * len(dnames))
+    )
     for r, d in enumerate(dnames):
         X, y = scatter[d]["X"], scatter[d]["y"]
         for c, key in enumerate(keys):
             ax = axes[r, c]
             lab = scatter[d][key]
             ax.scatter(X[:, 0], X[:, 1], c=lab, cmap="tab10", s=3, linewidths=0)
-            ax.set_xticks([]); ax.set_yticks([])
+            ax.set_xticks([])
+            ax.set_yticks([])
             m = np.asarray(ari[(d, key)])
             ax.set_title(f"ARI {m[0]:.2f} (seed 0)", fontsize=7)
             if r == 0:
@@ -350,38 +416,59 @@ def verdicts(raw, ari, dist, feasible):
     if ratios:
         worst = max(r for _, r in ratios)
         ok = worst <= 10
-        out["P1"] = (f"{'PASS' if ok else 'FAIL'}: worst feasible IVATMeans/FCM ratio {worst:.2f}× "
-                     f"over N = {', '.join(str(n) for n, _ in ratios)}")
+        out["P1"] = (
+            f"{'PASS' if ok else 'FAIL'}: worst feasible IVATMeans/FCM ratio {worst:.2f}× "
+            f"over N = {', '.join(str(n) for n, _ in ratios)}"
+        )
     else:
         out["P1"] = "NOT EVALUATED: no feasible rung"
     # P2
-    m_moons = np.mean(ari[("two_moons", "ivat")]); m_circ = np.mean(ari[("circles", "ivat")])
-    k_moons = np.mean(ari[("two_moons", "kmeans")]); k_circ = np.mean(ari[("circles", "kmeans")])
+    m_moons = np.mean(ari[("two_moons", "ivat")])
+    m_circ = np.mean(ari[("circles", "ivat")])
+    k_moons = np.mean(ari[("two_moons", "kmeans")])
+    k_circ = np.mean(ari[("circles", "kmeans")])
     refuted = m_moons >= 0.99 or m_circ >= 0.99
-    r_moons = np.mean(ari[("two_moons", "ivat_rel")]); r_circ = np.mean(ari[("circles", "ivat_rel")])
-    out["P2"] = (f"{'REFUTED' if refuted else 'NOT REFUTED'} for the default medoid refine: IVATMeans ARI two_moons "
-                 f"{m_moons:.3f}, circles {m_circ:.3f} (predicted near k-means row 0.27 / 0.00; our k-means arm "
-                 f"{k_moons:.3f} / {k_circ:.3f}). The relational refine reads {r_moons:.3f} / {r_circ:.3f}; "
-                 f"a relational ARI >= 0.99 is a separate finding about §5.2, reported here, not a P2 verdict")
+    r_moons = np.mean(ari[("two_moons", "ivat_rel")])
+    r_circ = np.mean(ari[("circles", "ivat_rel")])
+    out["P2"] = (
+        f"{'REFUTED' if refuted else 'NOT REFUTED'} for the default medoid refine: IVATMeans ARI two_moons "
+        f"{m_moons:.3f}, circles {m_circ:.3f} (predicted near k-means row 0.27 / 0.00; our k-means arm "
+        f"{k_moons:.3f} / {k_circ:.3f}). The relational refine reads {r_moons:.3f} / {r_circ:.3f}; "
+        f"a relational ARI >= 0.99 is a separate finding about §5.2, reported here, not a P2 verdict"
+    )
     # P3
     b_ivat = np.mean(ari[("easy_blobs", "ivat")])
-    b_best = max(np.mean(ari[("easy_blobs", "fcm")]), np.mean(ari[("easy_blobs", "kmeans")]))
+    b_best = max(
+        np.mean(ari[("easy_blobs", "fcm")]), np.mean(ari[("easy_blobs", "kmeans")])
+    )
     gap = b_best - b_ivat
-    out["P3"] = (f"{'PASS' if gap <= 0.05 else 'FAIL'}: easy_blobs IVATMeans {b_ivat:.3f} vs best baseline {b_best:.3f} "
-                 f"(gap {gap:+.3f}, threshold 0.05)")
+    out["P3"] = (
+        f"{'PASS' if gap <= 0.05 else 'FAIL'}: easy_blobs IVATMeans {b_ivat:.3f} vs best baseline {b_best:.3f} "
+        f"(gap {gap:+.3f}, threshold 0.05)"
+    )
     # P4
     per = {d: dist[(d, "ivat_fixed")] for d, _, _ in AE.DATASETS}
-    out["P4"] = (f"{'PASS' if all(v == 1 for v in per.values()) else 'FAIL'}: IVATMeans distinct labelings across "
-                 f"10 seeds per dataset = {per}")
+    out["P4"] = (
+        f"{'PASS' if all(v == 1 for v in per.values()) else 'FAIL'}: IVATMeans distinct labelings across "
+        f"10 seeds per dataset = {per}"
+    )
     # P5
-    base = {(d, a): dist[(d, a)] for d, _, _ in AE.DATASETS for a in ("fcm", "kmeans", "em5", "em25")}
+    base = {
+        (d, a): dist[(d, a)]
+        for d, _, _ in AE.DATASETS
+        for a in ("fcm", "kmeans", "em5", "em25")
+    }
     varied = any(v > 1 for v in base.values())
-    out["P5"] = (f"{'PASS' if varied else 'FAIL'}: baselines vary across seeds on "
-                 f"{sum(v > 1 for v in base.values())}/{len(base)} dataset×arm cells")
+    out["P5"] = (
+        f"{'PASS' if varied else 'FAIL'}: baselines vary across seeds on "
+        f"{sum(v > 1 for v in base.values())}/{len(base)} dataset×arm cells"
+    )
     return out
 
 
-def write_report(header_perf, rows_perf, header_q, rows_q, header_d, rows_d, v, feasible):
+def write_report(
+    header_perf, rows_perf, header_q, rows_q, header_d, rows_d, v, feasible
+):
     def md(h, rs):
         s = "| " + " | ".join(h) + " |\n|" + "---|" * len(h) + "\n"
         for r in rs:
@@ -444,6 +531,7 @@ IVATMeans should show 1 distinct labelling on both columns. Baselines should sho
 def tribble_version():
     try:
         import importlib.metadata as md
+
         return md.version("tribble-clustering")
     except Exception:
         return "unknown (not installed as a distribution)"
@@ -453,7 +541,10 @@ def main():
     print("G9: IVATMeans vs FCM vs k-means vs E-means", flush=True)
     ram = _phys_ram_bytes()
     feasible = ivat_ok_map(ram)
-    print(f"RAM {ram/1e9:.1f} GB, IVATMeans budget {MEM_BUDGET_FRAC*ram/1e9:.1f} GB", flush=True)
+    print(
+        f"RAM {ram/1e9:.1f} GB, IVATMeans budget {MEM_BUDGET_FRAC*ram/1e9:.1f} GB",
+        flush=True,
+    )
 
     if SKIP_LADDER:
         raw = {}
@@ -474,23 +565,57 @@ def main():
 
     v = verdicts(raw, ari, dist, feasible)
     import json
+
     raw_path = os.path.join(C.OUTPUT_DIR, "g9_raw.json")
     with open(raw_path, "w") as fh:
-        json.dump({
-            "ladder": {str(N): {k: (v_ if isinstance(v_, str) else [float(x) for x in v_]) for k, v_ in d.items()}
-                       for N, d in raw.items()},
-            "quality_ari": {f"{d}|{a}": [float(x) for x in vals] for (d, a), vals in ari.items()},
-            "distinct_labelings": {f"{d}|{a}": int(n) for (d, a), n in dist.items()},
-        }, fh, indent=1)
+        json.dump(
+            {
+                "ladder": {
+                    str(N): {
+                        k: (v_ if isinstance(v_, str) else [float(x) for x in v_])
+                        for k, v_ in d.items()
+                    }
+                    for N, d in raw.items()
+                },
+                "quality_ari": {
+                    f"{d}|{a}": [float(x) for x in vals] for (d, a), vals in ari.items()
+                },
+                "distinct_labelings": {
+                    f"{d}|{a}": int(n) for (d, a), n in dist.items()
+                },
+            },
+            fh,
+            indent=1,
+        )
     print("raw:", raw_path, flush=True)
 
-    C.emit("table_g9_performance", "G9 performance: CPU wall clock on the shuttle N ladder, k = 7 (mean ± std, 10 seeds)",
-           header_perf, rows_perf, note="CPU only. Infeasible IVATMeans rungs are marked, not dropped.", seeds=SEEDS)
-    C.emit("table_g9_quality", "G9 quality: ARI on the six Table 3.5 constructions (mean ± std, 10 seeds)",
-           header_q, rows_q, note="Bridge points excluded from ARI. Determinism and manipulation check in table_g9_determinism.", seeds=SEEDS)
-    C.emit("table_g9_determinism", "G9 determinism and manipulation check: distinct labelings across 10 seeds",
-           header_d, rows_d, note="IVATMeans should read 1. Baselines should read >1 where their restarts move the partition.", seeds=SEEDS)
-    path = write_report(header_perf, rows_perf, header_q, rows_q, header_d, rows_d, v, feasible)
+    C.emit(
+        "table_g9_performance",
+        "G9 performance: CPU wall clock on the shuttle N ladder, k = 7 (mean ± std, 10 seeds)",
+        header_perf,
+        rows_perf,
+        note="CPU only. Infeasible IVATMeans rungs are marked, not dropped.",
+        seeds=SEEDS,
+    )
+    C.emit(
+        "table_g9_quality",
+        "G9 quality: ARI on the six Table 3.5 constructions (mean ± std, 10 seeds)",
+        header_q,
+        rows_q,
+        note="Bridge points excluded from ARI. Determinism and manipulation check in table_g9_determinism.",
+        seeds=SEEDS,
+    )
+    C.emit(
+        "table_g9_determinism",
+        "G9 determinism and manipulation check: distinct labelings across 10 seeds",
+        header_d,
+        rows_d,
+        note="IVATMeans should read 1. Baselines should read >1 where their restarts move the partition.",
+        seeds=SEEDS,
+    )
+    path = write_report(
+        header_perf, rows_perf, header_q, rows_q, header_d, rows_d, v, feasible
+    )
     print("\n".join(f"{k}: {val}" for k, val in v.items()), flush=True)
     print("report:", path, flush=True)
 

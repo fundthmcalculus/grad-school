@@ -52,10 +52,15 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 from faiss.contrib.e_means import NumpyEmeans  # noqa: E402
 from sklearn.cluster import kmeans_plusplus  # noqa: E402
-from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score  # noqa: E402
+from sklearn.metrics import (
+    adjusted_rand_score,
+    normalized_mutual_info_score,
+)  # noqa: E402
 from tribbleclustering import FuzzyCMeans, IVATMeans, KMeans  # noqa: E402
 
-CACHE = os.environ.get("REPRO_EMBED_CACHE", os.path.expanduser("~/.cache/grad-school/embeddings"))
+CACHE = os.environ.get(
+    "REPRO_EMBED_CACHE", os.path.expanduser("~/.cache/grad-school/embeddings")
+)
 CORPORA = ["ag_news", "emotion", "newsgroups20"]
 EMBEDS = ["st", "tfidf"]
 SEEDS = list(C.SEEDS)
@@ -83,14 +88,17 @@ def m_ivat(X, k, s):
 
 
 def m_em_default(X, k, s):
-    C_, lab = NumpyEmeans(X.shape[1], k, seed=s).train(np.ascontiguousarray(X, np.float32))
+    C_, lab = NumpyEmeans(X.shape[1], k, seed=s).train(
+        np.ascontiguousarray(X, np.float32)
+    )
     return np.asarray(lab).ravel(), np.asarray(C_)
 
 
 def m_em_kpp25(X, k, s):
     c0, _ = kmeans_plusplus(X, k, random_state=s)
     C_, lab = NumpyEmeans(X.shape[1], k, nepochs=25, seed=s).train(
-        np.ascontiguousarray(X, np.float32), init_centroids=np.ascontiguousarray(c0, np.float32)
+        np.ascontiguousarray(X, np.float32),
+        init_centroids=np.ascontiguousarray(c0, np.float32),
     )
     return np.asarray(lab).ravel(), np.asarray(C_)
 
@@ -127,14 +135,19 @@ def search_metrics(Xb, yb, Xq, yq, labels, centres):
         for i in range(len(Xq)):
             cand = np.flatnonzero(np.isin(labels, order[i, :p]))
             if cand.size == 0:
-                rec.append(0.0); prec.append(0.0); scan.append(0.0)
+                rec.append(0.0)
+                prec.append(0.0)
+                scan.append(0.0)
                 continue
             top = cand[np.argsort(-S[i, cand])[:TOPK]]
             rec.append(len(set(top.tolist()) & set(exact_top[i].tolist())) / TOPK)
             prec.append(float(np.mean(yb[top] == yq[i])))
             scan.append(cand.size / len(Xb))
-        out[f"nprobe{p}"] = {"recall": float(np.mean(rec)), "precision": float(np.mean(prec)),
-                             "scan": float(np.mean(scan))}
+        out[f"nprobe{p}"] = {
+            "recall": float(np.mean(rec)),
+            "precision": float(np.mean(prec)),
+            "scan": float(np.mean(scan)),
+        }
     return out
 
 
@@ -150,12 +163,17 @@ def main():
         for emb in EMBEDS:
             path = os.path.join(CACHE, f"{corp}.npz")
             d = np.load(path)
-            Xb, Xq = d[f"{emb}_base"].astype(np.float64), d[f"{emb}_query"].astype(np.float64)
+            Xb, Xq = d[f"{emb}_base"].astype(np.float64), d[f"{emb}_query"].astype(
+                np.float64
+            )
             yb, yq = d["y_base"], d["y_query"]
             k = int(d["n_classes"])
             key = f"{corp}|{emb}"
             raw[key] = {}
-            print(f"== {corp} / {emb}: N={len(Xb)} d={Xb.shape[1]} k={k} queries={len(Xq)}", flush=True)
+            print(
+                f"== {corp} / {emb}: N={len(Xb)} d={Xb.shape[1]} k={k} queries={len(Xq)}",
+                flush=True,
+            )
             for name, fn, mode in METHODS:
                 seeds = SEEDS if mode == "seeds" else [0]
                 ari, nmi, pur, secs, labs_all, search_runs = [], [], [], [], [], []
@@ -170,33 +188,81 @@ def main():
                     labs_all.append(lab.tobytes())
                     search_runs.append(search_metrics(Xb, yb, Xq, yq, lab, cen))
                 distinct = len(set(labs_all))
-                raw[key][name] = {"ari": ari, "nmi": nmi, "purity": pur, "sec": secs,
-                                  "distinct_labelings": distinct, "search": search_runs}
-                clus_rows.append([corp, emb, name, ms(ari), ms(nmi), ms(pur), ms(secs), str(distinct)])
-                row = [corp, emb, name, f"{np.mean([r['exact_precision'] for r in search_runs]):.3f}"]
+                raw[key][name] = {
+                    "ari": ari,
+                    "nmi": nmi,
+                    "purity": pur,
+                    "sec": secs,
+                    "distinct_labelings": distinct,
+                    "search": search_runs,
+                }
+                clus_rows.append(
+                    [
+                        corp,
+                        emb,
+                        name,
+                        ms(ari),
+                        ms(nmi),
+                        ms(pur),
+                        ms(secs),
+                        str(distinct),
+                    ]
+                )
+                row = [
+                    corp,
+                    emb,
+                    name,
+                    f"{np.mean([r['exact_precision'] for r in search_runs]):.3f}",
+                ]
                 for p in NPROBES:
                     rr = [r[f"nprobe{p}"] for r in search_runs]
-                    row += [ms([x["recall"] for x in rr]), ms([x["precision"] for x in rr]),
-                            ms([x["scan"] for x in rr])]
+                    row += [
+                        ms([x["recall"] for x in rr]),
+                        ms([x["precision"] for x in rr]),
+                        ms([x["scan"] for x in rr]),
+                    ]
                 srch_rows.append(row)
-                print(f"  {name:32s} ARI={ms(ari)}  sec={ms(secs)}  distinct={distinct}  "
-                      f"recall@10 nprobe1={ms([r['nprobe1']['recall'] for r in search_runs])}", flush=True)
+                print(
+                    f"  {name:32s} ARI={ms(ari)}  sec={ms(secs)}  distinct={distinct}  "
+                    f"recall@10 nprobe1={ms([r['nprobe1']['recall'] for r in search_runs])}",
+                    flush=True,
+                )
 
     os.makedirs(C.OUTPUT_DIR, exist_ok=True)
     with open(RAW_JSON, "w") as fh:
         json.dump(raw, fh)
 
-    clus_header = ["corpus", "embedding", "method", "ARI", "NMI", "purity", "seconds", "distinct labelings"]
-    C.emit("table_ivat_embed_clustering", "IVATMeans for embedding clustering: quality and cost (mean ± std)",
-           clus_header, clus_rows,
-           note="Baselines over 10 seeds; IVATMeans run once (no random state in its construction), its distinct-labelings count is over the single run.",
-           seeds=SEEDS)
+    clus_header = [
+        "corpus",
+        "embedding",
+        "method",
+        "ARI",
+        "NMI",
+        "purity",
+        "seconds",
+        "distinct labelings",
+    ]
+    C.emit(
+        "table_ivat_embed_clustering",
+        "IVATMeans for embedding clustering: quality and cost (mean ± std)",
+        clus_header,
+        clus_rows,
+        note="Baselines over 10 seeds; IVATMeans run once (no random state in its construction), its distinct-labelings count is over the single run.",
+        seeds=SEEDS,
+    )
     srch_header = ["corpus", "embedding", "method", "exact precision@10"] + [
-        h for p in NPROBES for h in (f"nprobe{p} recall@10", f"nprobe{p} precision@10", f"nprobe{p} scan")]
-    C.emit("table_ivat_embed_search", "IVF-style similarity search on method cells (mean ± std over seeds)",
-           srch_header, srch_rows,
-           note="500 queries per corpus against 10,000 base documents, cosine. Exact cosine search is the reference (recall 1.0 by definition). Scan = share of base scored per query.",
-           seeds=SEEDS)
+        h
+        for p in NPROBES
+        for h in (f"nprobe{p} recall@10", f"nprobe{p} precision@10", f"nprobe{p} scan")
+    ]
+    C.emit(
+        "table_ivat_embed_search",
+        "IVF-style similarity search on method cells (mean ± std over seeds)",
+        srch_header,
+        srch_rows,
+        note="500 queries per corpus against 10,000 base documents, cosine. Exact cosine search is the reference (recall 1.0 by definition). Scan = share of base scored per query.",
+        seeds=SEEDS,
+    )
 
     # figure: ARI by corpus x embedding
     fig, ax = plt.subplots(figsize=(10, 4.8))
@@ -205,14 +271,38 @@ def main():
     w = 0.8 / len(names)
     for i, nm in enumerate(names):
         mu = [np.mean(raw[f"{c}|{e}"][nm]["ari"]) for c, e in combos]
-        sd = [np.std(raw[f"{c}|{e}"][nm]["ari"], ddof=1) if len(raw[f"{c}|{e}"][nm]["ari"]) > 1 else 0 for c, e in combos]
-        ax.bar(np.arange(len(combos)) + (i - len(names) / 2 + 0.5) * w, mu, w, yerr=sd, capsize=2, label=nm)
+        sd = [
+            (
+                np.std(raw[f"{c}|{e}"][nm]["ari"], ddof=1)
+                if len(raw[f"{c}|{e}"][nm]["ari"]) > 1
+                else 0
+            )
+            for c, e in combos
+        ]
+        ax.bar(
+            np.arange(len(combos)) + (i - len(names) / 2 + 0.5) * w,
+            mu,
+            w,
+            yerr=sd,
+            capsize=2,
+            label=nm,
+        )
     ax.set_xticks(range(len(combos)))
     ax.set_xticklabels([f"{c}\n{e}" for c, e in combos], fontsize=8)
-    ax.set_ylabel("ARI vs document labels (mean ± std)"); ax.set_ylim(0, 1)
-    ax.set_title("Embedding clustering: ARI by corpus and embedding (N = 10,000, k = classes)")
-    ax.legend(fontsize=7, ncol=3, loc="upper center", bbox_to_anchor=(0.5, -0.18), frameon=False)
-    ax.grid(axis="y", alpha=0.3); fig.tight_layout()
+    ax.set_ylabel("ARI vs document labels (mean ± std)")
+    ax.set_ylim(0, 1)
+    ax.set_title(
+        "Embedding clustering: ARI by corpus and embedding (N = 10,000, k = classes)"
+    )
+    ax.legend(
+        fontsize=7,
+        ncol=3,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.18),
+        frameon=False,
+    )
+    ax.grid(axis="y", alpha=0.3)
+    fig.tight_layout()
     C.save_figure(fig, "fig_ivat_embed_ari")
     plt.close(fig)
 
@@ -228,9 +318,12 @@ def main():
         ax.set_title(f"{c} / {e}", fontsize=9)
         ax.set_xlabel("share of base scanned (log)", fontsize=8)
         ax.grid(alpha=0.3)
-    axes[0, 0].set_ylabel("recall@10 vs exact"); axes[1, 0].set_ylabel("recall@10 vs exact")
+    axes[0, 0].set_ylabel("recall@10 vs exact")
+    axes[1, 0].set_ylabel("recall@10 vs exact")
     axes[0, 0].legend(fontsize=7, loc="lower right")
-    fig.suptitle("IVF-style search: recall@10 vs scan cost (nprobe = 1, 2, 3)", fontsize=10)
+    fig.suptitle(
+        "IVF-style search: recall@10 vs scan cost (nprobe = 1, 2, 3)", fontsize=10
+    )
     fig.tight_layout()
     C.save_figure(fig, "fig_ivat_embed_search")
     plt.close(fig)

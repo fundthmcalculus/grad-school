@@ -55,23 +55,53 @@ def main():
                     dd, tag = dim, "PCA"
                 IVATMeans(n_clusters=k, random_state=0).fit(Xb[:200])  # JIT warm-up
                 t0 = time.perf_counter()
-                lab = np.asarray(IVATMeans(n_clusters=k, random_state=0).fit(Xb).labels_)
+                lab = np.asarray(
+                    IVATMeans(n_clusters=k, random_state=0).fit(Xb).labels_
+                )
                 sec = time.perf_counter() - t0
                 ari = adjusted_rand_score(yb, lab)
                 sizes = np.bincount(lab, minlength=k)
                 dlabel = f"d={dd} ({tag})"
-                raw[key][dlabel] = {"ari": ari, "min_size": int(sizes.min()), "max_size": int(sizes.max()),
-                                    "sec": sec, "labels": lab.tolist()}
-                rows.append([corp, emb, dlabel, f"{ari:.3f}", f"{int(sizes.min())} / {int(sizes.max())}", f"{sec:.2f}"])
-                print(f"{corp:14s} {emb:6s} {dlabel:18s} ARI={ari:.3f} sizes={int(sizes.min())}/{int(sizes.max())} sec={sec:.2f}", flush=True)
+                raw[key][dlabel] = {
+                    "ari": ari,
+                    "min_size": int(sizes.min()),
+                    "max_size": int(sizes.max()),
+                    "sec": sec,
+                    "labels": lab.tolist(),
+                }
+                rows.append(
+                    [
+                        corp,
+                        emb,
+                        dlabel,
+                        f"{ari:.3f}",
+                        f"{int(sizes.min())} / {int(sizes.max())}",
+                        f"{sec:.2f}",
+                    ]
+                )
+                print(
+                    f"{corp:14s} {emb:6s} {dlabel:18s} ARI={ari:.3f} sizes={int(sizes.min())}/{int(sizes.max())} sec={sec:.2f}",
+                    flush=True,
+                )
 
     os.makedirs(C.OUTPUT_DIR, exist_ok=True)
     with open(RAW_JSON, "w") as fh:
         json.dump(raw, fh)
-    C.emit("table_pca_ivat", "IVATMeans under PCA (one run per setting; no random state)",
-           ["corpus", "embedding", "dimension", "ARI", "min / max cluster size", "seconds"], rows,
-           note="Same PCA settings as table_pca_before_clustering. PCA fitted on the base set, centred, no whitening. IVATMeans has no random state, so each row is one run.",
-           seeds=[0])
+    C.emit(
+        "table_pca_ivat",
+        "IVATMeans under PCA (one run per setting; no random state)",
+        [
+            "corpus",
+            "embedding",
+            "dimension",
+            "ARI",
+            "min / max cluster size",
+            "seconds",
+        ],
+        rows,
+        note="Same PCA settings as table_pca_before_clustering. PCA fitted on the base set, centred, no whitening. IVATMeans has no random state, so each row is one run.",
+        seeds=[0],
+    )
     print("raw:", RAW_JSON, flush=True)
 
 

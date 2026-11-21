@@ -70,13 +70,16 @@ def run_baselines(X, k):
             if meth == "k-means":
                 lab = np.asarray(RE.m_kmeans(X, k, s)[0])
             elif meth == "E-means (5 ep)":
-                _, lab = NumpyEmeans(X.shape[1], k, seed=s).train(np.ascontiguousarray(X, np.float32))
+                _, lab = NumpyEmeans(X.shape[1], k, seed=s).train(
+                    np.ascontiguousarray(X, np.float32)
+                )
                 lab = np.asarray(lab).ravel()
             else:
                 lab = np.asarray(FuzzyCMeans(k, m=2.0, random_state=s).fit(X).labels_)
             ari.append(adjusted_rand_score(RE_yb, lab))
             sz = np.bincount(lab, minlength=k)
-            smin.append(int(sz.min())); smax.append(int(sz.max()))
+            smin.append(int(sz.min()))
+            smax.append(int(sz.max()))
         out[meth] = {"ari": ari, "min_size": smin, "max_size": smax}
     return out
 
@@ -86,6 +89,7 @@ def run_ivat(X, k, log_distance=False):
 
     def patched(Z):
         from scipy.spatial.distance import cdist as _cd
+
         Dm = _cd(Z, Z)
         if log_distance:
             Dm = np.log1p(Dm)
@@ -98,7 +102,11 @@ def run_ivat(X, k, log_distance=False):
     finally:
         IVM._pairwise_distances = orig
     sz = np.bincount(lab, minlength=k)
-    return {"ari": adjusted_rand_score(RE_yb, lab), "min_size": int(sz.min()), "max_size": int(sz.max())}
+    return {
+        "ari": adjusted_rand_score(RE_yb, lab),
+        "min_size": int(sz.min()),
+        "max_size": int(sz.max()),
+    }
 
 
 RE_yb = None
@@ -135,31 +143,62 @@ def main():
                 ivat = run_ivat(X, k, log_distance=True)
                 base = None
                 raw[key] = {"IVATMeans (medoid)": ivat}
-                rows.append([corp, name, "—", "—", "—", f"{ivat['ari']:.3f}", f"{ivat['min_size']} / {ivat['max_size']}"])
-                print(f"{corp:14s} {name:46s} IVAT ARI={ivat['ari']:.3f} sizes={ivat['min_size']}/{ivat['max_size']}", flush=True)
+                rows.append(
+                    [
+                        corp,
+                        name,
+                        "—",
+                        "—",
+                        "—",
+                        f"{ivat['ari']:.3f}",
+                        f"{ivat['min_size']} / {ivat['max_size']}",
+                    ]
+                )
+                print(
+                    f"{corp:14s} {name:46s} IVAT ARI={ivat['ari']:.3f} sizes={ivat['min_size']}/{ivat['max_size']}",
+                    flush=True,
+                )
                 continue
             res = run_baselines(X, k)
             res["IVATMeans (medoid)"] = run_ivat(X, k)
             raw[key] = res
             a = {m: np.mean(res[m]["ari"]) for m in res}
-            print(f"{corp:14s} {name:46s} km={a['k-means']:.3f} em={a['E-means (5 ep)']:.3f} "
-                  f"fcm={a['FCM (m=2)']:.3f} ivat={res['IVATMeans (medoid)']['ari']:.3f}", flush=True)
-            rows.append([corp, name,
-                         f"{a['k-means']:.3f} ± {np.std(res['k-means']['ari'], ddof=1):.3f}",
-                         f"{a['E-means (5 ep)']:.3f} ± {np.std(res['E-means (5 ep)']['ari'], ddof=1):.3f}",
-                         f"{a['FCM (m=2)']:.3f} ± {np.std(res['FCM (m=2)']['ari'], ddof=1):.3f}",
-                         f"{res['IVATMeans (medoid)']['ari']:.3f}",
-                         f"{res['IVATMeans (medoid)']['min_size']} / {res['IVATMeans (medoid)']['max_size']}"])
+            print(
+                f"{corp:14s} {name:46s} km={a['k-means']:.3f} em={a['E-means (5 ep)']:.3f} "
+                f"fcm={a['FCM (m=2)']:.3f} ivat={res['IVATMeans (medoid)']['ari']:.3f}",
+                flush=True,
+            )
+            rows.append(
+                [
+                    corp,
+                    name,
+                    f"{a['k-means']:.3f} ± {np.std(res['k-means']['ari'], ddof=1):.3f}",
+                    f"{a['E-means (5 ep)']:.3f} ± {np.std(res['E-means (5 ep)']['ari'], ddof=1):.3f}",
+                    f"{a['FCM (m=2)']:.3f} ± {np.std(res['FCM (m=2)']['ari'], ddof=1):.3f}",
+                    f"{res['IVATMeans (medoid)']['ari']:.3f}",
+                    f"{res['IVATMeans (medoid)']['min_size']} / {res['IVATMeans (medoid)']['max_size']}",
+                ]
+            )
 
     os.makedirs(C.OUTPUT_DIR, exist_ok=True)
     with open(RAW_JSON, "w") as fh:
         json.dump(raw, fh)
-    C.emit("table_log_transform",
-           "Log transforms: ARI for k-means, E-means, FCM and IVATMeans against their baselines",
-           ["corpus", "representation", "k-means", "E-means 5 ep", "FCM (m=2)", "IVATMeans", "IVATMeans min / max size"],
-           rows,
-           note="Baseline rows and transformed rows use the same documents. Baselines: mean ± std over 10 seeds. IVATMeans: one run. D1 rows are IVATMeans only.",
-           seeds=SEEDS)
+    C.emit(
+        "table_log_transform",
+        "Log transforms: ARI for k-means, E-means, FCM and IVATMeans against their baselines",
+        [
+            "corpus",
+            "representation",
+            "k-means",
+            "E-means 5 ep",
+            "FCM (m=2)",
+            "IVATMeans",
+            "IVATMeans min / max size",
+        ],
+        rows,
+        note="Baseline rows and transformed rows use the same documents. Baselines: mean ± std over 10 seeds. IVATMeans: one run. D1 rows are IVATMeans only.",
+        seeds=SEEDS,
+    )
     print("raw:", RAW_JSON, flush=True)
 
 

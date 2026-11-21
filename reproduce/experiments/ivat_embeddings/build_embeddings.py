@@ -33,7 +33,9 @@ import numpy as np
 
 warnings.filterwarnings("ignore")
 
-CACHE = os.environ.get("REPRO_EMBED_CACHE", os.path.expanduser("~/.cache/grad-school/embeddings"))
+CACHE = os.environ.get(
+    "REPRO_EMBED_CACHE", os.path.expanduser("~/.cache/grad-school/embeddings")
+)
 N_BASE = int(os.environ.get("REPRO_EMBED_NBASE", "10000"))
 N_QUERY = 500
 SEED = 0
@@ -57,7 +59,9 @@ def load_split(repo, split):
 def make_vectorizer():
     from sklearn.feature_extraction.text import TfidfVectorizer
 
-    return TfidfVectorizer(min_df=2, stop_words="english", max_features=50000, sublinear_tf=True)
+    return TfidfVectorizer(
+        min_df=2, stop_words="english", max_features=50000, sublinear_tf=True
+    )
 
 
 def select_nonempty(rng, tr_text, te_text, ib, iq):
@@ -97,33 +101,51 @@ def main():
         te_text, te_y = load_split(repo, "test")
         ib = [int(v) for v in rng.choice(len(tr_text), N_BASE, replace=False)]
         iq = [int(v) for v in rng.choice(len(te_text), N_QUERY, replace=False)]
-        vec, tf_b, tf_q, ib, iq, replaced = select_nonempty(rng, tr_text, te_text, ib, iq)
-        print(f"{name}: replaced empty-vector documents: base {replaced['base']}, query {replaced['query']}", flush=True)
+        vec, tf_b, tf_q, ib, iq, replaced = select_nonempty(
+            rng, tr_text, te_text, ib, iq
+        )
+        print(
+            f"{name}: replaced empty-vector documents: base {replaced['base']}, query {replaced['query']}",
+            flush=True,
+        )
 
         base_t = [tr_text[i] for i in ib]
         query_t = [te_text[i] for i in iq]
         yb, yq = tr_y[ib], te_y[iq]
 
-        st_b = model.encode(base_t, batch_size=64, normalize_embeddings=True, show_progress_bar=False)
-        st_q = model.encode(query_t, batch_size=64, normalize_embeddings=True, show_progress_bar=False)
+        st_b = model.encode(
+            base_t, batch_size=64, normalize_embeddings=True, show_progress_bar=False
+        )
+        st_q = model.encode(
+            query_t, batch_size=64, normalize_embeddings=True, show_progress_bar=False
+        )
 
         svd = TruncatedSVD(TFIDF_DIM, random_state=SEED)
         zb = svd.fit_transform(tf_b)
         zq = svd.transform(tf_q)
-        assert np.all(np.linalg.norm(zb, axis=1) > 1e-9) and np.all(np.linalg.norm(zq, axis=1) > 1e-9), "zero row after SVD"
+        assert np.all(np.linalg.norm(zb, axis=1) > 1e-9) and np.all(
+            np.linalg.norm(zq, axis=1) > 1e-9
+        ), "zero row after SVD"
         zb /= np.linalg.norm(zb, axis=1, keepdims=True)
         zq /= np.linalg.norm(zq, axis=1, keepdims=True)
 
         path = os.path.join(CACHE, f"{name}.npz")
         np.savez(
             path,
-            st_base=st_b.astype(np.float32), st_query=st_q.astype(np.float32),
-            tfidf_base=zb.astype(np.float32), tfidf_query=zq.astype(np.float32),
-            y_base=yb, y_query=yq,
+            st_base=st_b.astype(np.float32),
+            st_query=st_q.astype(np.float32),
+            tfidf_base=zb.astype(np.float32),
+            tfidf_query=zq.astype(np.float32),
+            y_base=yb,
+            y_query=yq,
             n_classes=np.int64(len(np.unique(tr_y))),
-            replaced_base=np.int64(replaced["base"]), replaced_query=np.int64(replaced["query"]),
+            replaced_base=np.int64(replaced["base"]),
+            replaced_query=np.int64(replaced["query"]),
         )
-        print(f"{name}: base {st_b.shape} query {st_q.shape} classes {len(np.unique(yb))} -> {path}", flush=True)
+        print(
+            f"{name}: base {st_b.shape} query {st_q.shape} classes {len(np.unique(yb))} -> {path}",
+            flush=True,
+        )
 
 
 if __name__ == "__main__":
