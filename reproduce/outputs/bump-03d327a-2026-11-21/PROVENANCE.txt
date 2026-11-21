@@ -1,0 +1,27 @@
+tribble-fis pin bump 2bdf875 -> 03d327a: the affected generators, one at a time, ten seeds each.
+NOT a whole-document sweep. Produced 2026-11-21. Wall-clock per table: see STATUS.txt.
+
+THE RUN WAS MADE AT 7e0e804, NOT AT THE PINNED COMMIT. 7e0e804 is the head of tribble-fis PR #250; the
+pinned commit 03d327a is its squash merge. The two trees are byte-identical (git diff --name-only 7e0e804
+03d327a: 0 files), so the results apply to the pin; the run was started before the merge to save an hour.
+STATUS.txt therefore records pin=7e0e804.
+
+preflight --suite fis: 6 passed, 0 skipped (preflight.txt), captured AFTER the run, at 03d327a.
+
+tribble-fis: 03d327ae770b9c20bab0aae4b5a718570858fae9
+tribble-cluster: 20264b3b5bf1851285794eb33acfb4506a87ae2e
+tribble-opt: c21d543f1b4458ff59b181365af38c1e17dd716b
+grad-school: branch restarted from main ffda98dd74689ef7954ff6d991391ce5190496b7; no generator changed
+imported: tribble-fis editable; optimizers c21d543f1b4458ff59b181365af38c1e17dd716b;
+          tribble-clustering not installed in the tribble-fis environment.
+kernel: NumPy (compiled kernel not built in this environment)
+
+seeds: 0,1,2,3,4,5,6,7,8,9 (every table)
+tables: 6.1, G.5, A.1/A.2, 4.1 (+4.1b timing), A.7, 4.1c (sweep, comparison, cost, per-run CSV)
+RT-IOT2022: absent from data/, so its rows are N/A in 4.1 and unchecked.
+
+machine: Linux 6.18.44-fc-v726, Intel(R) Xeon(R) Processor @ 2.10GHz, 4 logical cores, 15.7 GiB
+TIMINGS ARE FROM THIS HOST, NOT THE RUN-OF-RECORD i9-14900HX: ratios transfer, seconds do not.
+ANFIS is not deterministic run to run, so its cells are a sample.
+
+Logs are not kept; table_4_1c_topn_runs.csv is the complete per-fit record for 4.1c.

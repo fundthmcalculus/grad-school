@@ -18,6 +18,50 @@ as having no generator yet.
 
 ---
 
+## 2026-11-21 — `tribble-fis` pin `2bdf875` → `03d327a` (#246, #249, #250), `outputs/bump-03d327a-2026-11-21/`
+
+**Status: nothing the proposal quotes moved. Not a whole-document sweep; not itself citable.**
+
+**What the bump brings.** `fit_growing` on `TribbleClassifier` (#246, Gaussian memberships; #249 extends it to
+trapezoid and triangular) and on `TribbleRegressor` (#250): rank the features once and add one ranked feature
+at a time until a held-out target is met, a new way to choose `top_n`. Docs: `tribble-fis/docs/grow-to-target.md`.
+**No generator here calls it**, so none was expected to move. Unlike the previous bump, though, this one
+**did refactor `fit`**: both estimators' model-building tails were extracted (`_fit_memberships`,
+`_build_model` / `_solve`) and `grow_features` became a callback loop. The check therefore exercises a
+changed code path, which is what makes "nothing moved" informative here.
+
+**The check.** Same generators, same environment, ten seeds, NumPy kernel, one table at a time, against the
+`2bdf875` outputs. `preflight --suite fis`: **6 passed, 0 skipped**.
+
+| Table | Result vs `2bdf875` |
+|---|---|
+| 6.1 (incl. PhiUSIIL row) | **byte-identical** |
+| G.5 | **byte-identical** |
+| A.1 rankings, A.2 accuracies (4 scorers × 9 `top_n`) | identical (0 of 50 cells differ; fit-seconds excluded) |
+| 4.1c, **all 1,120 sweep fits** | **bit-identical** (unrounded scores and features kept; 0 failed) |
+| 4.1, MoG / GA-FIS / RF columns, all rows incl. PhiUSIIL | identical; train-time cells moved (expected) |
+| A.7, non-timing rows | identical |
+
+**The ANFIS cells moved again, and are still noise.** Table 4.1: Bike Sharing ANFIS `0.538 ± 0.092 → 0.534 ± 0.087`,
+PhiUSIIL ANFIS `0.998 → 0.999`. ANFIS imports nothing from `tribblefis` and is nondeterministic run to run.
+Every reading recorded this week: Bike Sharing ANFIS `0.533`, `0.533`, `0.533`, `0.538`, `0.539`, `0.534`, `0.533`
+(seven runs over five pins); PhiUSIIL ANFIS `0.998`–`0.999` throughout. The movement is the same size as the
+spread between runs at a single pin.
+
+**One thing to know about how this was run.** The tables were run at `7e0e804`, the head of tribble-fis #250,
+*before* it merged, to save about an hour. The pin is `03d327a`, its squash merge. The two trees are
+**byte-identical** (`git diff --name-only 7e0e804 03d327a`: 0 files), so the results apply to the pin;
+`STATUS.txt` in the archive records `pin=7e0e804` for that reason, and the archive's `PROVENANCE.txt` says so
+at the top.
+
+**Not covered.** A whole-document sweep (grad-school#298, to be run on the run-of-record machine; preflight
+passes, so it can be citable). RT-IOT2022 is absent, so its rows are `N/A` and unchecked. The compiled kernel was
+not built here. Timings are from a 4-core Xeon, not the run-of-record i9. `fit_growing`'s own measurements
+(held-out score equal to a refit at every size; 3.7×–15.9× cheaper than a refit sweep for the classifier,
+2.8×–11.1× for the regressor) live in the tribble-fis docs and benchmarks, not here.
+
+---
+
 ## 2026-11-21 — `tribble-fis` pin `31e8ae9` → `2bdf875` (#243, #244, #245), `outputs/bump-2bdf875-2026-11-21/`
 
 **Status: nothing the proposal quotes moved. Not a whole-document sweep; not itself citable.**

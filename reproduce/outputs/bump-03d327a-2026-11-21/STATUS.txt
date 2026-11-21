@@ -1,0 +1,7 @@
+table_6_1_model_family rc=0 70s pin=7e0e804
+table_g5_output_partitioning rc=0 81s pin=7e0e804
+table_a1_feature_scoring rc=0 105s pin=7e0e804
+table_4_1_mog_baselines rc=0 1024s pin=7e0e804
+table_a7_regression_scale rc=0 1147s pin=7e0e804
+table_4_1c_topn_sweep rc=0 1178s pin=7e0e804
+DONE
