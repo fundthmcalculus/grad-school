@@ -177,3 +177,23 @@ For the dense arm, use `--mixer fuzzydelta` and drop `WIN`. For w128, set `WIN=1
 **Known limits:** the restarts on the sandbox killed runs repeatedly; checkpoints every 100 steps are the recovery
 path. The bsolve arm is left out: at T = 2048 its per-token Python loop makes it impractical on CPU. The frozen-versus-
 learned effect from the pilot (about 0.04 BPC) is not explained yet and is not part of this run's design.
+
+## Results: T = 2048 at the 50K shape (CPU, 2026-11-21)
+
+Run at the 50K shape (width 48, rules 68/48, 49,689 parameters) rather than the handoff's 100K, the smallest size in the plan. Frozen `oh48`, ctx 2048, batch 8, 4M characters, lr 0.01, warm-up 100, fp32, validation on 500K characters, one run at a time (`flm/window_t2048/run_serial.sh`).
+
+| arm | mixer | window | seed 0 | seed 1 | characters per second |
+|---|---|---|---|---|---|
+| dense | fuzzy delta | 2048 | 2.2508 | 2.2393 | about 6.3K |
+| w32 | strict restart (`wdelta`) | 32 | 2.2473 | 2.2385 | about 18.7K |
+| w128 | strict restart (`wdelta`) | 128 | 2.2420 | 2.2365 | about 2K |
+
+**Findings**
+
+- **A 32-character strict window matches the dense mixer at T = 2048 and 50K.** It is 0.0035 bits better on seed 0 and 0.0008 bits better on seed 1. On two seeds, w32 is no worse than dense by more than 0.004 bits. That is not a claim of equivalence: the pilot's rule is that differences under 0.01 are not resolved by two seeds, so these are "not distinguishable from dense", not proven equal.
+- **Prediction 1 is refuted.** Dense was registered to beat w32 by at least 0.01 on both seeds. It does not; w32 is slightly ahead on both.
+- **Prediction 2 is moot.** w128 was registered to close at least half of the dense-to-w32 gap. There is no gap to close: on the two-seed means, w32 is 0.0022 bits ahead of dense, not behind it. Means are dense 2.2451, w32 2.2429, w128 2.2393. w128 is lowest on the mean, but its margin over w32 (0.0036) is inside what two seeds resolve, so this is reported as no detectable difference among the three arms.
+- **Prediction 3 is right.** At T = 2048 w32 is about 3× faster per step than dense on this CPU (the registered prediction was at least 2×).
+- **Scope.** One size (50K), one context length (2048), one frozen dictionary, two seeds, and 4M characters. Whether a 32-character window stays sufficient at 100K, at longer contexts, or at 300M characters is not tested here.
+
+**Run notes.** An earlier batch with all six arms running concurrently diverged to NaN in five of six runs, in two separate attempts. The runs were healthy when run alone (dense seed 0 and w32 seed 0 reran healthy solo at 2.2508 and 2.2469), so concurrent execution is the trigger; the mechanism is not identified. Those concurrent numbers are discarded and the serial runs above are the record.
