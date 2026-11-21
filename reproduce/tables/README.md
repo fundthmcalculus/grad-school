@@ -49,6 +49,7 @@ Outputs: `reproduce/outputs/table_4_1.{md,csv}`, `table_6_1.{md,csv}`, `table_3_
 |---|---|---|---|---|
 | `table_3_1_pvat_scaling.py` | Table 3.1 | random 2-D point sets | exact pVAT | in-script classical O(N³) VAT |
 | `table_4_1_mog_baselines.py` | Table 4.1 | Concrete, PhiUSIIL | MoG FIS (time + accuracy) | sklearn RF; ANFIS/GA-FIS optional |
+| `table_4_1c_topn_sweep.py` | Table 4.1c (no prose table yet) | Concrete, Bike Sharing, PhiUSIIL | MoG swept over `top_n` x 4 feature scorers; score, per-run and whole-sweep cost | shipped MoG default; ANFIS, GA-FIS, sklearn RF (ten seeds each). RT-IOT2022 excluded (cost) |
 | `table_6_1_model_family.py` | Table 6.1 | Concrete, PhiUSIIL | flat / fuzzy tree / HME | sklearn CART & RF; M5 optional |
 | `table_norm_conorm_matrix.py` | Norm/conorm comparison | Concrete, PhiUSIIL | flat / fuzzy tree / HME, swept over the 5 De Morgan pairs | — (the families are compared against each other) |
 | `table_tribbletree_tsk_order.py` | TribbleTree TSK order sweep | Concrete, BodyFat | flat / fuzzy tree / HME / deconstructed (hand-authored topology), swept over `tsk_order` 0th/1st/2nd (quality + training time) | — (the orders are compared against each other) |
