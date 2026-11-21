@@ -46,21 +46,22 @@ Check it before citing any table, and update it when a generator changes.
 
 ## The `tribble-fis` pin, and how the last bump was checked
 
-Currently `2bdf875` (bumped 2026-11-21: tribble-fis #243/#244/#245 — a print fix, the Pareto
-front on `optimizers`' dominance test, and the opt-in interaction engine / crossover columns —
-on top of `31e8ae9`, 2026-11-20: `14b4942` for #239/#241, the `higher_order` scorer and Pareto
-feature selection, then `31e8ae9` for #232, the dependency-sync that realigned the lock's
-`optimizers`/`tribble-clustering` with the submodule pins here). The `2bdf875` check — Tables
-6.1, G.5, A.1/A.2, 4.1, A.7 and 4.1c at ten seeds, `outputs/bump-2bdf875-2026-11-21/` — found
-no quoted number moved; the full record is the first section of `PROVENANCE_MAP.md`. **That bump was checked the same way** — Tables 4.1,
-6.1, A.7, G.5 diffed column by column at `d97d6b8` vs `14b4942`, plus a separate
-old-vs-new-generator control for Table A.1 — and nothing the proposal quotes moved; the
-record, including the one cell that did (ANFIS, a nondeterministic baseline), is the
-2026-11-20 section of `PROVENANCE_MAP.md`. `preflight.py --suite fis` failed PIN-MATCH
-at `14b4942` (`optimizers` lock vs `tribble-opt` pin) and passes 6/6 at `31e8ae9`.
-**The first version of that check missed the PhiUSIIL classification rows** (the dataset
-was absent, so they were `N/A` on both sides); they were re-run at three pins and did not
-move. Lesson, again: an `N/A` on both sides of a diff is not a match.
+Currently `03d327a` (bumped 2026-11-21: tribble-fis #246/#249/#250, `fit_growing`, which grows the model one
+ranked feature at a time until a held-out target is met, for the classifier and the regressor). The check —
+Tables 6.1, G.5, A.1/A.2, 4.1, A.7 and 4.1c at ten seeds, `outputs/bump-03d327a-2026-11-21/` — found no quoted
+number moved; the full record is the first section of `PROVENANCE_MAP.md`. This bump refactored `fit` (it is not
+just new methods), so "nothing moved" is informative.
+
+The chain this week, each step checked the same way: `14b4942` (#239/#241: the `higher_order` scorer and Pareto
+selection; the compiled-kernel FMA fix) → `31e8ae9` (#232, the dependency-sync that realigned the lock's
+`optimizers`/`tribble-clustering` with the submodule pins here) → `2bdf875` (#243/#244/#245: a print fix, the
+Pareto front on `optimizers`' dominance test, the opt-in interaction engine and crossover columns) → `03d327a`.
+Records: the 2026-11-20 and 2026-11-21 sections of `PROVENANCE_MAP.md`, and `outputs/bump-2bdf875-2026-11-21/`.
+Lessons they recorded: `preflight.py --suite fis` failed PIN-MATCH at `14b4942` and has passed 6/6 since
+`31e8ae9`; **the first check missed the PhiUSIIL classification rows** (the dataset was absent, so they were `N/A`
+on both sides) and they were re-run at three pins and did not move — *an `N/A` on both sides of a diff is not a
+match*; and the one cell family that moves, ANFIS, is a nondeterministic baseline that imports nothing from
+`tribblefis`.
 
 The earlier bump to `141596e`: the previous pin, `058501f`, was 22 commits behind it; the bump
 was made to pick up
