@@ -118,7 +118,7 @@ The rule count is $K$ by construction: the number of classes for classification 
 \label{sec:setup}
 
 \subsection{Datasets}
-Table~\ref{tab:datasets} lists the datasets. All are public. Sizes for Concrete, Glass, RT-IOT2022 and BETH are taken from the dataset specification file that the paper's text is built from. Bike Sharing and PhiUSIIL sizes follow the same specification. \todo{Confirm Bike Sharing and PhiUSIIL row counts against the specification file.}
+Table~\ref{tab:datasets} lists the datasets. All are public. Sizes are taken from the dataset specification file that the paper's text is built from (\texttt{reproduce/dataset\_specs.yaml}).
 
 \begin{table}[t]
 \centering
@@ -129,9 +129,10 @@ Table~\ref{tab:datasets} lists the datasets. All are public. Sizes for Concrete,
 Dataset & Task & Rows & Features & Notes \\
 \midrule
 Concrete \cite{yeh1998modeling} & regression & 1{,}030 & 8 & target skew $+0.42$ \\
+Bike Sharing & regression & 17{,}379 & 12 & hourly demand \\
 Glass & 6-class & 214 & 9 & \\
-RT-IOT2022 & 12-class & 123{,}117 & 81 & \todo{prose says 83; spec says 81} \\
-PhiUSIIL & binary & 235{,}795 & 47 & \todo{see Section~\ref{sec:phi}} \\
+RT-IOT2022 & 12-class & 123{,}117 & 81 & 83 published columns; index and two text columns dropped \\
+PhiUSIIL & binary & 235{,}795 & 47 & three label-derived features dropped \\
 BETH & binary, one-class & 1{,}141{,}078 & 8 & benign-only training \\
 \bottomrule
 \end{tabular}
@@ -281,7 +282,7 @@ BETH has no positive examples in its training and validation splits, so no super
 
 \subsection{Phishing URLs}
 \label{sec:phi}
-On PhiUSIIL the construction trains in $0.13 \pm 0.02$\,s. Its accuracy is reported differently in two archived runs, and we have not yet reconciled them. The 47-feature run without the leaking whitelist-similarity column reports $0.440 \pm 0.181$. A later leak-free run reports $0.997 \pm 0.001$ at $0.28 \pm 0.02$\,s. \todo{Reconcile PhiUSIIL accuracy: 0.440 vs 0.997 across archived runs. Do not publish either number until resolved.} A one-class detector trained on legitimate URLs only, with no phishing samples, reaches AUROC $0.9992 \pm 0.0001$ and recall $0.9977 \pm 0.0004$ at 1\% false-alarm rate. That number reflects the dataset's separability more than any method, since whitened Mahalanobis distance matches it.
+On PhiUSIIL the construction trains in $0.13 \pm 0.02$\,s and reaches $0.997 \pm 0.001$ accuracy at $0.28 \pm 0.02$\,s on the 47-feature leak-free set. The three features computed from knowledge of the legitimate class are dropped on load. An earlier value of $0.440 \pm 0.181$ came from runs made before the loader's label polarity was corrected on 2026-08-30, and it is not reported. The fuzzy baselines and CART reach $0.997$--$0.999$ and random forest $1.000$ on the same features, so PhiUSIIL does not separate the methods. \todo{Re-run the one-class PhiUSIIL detector under the corrected loader; its label handling may predate the fix.} A one-class detector trained on legitimate URLs only, with no phishing samples, reaches AUROC $0.9992 \pm 0.0001$ and recall $0.9977 \pm 0.0004$ at 1\% false-alarm rate. That number reflects the dataset's separability more than any method, since whitened Mahalanobis distance matches it.
 
 \subsection{Turbofan remaining useful life}
 As a demonstration on a regression task with a public benchmark, the construction was run once on the N-CMAPSS DS02 split, using 18 physically measured channels. It reaches per-sample RMSE $7.23$, against $7.22$ for a published CNN and $8.34$ for a published MLP on the public 20-channel input set~\cite{ariaschao2021ncmapss,custode2022evolutionary}. This is one fixed split with no variance estimate, and the comparison is across input sets. We report it as a demonstration, not a benchmark result.
