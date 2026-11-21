@@ -137,3 +137,40 @@ The earlier calibrated footprint also moved the point prediction, which cost acc
 - The decoupled footprint still tracks observable noise, but its intervals lose to kNN on every seed (0/10). The gap is about 0.14 Winkler.
 - Under-coverage is not overfitting. On seeds 0–2, training coverage (0.84–0.86) matches test coverage (0.80–0.84). The footprint family, under the current optimiser budget, cannot reach the nominal 90% even on its own training data.
 - Conclusion: decoupling removes the point-accuracy cost, but a parametric footprint still does not beat a non-parametric residual quantile. A useful type-2 result would need a footprint that can reach nominal coverage: a per-rule or nonparametric footprint, or a hybrid with the kNN residual scale.
+
+## Footprint shortfall: diagnosis and candidate fixes
+
+The calibrated footprint under-covers (0.79 held-out against 0.90 nominal), its width tracks noise only partly, and it loses to kNN on every seed. Three things were checked.
+
+**Diagnosis.** The centre is right: the calibrated interval covers the *noise-free* target 95–98% of the time. The misses are noise tails. On missed points |y − f| ≈ 0.15, close to the high-noise sd, so the intervals are too narrow in the tails. The footprint can only reweight the rule firings, which does not supply noise-level width.
+
+| arm (x_hetero, mean of 10 seeds) | train coverage | held-out coverage | held-out Winkler | Spearman(width, sd) | train–test Winkler gap |
+|---|---:|---:|---:|---:|---:|
+| B2, kNN residual (reference) | – | 0.857 | **0.470** | +0.85 | – |
+| DEC, footprint (baseline) | 0.841 | 0.793 | 0.611 | +0.69 | 0.13 |
+| LONG, footprint, 300-iteration cap | 0.842 | 0.793 | 0.611 | +0.69 | 0.13 |
+| RULE, per-rule footprint (50 params) | 0.868 | 0.808 | 0.607 | +0.66 | **0.17** |
+| ICON, interval consequents (25 params) | **0.914** | 0.846 | 0.498 | **+0.83** | 0.14 |
+
+**Candidate fixes**
+1. **Longer optimiser (LONG): rejected.** Identical to the baseline, so the optimiser is not the cause.
+2. **Per-rule footprint (RULE): rejected.** No better than the baseline and overfits more. Rule-level firing scales don't add noise-level width.
+3. **Interval consequents (ICON): partial fix.** Each rule's consequent becomes an interval yhat ± d_r, and the output bounds are Karnik–Mendel over those. This adds noise-level width directly, and the rules form a grid over x, so local widths can follow local noise. It beats the baseline footprint on all 10 seeds (0.498 vs 0.611), tracks noise (ρ = +0.83), keeps the point unchanged, and does not track the hidden regime (ρ = +0.02). It still loses to kNN on 9 of 10 seeds (+0.029 mean).
+
+**Pre-registered checks (`fou_solutions_study.py`, `icon_study.py`)**
+- S1 (RULE reaches nominal coverage): **fail** (0.868 train, 0.808 held-out).
+- S2 (LONG beats baseline coverage by ≥ 0.03): **fail** (identical).
+- S3 (RULE beats DEC): **fail** (0.607 vs 0.611, a tie).
+- S4 (RULE within 0.03 of kNN): **fail** (+0.137).
+- S5 (RULE does not track hidden regime): **pass**.
+- S6 (RULE overfit gap < 0.05): **fail** (0.17).
+- I1 (ICON coverage in [0.85, 0.95]): **marginal fail** (train 0.914 passes, held-out 0.846 is just under 0.85).
+- I2 (ICON beats DEC): **pass** (10/10 seeds).
+- I3 (ICON within 0.03 of kNN): **marginal pass** on the mean (+0.029), but kNN wins 9/10 seeds.
+- I4 (ICON tracks noise, ρ > 0.5): **pass** (+0.83).
+- I5 (ICON does not track hidden regime): **pass** (+0.02).
+- I6 (identical point across arms): **pass** (checked in code).
+
+**Open issue with ICON.** Its train–test Winkler gap (0.14) is as large as the footprint's, and held-out coverage sits under nominal. The 25 half-widths partly fit training noise. Regularising them (for example, a smoothness prior across neighbouring rules or cross-validated shrinkage towards a global width) is the obvious next step. The kNN baseline has no such gap and still wins.
+
+**Conclusion for type-2.** The best type-2 variant so far is interval consequents, not the firing footprint. It is still not better than the kNN residual interval, so the practical recommendation in this report stands: use kNN residuals unless the regularised interval-consequent model shows a clear gain on held-out data.

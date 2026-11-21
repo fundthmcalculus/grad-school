@@ -237,3 +237,7 @@ What this says:
 ## Part 6: decoupled footprint (`decoupled_fou_study.py`)
 
 The footprint sets the interval only; the point is the type-1 centre model, so the point cannot move. Results and the coverage diagnosis are in [`REPORT.md`](REPORT.md#follow-up-decoupled-footprint-decoupled_fou_studypy). Short version: point accuracy is preserved, tracking is partial (ρ = +0.69), and the intervals lose to the kNN residual baseline on every seed. Training coverage is not higher than test, so the shortfall is the footprint family under the current optimiser budget, not overfitting.
+
+## Part 7: why the footprint under-covers, and two fixes (`fou_solutions_study.py`, `icon_study.py`)
+
+The covering problem is in the noise tails, not the mean. Longer optimisation and a per-rule footprint do not fix it. Interval-valued consequents (`icon_study.py`) close most of the gap to the kNN baseline but do not beat it, and they show a train–test gap. Details and checks are in [`REPORT.md`](REPORT.md#footprint-shortfall-diagnosis-and-candidate-fixes).
