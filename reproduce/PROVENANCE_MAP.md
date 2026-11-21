@@ -18,11 +18,20 @@ as having no generator yet.
 
 ---
 
-## 2026-11-20 — `tribble-fis` pin `d97d6b8` → `14b4942` (tribble-fis #239, #241)
+## 2026-11-20 — `tribble-fis` pin `d97d6b8` → `14b4942` → `31e8ae9` (tribble-fis #239, #241, #232)
 
-**Status: no archived table moved. Nothing below is a citable run.** A whole-document
-sweep was *not* run at the new pin; this section records a targeted bump check
-(AGENTS.md non-negotiable 5) and what it does and does not license.
+**Status: no archived table moved. Nothing below is itself a citable run** — a
+whole-document sweep was *not* run at the new pin; this section records targeted bump
+checks (AGENTS.md non-negotiable 5) and what they do and do not license. PIN-MATCH is
+**cleared** at `31e8ae9` (see the last paragraphs).
+
+**Correction to the first version of this section.** It said no quoted number moved after
+checking Tables 4.1, 6.1, A.7 and G.5 at `d97d6b8` vs `14b4942`. That check had a hole:
+`data/PhiUSIIL_Phishing_URL_Dataset.csv` was absent, so **Table 4.1's PhiUSIIL
+(classification) row and Table 6.1's PhiUSIIL row were `N/A` on both sides** and were
+never compared — the classification columns are exactly what B14 says an earlier bump
+check missed. RT-IOT2022 (Table 4.1's other `N/A` row) is still absent and **still
+unchecked**. The dataset was then recovered and those rows re-run, below.
 
 **What the bump brings.** #239 adds the `higher_order` feature scorer
 (`method="higher_order"`: moment distance through skewness and kurtosis), an optional
@@ -76,22 +85,40 @@ from k = 10, and behind `composite` from k = 7. One dataset, one split protocol;
 appendix (`prose/appendix.md`) is deliberately **not** changed. Fit time is ~2–3× the
 others at k = 1 (0.22 s vs 0.07–0.10 s).
 
-**Why none of this is citable.** `preflight.py --suite fis` **fails PIN-MATCH**:
+**PhiUSIIL rows, three pins.** Table 4.1's PhiUSIIL row (the generator's own `_bench`, ten
+seeds, 20,000 × 47 leak-free) and the whole of Table 6.1, at `d97d6b8`, `14b4942` and
+`31e8ae9`: every non-timing cell **identical at all three pins** (MoG `0.440 ± 0.181`,
+ANFIS `0.999 ± 0.001`, GA-FIS `0.998 ± 0.001`, RF `1.000 ± 0.000`, per-seed MoG and RF
+accuracies identical; 6.1: 0 differing cells). They also equal the leak-free values
+already recorded above in this file, so the bump check now agrees with the archive on
+the classification rows too.
+
+**What the earlier PIN-MATCH failure was (now cleared).** `preflight.py --suite fis` **fails PIN-MATCH**:
 `optimizers` imports `10d8300` (the `tribble-fis` lock) while the submodule pin is
 `c21d543`. This is **not** caused by the bump — the lock names `10d8300` at both
-`d97d6b8` and `14b4942`. It is the lock-vs-pin gap AGENTS.md rule 5 describes, open until
-the lock and the `tribble-opt` pin are brought into step (the dependency-sync PR,
-tribble-fis #232, is the likely route). It does not threaten the *comparison* above
-(neither arm exercises `optimizers`; the version is identical on both sides), but it stamps
-any archive made in this environment **NOT CITABLE**. `INSTALL-FRESH` passes.
-`--suite cluster` passes.
+`d97d6b8` and `14b4942`. It is the lock-vs-pin gap AGENTS.md rule 5 describes.
+It did not threaten the *comparison* (neither arm exercises `optimizers`; the version was
+identical on both sides) but it stamps archives made in that environment NOT CITABLE.
+
+**PIN-MATCH cleared: `tribble-fis` #232 (dependency-sync) merged, pin now `31e8ae9`.**
+It moves `optimizers` to `c21d543` and `tribble-clustering` to `20264b3` in the
+`tribble-fis` lock — exactly the `tribble-opt` and `tribble-cluster` submodule pins here.
+`preflight.py --suite fis`: **6 passed, 0 skipped** (PIN-MATCH, INSTALL-FRESH, DATASETS,
+W1-SCALE, SCALER-ALIAS, MODEL-NAMES). Because this is a second pin move, the cheap
+generators were re-run at `31e8ae9` against the `14b4942` outputs: Table G.5
+byte-identical; Table A.1/A.2 accuracies and rankings identical (ten seeds, four scorers);
+the PhiUSIIL rows as above. **Not re-run at `31e8ae9`:** Tables 4.1 (non-PhiUSIIL rows)
+and A.7 — they import neither `optimizers` nor `tribbleclustering`, and take ~12 and ~18
+minutes; a whole-document sweep will cover them.
 
 **Dataset note.** `data/PhiUSIIL_Phishing_URL_Dataset.csv` was absent and was recovered
 from `tribble-fis` history with the command in `data/.gitignore` (git-ignored, 56,854,345
 bytes, 235,795 rows). The generator announces the three leak columns it drops.
 
-**Still owed.** A whole-document sweep at this pin once PIN-MATCH is clear (the run of
-record is still `full-2026-08-22`, at `tribble-fis` `141596e`); `check_prose.py` against it.
+**Still owed.** A whole-document sweep at `31e8ae9` (preflight now passes, so it can be
+citable); the run of record is still `full-2026-08-22`, at `tribble-fis` `141596e`.
+`check_prose.py` against the new sweep. RT-IOT2022 is absent, so its rows stay `N/A`
+until it is fetched.
 
 ---
 

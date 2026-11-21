@@ -46,14 +46,18 @@ Check it before citing any table, and update it when a generator changes.
 
 ## The `tribble-fis` pin, and how the last bump was checked
 
-Currently `14b4942` (bumped 2026-11-20 for tribble-fis #239/#241: the `higher_order`
-scorer and Pareto feature selection). **That bump was checked the same way** — Tables 4.1,
+Currently `31e8ae9` (bumped 2026-11-20: `14b4942` for tribble-fis #239/#241 — the
+`higher_order` scorer and Pareto feature selection — then `31e8ae9` for #232, the
+dependency-sync that realigned the lock's `optimizers`/`tribble-clustering` with the
+submodule pins here). **That bump was checked the same way** — Tables 4.1,
 6.1, A.7, G.5 diffed column by column at `d97d6b8` vs `14b4942`, plus a separate
 old-vs-new-generator control for Table A.1 — and nothing the proposal quotes moved; the
 record, including the one cell that did (ANFIS, a nondeterministic baseline), is the
-2026-11-20 section of `PROVENANCE_MAP.md`. `preflight.py --suite fis` currently fails
-PIN-MATCH (`optimizers` lock vs `tribble-opt` pin) at *both* ends of that bump, so
-archives made here are NOT CITABLE until that is cleared.
+2026-11-20 section of `PROVENANCE_MAP.md`. `preflight.py --suite fis` failed PIN-MATCH
+at `14b4942` (`optimizers` lock vs `tribble-opt` pin) and passes 6/6 at `31e8ae9`.
+**The first version of that check missed the PhiUSIIL classification rows** (the dataset
+was absent, so they were `N/A` on both sides); they were re-run at three pins and did not
+move. Lesson, again: an `N/A` on both sides of a diff is not a match.
 
 The earlier bump to `141596e`: the previous pin, `058501f`, was 22 commits behind it; the bump
 was made to pick up
