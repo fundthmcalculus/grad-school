@@ -121,7 +121,14 @@ def allocate(R: int, counts: np.ndarray) -> np.ndarray:
 
 
 @torch.no_grad()
-def construct(model: TinyLM, x_ids: torch.Tensor, y_ids: torch.Tensor, cls: np.ndarray, seed: int, ridge: float = 1e-2) -> dict:
+def construct(
+    model: TinyLM,
+    x_ids: torch.Tensor,
+    y_ids: torch.Tensor,
+    cls: np.ndarray,
+    seed: int,
+    ridge: float = 1e-2,
+) -> dict:
     """x_ids, y_ids: (N, CTX) current and next characters.  Builds the blocks in order and returns per-block diagnostics."""
     gen = torch.Generator().manual_seed(seed)
     L = len(model.blocks)
@@ -131,7 +138,9 @@ def construct(model: TinyLM, x_ids: torch.Tensor, y_ids: torch.Tensor, cls: np.n
     labels = torch.as_tensor(cls[y_ids.numpy()]).reshape(-1)
     diag = {}
     for li, blk in enumerate(model.blocks):
-        ffn = blk.ffn  # FuzzyFFNRaw: raw-input Gaussian antecedents (layer 0 reads two tokens: taps=2)
+        ffn = (
+            blk.ffn
+        )  # FuzzyFFNRaw: raw-input Gaussian antecedents (layer 0 reads two tokens: taps=2)
         mid = x + blk.mix(blk.mixer_in(x))
         share = (li + 1) / L
         target = (h0 + share * (tgt - h0)).reshape(-1, h0.shape[-1])
@@ -170,10 +179,14 @@ def construct(model: TinyLM, x_ids: torch.Tensor, y_ids: torch.Tensor, cls: np.n
 
 
 @torch.no_grad()
-def windows(arr: np.ndarray, n_win: int, offset: int = 0) -> tuple[torch.Tensor, torch.Tensor]:
+def windows(
+    arr: np.ndarray, n_win: int, offset: int = 0
+) -> tuple[torch.Tensor, torch.Tensor]:
     seg = np.asarray(arr[offset : offset + n_win * (CTX + 1) + 1], dtype=np.int64)
     x = np.stack([seg[i * (CTX + 1) : i * (CTX + 1) + CTX] for i in range(n_win)])
-    y = np.stack([seg[i * (CTX + 1) + 1 : i * (CTX + 1) + CTX + 1] for i in range(n_win)])
+    y = np.stack(
+        [seg[i * (CTX + 1) + 1 : i * (CTX + 1) + CTX + 1] for i in range(n_win)]
+    )
     return torch.from_numpy(x), torch.from_numpy(y)
 
 
@@ -199,7 +212,11 @@ def main(argv=None) -> dict:
     ap.add_argument("--eval-chars", type=int, default=200_000)
     ap.add_argument("--build-windows", type=int, default=2000)
     ap.add_argument("--seed", type=int, default=0)
-    ap.add_argument("--zero-mix", action="store_true", help="zero each fuzzy mixer's output projection before construction (blocks = FFN only)")
+    ap.add_argument(
+        "--zero-mix",
+        action="store_true",
+        help="zero each fuzzy mixer's output projection before construction (blocks = FFN only)",
+    )
     a = ap.parse_args(argv)
     cls = char_classes()
     train = load("train")
@@ -224,8 +241,8 @@ def main(argv=None) -> dict:
     # (c) n-gram references on the same validation characters
     n_chars = n_eval * (CTX + 1)
     v = np.asarray(val[:n_chars], dtype=np.int64)
-    uni = bits_ngram(np.asarray(train[: 20_000_000], dtype=np.int64), v, 1)
-    big = bits_ngram(np.asarray(train[: 20_000_000], dtype=np.int64), v, 2)
+    uni = bits_ngram(np.asarray(train[:20_000_000], dtype=np.int64), v, 1)
+    big = bits_ngram(np.asarray(train[:20_000_000], dtype=np.int64), v, 2)
 
     rec = {
         "donor": a.donor,
