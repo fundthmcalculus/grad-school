@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v34-mrl\\m1_s4.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.19139,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.28161
+  ],
+  [
+   100,
+   1.62227
+  ],
+  [
+   200,
+   1.47792
+  ],
+  [
+   300,
+   1.41667
+  ],
+  [
+   400,
+   1.37022
+  ],
+  [
+   500,
+   1.33226
+  ],
+  [
+   600,
+   1.29934
+  ],
+  [
+   700,
+   1.26943
+  ],
+  [
+   800,
+   1.24881
+  ],
+  [
+   900,
+   1.22654
+  ],
+  [
+   1000,
+   1.20554
+  ],
+  [
+   1100,
+   1.19589
+  ],
+  [
+   1160,
+   1.19139
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.1721
+  ],
+  [
+   50,
+   8.2632
+  ],
+  [
+   100,
+   6.4715
+  ],
+  [
+   150,
+   5.6033
+  ],
+  [
+   200,
+   5.1298
+  ],
+  [
+   250,
+   4.8955
+  ],
+  [
+   300,
+   4.7347
+  ],
+  [
+   350,
+   4.6376
+  ],
+  [
+   400,
+   4.5358
+  ],
+  [
+   450,
+   4.4884
+  ],
+  [
+   500,
+   4.4246
+  ],
+  [
+   550,
+   4.3812
+  ],
+  [
+   600,
+   4.3147
+  ],
+  [
+   650,
+   4.2674
+  ],
+  [
+   700,
+   4.2285
+  ],
+  [
+   750,
+   4.1925
+  ],
+  [
+   800,
+   4.1504
+  ],
+  [
+   850,
+   4.0992
+  ],
+  [
+   900,
+   4.0732
+  ],
+  [
+   950,
+   4.047
+  ],
+  [
+   1000,
+   4.0128
+  ],
+  [
+   1050,
+   3.9739
+  ],
+  [
+   1100,
+   3.9644
+  ],
+  [
+   1150,
+   3.9453
+  ],
+  [
+   1159,
+   3.9466
+  ]
+ ],
+ "train_seconds": 82.21,
+ "wall_seconds": 96.17,
+ "chars_per_sec": 115584,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and owner. Hover was happy to be a attay. Vike became best friends. Velydy was always happy to have a magic wind.\n<|eot|>\n\n\nLily and Ben are friends. They like to play with. They have a new pociti. They have a big pond. They have a fun day. They have many animals cars and happy.\nMip is a good attay, \"His have an enviddssful yow!\" They and Lily sighed everywhere. They like a new place. They are good friends. They are happy and an idea. They play together. They are happy.\nThey have to make a face with the sporn. They know that they didn't listen to the big tree. They say how to the park like the monkele. They are nice and happy. They are happy. They are careful and proud. They have each other.\n<|eot|>\nOne day, a little girl named Amy went for a walk in the park. She saw a little boy named Tim's mom, he saw a big, shiny toy. Spot wanted to help the ball, but he could not find it. He promised to play with his toys and play.\nLily thought about Sam and Sam pight. The ball having fun to use the ball out to play. Sam decided to play until",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,159 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v8-ctx\\D-d48-bpe1024-ctx512_30M_s1.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512
+ },
+ "params_total": 93344,
+ "params_nonemb": 44192,
+ "steps": 580,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.15898,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   145,
+   1.42463
+  ],
+  [
+   290,
+   1.27532
+  ],
+  [
+   435,
+   1.1977
+  ],
+  [
+   580,
+   1.15898
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3979
+  ],
+  [
+   50,
+   8.4912
+  ],
+  [
+   100,
+   6.3553
+  ],
+  [
+   150,
+   5.2418
+  ],
+  [
+   200,
+   4.6837
+  ],
+  [
+   250,
+   4.3664
+  ],
+  [
+   300,
+   4.1894
+  ],
+  [
+   350,
+   4.0474
+  ],
+  [
+   400,
+   3.9417
+  ],
+  [
+   450,
+   3.8624
+  ],
+  [
+   500,
+   3.7888
+  ],
+  [
+   550,
+   3.7324
+  ],
+  [
+   579,
+   3.7118
+  ]
+ ],
+ "train_seconds": 244.72,
+ "wall_seconds": 503.72,
+ "chars_per_sec": 38831,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big warm bird.\nAs the meat took the beach at her mom. They walked to the garden and found lots of fun. They played together and have fun together. One day, they found a toy and loved to go inside. The viinat was just tired.\nThe next day, a big cat saw a timon that the cat was happy. The cat agreed and sat on the first. The cat was happy to have another bird.\n<|eot|>\nOne day, a little girl named Lily found a bag. It was shiny because Tom was very sad. The But there was a gray bird named Sally three year. Sue loved to play with her friends.\nOne day, she saw a big hoop on her floor. Poppie thought it was a big, power, but she was very nice. She readed and found a long bucket. The parenti felt much better.\nAn, the bald man said, \"Come, I can I play with me?\" The little girl smiled and said, \"Yes, I want to play with you with it.\"\nAfter the next day, while Sally said, \"I know how to play with you.\" \nThe little girl said, \"I will be fun towen with us.\" She liked the minr wa",
+ "rule_init": {},
+ "ngram_init": {}
+}

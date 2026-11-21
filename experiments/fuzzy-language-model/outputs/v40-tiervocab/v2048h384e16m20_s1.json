@@ -1,0 +1,234 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v2048h384e16m20_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe2048",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 2048
+ },
+ "config": {
+  "vocab_size": 2048,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99280,
+ "params_nonemb": 53456,
+ "steps": 1001,
+ "chars_seen": 30011180,
+ "chars_per_token": 3.6598144,
+ "val_bpc": 1.08195,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.0623
+  ],
+  [
+   100,
+   1.48359
+  ],
+  [
+   200,
+   1.35018
+  ],
+  [
+   300,
+   1.28065
+  ],
+  [
+   400,
+   1.23535
+  ],
+  [
+   500,
+   1.19676
+  ],
+  [
+   600,
+   1.16415
+  ],
+  [
+   700,
+   1.13268
+  ],
+  [
+   800,
+   1.10622
+  ],
+  [
+   900,
+   1.09117
+  ],
+  [
+   1000,
+   1.08192
+  ],
+  [
+   1001,
+   1.08195
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.1922
+  ],
+  [
+   50,
+   8.8311
+  ],
+  [
+   100,
+   6.8191
+  ],
+  [
+   150,
+   5.8119
+  ],
+  [
+   200,
+   5.3011
+  ],
+  [
+   250,
+   5.0068
+  ],
+  [
+   300,
+   4.8314
+  ],
+  [
+   350,
+   4.7077
+  ],
+  [
+   400,
+   4.6301
+  ],
+  [
+   450,
+   4.5457
+  ],
+  [
+   500,
+   4.4609
+  ],
+  [
+   550,
+   4.3724
+  ],
+  [
+   600,
+   4.3194
+  ],
+  [
+   650,
+   4.2446
+  ],
+  [
+   700,
+   4.1916
+  ],
+  [
+   750,
+   4.1605
+  ],
+  [
+   800,
+   4.1012
+  ],
+  [
+   850,
+   4.0774
+  ],
+  [
+   900,
+   4.0732
+  ],
+  [
+   950,
+   4.0138
+  ],
+  [
+   1000,
+   3.9854
+  ]
+ ],
+ "train_seconds": 73.29,
+ "wall_seconds": 85.69,
+ "chars_per_sec": 111893,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. Her mom was a good day. She would have an moder persister to play with her. And of your quiet tree, making apples.\n<|eot|>\nOnce upon a time, in a small forest, there was a little girl named Amy. Amy was very sad because she could not play her.\nAmy asked her friend, a little girl named Amy. She said, \"I am your friends. I like a big tree. With your friend please?\" Amy said. \"Yes, you can both learn and work.\" And they lived happily ever after.\n<|eot|>\n\n\nTom and Ben are twins. They like to play with their toys. They like to play with them with toys. They like to play, kids, and their friends. They want to play together.\nOne day, they see a big cake. They are very happy. They want to play with their toys. They have fun. They see their toys who are need. They have fun and like their toys. They like to play with their toys. They are happy. They like to play with their toys.\nThey see a story. They are still brave. They like birds and have fun like their toys. They have fun. They have fun. They have fun together. They have fun.\n\"Yes, they are crying!\" Lily says. She says they are too fast. He pulls on them and put it on the cake.\n\"Rel",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,142 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 4000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 4,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-pilot\\base_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 155,
+ "chars_seen": 4010100,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.43989,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   38,
+   1.95835
+  ],
+  [
+   76,
+   1.67224
+  ],
+  [
+   114,
+   1.56743
+  ],
+  [
+   152,
+   1.44415
+  ],
+  [
+   155,
+   1.43989
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2386
+  ],
+  [
+   50,
+   8.2135
+  ],
+  [
+   100,
+   6.3445
+  ],
+  [
+   150,
+   5.3333
+  ],
+  [
+   154,
+   5.2715
+  ]
+ ],
+ "train_seconds": 728.28,
+ "wall_seconds": 998.79,
+ "chars_per_sec": 1744,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 4,
+ "device": "cpu",
+ "device_name": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called her mom.\nLily saw a big vale ate outside. She was very fast and thought about it. But he wanted to push to play with the window. Kitty was too hard to going to the vive.\nTom and Sam became best friends. They played together all sling their home, and the wet was curious. They had many friends. Inside they were clever, something unexpected happened.\nThe endy saw something aame with a little bunny. There found a friendly, a little boy named Tom. Max were so happy and said, \"I want to make a first, a bunny. This was even notad. You have to play again. You are hooses and behind the Pase. It is now. I want to pourse, but you want to play with meing on your toys?\"\n\"Hi, is sad. Tom tipped and Ben.\nAnna and Ben are scared. They are all fun playing with their toys. It is a big tree. They be fun, but they can go inside and say good?\"\nThey talked the bug. They are hurt the noise. They are not happy to make fun. Max plant Sam are sad. Tom are food and having fun. They towet the perphone. They are playing",
+ "rule_init": {},
+ "ngram_init": {}
+}

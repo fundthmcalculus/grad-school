@@ -1,0 +1,159 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 56,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v5-spend\\a-512-d56_10M_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe512",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 512
+ },
+ "config": {
+  "vocab_size": 512,
+  "d_model": 56,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 86496,
+ "params_nonemb": 57824,
+ "steps": 510,
+ "chars_seen": 10018634,
+ "chars_per_token": 2.3979958,
+ "val_bpc": 1.32541,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   127,
+   1.70938
+  ],
+  [
+   254,
+   1.50147
+  ],
+  [
+   381,
+   1.38572
+  ],
+  [
+   508,
+   1.32518
+  ],
+  [
+   510,
+   1.32541
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.3706
+  ],
+  [
+   50,
+   7.4366
+  ],
+  [
+   100,
+   5.6188
+  ],
+  [
+   150,
+   4.6493
+  ],
+  [
+   200,
+   4.1557
+  ],
+  [
+   250,
+   3.8569
+  ],
+  [
+   300,
+   3.6689
+  ],
+  [
+   350,
+   3.5209
+  ],
+  [
+   400,
+   3.4059
+  ],
+  [
+   450,
+   3.3208
+  ],
+  [
+   500,
+   3.2662
+  ],
+  [
+   509,
+   3.2542
+  ]
+ ],
+ "train_seconds": 102.72,
+ "wall_seconds": 122.74,
+ "chars_per_sec": 40672,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big, blockful tree! Amy was very important. He was happy that he saw a big tree with his big.\nAt the lady, Lily looked at the bear and said, \"Tom, I can help you.\" The tree looked at the park and took the tree away. The rer door said, \"I want the sky, let's go up to the tree! You have so much fun, you are a inside!\"\nThe bird smiled and said, \"Hi, you can play with your friends.\"\nSo the bird had to play, dress in the tree. They played with the shelf. The bird looked at the sky and happy too. The bight was so happy. They started to fly about his home. They played in the water. One day, they saw a big party plan to play with the tree. The burtanket was a great time. The rabbit was happy to be happy and had lots of fun.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. Tim was very happy and had a long thought. He was a trip and he played with his t",
+ "rule_init": {},
+ "ngram_init": {}
+}

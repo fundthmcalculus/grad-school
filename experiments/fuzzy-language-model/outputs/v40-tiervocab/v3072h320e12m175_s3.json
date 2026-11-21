@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.75,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v3072h320e12m175_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.75,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99320,
+ "params_nonemb": 50360,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.0631,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06584
+  ],
+  [
+   100,
+   1.42695
+  ],
+  [
+   200,
+   1.28673
+  ],
+  [
+   300,
+   1.22515
+  ],
+  [
+   400,
+   1.18311
+  ],
+  [
+   500,
+   1.15233
+  ],
+  [
+   600,
+   1.12092
+  ],
+  [
+   700,
+   1.09831
+  ],
+  [
+   800,
+   1.07826
+  ],
+  [
+   900,
+   1.0658
+  ],
+  [
+   953,
+   1.0631
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.768
+  ],
+  [
+   50,
+   9.1102
+  ],
+  [
+   100,
+   6.9563
+  ],
+  [
+   150,
+   5.8848
+  ],
+  [
+   200,
+   5.3344
+  ],
+  [
+   250,
+   5.0353
+  ],
+  [
+   300,
+   4.8723
+  ],
+  [
+   350,
+   4.7458
+  ],
+  [
+   400,
+   4.64
+  ],
+  [
+   450,
+   4.5679
+  ],
+  [
+   500,
+   4.4978
+  ],
+  [
+   550,
+   4.4499
+  ],
+  [
+   600,
+   4.3797
+  ],
+  [
+   650,
+   4.3265
+  ],
+  [
+   700,
+   4.2754
+  ],
+  [
+   750,
+   4.2463
+  ],
+  [
+   800,
+   4.2009
+  ],
+  [
+   850,
+   4.1631
+  ],
+  [
+   900,
+   4.1358
+  ],
+  [
+   950,
+   4.128
+  ],
+  [
+   952,
+   4.1268
+  ]
+ ],
+ "train_seconds": 72.85,
+ "wall_seconds": 84.37,
+ "chars_per_sec": 107165,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl at the lake. She loved to play with the big, red truck. She would learn to get the rock.\nOne day, she saw a big tree. The other animals loved the boat. The other people in the green farm were happy. The dough was not for the hot blue cream on the tow. The day, the moral of the day of the day, the lovely day looking for.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to play in the park in the park. One day, she saw a big tree. The tree was very happy.\nLily asked, \"What is it, my friend?\" The bird asked her hould you, \"Don't be scared. Do you want to play with me?\"\nLily smiled. She looked at the tree and said, \"No, I know it was a fun friend.\" Lily said, \"I will help you have to be valen you.\" The bird was hungry and could not play too.\nLily said, \"Thank you, Lily!\" Lily laughed and played with the bird. But then, something unexpected happened. The bird got scared, and they all played near the grass. The bird picked up the green tree and down to help. And from that day on, Lily and the bird became best friends.\n<|eot|>\nOnce upon a time, there was a little red ball. It was very pretty and pretty. The ball was very harmless.",
+ "rule_init": {},
+ "ngram_init": {}
+}

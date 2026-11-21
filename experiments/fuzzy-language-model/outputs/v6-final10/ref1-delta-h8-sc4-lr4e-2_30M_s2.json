@@ -1,0 +1,207 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.56,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.04,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-final10\\ref1-delta-h8-sc4-lr4e-2_30M_s2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.56,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93392,
+ "params_nonemb": 44240,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.16047,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.38758
+  ],
+  [
+   580,
+   1.26693
+  ],
+  [
+   870,
+   1.19623
+  ],
+  [
+   1160,
+   1.16047
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3105
+  ],
+  [
+   50,
+   8.2993
+  ],
+  [
+   100,
+   6.3706
+  ],
+  [
+   150,
+   5.4116
+  ],
+  [
+   200,
+   4.9129
+  ],
+  [
+   250,
+   4.6395
+  ],
+  [
+   300,
+   4.4879
+  ],
+  [
+   350,
+   4.3707
+  ],
+  [
+   400,
+   4.2933
+  ],
+  [
+   450,
+   4.2219
+  ],
+  [
+   500,
+   4.1616
+  ],
+  [
+   550,
+   4.103
+  ],
+  [
+   600,
+   4.0387
+  ],
+  [
+   650,
+   3.9836
+  ],
+  [
+   700,
+   3.9458
+  ],
+  [
+   750,
+   3.8949
+  ],
+  [
+   800,
+   3.8599
+  ],
+  [
+   850,
+   3.8301
+  ],
+  [
+   900,
+   3.7973
+  ],
+  [
+   950,
+   3.7711
+  ],
+  [
+   1000,
+   3.7415
+  ],
+  [
+   1050,
+   3.7326
+  ],
+  [
+   1100,
+   3.7145
+  ],
+  [
+   1150,
+   3.7004
+  ],
+  [
+   1159,
+   3.6933
+  ]
+ ],
+ "train_seconds": 208.69,
+ "wall_seconds": 221.0,
+ "chars_per_sec": 45535,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big dog named Max. Max loved to play with his friends, a little cat named.\nOne day, Tim found a big box. He wanted to play with the ball, but he wanted to play with the toy car. He said, \"Help, cat! That's a big dog.\" They played games and had lots of fun.\n<|eot|>\nOnce upon a time, there was a little girl named Amy. Sue loved to play with her toys, and see her mom to her dad. She was a little bunny. One day, Lucy went to the park with her mom, \"Can I help the oven, a little bird? Sally thank you, you can sing and hurt you to make new friends,\" she said. \"You're welcome, Lucy.\" Lily said, \"Yes, you can't see it, so you, I don't know.\" She said, \"Dellow! You are very spirit on Tom.\"\nSam and Sue went up to the water. They were happy to see what was inside. They knew that about the big tree, and they both became friends who was going to play with the sack. And they both laughed and bed the sun together.\n<|eot|>\nOnce upon a time, there was a little girl named Sue. Sue was very fast and having fun. One day, Sue went outside to play. Sue wanted to learn",
+ "rule_init": {},
+ "ngram_init": {}
+}

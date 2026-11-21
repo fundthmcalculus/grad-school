@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 1,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\b1_ffn_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 1,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99202,
+ "params_nonemb": 47938,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.13533,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06635
+  ],
+  [
+   100,
+   1.52857
+  ],
+  [
+   200,
+   1.35427
+  ],
+  [
+   300,
+   1.29
+  ],
+  [
+   400,
+   1.2514
+  ],
+  [
+   500,
+   1.22047
+  ],
+  [
+   600,
+   1.19069
+  ],
+  [
+   700,
+   1.16833
+  ],
+  [
+   800,
+   1.15008
+  ],
+  [
+   900,
+   1.13912
+  ],
+  [
+   953,
+   1.13533
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7638
+  ],
+  [
+   50,
+   9.4575
+  ],
+  [
+   100,
+   7.4602
+  ],
+  [
+   150,
+   6.243
+  ],
+  [
+   200,
+   5.6337
+  ],
+  [
+   250,
+   5.3357
+  ],
+  [
+   300,
+   5.1504
+  ],
+  [
+   350,
+   5.0178
+  ],
+  [
+   400,
+   4.9293
+  ],
+  [
+   450,
+   4.8591
+  ],
+  [
+   500,
+   4.7801
+  ],
+  [
+   550,
+   4.7098
+  ],
+  [
+   600,
+   4.6342
+  ],
+  [
+   650,
+   4.5879
+  ],
+  [
+   700,
+   4.5438
+  ],
+  [
+   750,
+   4.5116
+  ],
+  [
+   800,
+   4.4817
+  ],
+  [
+   850,
+   4.4552
+  ],
+  [
+   900,
+   4.4143
+  ],
+  [
+   950,
+   4.3995
+  ],
+  [
+   952,
+   4.4005
+  ]
+ ],
+ "train_seconds": 44.28,
+ "wall_seconds": 50.87,
+ "chars_per_sec": 176318,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a little boy named Tim. He loved to play with his toy house and have fun. So, he would sing, but he was bright and a pretty bird.\nOne sunny day, Tim found a big boat. He decided to go to the farm with his friends. But then, the squirrel, a little rabbit came to the lion. The rabbit was happy to see a big red blue tree. Tim was very surprised. He said, \"I ask you to be my friend.\"\nThen, Tim and the rabbit became best friends. They played and had a new friend. They played together, and the wise squirrel were happy. They played together for the day together.\n<|eot|>\n\n\nAnna and Tom are twins, and Ben and Ben. They like to play with their toys and sleep. They like to play in the garden and have fun. They have fun and laugh and build a fun day of the gather.\nOne day, let go of the park to play together. It is a big red box and a shirt. The window is very fast, but it is a dress. The box is blue and small.\n\"Look, Ben, Sam, I know what I want to fix it!\" Lily says. She is not nice to each other.\nBen will feel good at Mom and remembered the banana. She says they are not happy. She comes back to the big tree. It is not nice. She sees her toy truck and gave Mom a",
+ "rule_init": {},
+ "ngram_init": {}
+}

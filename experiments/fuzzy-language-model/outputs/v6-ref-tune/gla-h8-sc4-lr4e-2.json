@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "linear",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.04,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-ref-tune\\gla-h8-sc4-lr4e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "linear",
+  "ffn": "mlp",
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93376,
+ "params_nonemb": 44224,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.27101,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.59895
+  ],
+  [
+   192,
+   1.42464
+  ],
+  [
+   288,
+   1.32635
+  ],
+  [
+   384,
+   1.2724
+  ],
+  [
+   387,
+   1.27101
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.295
+  ],
+  [
+   50,
+   8.3669
+  ],
+  [
+   100,
+   6.3918
+  ],
+  [
+   150,
+   5.39
+  ],
+  [
+   200,
+   4.8809
+  ],
+  [
+   250,
+   4.5796
+  ],
+  [
+   300,
+   4.358
+  ],
+  [
+   350,
+   4.1985
+  ],
+  [
+   386,
+   4.1341
+  ]
+ ],
+ "train_seconds": 31.69,
+ "wall_seconds": 38.68,
+ "chars_per_sec": 100045,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Suby. She had a special shiver. One day she was a hop that he was shy because he would pushed it to move. Lily was beautiful and bloined, \"Thank you, mark. I just tired your name. I am a slump!\"\nLily said, \"It's another train, Ben. I can help you show you.\" Jack's mom was happy to see what she was. She said, \"I am not and full. This is not like your new place?\"\nJohn said, \"I am the anxat thing!\" The bunny was happy and clapped her.\nThey walked to the pope and saw lots of fun. They made the best of fun. They knew that the toys like the monstoodsy. They learned that if only and the obal bird were gone. Tom and her friends were very happy.\n<|eot|>\nOnce upon a time, there was a dog named Tim. Tim loved to play outside with his ball. One day, Tim met a little boy named Tim. Tim was angry. He loved to play with. He wanted to play with his friend, a big cat.\nTim thought his friend, Sam, who was so happy. He tried to catch his friend, Tim and they found a big tree.",
+ "rule_init": {},
+ "ngram_init": {}
+}

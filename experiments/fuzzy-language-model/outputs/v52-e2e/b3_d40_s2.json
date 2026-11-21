@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 40,
+  "layers": 3,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\b3_d40_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 40,
+  "n_layers": 3,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99002,
+ "params_nonemb": 50906,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.14705,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06799
+  ],
+  [
+   100,
+   1.53011
+  ],
+  [
+   200,
+   1.36991
+  ],
+  [
+   300,
+   1.3004
+  ],
+  [
+   400,
+   1.26119
+  ],
+  [
+   500,
+   1.22897
+  ],
+  [
+   600,
+   1.20269
+  ],
+  [
+   700,
+   1.17981
+  ],
+  [
+   800,
+   1.16137
+  ],
+  [
+   900,
+   1.15029
+  ],
+  [
+   953,
+   1.14705
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7736
+  ],
+  [
+   50,
+   9.3473
+  ],
+  [
+   100,
+   7.3698
+  ],
+  [
+   150,
+   6.2501
+  ],
+  [
+   200,
+   5.6736
+  ],
+  [
+   250,
+   5.365
+  ],
+  [
+   300,
+   5.1858
+  ],
+  [
+   350,
+   5.0759
+  ],
+  [
+   400,
+   4.9698
+  ],
+  [
+   450,
+   4.8738
+  ],
+  [
+   500,
+   4.8042
+  ],
+  [
+   550,
+   4.7314
+  ],
+  [
+   600,
+   4.6654
+  ],
+  [
+   650,
+   4.6311
+  ],
+  [
+   700,
+   4.5866
+  ],
+  [
+   750,
+   4.5587
+  ],
+  [
+   800,
+   4.5088
+  ],
+  [
+   850,
+   4.4774
+  ],
+  [
+   900,
+   4.4697
+  ],
+  [
+   950,
+   4.4536
+  ],
+  [
+   952,
+   4.4547
+  ]
+ ],
+ "train_seconds": 111.67,
+ "wall_seconds": 127.68,
+ "chars_per_sec": 69913,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl at the lake. \nOne day, the little girl was scared and wanted to learn to get the ornace. She opened it and saw a little butterfly on the ground. The boat picked up the bear and went to the fish.\nThe dough was so happy! The blue cream on the blue tree, and they worked running together. The cakey was happy to have a friend to have a game.\n<|eot|>\n\n \nOnce upon a time there were two friends, a rabbit. They were laughing and had a special saaps. One day, they decided to sing the shaps and fit for the ducks forfuls. The whole place were a big vorct, and if they had a fun day.\nThe children looked gone and said, \"You can fly with me a little kid!\" His mommy said, \"Please, don't go to it. I'm sorry, I don't know like you.\"\nDon't be slow and swe's name too. He felt sad. The picture was so jealous, but the large dress. The little girl was sad. Suddenly, he found out the slaxi and thought, \"Look, I am a nice boy. I will give you a new to you!\"\nThe big snakeed an idea, remembered it to help and in the water. The little goat was so happy. The baby smiled and thanked Ticy. After a while, the boy gave the tomato",
+ "rule_init": {},
+ "ngram_init": {}
+}

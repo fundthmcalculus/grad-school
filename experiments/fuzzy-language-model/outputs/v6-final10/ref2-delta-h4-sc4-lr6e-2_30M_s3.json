@@ -1,0 +1,207 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 4,
+  "rules": 16,
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-final10\\ref2-delta-h4-sc4-lr6e-2_30M_s3.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 4,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93376,
+ "params_nonemb": 44224,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.15327,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.39229
+  ],
+  [
+   580,
+   1.26849
+  ],
+  [
+   870,
+   1.19196
+  ],
+  [
+   1160,
+   1.15327
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.358
+  ],
+  [
+   50,
+   8.1527
+  ],
+  [
+   100,
+   6.2765
+  ],
+  [
+   150,
+   5.3597
+  ],
+  [
+   200,
+   4.9005
+  ],
+  [
+   250,
+   4.6496
+  ],
+  [
+   300,
+   4.4803
+  ],
+  [
+   350,
+   4.3759
+  ],
+  [
+   400,
+   4.299
+  ],
+  [
+   450,
+   4.2335
+  ],
+  [
+   500,
+   4.1743
+  ],
+  [
+   550,
+   4.112
+  ],
+  [
+   600,
+   4.0587
+  ],
+  [
+   650,
+   4.0027
+  ],
+  [
+   700,
+   3.9553
+  ],
+  [
+   750,
+   3.9114
+  ],
+  [
+   800,
+   3.8719
+  ],
+  [
+   850,
+   3.8249
+  ],
+  [
+   900,
+   3.7918
+  ],
+  [
+   950,
+   3.7627
+  ],
+  [
+   1000,
+   3.7295
+  ],
+  [
+   1050,
+   3.7166
+  ],
+  [
+   1100,
+   3.6965
+  ],
+  [
+   1150,
+   3.6752
+  ],
+  [
+   1159,
+   3.6675
+  ]
+ ],
+ "train_seconds": 110.29,
+ "wall_seconds": 117.06,
+ "chars_per_sec": 86163,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Ben. \nOne day, a little girl named Lily went outside. She was very hope her fat. She puts the bird to break the windows Kitty. It was a big, moon. The bird flew up and down the pond. The bird said, \"Thank you, Lily, for helping me.\"\nA Mark chaced them and yelled. She was happy to have more fun day. She hugged her happy she couldn't like the bird and watched the bird. She found her toy to sit and were so happy.\nLily laughed and said, \"Don't worry, you married your toy!\" Her mom smiled and thanked Tom to help Lily. They both played and played on the mailbox.\n<|eot|>\nOnce upon a time, in the monster, there lived a little girl named Lucy. Lucy was very smartful. She had a big hug and lived in a big door. One day, she saw a big, fun playing in the sky. It was a big, bright behind invite. But she had an idea!\nWhile she was playing, she saw the little girl named Amy said, \"I saw this for you, birds!\" Sue was surprised. Her mom said, \"I'm sorry, Sue. I don't need to share your wa",
+ "rule_init": {},
+ "ngram_init": {}
+}

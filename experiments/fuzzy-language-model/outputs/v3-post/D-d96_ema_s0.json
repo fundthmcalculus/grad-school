@@ -1,0 +1,216 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 96,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.003,
+  "wd": 0.01,
+  "warmup": 50,
+  "seed": 100,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-post\\D-d96_ema_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-big\\D-d96_30M_s0.pt",
+  "ema_decay": 0.999,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 96,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 162272,
+ "params_nonemb": 152864,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.19515,
+ "val_bpc_ema": 1.19481,
+ "evals": [
+  [
+   0,
+   1.22233
+  ],
+  [
+   305,
+   1.21505
+  ],
+  [
+   610,
+   1.20763
+  ],
+  [
+   915,
+   1.19987
+  ],
+  [
+   1220,
+   1.19516
+  ],
+  [
+   1221,
+   1.19515
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   1.1945
+  ],
+  [
+   50,
+   1.2111
+  ],
+  [
+   100,
+   1.2175
+  ],
+  [
+   150,
+   1.2176
+  ],
+  [
+   200,
+   1.2276
+  ],
+  [
+   250,
+   1.223
+  ],
+  [
+   300,
+   1.223
+  ],
+  [
+   350,
+   1.2245
+  ],
+  [
+   400,
+   1.2236
+  ],
+  [
+   450,
+   1.2223
+  ],
+  [
+   500,
+   1.2195
+  ],
+  [
+   550,
+   1.2184
+  ],
+  [
+   600,
+   1.2147
+  ],
+  [
+   650,
+   1.2149
+  ],
+  [
+   700,
+   1.2173
+  ],
+  [
+   750,
+   1.2099
+  ],
+  [
+   800,
+   1.2067
+  ],
+  [
+   850,
+   1.2115
+  ],
+  [
+   900,
+   1.2074
+  ],
+  [
+   950,
+   1.202
+  ],
+  [
+   1000,
+   1.2099
+  ],
+  [
+   1050,
+   1.2022
+  ],
+  [
+   1100,
+   1.2046
+  ],
+  [
+   1150,
+   1.2029
+  ],
+  [
+   1200,
+   1.2023
+  ],
+  [
+   1220,
+   1.207
+  ]
+ ],
+ "train_seconds": 171.33,
+ "wall_seconds": 195.62,
+ "chars_per_sec": 58383,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a small bird. The dog was a big party. The frog did not like the bear. The big man was fun and played with the right ball. The bird had lots of fun together, and the flower had found. The little ignorant was bright and watch the squash. The bird said, \"Yes, I want to do me.\" They learned",
+ "rule_init": {},
+ "ngram_init": {}
+}

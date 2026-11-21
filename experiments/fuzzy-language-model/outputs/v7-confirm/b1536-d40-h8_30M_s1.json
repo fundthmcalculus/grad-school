@@ -1,0 +1,199 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 40,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v7-confirm\\b1536-d40-h8_30M_s1.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1536",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1536
+ },
+ "config": {
+  "vocab_size": 1536,
+  "d_model": 40,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93792,
+ "params_nonemb": 32352,
+ "steps": 1052,
+ "chars_seen": 30013285,
+ "chars_per_token": 3.4826342,
+ "val_bpc": 1.11928,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   263,
+   1.30433
+  ],
+  [
+   526,
+   1.20402
+  ],
+  [
+   789,
+   1.14604
+  ],
+  [
+   1052,
+   1.11928
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.8959
+  ],
+  [
+   50,
+   8.9996
+  ],
+  [
+   100,
+   6.8035
+  ],
+  [
+   150,
+   5.6815
+  ],
+  [
+   200,
+   5.0961
+  ],
+  [
+   250,
+   4.7987
+  ],
+  [
+   300,
+   4.6169
+  ],
+  [
+   350,
+   4.473
+  ],
+  [
+   400,
+   4.4173
+  ],
+  [
+   450,
+   4.362
+  ],
+  [
+   500,
+   4.2977
+  ],
+  [
+   550,
+   4.2413
+  ],
+  [
+   600,
+   4.2088
+  ],
+  [
+   650,
+   4.1708
+  ],
+  [
+   700,
+   4.1253
+  ],
+  [
+   750,
+   4.0727
+  ],
+  [
+   800,
+   4.0502
+  ],
+  [
+   850,
+   4.0062
+  ],
+  [
+   900,
+   3.9861
+  ],
+  [
+   950,
+   3.9586
+  ],
+  [
+   1000,
+   3.9426
+  ],
+  [
+   1050,
+   3.94
+  ],
+  [
+   1051,
+   3.9407
+  ]
+ ],
+ "train_seconds": 211.35,
+ "wall_seconds": 222.43,
+ "chars_per_sec": 40776,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little boy named Tim. Tim was very at salways healthday. He put on the pretty flowers ont for the boy and the dog were so excited to inviants.\nIn the kitchen, Tim saw that it was a girl, and who loved the show pillags for her mom. She would not play with Sue, and they didn't listen to Tom. Sue said, \"Surprise I am playing with the mother. I wonder what it's today. You have to share the yield.\"\nTim's friends said, \"Yes, you cannot on the table and batter.\" Tom was very happy. They worked together to eat.\nLater, Tim's mom said, \"Yes, I will be fun!\" Tim was happy to have a bark. The mom gave him the shelpress the dight, and they all ran towards the pot. They were very happy with their mom and daddy. They played with music and had a lot of fun.\nFrom that day on, Tim and the little of muk lived on the table. They played all day and had lots of fun. The moral of the story is that pugathers, they need to be kind and always wait for him to go home.\n<|eot|>\n\nOnce there was a boy named Jack. He lived in a big, green sun. One day, he",
+ "rule_init": {},
+ "ngram_init": {}
+}

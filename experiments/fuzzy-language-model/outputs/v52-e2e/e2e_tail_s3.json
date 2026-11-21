@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\e2e_tail_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99019,
+ "params_nonemb": 47755,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.14137,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.11172
+  ],
+  [
+   100,
+   1.51746
+  ],
+  [
+   200,
+   1.35886
+  ],
+  [
+   300,
+   1.29775
+  ],
+  [
+   400,
+   1.25387
+  ],
+  [
+   500,
+   1.22083
+  ],
+  [
+   600,
+   1.19464
+  ],
+  [
+   700,
+   1.1741
+  ],
+  [
+   800,
+   1.15651
+  ],
+  [
+   900,
+   1.1435
+  ],
+  [
+   953,
+   1.14137
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.9196
+  ],
+  [
+   50,
+   9.3682
+  ],
+  [
+   100,
+   7.3445
+  ],
+  [
+   150,
+   6.23
+  ],
+  [
+   200,
+   5.6388
+  ],
+  [
+   250,
+   5.3195
+  ],
+  [
+   300,
+   5.1449
+  ],
+  [
+   350,
+   5.0115
+  ],
+  [
+   400,
+   4.9013
+  ],
+  [
+   450,
+   4.8331
+  ],
+  [
+   500,
+   4.7621
+  ],
+  [
+   550,
+   4.7198
+  ],
+  [
+   600,
+   4.6521
+  ],
+  [
+   650,
+   4.5993
+  ],
+  [
+   700,
+   4.5534
+  ],
+  [
+   750,
+   4.5325
+  ],
+  [
+   800,
+   4.4937
+  ],
+  [
+   850,
+   4.4597
+  ],
+  [
+   900,
+   4.4332
+  ],
+  [
+   950,
+   4.4261
+  ],
+  [
+   952,
+   4.4235
+  ]
+ ],
+ "train_seconds": 76.59,
+ "wall_seconds": 87.65,
+ "chars_per_sec": 101931,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was very kind and loved the big ball.\n<|eot|>\nOnce upon a time, there was a girl named Amy. She loved to play with her toys and other animals. One day, she decided to go to the park with her friends.\nThen, she saw a big ball on the ball. She decided to go to her ball, but she was having a fun day.\nThe ball went to the park and gave her a tree. She packed it to the bird. Then, she ran into the kitchen and waited. A little dog came to the tree and showed her a tree. Her mom was very sad and smiled. The buttons looked at it and said, \"Thank you, Amy! I want to play with you.\" They opened the pond and found lots of fun. And they did not rolling the tree.\n<|eot|>\n\nOnce upon a time, there lived an anrew named Max. Max was a little bunny who was a slow trayous of food. Max felt very sad because he always wanted to take the amazing cookies with his friend and a long time.\nOne day, Max found a big hug. Max wanted to see the button, but it was a big, green, strong voice to do. Max wanted to help the king's boot. He said, \"No, you can't go outside.\" Max did not want to play with his toy. They played together and had lots of fun.\n",
+ "rule_init": {},
+ "ngram_init": {}
+}

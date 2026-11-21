@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\e2e_tail_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99019,
+ "params_nonemb": 47755,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.13093,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.02741
+  ],
+  [
+   100,
+   1.49919
+  ],
+  [
+   200,
+   1.34782
+  ],
+  [
+   300,
+   1.28235
+  ],
+  [
+   400,
+   1.24446
+  ],
+  [
+   500,
+   1.21461
+  ],
+  [
+   600,
+   1.18718
+  ],
+  [
+   700,
+   1.16417
+  ],
+  [
+   800,
+   1.1461
+  ],
+  [
+   900,
+   1.13412
+  ],
+  [
+   953,
+   1.13093
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.6356
+  ],
+  [
+   50,
+   9.2174
+  ],
+  [
+   100,
+   7.2645
+  ],
+  [
+   150,
+   6.1579
+  ],
+  [
+   200,
+   5.5991
+  ],
+  [
+   250,
+   5.2885
+  ],
+  [
+   300,
+   5.1093
+  ],
+  [
+   350,
+   5.0073
+  ],
+  [
+   400,
+   4.9107
+  ],
+  [
+   450,
+   4.8109
+  ],
+  [
+   500,
+   4.7416
+  ],
+  [
+   550,
+   4.6704
+  ],
+  [
+   600,
+   4.6048
+  ],
+  [
+   650,
+   4.5708
+  ],
+  [
+   700,
+   4.5278
+  ],
+  [
+   750,
+   4.4952
+  ],
+  [
+   800,
+   4.4462
+  ],
+  [
+   850,
+   4.4165
+  ],
+  [
+   900,
+   4.4107
+  ],
+  [
+   950,
+   4.3913
+  ],
+  [
+   952,
+   4.3925
+  ]
+ ],
+ "train_seconds": 76.09,
+ "wall_seconds": 87.13,
+ "chars_per_sec": 102598,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl called Lucy. She was very excited to play with her mom. She was very happy to see her doll orcle and loved each other.\nOne day, Lucy found an old man on the farm. He saw her and said, \"Don't worry, your food is the room!\" Lucy was very happy. She decided to go to her else, but she was having so lovely.\nIt went back to her. She said, \"I am the best day at it!\" She opened the muple and looked at her saered. She said, \"Is, I'm glad you were just fit, but I am not so much. I'm not a fancy vend\".\nThe Anna and her mom started to laugh and said, \"Don't worry, I'm having so disgusting. And I will keep me feel better.\"\n<|eot|>\n\n\nLily and Tom are friends. They like to play and run on the slide and splash. They jump together. It swe and sing too hard. They take them around.\nOne day, they see a dress. They see some paper and mails. Tw asks Tom and Tom cooks. He stoped them to fix it. He looks at them and says, \"I want to help me higher. But it's just remembered it's blue and right. You are not foolish. Let's go. I have to play. Can you are not a good friend. You can have important",
+ "rule_init": {},
+ "ngram_init": {}
+}

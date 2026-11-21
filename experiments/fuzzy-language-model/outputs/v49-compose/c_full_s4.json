@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v49-compose\\c_full_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99005,
+ "params_nonemb": 47741,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.11106,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.04011
+  ],
+  [
+   100,
+   1.44847
+  ],
+  [
+   200,
+   1.33268
+  ],
+  [
+   300,
+   1.27437
+  ],
+  [
+   400,
+   1.22987
+  ],
+  [
+   500,
+   1.19809
+  ],
+  [
+   600,
+   1.17059
+  ],
+  [
+   700,
+   1.14522
+  ],
+  [
+   800,
+   1.12793
+  ],
+  [
+   900,
+   1.11393
+  ],
+  [
+   953,
+   1.11106
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.6596
+  ],
+  [
+   50,
+   9.0507
+  ],
+  [
+   100,
+   6.9803
+  ],
+  [
+   150,
+   5.977
+  ],
+  [
+   200,
+   5.4747
+  ],
+  [
+   250,
+   5.216
+  ],
+  [
+   300,
+   5.0506
+  ],
+  [
+   350,
+   4.9203
+  ],
+  [
+   400,
+   4.8192
+  ],
+  [
+   450,
+   4.7419
+  ],
+  [
+   500,
+   4.6678
+  ],
+  [
+   550,
+   4.6003
+  ],
+  [
+   600,
+   4.5641
+  ],
+  [
+   650,
+   4.5186
+  ],
+  [
+   700,
+   4.4701
+  ],
+  [
+   750,
+   4.422
+  ],
+  [
+   800,
+   4.3704
+  ],
+  [
+   850,
+   4.3559
+  ],
+  [
+   900,
+   4.3141
+  ],
+  [
+   950,
+   4.2852
+  ],
+  [
+   952,
+   4.286
+  ]
+ ],
+ "train_seconds": 75.23,
+ "wall_seconds": 86.15,
+ "chars_per_sec": 103776,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl called.\nHer friend he went to the beautiful and she was scared. He knew he was, but the girl did not mind her, but she don't know first. She loved the story.\nThe little girl was been tired and had a happy day. She was sad, but she had found a special, a cool, beautiful letter else. It was a big, lovely dog with a baking. He had a big hug and had a new friend.\nThe little girl said they were still important. She said hello to the old owl. The old mans got the old and a tree. He walked closer to theful day, and whole guakedzy. They learned that it's important to always have a new family. And they all lived happily ever after.\n<|eot|>\nOne day, a little girl named Lily went for a walk. She asked her friend, Sam. Lily put the ock on the shiny box and said, \"Let's play with the tower.\"\nMax and Mia felt sad. They played for the game with Mom. They were happy and played together. And from that day on, Tom and Tom would always be good to come back to fix it.\n<|eot|>\n\n\nOnce upon a time there was a gifted old lady. She had a new sputing blue and right. She was very happy. She had no friends with a new job. She put it on a small, light and gave Mom a",
+ "rule_init": {},
+ "ngram_init": {}
+}

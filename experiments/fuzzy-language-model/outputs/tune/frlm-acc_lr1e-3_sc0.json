@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.001,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-acc_lr1e-3_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 28004,
+ "params_nonemb": 24868,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.33875,
+ "evals": [
+  [
+   305,
+   3.01003
+  ],
+  [
+   610,
+   2.54993
+  ],
+  [
+   915,
+   2.38464
+  ],
+  [
+   1220,
+   2.3395
+  ],
+  [
+   1221,
+   2.33875
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8624
+  ],
+  [
+   50,
+   6.5714
+  ],
+  [
+   100,
+   5.7333
+  ],
+  [
+   150,
+   4.869
+  ],
+  [
+   200,
+   4.1262
+  ],
+  [
+   250,
+   3.6091
+  ],
+  [
+   300,
+   3.2799
+  ],
+  [
+   350,
+   3.076
+  ],
+  [
+   400,
+   2.9291
+  ],
+  [
+   450,
+   2.8306
+  ],
+  [
+   500,
+   2.7414
+  ],
+  [
+   550,
+   2.6611
+  ],
+  [
+   600,
+   2.6039
+  ],
+  [
+   650,
+   2.5593
+  ],
+  [
+   700,
+   2.5247
+  ],
+  [
+   750,
+   2.4922
+  ],
+  [
+   800,
+   2.4574
+  ],
+  [
+   850,
+   2.434
+  ],
+  [
+   900,
+   2.4124
+  ],
+  [
+   950,
+   2.3965
+  ],
+  [
+   1000,
+   2.3699
+  ],
+  [
+   1050,
+   2.3641
+  ],
+  [
+   1100,
+   2.3546
+  ],
+  [
+   1150,
+   2.3485
+  ],
+  [
+   1200,
+   2.3547
+  ],
+  [
+   1220,
+   2.3515
+  ]
+ ],
+ "train_seconds": 525.79,
+ "wall_seconds": 672.2,
+ "chars_per_sec": 19024,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time. He very shime for the she little saw ea her had a slo be sad said, \"Mare and her baw to play in roull. She saw and sades all gowalsted his mom fery meawne togetherrim, some. They was her fleaw. The live thime, sting it, the goon. At a placked was a not barss. The loce to suryand the lits at and sa",
+ "rule_init": {}
+}

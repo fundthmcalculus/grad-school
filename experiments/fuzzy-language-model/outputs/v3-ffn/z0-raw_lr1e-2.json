@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn\\z0-raw_lr1e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 0,
+  "ffn_width": "rule",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 0,
+  "ffn_width": "rule",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 85444,
+ "params_nonemb": 79172,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.76012,
+ "evals": [
+  [
+   305,
+   2.17756
+  ],
+  [
+   610,
+   1.93945
+  ],
+  [
+   915,
+   1.81398
+  ],
+  [
+   1220,
+   1.76104
+  ],
+  [
+   1221,
+   1.76012
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.0153
+  ],
+  [
+   50,
+   5.4671
+  ],
+  [
+   100,
+   3.9584
+  ],
+  [
+   150,
+   3.1405
+  ],
+  [
+   200,
+   2.7071
+  ],
+  [
+   250,
+   2.4574
+  ],
+  [
+   300,
+   2.3104
+  ],
+  [
+   350,
+   2.2134
+  ],
+  [
+   400,
+   2.1311
+  ],
+  [
+   450,
+   2.0853
+  ],
+  [
+   500,
+   2.0434
+  ],
+  [
+   550,
+   1.9939
+  ],
+  [
+   600,
+   1.9627
+  ],
+  [
+   650,
+   1.9417
+  ],
+  [
+   700,
+   1.9194
+  ],
+  [
+   750,
+   1.902
+  ],
+  [
+   800,
+   1.8776
+  ],
+  [
+   850,
+   1.8608
+  ],
+  [
+   900,
+   1.8433
+  ],
+  [
+   950,
+   1.8298
+  ],
+  [
+   1000,
+   1.8016
+  ],
+  [
+   1050,
+   1.7965
+  ],
+  [
+   1100,
+   1.7851
+  ],
+  [
+   1150,
+   1.7763
+  ],
+  [
+   1200,
+   1.7787
+  ],
+  [
+   1220,
+   1.7786
+  ]
+ ],
+ "train_seconds": 59.02,
+ "wall_seconds": 71.02,
+ "chars_per_sec": 169489,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a girl garden. \"Wo solouted the ine, and we prinning. Ben was good made a fun watch asted toy espur and him gonen. The zoo, letting, a ingirl named Buddy. They keep the knew a bike sad. They so go down looked at the cat it and a colling bety and went to do the stay to rathouse. It was ta",
+ "rule_init": {}
+}

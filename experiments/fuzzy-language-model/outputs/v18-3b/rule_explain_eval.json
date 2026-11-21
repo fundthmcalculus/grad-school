@@ -1,0 +1,41 @@
+{
+ "ckpt": "outputs/v18-3b/D-d48-bpe1024-ctx512-r32_3000M_s0.pt",
+ "m": 8,
+ "groups": {
+  "capitalised piece": {
+   "n": 3093,
+   "model": 0.853,
+   "reading": 0.836
+  },
+  "frequent piece": {
+   "n": 9661,
+   "model": 0.909,
+   "reading": 0.86
+  },
+  "other piece": {
+   "n": 15503,
+   "model": 0.706,
+   "reading": 0.647
+  },
+  "p 0.05-0.5": {
+   "n": 11953,
+   "model": 1.0,
+   "reading": 0.949
+  },
+  "p<0.05": {
+   "n": 10100,
+   "model": 0.396,
+   "reading": 0.326
+  },
+  "p>0.5": {
+   "n": 10715,
+   "model": 1.0,
+   "reading": 0.978
+  },
+  "punctuation / newline": {
+   "n": 4511,
+   "model": 0.954,
+   "reading": 0.93
+  }
+ }
+}

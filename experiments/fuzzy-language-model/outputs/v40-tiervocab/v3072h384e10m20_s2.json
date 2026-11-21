@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v3072h384e10m20_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99248,
+ "params_nonemb": 53456,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.0657,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05416
+  ],
+  [
+   100,
+   1.41823
+  ],
+  [
+   200,
+   1.29496
+  ],
+  [
+   300,
+   1.23239
+  ],
+  [
+   400,
+   1.18875
+  ],
+  [
+   500,
+   1.1581
+  ],
+  [
+   600,
+   1.12497
+  ],
+  [
+   700,
+   1.10095
+  ],
+  [
+   800,
+   1.08252
+  ],
+  [
+   900,
+   1.07026
+  ],
+  [
+   953,
+   1.0657
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7122
+  ],
+  [
+   50,
+   9.0754
+  ],
+  [
+   100,
+   6.9266
+  ],
+  [
+   150,
+   5.8585
+  ],
+  [
+   200,
+   5.3444
+  ],
+  [
+   250,
+   5.0641
+  ],
+  [
+   300,
+   4.8994
+  ],
+  [
+   350,
+   4.7964
+  ],
+  [
+   400,
+   4.6981
+  ],
+  [
+   450,
+   4.6009
+  ],
+  [
+   500,
+   4.529
+  ],
+  [
+   550,
+   4.4577
+  ],
+  [
+   600,
+   4.379
+  ],
+  [
+   650,
+   4.3415
+  ],
+  [
+   700,
+   4.2954
+  ],
+  [
+   750,
+   4.2607
+  ],
+  [
+   800,
+   4.2078
+  ],
+  [
+   850,
+   4.1744
+  ],
+  [
+   900,
+   4.1621
+  ],
+  [
+   950,
+   4.1412
+  ],
+  [
+   952,
+   4.1433
+  ]
+ ],
+ "train_seconds": 72.71,
+ "wall_seconds": 84.71,
+ "chars_per_sec": 107374,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was very excited to see the cars. Her mom said, \"Let's get the cars and adventures can make pretty treats.\"\nA little girl found a big, red boat. She decided to go here to look for songs. She saw a pretty animal on therobe and also found a shiny apple. Lucy worked down and was very tired. She wanted to make her faces and learning it is. Her mom gave her a big smile and said \"You are so bad. You are important. We have to sailed you.\"\nThe girl agreed to a little girl who came to her mommy, but she could not find it. She put her paws on the ground and picked it up and smiled.\nAmy said, \"We will be my fancy bean and sorry to take your surprise house. But my rareob is not not.\" Amy said, \"Yes, so of my name, I don't know like you.\"\nSue and her mom went home and smiled. They said, \"I love you, grandma. I was too kind with it. I will help you.\"\nAmy's mom smiled and said, \"I won't learn to stay in the girl's inside. I won't care of you to help you help.\"\nMia's mom laughed and remembered it's blue and right. She gave her anroom to her mom and mom for her mom. She thanked her mom for her and said no. Mom said",
+ "rule_init": {},
+ "ngram_init": {}
+}

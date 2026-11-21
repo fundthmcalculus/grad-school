@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.003,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/flm_lr3e-3_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 26112,
+ "params_nonemb": 22976,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.11948,
+ "evals": [
+  [
+   305,
+   2.75417
+  ],
+  [
+   610,
+   2.29578
+  ],
+  [
+   915,
+   2.16135
+  ],
+  [
+   1220,
+   2.11977
+  ],
+  [
+   1221,
+   2.11948
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8403
+  ],
+  [
+   50,
+   6.2287
+  ],
+  [
+   100,
+   5.1578
+  ],
+  [
+   150,
+   4.3017
+  ],
+  [
+   200,
+   3.6788
+  ],
+  [
+   250,
+   3.2715
+  ],
+  [
+   300,
+   3.0083
+  ],
+  [
+   350,
+   2.8141
+  ],
+  [
+   400,
+   2.6579
+  ],
+  [
+   450,
+   2.5498
+  ],
+  [
+   500,
+   2.4651
+  ],
+  [
+   550,
+   2.3879
+  ],
+  [
+   600,
+   2.3354
+  ],
+  [
+   650,
+   2.3008
+  ],
+  [
+   700,
+   2.2724
+  ],
+  [
+   750,
+   2.2506
+  ],
+  [
+   800,
+   2.2224
+  ],
+  [
+   850,
+   2.2036
+  ],
+  [
+   900,
+   2.1887
+  ],
+  [
+   950,
+   2.1767
+  ],
+  [
+   1000,
+   2.1493
+  ],
+  [
+   1050,
+   2.144
+  ],
+  [
+   1100,
+   2.1343
+  ],
+  [
+   1150,
+   2.1297
+  ],
+  [
+   1200,
+   2.1359
+  ],
+  [
+   1220,
+   2.1349
+  ]
+ ],
+ "train_seconds": 189.35,
+ "wall_seconds": 365.06,
+ "chars_per_sec": 52826,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was not for there some. He saw eext to the walked Sam her.\nMax dog more fruny with his sackful care happy was a ssarled an everer sitt her read. He red and had played hus to to hers make. The learn tige said and bleed to small and casly wanted to bles at the scare. They add just and the was ",
+ "rule_init": {}
+}

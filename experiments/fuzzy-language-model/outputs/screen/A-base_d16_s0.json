@@ -1,0 +1,235 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 16,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cpu",
+  "eval_chars": 300000,
+  "eval_every": 100,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/screen/A-base_d16_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 16,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 8568,
+ "params_nonemb": 7000,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.10254,
+ "evals": [
+  [
+   0,
+   6.61953
+  ],
+  [
+   100,
+   3.17838
+  ],
+  [
+   200,
+   2.6799
+  ],
+  [
+   300,
+   2.47138
+  ],
+  [
+   400,
+   2.37463
+  ],
+  [
+   500,
+   2.33854
+  ],
+  [
+   600,
+   2.27006
+  ],
+  [
+   700,
+   2.24313
+  ],
+  [
+   800,
+   2.19607
+  ],
+  [
+   900,
+   2.17189
+  ],
+  [
+   1000,
+   2.13928
+  ],
+  [
+   1100,
+   2.12019
+  ],
+  [
+   1200,
+   2.09985
+  ],
+  [
+   1221,
+   2.10254
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.6223
+  ],
+  [
+   50,
+   5.5283
+  ],
+  [
+   100,
+   4.3439
+  ],
+  [
+   150,
+   3.4678
+  ],
+  [
+   200,
+   3.0071
+  ],
+  [
+   250,
+   2.7448
+  ],
+  [
+   300,
+   2.5969
+  ],
+  [
+   350,
+   2.5079
+  ],
+  [
+   400,
+   2.4332
+  ],
+  [
+   450,
+   2.3967
+  ],
+  [
+   500,
+   2.3663
+  ],
+  [
+   550,
+   2.3202
+  ],
+  [
+   600,
+   2.2907
+  ],
+  [
+   650,
+   2.2715
+  ],
+  [
+   700,
+   2.2575
+  ],
+  [
+   750,
+   2.2406
+  ],
+  [
+   800,
+   2.217
+  ],
+  [
+   850,
+   2.2008
+  ],
+  [
+   900,
+   2.1829
+  ],
+  [
+   950,
+   2.1687
+  ],
+  [
+   1000,
+   2.1424
+  ],
+  [
+   1050,
+   2.1323
+  ],
+  [
+   1100,
+   2.1202
+  ],
+  [
+   1150,
+   2.1105
+  ],
+  [
+   1200,
+   2.1129
+  ],
+  [
+   1220,
+   2.1118
+  ]
+ ],
+ "train_seconds": 1162.85,
+ "wall_seconds": 1448.59,
+ "chars_per_sec": 8602,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "device": "cpu",
+ "device_name": "11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz",
+ "host": "localhost.localdomain",
+ "sample": "Once upon a time, there noth Ben vogs, but It wour asked the was very said the said, \"Max was dayg ballit in think. He care had them sad said, \"Helly, the it with them the red by liked to to hurted to her flew fun the mest in to the time, there ornet a boy said. Bob and very at the sce pearned and very day. Mave to",
+ "rule_init": {},
+ "ngram_init": {}
+}

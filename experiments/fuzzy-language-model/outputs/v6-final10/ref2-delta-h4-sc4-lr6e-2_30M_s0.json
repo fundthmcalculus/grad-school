@@ -1,0 +1,207 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 4,
+  "rules": 16,
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-final10\\ref2-delta-h4-sc4-lr6e-2_30M_s0.json",
+  "save_model": true,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 4,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93376,
+ "params_nonemb": 44224,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.15452,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.37928
+  ],
+  [
+   580,
+   1.26414
+  ],
+  [
+   870,
+   1.19534
+  ],
+  [
+   1160,
+   1.15452
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3342
+  ],
+  [
+   50,
+   8.1488
+  ],
+  [
+   100,
+   6.2971
+  ],
+  [
+   150,
+   5.3732
+  ],
+  [
+   200,
+   4.9206
+  ],
+  [
+   250,
+   4.6677
+  ],
+  [
+   300,
+   4.4926
+  ],
+  [
+   350,
+   4.3749
+  ],
+  [
+   400,
+   4.2988
+  ],
+  [
+   450,
+   4.2201
+  ],
+  [
+   500,
+   4.1466
+  ],
+  [
+   550,
+   4.1015
+  ],
+  [
+   600,
+   4.0681
+  ],
+  [
+   650,
+   4.0068
+  ],
+  [
+   700,
+   3.9471
+  ],
+  [
+   750,
+   3.9142
+  ],
+  [
+   800,
+   3.8847
+  ],
+  [
+   850,
+   3.8334
+  ],
+  [
+   900,
+   3.8001
+  ],
+  [
+   950,
+   3.7636
+  ],
+  [
+   1000,
+   3.7326
+  ],
+  [
+   1050,
+   3.7067
+  ],
+  [
+   1100,
+   3.684
+  ],
+  [
+   1150,
+   3.6713
+  ],
+  [
+   1159,
+   3.667
+  ]
+ ],
+ "train_seconds": 113.18,
+ "wall_seconds": 120.32,
+ "chars_per_sec": 83959,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and ripped. The big measure was a passy. The castle was not happy. \nBut then, the mouse jumped on the magical house. Kitty and her friend, a little boy named Tim's mom. They had a lot of fun. The cute yellow bottle, and the chair. They chaired it and played together. The sun was happy they could.\nThe end.\n<|eot|>\nOne day, a little boy named Tim went to the park. He saw a big tree with pretty places. He wanted to play with his friends. They ran to Sator the tree.\nInside the box, he saw a fairy. It thought it was a little girl who didn't want it. Poppy thought it was a big, pot for, but she was very nice. She read acorn.\nAs he got outside on, he saw a pretty bug on the door. The bird was sad and flew away. Tim was so excited that he was so excited to see the bug. They realized a small box with each other, and her friends came to play with. They both laughed and became good friends.\n<|eot|>\nOnce upon a time, there was a vegetable. The counter had an tower with many uncomfortable. It",
+ "rule_init": {},
+ "ngram_init": {}
+}

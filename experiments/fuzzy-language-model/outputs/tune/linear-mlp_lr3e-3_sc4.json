@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "linear",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.003,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/linear-mlp_lr3e-3_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "linear",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 19940,
+ "params_nonemb": 16804,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.97972,
+ "evals": [
+  [
+   305,
+   2.40717
+  ],
+  [
+   610,
+   2.11692
+  ],
+  [
+   915,
+   2.01775
+  ],
+  [
+   1220,
+   1.98007
+  ],
+  [
+   1221,
+   1.97972
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.0401
+  ],
+  [
+   50,
+   6.2994
+  ],
+  [
+   100,
+   4.9642
+  ],
+  [
+   150,
+   3.9292
+  ],
+  [
+   200,
+   3.2826
+  ],
+  [
+   250,
+   2.8771
+  ],
+  [
+   300,
+   2.6252
+  ],
+  [
+   350,
+   2.4682
+  ],
+  [
+   400,
+   2.3513
+  ],
+  [
+   450,
+   2.2812
+  ],
+  [
+   500,
+   2.2249
+  ],
+  [
+   550,
+   2.1689
+  ],
+  [
+   600,
+   2.1328
+  ],
+  [
+   650,
+   2.1144
+  ],
+  [
+   700,
+   2.0959
+  ],
+  [
+   750,
+   2.0803
+  ],
+  [
+   800,
+   2.0585
+  ],
+  [
+   850,
+   2.0457
+  ],
+  [
+   900,
+   2.0353
+  ],
+  [
+   950,
+   2.0242
+  ],
+  [
+   1000,
+   2.0013
+  ],
+  [
+   1050,
+   2.0013
+  ],
+  [
+   1100,
+   1.993
+  ],
+  [
+   1150,
+   1.9884
+  ],
+  [
+   1200,
+   1.9944
+  ],
+  [
+   1220,
+   1.9937
+  ]
+ ],
+ "train_seconds": 432.93,
+ "wall_seconds": 529.59,
+ "chars_per_sec": 23104,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was not for the smell doget see wanted to plal!\nThey day, a big be fired greame the parrounful came happicems ands all gon saw he sit with reame. The did alir pong, there was a big, meap. The leade tige shined the togething the red as ame and shail wanted to his polay. Max was liked. He was ",
+ "rule_init": {}
+}

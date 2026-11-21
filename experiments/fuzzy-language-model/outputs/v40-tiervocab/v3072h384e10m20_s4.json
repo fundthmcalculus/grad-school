@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v3072h384e10m20_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99248,
+ "params_nonemb": 53456,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06702,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.08756
+  ],
+  [
+   100,
+   1.43824
+  ],
+  [
+   200,
+   1.28643
+  ],
+  [
+   300,
+   1.23115
+  ],
+  [
+   400,
+   1.18715
+  ],
+  [
+   500,
+   1.15614
+  ],
+  [
+   600,
+   1.13123
+  ],
+  [
+   700,
+   1.10143
+  ],
+  [
+   800,
+   1.08372
+  ],
+  [
+   900,
+   1.0702
+  ],
+  [
+   953,
+   1.06702
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.8506
+  ],
+  [
+   50,
+   9.145
+  ],
+  [
+   100,
+   6.9667
+  ],
+  [
+   150,
+   5.877
+  ],
+  [
+   200,
+   5.3291
+  ],
+  [
+   250,
+   5.0577
+  ],
+  [
+   300,
+   4.883
+  ],
+  [
+   350,
+   4.7604
+  ],
+  [
+   400,
+   4.6566
+  ],
+  [
+   450,
+   4.581
+  ],
+  [
+   500,
+   4.5155
+  ],
+  [
+   550,
+   4.4497
+  ],
+  [
+   600,
+   4.4148
+  ],
+  [
+   650,
+   4.3617
+  ],
+  [
+   700,
+   4.3121
+  ],
+  [
+   750,
+   4.2619
+  ],
+  [
+   800,
+   4.2085
+  ],
+  [
+   850,
+   4.1899
+  ],
+  [
+   900,
+   4.1475
+  ],
+  [
+   950,
+   4.1202
+  ],
+  [
+   952,
+   4.121
+  ]
+ ],
+ "train_seconds": 73.4,
+ "wall_seconds": 85.73,
+ "chars_per_sec": 106361,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was busy and had a beautiful day outside. One day, Lucy saw her mom and dad. She picked it up and saw her family. Sue found a big, red boat.\nSue saw her best friend, the songs, and they all thought for the big blue cream on the water. Lily decided to help her feel better. She walked around the tree and saw her family. Every day, she hugged her and hugged her friends and showed her how it was.\n<|eot|>\n\n\nBen and Lily were playing in the park. They liked to know what to do. They liked to play and fit. They had a big, red lying in the park.\n\"Look, we need to be careful,\" Ben said.\n\"Okay, Anna, I love you,\" Ben said.\n\"No, I want to cross the cravel!\" Anna says.\n\"Bhh, please don't see the veailer,\" Mom said. \"It's nice too. I can't do it. But you have to be kind with them. We will be safe and play together.\"\nThey found the slip and thought what was inside. They saw a big boy who wanted to watch it. He saw the red ball and started to feel better.\n\"Big, you are a magic ball. You are too big. He will drive it up. Tun and Anna\",\" Sara said.\nThey ran",
+ "rule_init": {},
+ "ngram_init": {}
+}

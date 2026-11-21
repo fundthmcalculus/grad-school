@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 1,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\b1_ffn_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 1,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99202,
+ "params_nonemb": 47938,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.13959,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.10557
+  ],
+  [
+   100,
+   1.49557
+  ],
+  [
+   200,
+   1.34912
+  ],
+  [
+   300,
+   1.28965
+  ],
+  [
+   400,
+   1.24345
+  ],
+  [
+   500,
+   1.21754
+  ],
+  [
+   600,
+   1.19215
+  ],
+  [
+   700,
+   1.17194
+  ],
+  [
+   800,
+   1.15414
+  ],
+  [
+   900,
+   1.14215
+  ],
+  [
+   953,
+   1.13959
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.9289
+  ],
+  [
+   50,
+   9.2816
+  ],
+  [
+   100,
+   7.2712
+  ],
+  [
+   150,
+   6.1599
+  ],
+  [
+   200,
+   5.5855
+  ],
+  [
+   250,
+   5.28
+  ],
+  [
+   300,
+   5.115
+  ],
+  [
+   350,
+   4.9804
+  ],
+  [
+   400,
+   4.8756
+  ],
+  [
+   450,
+   4.8124
+  ],
+  [
+   500,
+   4.7444
+  ],
+  [
+   550,
+   4.6998
+  ],
+  [
+   600,
+   4.6358
+  ],
+  [
+   650,
+   4.5849
+  ],
+  [
+   700,
+   4.5439
+  ],
+  [
+   750,
+   4.5213
+  ],
+  [
+   800,
+   4.4862
+  ],
+  [
+   850,
+   4.4547
+  ],
+  [
+   900,
+   4.4269
+  ],
+  [
+   950,
+   4.4221
+  ],
+  [
+   952,
+   4.4204
+  ]
+ ],
+ "train_seconds": 44.08,
+ "wall_seconds": 50.67,
+ "chars_per_sec": 177116,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a bright tree. It would go out to the park to play with it. One day, a big melant, he saw a big tree. The bird saw a big tree. The other cloud was scared. The bird decided to go to the bird, but it didn't come out.\nThe bird learned that it was not care about what you should be else. It was a big tree and the bird was. Every day, the bird said, \"I found it together.\" The bird said, \"Thank you, little boy, can I follow things. Let's play together!\" The bird understood and flew away to the boy, but he could not find it. He put the bird on the tree and went back to his friend.\nThe next day, the bird flew into a big, fierce dog. The cat learned that the cat had to get the cat. The end. The cat was so happy again.\n<|eot|>\nOnce upon a time, in a small house, there was a swive. It was very busy. All the cat always worked while.\nOne day, the cat and the cat were sad. The cat wanted to help the cat. But, the cat thought it was too big. The dog said, \"I will help you.\" The cat and the cat became best friends. They played together in the big tree all day. They had a lot of fun, and it had a lot of fun. The cat and the cat became good friends",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,206 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 96,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.02,
+  "wd": 0.01,
+  "warmup": 300,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 2000,
+  "out": "outputs\\v32-ladder\\d96-L2_30M_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 96,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 251168,
+ "params_nonemb": 152864,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 0.95934,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   1160,
+   0.95934
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.6716
+  ],
+  [
+   50,
+   8.9695
+  ],
+  [
+   100,
+   6.7533
+  ],
+  [
+   150,
+   5.4834
+  ],
+  [
+   200,
+   4.8382
+  ],
+  [
+   250,
+   4.4866
+  ],
+  [
+   300,
+   4.2639
+  ],
+  [
+   350,
+   4.0898
+  ],
+  [
+   400,
+   3.9536
+  ],
+  [
+   450,
+   3.8143
+  ],
+  [
+   500,
+   3.7148
+  ],
+  [
+   550,
+   3.6223
+  ],
+  [
+   600,
+   3.5436
+  ],
+  [
+   650,
+   3.4649
+  ],
+  [
+   700,
+   3.408
+  ],
+  [
+   750,
+   3.3704
+  ],
+  [
+   800,
+   3.3053
+  ],
+  [
+   850,
+   3.248
+  ],
+  [
+   900,
+   3.2128
+  ],
+  [
+   950,
+   3.1622
+  ],
+  [
+   1000,
+   3.1191
+  ],
+  [
+   1050,
+   3.0918
+  ],
+  [
+   1100,
+   3.0728
+  ],
+  [
+   1150,
+   3.076
+  ],
+  [
+   1159,
+   3.0718
+  ]
+ ],
+ "train_seconds": 80.83,
+ "wall_seconds": 84.62,
+ "chars_per_sec": 117557,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big card. The cardboard was special and wanted to make a big snag with its friends.\nA little girl named Lily went to the cardboard. She saw the cardboard and had a baby grandma ever. She was happy and went to the cardboard with her mom. Lily was curious. She asked her mom, \"Can you help me?\" Her mom said, \"Yes, she will love a family!\" Lily said, \"Yes, Lily. I will help you.\"\nLily was happy and said, \"Yes, let's make a special petboard!\" They all played together. They made a snackce for Lily and her friends. They were so happy to share the cardboard with their friends. They played together every day.\n<|eot|>\nOnce upon a time, there was a little girl named Lucy. She loved to play with her toys. Every day, she would go to her room and play with her toys. One day, her mom was playing with her toys.\nLucy's mom told her about one, her mommy said, \"Let's play with your toys and buy delicious toys.\"\nLucy wanted to play with her toys. Her mom said, \"Let's play with the toys, Lucy!\" Lucy said, \"Yes, let's play with your toys.\"",
+ "rule_init": {},
+ "ngram_init": {}
+}

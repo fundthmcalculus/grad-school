@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v25-rep\\weight_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11319,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.28517
+  ],
+  [
+   100,
+   1.59357
+  ],
+  [
+   200,
+   1.43921
+  ],
+  [
+   300,
+   1.37099
+  ],
+  [
+   400,
+   1.31288
+  ],
+  [
+   500,
+   1.26711
+  ],
+  [
+   600,
+   1.23012
+  ],
+  [
+   700,
+   1.20025
+  ],
+  [
+   800,
+   1.1721
+  ],
+  [
+   900,
+   1.15033
+  ],
+  [
+   1000,
+   1.13054
+  ],
+  [
+   1100,
+   1.11689
+  ],
+  [
+   1160,
+   1.11319
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.9322
+  ],
+  [
+   50,
+   8.5705
+  ],
+  [
+   100,
+   6.5999
+  ],
+  [
+   150,
+   5.6405
+  ],
+  [
+   200,
+   5.1532
+  ],
+  [
+   250,
+   4.8784
+  ],
+  [
+   300,
+   4.7004
+  ],
+  [
+   350,
+   4.5667
+  ],
+  [
+   400,
+   4.4592
+  ],
+  [
+   450,
+   4.3413
+  ],
+  [
+   500,
+   4.2578
+  ],
+  [
+   550,
+   4.1773
+  ],
+  [
+   600,
+   4.1026
+  ],
+  [
+   650,
+   4.0253
+  ],
+  [
+   700,
+   3.9715
+  ],
+  [
+   750,
+   3.9431
+  ],
+  [
+   800,
+   3.879
+  ],
+  [
+   850,
+   3.8222
+  ],
+  [
+   900,
+   3.7889
+  ],
+  [
+   950,
+   3.7406
+  ],
+  [
+   1000,
+   3.7006
+  ],
+  [
+   1050,
+   3.6734
+  ],
+  [
+   1100,
+   3.6553
+  ],
+  [
+   1150,
+   3.6581
+  ],
+  [
+   1159,
+   3.6543
+  ]
+ ],
+ "train_seconds": 80.31,
+ "wall_seconds": 94.86,
+ "chars_per_sec": 118323,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and old bird. \nThe meet hoping a little bird was a big, spinhter. He was very happy that his pizzy top of a ciztut. It loved to go to the apple.\nThe pocket of the bedroom and the bird slid down to the bedroom. He thought the bird was the ear.\nThe bird was so excited that then they found the apple. The bird said, \"OK, the bird! You can sing a mof too. Do you want to see it?\" But then, a grow came an close through. The bird was safe and hurt. \nThe bird thanked the bird for a bord for a while. The bird replied with the bird how to fix the pils, but it was very nice. \nThe bird and the bird never bored. They had lots of fun day while they had an idea. They shared the bird together in the bed, and the bird was so happy. And they all became best friends.\n<|eot|>\nOnce upon a time, there was a fine little boy named Tim. Tim was very excited. He went to a pagcolo and his mom said, \"Hello, having a gift!\" They went outside and showed the mightray",
+ "rule_init": {},
+ "ngram_init": {}
+}

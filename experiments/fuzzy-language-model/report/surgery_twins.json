@@ -1,0 +1,16 @@
+{
+ "events": 97,
+ "events_with_signature_matches": 97,
+ "median_matches": 85.0,
+ "helped": [
+  921,
+  1297
+ ],
+ "helped_share": 0.7101002313030069,
+ "hurt": [
+  3074,
+  10301
+ ],
+ "hurt_share": 0.29841762935637317,
+ "events_with_helped_den": 72
+}

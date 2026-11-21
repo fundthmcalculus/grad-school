@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v22-tribble\\cf_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.18589,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.17693
+  ],
+  [
+   100,
+   1.60493
+  ],
+  [
+   200,
+   1.45963
+  ],
+  [
+   300,
+   1.39992
+  ],
+  [
+   400,
+   1.35719
+  ],
+  [
+   500,
+   1.3244
+  ],
+  [
+   600,
+   1.29177
+  ],
+  [
+   700,
+   1.26164
+  ],
+  [
+   800,
+   1.24028
+  ],
+  [
+   900,
+   1.21841
+  ],
+  [
+   1000,
+   1.20091
+  ],
+  [
+   1100,
+   1.18967
+  ],
+  [
+   1160,
+   1.18589
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.0373
+  ],
+  [
+   50,
+   8.0401
+  ],
+  [
+   100,
+   6.2826
+  ],
+  [
+   150,
+   5.4073
+  ],
+  [
+   200,
+   4.945
+  ],
+  [
+   250,
+   4.7126
+  ],
+  [
+   300,
+   4.5485
+  ],
+  [
+   350,
+   4.4506
+  ],
+  [
+   400,
+   4.3616
+  ],
+  [
+   450,
+   4.3094
+  ],
+  [
+   500,
+   4.2485
+  ],
+  [
+   550,
+   4.1958
+  ],
+  [
+   600,
+   4.13
+  ],
+  [
+   650,
+   4.0868
+  ],
+  [
+   700,
+   4.05
+  ],
+  [
+   750,
+   4.0152
+  ],
+  [
+   800,
+   3.968
+  ],
+  [
+   850,
+   3.9193
+  ],
+  [
+   900,
+   3.8925
+  ],
+  [
+   950,
+   3.8637
+  ],
+  [
+   1000,
+   3.8336
+  ],
+  [
+   1050,
+   3.802
+  ],
+  [
+   1100,
+   3.7934
+  ],
+  [
+   1150,
+   3.7672
+  ],
+  [
+   1159,
+   3.7699
+  ]
+ ],
+ "train_seconds": 79.18,
+ "wall_seconds": 96.04,
+ "chars_per_sec": 120009,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy. \nLily saw her room, and a little girl named Lucy. Lily liked to run and play in the park. She would pushed the box, and she saw a beautiful surprise and loved to go inside. Her friend was a better gentle of a plane box. The girl said, \"Look, Lucy, we can chaigent. You should have to behave and makes good.\" They saw a big, red ball on the pillow. The next day, Sue and Lily found the billy's ball. They were very happy.\n<|eot|>\nOnce upon a time, a little girl named Sally three thought, a little girl named Lily was playing exceive. She wanted to show it to herself.\nLily and her mom watched come with the food. Lily was very sad, so she started to find a toy. She tried to stop, but she didn't want to play outside. Lily was sad and said, \"Yes, you can't play with my toys.\"\nLucy saw a big tree with a big cat. The little boy came to the park to play. Lily saw Lily and said, \"Thank you, Lily!\" Tom was very happy.\nLily said, \"I'm sorry, Max. I will help you help Tom. Let's play with the cat.\" Sam was happy too. She did not want to learn",
+ "rule_init": {
+  "variant": "cf",
+  "L0.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.9779
+  },
+  "L1.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.9617
+  }
+ },
+ "ngram_init": {}
+}

@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-mix\\acc-mean_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 87492,
+ "params_nonemb": 81220,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.46345,
+ "evals": [
+  [
+   305,
+   1.89396
+  ],
+  [
+   610,
+   1.66717
+  ],
+  [
+   915,
+   1.53367
+  ],
+  [
+   1220,
+   1.46417
+  ],
+  [
+   1221,
+   1.46345
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8787
+  ],
+  [
+   50,
+   4.9316
+  ],
+  [
+   100,
+   3.5134
+  ],
+  [
+   150,
+   2.7611
+  ],
+  [
+   200,
+   2.3669
+  ],
+  [
+   250,
+   2.1575
+  ],
+  [
+   300,
+   2.0224
+  ],
+  [
+   350,
+   1.9352
+  ],
+  [
+   400,
+   1.8616
+  ],
+  [
+   450,
+   1.8051
+  ],
+  [
+   500,
+   1.7652
+  ],
+  [
+   550,
+   1.7276
+  ],
+  [
+   600,
+   1.7003
+  ],
+  [
+   650,
+   1.6747
+  ],
+  [
+   700,
+   1.6514
+  ],
+  [
+   750,
+   1.6273
+  ],
+  [
+   800,
+   1.6132
+  ],
+  [
+   850,
+   1.5813
+  ],
+  [
+   900,
+   1.5612
+  ],
+  [
+   950,
+   1.5397
+  ],
+  [
+   1000,
+   1.5202
+  ],
+  [
+   1050,
+   1.5027
+  ],
+  [
+   1100,
+   1.4942
+  ],
+  [
+   1150,
+   1.4821
+  ],
+  [
+   1200,
+   1.4834
+  ],
+  [
+   1220,
+   1.4788
+  ]
+ ],
+ "train_seconds": 58.75,
+ "wall_seconds": 70.45,
+ "chars_per_sec": 170257,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Tom. He was so excited to rest him. Tim was big and very hurt.\nThe craper and the teash. The new raizating on home, it took the walk and the kids let in a little bird. \nThe little girl was very angry.\nOne day, the little boy were sad and came down and the little big tr",
+ "rule_init": {}
+}

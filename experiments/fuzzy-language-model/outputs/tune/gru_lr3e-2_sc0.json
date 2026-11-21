@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "gru",
+  "ffn": "none",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/gru_lr3e-2_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "gru",
+  "ffn": "none",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 15840,
+ "params_nonemb": 12704,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.74253,
+ "evals": [
+  [
+   305,
+   2.01518
+  ],
+  [
+   610,
+   1.86679
+  ],
+  [
+   915,
+   1.78032
+  ],
+  [
+   1220,
+   1.74126
+  ],
+  [
+   1221,
+   1.74253
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9078
+  ],
+  [
+   50,
+   5.5162
+  ],
+  [
+   100,
+   4.0182
+  ],
+  [
+   150,
+   3.1018
+  ],
+  [
+   200,
+   2.5813
+  ],
+  [
+   250,
+   2.2962
+  ],
+  [
+   300,
+   2.1442
+  ],
+  [
+   350,
+   2.0584
+  ],
+  [
+   400,
+   1.9923
+  ],
+  [
+   450,
+   1.9622
+  ],
+  [
+   500,
+   1.9356
+  ],
+  [
+   550,
+   1.8955
+  ],
+  [
+   600,
+   1.8784
+  ],
+  [
+   650,
+   1.8674
+  ],
+  [
+   700,
+   1.8513
+  ],
+  [
+   750,
+   1.8428
+  ],
+  [
+   800,
+   1.8252
+  ],
+  [
+   850,
+   1.815
+  ],
+  [
+   900,
+   1.8028
+  ],
+  [
+   950,
+   1.7912
+  ],
+  [
+   1000,
+   1.7675
+  ],
+  [
+   1050,
+   1.7656
+  ],
+  [
+   1100,
+   1.7548
+  ],
+  [
+   1150,
+   1.7512
+  ],
+  [
+   1200,
+   1.7571
+  ],
+  [
+   1220,
+   1.7562
+  ]
+ ],
+ "train_seconds": 188.76,
+ "wall_seconds": 197.95,
+ "chars_per_sec": 52989,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was a sticket, but I put make a big party. But Mia said, \"I am dress, doggy. It was a sincrite near her trem sad.s ylem. The bues sig, The read away. They liked to play with the listle. The growne!\" The squirrel. They go other around and was so a big tree. They excited and the little levery ",
+ "rule_init": {}
+}

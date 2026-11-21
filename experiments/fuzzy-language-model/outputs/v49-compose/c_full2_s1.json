@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v49-compose\\c_full2_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99019,
+ "params_nonemb": 47755,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.11079,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05967
+  ],
+  [
+   100,
+   1.44958
+  ],
+  [
+   200,
+   1.32287
+  ],
+  [
+   300,
+   1.26457
+  ],
+  [
+   400,
+   1.22538
+  ],
+  [
+   500,
+   1.19783
+  ],
+  [
+   600,
+   1.16862
+  ],
+  [
+   700,
+   1.14746
+  ],
+  [
+   800,
+   1.12608
+  ],
+  [
+   900,
+   1.11506
+  ],
+  [
+   953,
+   1.11079
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7632
+  ],
+  [
+   50,
+   9.1168
+  ],
+  [
+   100,
+   7.0135
+  ],
+  [
+   150,
+   5.9476
+  ],
+  [
+   200,
+   5.4452
+  ],
+  [
+   250,
+   5.1948
+  ],
+  [
+   300,
+   5.03
+  ],
+  [
+   350,
+   4.9113
+  ],
+  [
+   400,
+   4.8322
+  ],
+  [
+   450,
+   4.7707
+  ],
+  [
+   500,
+   4.6961
+  ],
+  [
+   550,
+   4.6278
+  ],
+  [
+   600,
+   4.5498
+  ],
+  [
+   650,
+   4.5027
+  ],
+  [
+   700,
+   4.4571
+  ],
+  [
+   750,
+   4.4211
+  ],
+  [
+   800,
+   4.3844
+  ],
+  [
+   850,
+   4.3579
+  ],
+  [
+   900,
+   4.3136
+  ],
+  [
+   950,
+   4.2967
+  ],
+  [
+   952,
+   4.2984
+  ]
+ ],
+ "train_seconds": 74.95,
+ "wall_seconds": 85.82,
+ "chars_per_sec": 104168,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl at a little girl named Jack. Peb Kit's so brave and she wanted to restseed the trains and show her mom her new family. \nA favorite place were the best of other people who liked to play with us. One day, Bobo was the best friend, the big blue house, a little girl named Lily, also a big sock in her room.\n\"Hi, mom! This is this?\" Ben said, \"I am angry!\" said the toy was very tired and not listen to her sauce. They said, \"Is, I'm sorry, Dad. We are my friends!\" They played together every day and had a lot of fun.\n<|eot|>\nOne day, a little boy named Tim and his favorite magnie found a big basketcrocarst. Tim wanted to play with his toy car with him. So, he went to his mom's house to have no pastal to get a fun dress.\nAt the farm, Tim saw a big, green window. He thought, \"Hi, a small bird! I am a train. I will read me bite you.\" Sam and his mom went to the park. They looked at the tree and had a lot of fun through the tree.\nAs they played, the sputes, it saw a wise old voice. The voice stopped and the bird blowing up. Ten looked so loud and scary. The bird and Tim",
+ "rule_init": {},
+ "ngram_init": {}
+}

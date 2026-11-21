@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v28-emb\\std20_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10679,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.62308
+  ],
+  [
+   100,
+   1.59313
+  ],
+  [
+   200,
+   1.43373
+  ],
+  [
+   300,
+   1.35951
+  ],
+  [
+   400,
+   1.30867
+  ],
+  [
+   500,
+   1.26531
+  ],
+  [
+   600,
+   1.22574
+  ],
+  [
+   700,
+   1.19496
+  ],
+  [
+   800,
+   1.16149
+  ],
+  [
+   900,
+   1.14014
+  ],
+  [
+   1000,
+   1.12175
+  ],
+  [
+   1100,
+   1.11037
+  ],
+  [
+   1160,
+   1.10679
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.525
+  ],
+  [
+   50,
+   8.7631
+  ],
+  [
+   100,
+   6.5173
+  ],
+  [
+   150,
+   5.4496
+  ],
+  [
+   200,
+   4.933
+  ],
+  [
+   250,
+   4.6427
+  ],
+  [
+   300,
+   4.4523
+  ],
+  [
+   350,
+   4.3452
+  ],
+  [
+   400,
+   4.2448
+  ],
+  [
+   450,
+   4.1607
+  ],
+  [
+   500,
+   4.0838
+  ],
+  [
+   550,
+   4.0199
+  ],
+  [
+   600,
+   3.942
+  ],
+  [
+   650,
+   3.8901
+  ],
+  [
+   700,
+   3.8285
+  ],
+  [
+   750,
+   3.7823
+  ],
+  [
+   800,
+   3.7379
+  ],
+  [
+   850,
+   3.7055
+  ],
+  [
+   900,
+   3.6652
+  ],
+  [
+   950,
+   3.6364
+  ],
+  [
+   1000,
+   3.588
+  ],
+  [
+   1050,
+   3.5598
+  ],
+  [
+   1100,
+   3.5477
+  ],
+  [
+   1150,
+   3.528
+  ],
+  [
+   1159,
+   3.5191
+  ]
+ ],
+ "train_seconds": 79.5,
+ "wall_seconds": 93.78,
+ "chars_per_sec": 119537,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big card. He didn't want to come to the park. One day, he decided to go fast for his mom. \nBut then, something unexpected happened. The mole started to path! It was a big, fairy. The floor was sad. There said, \"Hello, bird!\" The lonel smiled and said, \"You are the best jar and yelly. Thank you for you. We are not dangerous. Maybe the contorm. That is not like your tomord.\"\nThe boat said, \"I am the cool car through the berfork, I are.\" The fairy said, \"You're welcome, little dog!\" Park was happy.\n<|eot|>\nOne day, a little girl named Lily went for a walk. She saw a store and saw a little bucket. The parents decided to make it stuck on it. Lily had a plan and fun playing with her bucket.\nThe next day, Lily came outside in her room. But she had an idea, she asked her mom if she would bed the plate. Her mom smiled and said, \"That's a great sunny parents,\" she smiled and said, \"Thank you for parenting the parent",
+ "rule_init": {},
+ "ngram_init": {}
+}

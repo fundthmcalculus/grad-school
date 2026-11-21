@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.45,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v49-compose\\c_mid_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 4,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.45,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 4,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 100768,
+ "params_nonemb": 49504,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.0902,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06244
+  ],
+  [
+   100,
+   1.43049
+  ],
+  [
+   200,
+   1.31015
+  ],
+  [
+   300,
+   1.25071
+  ],
+  [
+   400,
+   1.2084
+  ],
+  [
+   500,
+   1.17965
+  ],
+  [
+   600,
+   1.14899
+  ],
+  [
+   700,
+   1.12571
+  ],
+  [
+   800,
+   1.10662
+  ],
+  [
+   900,
+   1.09334
+  ],
+  [
+   953,
+   1.0902
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7687
+  ],
+  [
+   50,
+   9.0354
+  ],
+  [
+   100,
+   6.8888
+  ],
+  [
+   150,
+   5.906
+  ],
+  [
+   200,
+   5.4028
+  ],
+  [
+   250,
+   5.1204
+  ],
+  [
+   300,
+   4.9581
+  ],
+  [
+   350,
+   4.8151
+  ],
+  [
+   400,
+   4.7693
+  ],
+  [
+   450,
+   4.678
+  ],
+  [
+   500,
+   4.6212
+  ],
+  [
+   550,
+   4.54
+  ],
+  [
+   600,
+   4.4642
+  ],
+  [
+   650,
+   4.413
+  ],
+  [
+   700,
+   4.3867
+  ],
+  [
+   750,
+   4.3639
+  ],
+  [
+   800,
+   4.3109
+  ],
+  [
+   850,
+   4.2704
+  ],
+  [
+   900,
+   4.241
+  ],
+  [
+   950,
+   4.226
+  ],
+  [
+   952,
+   4.2264
+  ]
+ ],
+ "train_seconds": 75.33,
+ "wall_seconds": 86.36,
+ "chars_per_sec": 103638,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was very excited to see the big, friendly bird. She knew she was a bit or trains and a pretty bird.\nOne day, Lucy saw her mom's boat. She decided to go to her and said, \"Lily, come out for the big blue cream!\" She said. Lily felt sad because she said \"Yes, she does enjoy her lovely hat. But when she went back to her and gave her a tow songs. She hugged it and said, ???Hello, Lily. You have to follow if you can play with it.\"\nLily and Lily flew up to each other, but they could not find it. They put the flower on the lock and they hit them and they both started to hide and down. They were very happy and proud of their book.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. Tim was a gymer. He had to have a big box of toys. His mom was hungry when he noticed something special. He felt sad because he always wanted to take a mess.\nOne day, Tim met a dog named Max. Max was very sleepy and wanted to play too. Max said, \"Hi, bird! I am going to bed here.\" Max was sad and started to feel strong.\n remembered that Max had seen his dream. He saw his red jar and birds. Max was sad, but he was scared. He didn't know what to do.",
+ "rule_init": {},
+ "ngram_init": {}
+}

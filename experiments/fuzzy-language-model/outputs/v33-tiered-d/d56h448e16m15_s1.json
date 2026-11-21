@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 56,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v33-tiered-d\\d56h448e16m15_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 56,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96608,
+ "params_nonemb": 61408,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10222,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.22234
+  ],
+  [
+   100,
+   1.59893
+  ],
+  [
+   200,
+   1.45319
+  ],
+  [
+   300,
+   1.37802
+  ],
+  [
+   400,
+   1.32004
+  ],
+  [
+   500,
+   1.27669
+  ],
+  [
+   600,
+   1.23366
+  ],
+  [
+   700,
+   1.19398
+  ],
+  [
+   800,
+   1.16677
+  ],
+  [
+   900,
+   1.14085
+  ],
+  [
+   1000,
+   1.12089
+  ],
+  [
+   1100,
+   1.10717
+  ],
+  [
+   1160,
+   1.10222
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.1719
+  ],
+  [
+   50,
+   8.0213
+  ],
+  [
+   100,
+   6.2532
+  ],
+  [
+   150,
+   5.3677
+  ],
+  [
+   200,
+   4.9143
+  ],
+  [
+   250,
+   4.6558
+  ],
+  [
+   300,
+   4.4768
+  ],
+  [
+   350,
+   4.3556
+  ],
+  [
+   400,
+   4.2786
+  ],
+  [
+   450,
+   4.1737
+  ],
+  [
+   500,
+   4.1152
+  ],
+  [
+   550,
+   4.0484
+  ],
+  [
+   600,
+   3.9839
+  ],
+  [
+   650,
+   3.9012
+  ],
+  [
+   700,
+   3.8461
+  ],
+  [
+   750,
+   3.7997
+  ],
+  [
+   800,
+   3.7385
+  ],
+  [
+   850,
+   3.6944
+  ],
+  [
+   900,
+   3.6626
+  ],
+  [
+   950,
+   3.6145
+  ],
+  [
+   1000,
+   3.5742
+  ],
+  [
+   1050,
+   3.5437
+  ],
+  [
+   1100,
+   3.5279
+  ],
+  [
+   1150,
+   3.5079
+  ],
+  [
+   1159,
+   3.5053
+  ]
+ ],
+ "train_seconds": 81.83,
+ "wall_seconds": 96.11,
+ "chars_per_sec": 116130,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy. Mia loved to play with her special person. One day, Mia met a little girl named Ley. Ley was playing on the ground. The girl was happy and said, \"Hi, I problem. Leo wants to hide. I am a sliding!\"\nSue and Tolf became good friends. They all played together and played together every day. They had a lot of fun day.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She liked to eat yogber. She would sleep all the kids and make a special size. One day, she wanted to take a walk, but she could not play with it.\nLily asked her friend, \"What are you doing?\" The midders said, \"My monstlessberry, Wat did you play with?\"\nLily said, \"Yes, I like to make a pretty monster.\" They played with the monster every day, but the monster was not not brave. They ran to the new monster and saved her monster away.\nWhen the monster smiled, and she ran to her friend Sam. They passed and having a loud day towet. They had lots of fun. They were playing",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v50-fuzzyinit\\proj_tskl_di_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98720,
+ "params_nonemb": 47456,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.07818,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.0352
+  ],
+  [
+   100,
+   1.44587
+  ],
+  [
+   200,
+   1.31012
+  ],
+  [
+   300,
+   1.24994
+  ],
+  [
+   400,
+   1.20601
+  ],
+  [
+   500,
+   1.1742
+  ],
+  [
+   600,
+   1.14201
+  ],
+  [
+   700,
+   1.11701
+  ],
+  [
+   800,
+   1.09509
+  ],
+  [
+   900,
+   1.08196
+  ],
+  [
+   953,
+   1.07818
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.6802
+  ],
+  [
+   50,
+   9.0234
+  ],
+  [
+   100,
+   6.9231
+  ],
+  [
+   150,
+   5.9287
+  ],
+  [
+   200,
+   5.4223
+  ],
+  [
+   250,
+   5.1287
+  ],
+  [
+   300,
+   4.964
+  ],
+  [
+   350,
+   4.816
+  ],
+  [
+   400,
+   4.7661
+  ],
+  [
+   450,
+   4.6725
+  ],
+  [
+   500,
+   4.6067
+  ],
+  [
+   550,
+   4.5182
+  ],
+  [
+   600,
+   4.4334
+  ],
+  [
+   650,
+   4.3819
+  ],
+  [
+   700,
+   4.3542
+  ],
+  [
+   750,
+   4.3298
+  ],
+  [
+   800,
+   4.2713
+  ],
+  [
+   850,
+   4.2262
+  ],
+  [
+   900,
+   4.1955
+  ],
+  [
+   950,
+   4.182
+  ],
+  [
+   952,
+   4.1827
+  ]
+ ],
+ "train_seconds": 77.64,
+ "wall_seconds": 89.32,
+ "chars_per_sec": 100556,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was very excited to play with her mom. One day, a big cat came and saw a big bug near a small tree. \"Why are you sad?\" Lucy said, \"I'll work!\"\nMia and the bird went to the tree. They went, excited to play with the bird, and they found a big else. It was a big tree and the bird was. Every day, she played with the bug all day and they were friends.\n<|eot|>\nOnce upon a time, in a big room, there was a little girl named Lily. She liked to play with her friends and buy two friends. One day, Lily and her mom found a big red ball. They saw many red ball and the big red ball. Lily liked to sleep with her ball.\nLily saw a big, round ball in her box. She took the ball on the rolls. Lily put the ball on the mitten all of the toy car. She was hungry and wanted to play too.\nLily said, \"Thank you, dog!\" Lily looked at the park and said, \"Thank you, Mia!\" Lily looked at the ball and thought, \"Look, Mom, can I play with you?\" Her mom smiled and said, \"I am not careful when you hear something about it.\"\nLily felt sad and they decided to see what was inside. They all played together. From that day on, Lily and her friends became good friends",
+ "rule_init": {},
+ "ngram_init": {}
+}

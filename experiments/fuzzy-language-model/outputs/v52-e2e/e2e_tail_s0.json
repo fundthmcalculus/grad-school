@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\e2e_tail_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99019,
+ "params_nonemb": 47755,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.13484,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05073
+  ],
+  [
+   100,
+   1.51778
+  ],
+  [
+   200,
+   1.35309
+  ],
+  [
+   300,
+   1.2902
+  ],
+  [
+   400,
+   1.25573
+  ],
+  [
+   500,
+   1.2233
+  ],
+  [
+   600,
+   1.19204
+  ],
+  [
+   700,
+   1.16986
+  ],
+  [
+   800,
+   1.15139
+  ],
+  [
+   900,
+   1.13764
+  ],
+  [
+   953,
+   1.13484
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7108
+  ],
+  [
+   50,
+   9.2017
+  ],
+  [
+   100,
+   7.2693
+  ],
+  [
+   150,
+   6.1803
+  ],
+  [
+   200,
+   5.6151
+  ],
+  [
+   250,
+   5.3002
+  ],
+  [
+   300,
+   5.1239
+  ],
+  [
+   350,
+   4.9792
+  ],
+  [
+   400,
+   4.9346
+  ],
+  [
+   450,
+   4.8433
+  ],
+  [
+   500,
+   4.7851
+  ],
+  [
+   550,
+   4.709
+  ],
+  [
+   600,
+   4.627
+  ],
+  [
+   650,
+   4.5784
+  ],
+  [
+   700,
+   4.5548
+  ],
+  [
+   750,
+   4.5353
+  ],
+  [
+   800,
+   4.4795
+  ],
+  [
+   850,
+   4.4389
+  ],
+  [
+   900,
+   4.4084
+  ],
+  [
+   950,
+   4.3964
+  ],
+  [
+   952,
+   4.3971
+  ]
+ ],
+ "train_seconds": 75.61,
+ "wall_seconds": 86.62,
+ "chars_per_sec": 103254,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. Sue was very excited to play with her mom. One day, a little girl named Sue came to Sue's house with her mom. Sue said, \"I found a toy toy. I am not good for being so pretty.\"\nTim tried to climb the leaves, but she could not play. Tom felt sad because she wanted to see a big gift. They put the hole out of the cloth and found a book. The rabbit said, \"Thank you for helping you. I will still remarm,\" said Sue. Sue and Tim went home. They played with the big box and had many colors, but was happy.\n<|eot|>\nOnce upon a time, in a big park, there lived a little boy named Tim. Tim loved to play with his mom and dad. They played together with the house every day. His mommy said, \"Please, let's go to it with it.\" Tim felt happy and wanted to play with Tim's friend.\nOne day, Tim's mom came to play with his ball. Tim saw the dog, but he was going to play with. Sue and his friends were all friends. They played with the ball all day long. Tim and Sue ate the ball and said, \"Thank you, Max!\" And they all lived happily ever after.\n<|eot|>\nOnce upon a time, in a sunny day, a nice dog named Spot, lived in a big park. They liked to play outside and play. One day",
+ "rule_init": {},
+ "ngram_init": {}
+}

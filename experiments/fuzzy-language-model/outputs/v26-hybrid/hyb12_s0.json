@@ -1,0 +1,152 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 4000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 4,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "outputs\\v26-hybrid\\hyb12_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 155,
+ "chars_seen": 4010100,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.4423,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   38,
+   1.9836
+  ],
+  [
+   76,
+   1.67233
+  ],
+  [
+   114,
+   1.55693
+  ],
+  [
+   152,
+   1.4461
+  ],
+  [
+   155,
+   1.4423
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.1406
+  ],
+  [
+   50,
+   8.2042
+  ],
+  [
+   100,
+   6.3428
+  ],
+  [
+   150,
+   5.3461
+  ],
+  [
+   154,
+   5.2883
+  ]
+ ],
+ "train_seconds": 687.27,
+ "wall_seconds": 960.39,
+ "chars_per_sec": 1848,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 4,
+ "device": "cpu",
+ "device_name": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and fast bird.\nBut then, the dog decided to help at her house. The bird is very sad that they firstelel. She laughed and took the moved. They decided to play with her favy toys and store.\n<|eot|>\nOnce upon a time, there was a aicy cat named Bobing lived in a big house with a chair. He liked the spin and sacks. He liked to play in the ground. He would see a blue hame with a little biro and fullies. He decided to make your new place and play.\nAt the tight, Spot came an idea. Tim wanted to play with her grass and was even more fun.\nOne day, Tim saw a big hotn was happy to be it. Pinncy was a big red car, so he had an idea. He had a big tree on acor. She loved it was gliane and shiny.\nThe cat went up, but they would both a plant all day playing. The bowin had arm tree to play.\nOne day, a little girl named Tom went to the park with his mom. She saw bed the box on the park. He tried to play with the tree, but Sam said, \"W I am Ben. What's towet me?\" Tim wanted to crinray",
+ "rule_init": {
+  "variant": "hyb12",
+  "L0.ffn": {
+   "gain": 1,
+   "ce_nats": 7.0082
+  },
+  "L1.ffn": {
+   "gain": 0.25,
+   "ce_nats": 7.0232
+  }
+ },
+ "ngram_init": {}
+}

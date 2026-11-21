@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\e2e_tail_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99019,
+ "params_nonemb": 47755,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.13614,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.08792
+  ],
+  [
+   100,
+   1.51416
+  ],
+  [
+   200,
+   1.35518
+  ],
+  [
+   300,
+   1.29438
+  ],
+  [
+   400,
+   1.25501
+  ],
+  [
+   500,
+   1.21865
+  ],
+  [
+   600,
+   1.19119
+  ],
+  [
+   700,
+   1.16932
+  ],
+  [
+   800,
+   1.15152
+  ],
+  [
+   900,
+   1.13912
+  ],
+  [
+   953,
+   1.13614
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.8756
+  ],
+  [
+   50,
+   9.3795
+  ],
+  [
+   100,
+   7.3569
+  ],
+  [
+   150,
+   6.2141
+  ],
+  [
+   200,
+   5.6231
+  ],
+  [
+   250,
+   5.328
+  ],
+  [
+   300,
+   5.138
+  ],
+  [
+   350,
+   4.9994
+  ],
+  [
+   400,
+   4.8936
+  ],
+  [
+   450,
+   4.8163
+  ],
+  [
+   500,
+   4.7457
+  ],
+  [
+   550,
+   4.6785
+  ],
+  [
+   600,
+   4.6505
+  ],
+  [
+   650,
+   4.6064
+  ],
+  [
+   700,
+   4.5586
+  ],
+  [
+   750,
+   4.512
+  ],
+  [
+   800,
+   4.4617
+  ],
+  [
+   850,
+   4.4478
+  ],
+  [
+   900,
+   4.4054
+  ],
+  [
+   950,
+   4.3786
+  ],
+  [
+   952,
+   4.3793
+  ]
+ ],
+ "train_seconds": 75.64,
+ "wall_seconds": 86.55,
+ "chars_per_sec": 103209,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was very excited to play with her friends. One day, a little girl named Amy was very bright and wide, but her friend would come around.\nAmy was sad because she had a work. She gave her the topers to her best. The little girl was sad because she did not know that her little girl was else. She said it was a lovely day with her.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She had a toy in her room in her room. She loved to play with her toys. One day, Lily found a big box under a tree. She looked in the park with her mom.\nLily went to the park with her mom, but the big cat was very lonely. They opened it and saw a little bird with a house. Lily looked at her and said, \"I don't want to share my ball again.\"\nLily and her mom went to the park together. They were hungry when they looked at the sun. The big dog was sad and thought, \"Hi, Lily. You are a good bird and small bird. Twace you want to cook, Lily?\"\nHer mother smiled and replied, \"Yes! You did not like you, Max. I am higher.\" Sue was happy and remembered it to help her. He was not happy to be nice to her.\n<|eot|>\nOnce upon a time, there was a bossy duck named Sam. Sam loved to",
+ "rule_init": {},
+ "ngram_init": {}
+}

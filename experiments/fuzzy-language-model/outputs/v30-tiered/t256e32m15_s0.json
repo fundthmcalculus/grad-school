@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t256e32m15_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 85664,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.14241,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.23716
+  ],
+  [
+   100,
+   1.62531
+  ],
+  [
+   200,
+   1.47276
+  ],
+  [
+   300,
+   1.40407
+  ],
+  [
+   400,
+   1.35474
+  ],
+  [
+   500,
+   1.31243
+  ],
+  [
+   600,
+   1.27713
+  ],
+  [
+   700,
+   1.239
+  ],
+  [
+   800,
+   1.20858
+  ],
+  [
+   900,
+   1.18321
+  ],
+  [
+   1000,
+   1.16352
+  ],
+  [
+   1100,
+   1.14763
+  ],
+  [
+   1160,
+   1.14241
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2438
+  ],
+  [
+   50,
+   8.1555
+  ],
+  [
+   100,
+   6.3514
+  ],
+  [
+   150,
+   5.4684
+  ],
+  [
+   200,
+   5.0137
+  ],
+  [
+   250,
+   4.7523
+  ],
+  [
+   300,
+   4.5862
+  ],
+  [
+   350,
+   4.4714
+  ],
+  [
+   400,
+   4.3868
+  ],
+  [
+   450,
+   4.3003
+  ],
+  [
+   500,
+   4.2367
+  ],
+  [
+   550,
+   4.1633
+  ],
+  [
+   600,
+   4.1018
+  ],
+  [
+   650,
+   4.0374
+  ],
+  [
+   700,
+   3.9804
+  ],
+  [
+   750,
+   3.9419
+  ],
+  [
+   800,
+   3.8783
+  ],
+  [
+   850,
+   3.8229
+  ],
+  [
+   900,
+   3.787
+  ],
+  [
+   950,
+   3.7372
+  ],
+  [
+   1000,
+   3.6963
+  ],
+  [
+   1050,
+   3.6701
+  ],
+  [
+   1100,
+   3.6508
+  ],
+  [
+   1150,
+   3.6498
+  ],
+  [
+   1159,
+   3.6479
+  ]
+ ],
+ "train_seconds": 80.79,
+ "wall_seconds": 95.07,
+ "chars_per_sec": 117626,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and clear. \nThe little boy was very sad. He had a big time. He needed that the fence was very kind. He learned to share the magic windows, so he knew he should give he could problem.\nOne day, the little girl's friend, a little bird named Poter. The little girl was curious. He succeted the yelloss, but then his mom was very careful. He saw something a big box. She said, \"Look, I will help me play with your toys. Do you like to play with?\" The little girl said, \"Yes, my toy box is. You can have a snack.\" The little girl was happy again.\n<|eot|>\n\nOne day, there was a little boy who had a shield. He was very excited and missed. He wanted to take the read and try to explore it he loved to pare.\nSuddenly, he went up to his room and grabbed her trip. The girl was a twin and wanted to eat. He realized that his tears was important to buy the dry hurt to his mom.\nThe boy smiled and said, \"Lily, I will help you help who I am so having left your tower to the uncomal mine. It",
+ "rule_init": {},
+ "ngram_init": {}
+}

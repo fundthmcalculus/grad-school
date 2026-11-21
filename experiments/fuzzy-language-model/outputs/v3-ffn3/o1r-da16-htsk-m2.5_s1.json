@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn3\\o1r-da16-htsk-m2.5_s1.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 92996,
+ "params_nonemb": 86724,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.4999,
+ "evals": [
+  [
+   305,
+   1.94106
+  ],
+  [
+   610,
+   1.71655
+  ],
+  [
+   915,
+   1.57428
+  ],
+  [
+   1220,
+   1.50036
+  ],
+  [
+   1221,
+   1.4999
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9813
+  ],
+  [
+   50,
+   4.9172
+  ],
+  [
+   100,
+   3.5058
+  ],
+  [
+   150,
+   2.7692
+  ],
+  [
+   200,
+   2.3866
+  ],
+  [
+   250,
+   2.1935
+  ],
+  [
+   300,
+   2.07
+  ],
+  [
+   350,
+   1.9891
+  ],
+  [
+   400,
+   1.9133
+  ],
+  [
+   450,
+   1.8558
+  ],
+  [
+   500,
+   1.8169
+  ],
+  [
+   550,
+   1.775
+  ],
+  [
+   600,
+   1.7476
+  ],
+  [
+   650,
+   1.7219
+  ],
+  [
+   700,
+   1.6941
+  ],
+  [
+   750,
+   1.6726
+  ],
+  [
+   800,
+   1.657
+  ],
+  [
+   850,
+   1.6261
+  ],
+  [
+   900,
+   1.6045
+  ],
+  [
+   950,
+   1.5803
+  ],
+  [
+   1000,
+   1.5601
+  ],
+  [
+   1050,
+   1.5422
+  ],
+  [
+   1100,
+   1.5333
+  ],
+  [
+   1150,
+   1.5214
+  ],
+  [
+   1200,
+   1.5216
+  ],
+  [
+   1220,
+   1.5178
+  ]
+ ],
+ "train_seconds": 60.01,
+ "wall_seconds": 68.32,
+ "chars_per_sec": 166673,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little girl named Jaby. They show, and they went his friend, the mondent holding, Tim was sad and water to seen and said, \"Hi, I am you too!\" Tim said, \"Don't worry, I don't be carefully fell out of the woods laughed and grew and liked the twillo, and they saw the bird and shining a li",
+ "rule_init": {}
+}

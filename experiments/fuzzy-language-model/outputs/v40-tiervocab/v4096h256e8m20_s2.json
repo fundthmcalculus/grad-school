@@ -1,0 +1,226 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v4096h256e8m20_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe4096",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 4096
+ },
+ "config": {
+  "vocab_size": 4096,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96848,
+ "params_nonemb": 53456,
+ "steps": 927,
+ "chars_seen": 30025470,
+ "chars_per_token": 3.9538496,
+ "val_bpc": 1.06593,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.07299
+  ],
+  [
+   100,
+   1.37106
+  ],
+  [
+   200,
+   1.25623
+  ],
+  [
+   300,
+   1.20514
+  ],
+  [
+   400,
+   1.17005
+  ],
+  [
+   500,
+   1.14062
+  ],
+  [
+   600,
+   1.11475
+  ],
+  [
+   700,
+   1.09501
+  ],
+  [
+   800,
+   1.07799
+  ],
+  [
+   900,
+   1.06725
+  ],
+  [
+   927,
+   1.06593
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   12.1309
+  ],
+  [
+   50,
+   9.3426
+  ],
+  [
+   100,
+   7.0225
+  ],
+  [
+   150,
+   5.8898
+  ],
+  [
+   200,
+   5.3561
+  ],
+  [
+   250,
+   5.0864
+  ],
+  [
+   300,
+   4.9274
+  ],
+  [
+   350,
+   4.8067
+  ],
+  [
+   400,
+   4.7214
+  ],
+  [
+   450,
+   4.6433
+  ],
+  [
+   500,
+   4.5875
+  ],
+  [
+   550,
+   4.5405
+  ],
+  [
+   600,
+   4.4838
+  ],
+  [
+   650,
+   4.4262
+  ],
+  [
+   700,
+   4.3683
+  ],
+  [
+   750,
+   4.3478
+  ],
+  [
+   800,
+   4.3067
+  ],
+  [
+   850,
+   4.28
+  ],
+  [
+   900,
+   4.2544
+  ],
+  [
+   926,
+   4.2303
+  ]
+ ],
+ "train_seconds": 70.31,
+ "wall_seconds": 81.12,
+ "chars_per_sec": 108013,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a helpful squirrel named Tommy. He lived in a small field. Every day, he was very happy to play with his friends.\nOne day, Sam asked his friends to help. His friends didn't want to play with his friends. They all went to the park with their friends, and they all wanted to play with him. They went to the swings and used the sun on the water.\nHe had a new friend, Tim, and the sun went down to the park. They had a lot of fun playing in the window. They were the best of friends. And they lived happily ever after.\n<|eot|>\n\n\nLily was a little girl named Lily. She loved to play in the park near her house. One day, she saw a big wall in the water. She was very nice to Anna. She said, \"What is that?\"\nLily said, \"Yrtnder you, Lily. You can't take it in the park. I can stay. We'll find your home to do.\"\nLily smiled and said, \"We can't get the diveches with me and nicely! You did a cake to be kind. We can share and find this cake on.\"\nBen and Sara gets and play. They did not listen to the cake. They made the cake over the table and admipe the cake. They let the cake to find their cloth. They put on the cake and hold and feed it. They feel sad and happy.",
+ "rule_init": {},
+ "ngram_init": {}
+}

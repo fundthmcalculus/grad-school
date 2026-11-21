@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v49-compose\\c_full2_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99019,
+ "params_nonemb": 47755,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.10243,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05025
+  ],
+  [
+   100,
+   1.45302
+  ],
+  [
+   200,
+   1.32068
+  ],
+  [
+   300,
+   1.26457
+  ],
+  [
+   400,
+   1.21972
+  ],
+  [
+   500,
+   1.18756
+  ],
+  [
+   600,
+   1.16202
+  ],
+  [
+   700,
+   1.13738
+  ],
+  [
+   800,
+   1.1182
+  ],
+  [
+   900,
+   1.1059
+  ],
+  [
+   953,
+   1.10243
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.6909
+  ],
+  [
+   50,
+   9.1487
+  ],
+  [
+   100,
+   7.0372
+  ],
+  [
+   150,
+   5.9938
+  ],
+  [
+   200,
+   5.4622
+  ],
+  [
+   250,
+   5.1741
+  ],
+  [
+   300,
+   5.0163
+  ],
+  [
+   350,
+   4.8872
+  ],
+  [
+   400,
+   4.7797
+  ],
+  [
+   450,
+   4.7099
+  ],
+  [
+   500,
+   4.6377
+  ],
+  [
+   550,
+   4.5907
+  ],
+  [
+   600,
+   4.5262
+  ],
+  [
+   650,
+   4.4703
+  ],
+  [
+   700,
+   4.4201
+  ],
+  [
+   750,
+   4.3953
+  ],
+  [
+   800,
+   4.3514
+  ],
+  [
+   850,
+   4.3157
+  ],
+  [
+   900,
+   4.2887
+  ],
+  [
+   950,
+   4.2795
+  ],
+  [
+   952,
+   4.2774
+  ]
+ ],
+ "train_seconds": 74.84,
+ "wall_seconds": 85.8,
+ "chars_per_sec": 104314,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. Lucy was very excited to play with her ball.\nOne sunny day, Lucy decided to spin in the park. She walked to the park, but she didn't like the boat. She decided to go here to look for a while. But it was for the bus was too far away. Lucy opened the door and down, \"Hi, let's go to the farm! But look for my race.\" Her mom was so surprised!\nA big wind came to the village. Lucy laughed and told her that she saileds. She felt happy and he got an old and they were just fit.\n<|eot|>\n\nSoon, there was a whole place. Everyone were playing in the park with many other animals. It had many friends and many toys. The fancy forest was safe and green.\nOne day the moral of the story is to always help others if you have to be a shy smile.\n<|eot|>\nOne day, a little girl named Sue went to the park with her mom. Sue saw a big, red window. She thought it was fun to move.\nOne day, Sue and her mommy went to the park with her. But she could not see the TV. But then, something unexpected happened. The sun started to shake. Mia and her mom came into the park. Lucy's mom came in the park. Sue saw the jar and did not know what it was. She put it in a small house that she gave the box",
+ "rule_init": {},
+ "ngram_init": {}
+}

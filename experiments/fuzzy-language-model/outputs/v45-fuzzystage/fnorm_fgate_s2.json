@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v45-fuzzystage\\fnorm_fgate_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99556,
+ "params_nonemb": 48292,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06213,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06295
+  ],
+  [
+   100,
+   1.41413
+  ],
+  [
+   200,
+   1.27822
+  ],
+  [
+   300,
+   1.22115
+  ],
+  [
+   400,
+   1.18407
+  ],
+  [
+   500,
+   1.15195
+  ],
+  [
+   600,
+   1.1222
+  ],
+  [
+   700,
+   1.09511
+  ],
+  [
+   800,
+   1.0775
+  ],
+  [
+   900,
+   1.06423
+  ],
+  [
+   953,
+   1.06213
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7394
+  ],
+  [
+   50,
+   9.0496
+  ],
+  [
+   100,
+   6.8875
+  ],
+  [
+   150,
+   5.826
+  ],
+  [
+   200,
+   5.3031
+  ],
+  [
+   250,
+   5.0243
+  ],
+  [
+   300,
+   4.8598
+  ],
+  [
+   350,
+   4.766
+  ],
+  [
+   400,
+   4.6684
+  ],
+  [
+   450,
+   4.5745
+  ],
+  [
+   500,
+   4.5054
+  ],
+  [
+   550,
+   4.433
+  ],
+  [
+   600,
+   4.3604
+  ],
+  [
+   650,
+   4.3209
+  ],
+  [
+   700,
+   4.2755
+  ],
+  [
+   750,
+   4.2455
+  ],
+  [
+   800,
+   4.1913
+  ],
+  [
+   850,
+   4.1633
+  ],
+  [
+   900,
+   4.1455
+  ],
+  [
+   950,
+   4.1241
+  ],
+  [
+   952,
+   4.126
+  ]
+ ],
+ "train_seconds": 76.53,
+ "wall_seconds": 87.93,
+ "chars_per_sec": 102009,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a little boy named Tim. He was ready to find his toy Katy.\nOne day, Tim was playing with his toy box and a little bird. Tim wanted to play with his ball, so he picked up the box and went to play with his friends. But then, he saw a big ball on the bipple. The bird was upset, but he could not fly by the ball.\nThe little bird said, \"I only how to get the ball to play with you. We can play with water and have fun.\" Tim was happy to play with the ball to play with the ball. They played with the ball all day long, and they played together.\n<|eot|>\nOnce upon a time, there was a boy named Tim. He had a favorite car. The car wanted to play with his ball. Tim would climb his ball and get water to sleep. They made a sack. Tim put the ball on his hand to get the car. They were happy to see the ball and making a ball.\nTim took the ball and dropped the ball inside the large ball. He put the ball in his mouth and went into the woods. He wanted to play too. So, he replied, \"I can play if you have you hiding through the ball.\"\nTim's mom laughed and remembered it to help. But then, they saw a new friend. The dog was a new ball. The dog looked around and saw the ball and gave it out",
+ "rule_init": {},
+ "ngram_init": {}
+}

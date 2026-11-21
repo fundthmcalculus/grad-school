@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.25,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t768e16m225_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.25,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98280,
+ "params_nonemb": 56552,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.103,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.24891
+  ],
+  [
+   100,
+   1.58089
+  ],
+  [
+   200,
+   1.4227
+  ],
+  [
+   300,
+   1.34909
+  ],
+  [
+   400,
+   1.30081
+  ],
+  [
+   500,
+   1.25781
+  ],
+  [
+   600,
+   1.21903
+  ],
+  [
+   700,
+   1.18749
+  ],
+  [
+   800,
+   1.16038
+  ],
+  [
+   900,
+   1.13767
+  ],
+  [
+   1000,
+   1.11858
+  ],
+  [
+   1100,
+   1.10924
+  ],
+  [
+   1160,
+   1.103
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2671
+  ],
+  [
+   50,
+   8.0433
+  ],
+  [
+   100,
+   6.2084
+  ],
+  [
+   150,
+   5.289
+  ],
+  [
+   200,
+   4.8293
+  ],
+  [
+   250,
+   4.5705
+  ],
+  [
+   300,
+   4.392
+  ],
+  [
+   350,
+   4.2792
+  ],
+  [
+   400,
+   4.2021
+  ],
+  [
+   450,
+   4.1003
+  ],
+  [
+   500,
+   4.0445
+  ],
+  [
+   550,
+   3.9861
+  ],
+  [
+   600,
+   3.9359
+  ],
+  [
+   650,
+   3.864
+  ],
+  [
+   700,
+   3.8182
+  ],
+  [
+   750,
+   3.775
+  ],
+  [
+   800,
+   3.7208
+  ],
+  [
+   850,
+   3.6816
+  ],
+  [
+   900,
+   3.6546
+  ],
+  [
+   950,
+   3.6128
+  ],
+  [
+   1000,
+   3.5728
+  ],
+  [
+   1050,
+   3.5419
+  ],
+  [
+   1100,
+   3.5279
+  ],
+  [
+   1150,
+   3.5156
+  ],
+  [
+   1159,
+   3.5102
+  ]
+ ],
+ "train_seconds": 80.92,
+ "wall_seconds": 94.96,
+ "chars_per_sec": 117430,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a little girl who was a sister. She had a special shiver. She wanted to go to the park, so she put the sharp pizzze on the window. Kitty and her friend fell, and they were making a new movie together.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. Lily was curious. She liked to play with her toys and shows to her mom. She liked to play with she play with her toys and makes the picture.\nOne day, Lily saw a big box. She loved to play with it all day longs. Lily and the box went inside their room and played together in the house. They liked to build a lot of fun all day long.\nAs they played, a big cat came out of a beautiful box. Lily was very sad, so she started to hold the toys. She remembered that her mom loved her hands. Lily was sad and said, \"Look, my room is yoursent!\"\nLily grew up and said, \"Yes, Lily, it before, mommy,\" Lily put the markoon and her toys. She said, \"Thank you for being you, Lily. And I know.\"\nLily and her mom said, pink. They knew that the box was fun tower. They all went together and played together all day",
+ "rule_init": {},
+ "ngram_init": {}
+}

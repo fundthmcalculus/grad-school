@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v45-fuzzystage\\fgate_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99456,
+ "params_nonemb": 48192,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.0615,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.03333
+  ],
+  [
+   100,
+   1.41162
+  ],
+  [
+   200,
+   1.27118
+  ],
+  [
+   300,
+   1.22222
+  ],
+  [
+   400,
+   1.18398
+  ],
+  [
+   500,
+   1.15403
+  ],
+  [
+   600,
+   1.12444
+  ],
+  [
+   700,
+   1.0997
+  ],
+  [
+   800,
+   1.07869
+  ],
+  [
+   900,
+   1.06447
+  ],
+  [
+   953,
+   1.0615
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.6703
+  ],
+  [
+   50,
+   9.042
+  ],
+  [
+   100,
+   6.8795
+  ],
+  [
+   150,
+   5.8295
+  ],
+  [
+   200,
+   5.2932
+  ],
+  [
+   250,
+   4.9994
+  ],
+  [
+   300,
+   4.8388
+  ],
+  [
+   350,
+   4.7082
+  ],
+  [
+   400,
+   4.6725
+  ],
+  [
+   450,
+   4.5848
+  ],
+  [
+   500,
+   4.5221
+  ],
+  [
+   550,
+   4.444
+  ],
+  [
+   600,
+   4.3612
+  ],
+  [
+   650,
+   4.3079
+  ],
+  [
+   700,
+   4.2802
+  ],
+  [
+   750,
+   4.2584
+  ],
+  [
+   800,
+   4.2036
+  ],
+  [
+   850,
+   4.1606
+  ],
+  [
+   900,
+   4.1305
+  ],
+  [
+   950,
+   4.1154
+  ],
+  [
+   952,
+   4.1158
+  ]
+ ],
+ "train_seconds": 73.43,
+ "wall_seconds": 84.52,
+ "chars_per_sec": 106316,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl called Lucy. She was very excited to see the little girl's toy. She said they would help her or trains and show her to her mom. She showed it to her mom and dad.\nThe little girl and her mom were happy she didn't come out for the girl. She told her mom. She decided to listen to her mom, a big dog, and Lily was looking for. Every night she saw her mom ask her to go home. She hugged her mom and dad. She said, \"Okay, you can be friends. You are the bests, and the girl. You are my best friend. Woulds like a whole place. \nThe girl and her mom were sorry for the fun with their family. She wished she opened it and her parents. She said, ???Yes, Lose, mom and dad. You are selfish and not good. Let's smile. You don't know like all the time.\" The girl was excited and she smiled.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to play outside. She had a big red bag road in the sky. Every day, she would stay all his friends and play all day.\nOne day, Lily's friend, Tim, came to the park. They were playing in the forest. Tim's mom gave the jar to her. She was so happy. She put it on a floor and lights. Mom had",
+ "rule_init": {},
+ "ngram_init": {}
+}

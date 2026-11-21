@@ -1,0 +1,159 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 72,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v5-bpe-probe\\D-d72-bpe512_10M_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe512",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 512
+ },
+ "config": {
+  "vocab_size": 512,
+  "d_model": 72,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 127328,
+ "params_nonemb": 90464,
+ "steps": 510,
+ "chars_seen": 10018634,
+ "chars_per_token": 2.3979958,
+ "val_bpc": 1.26715,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   127,
+   1.70102
+  ],
+  [
+   254,
+   1.50206
+  ],
+  [
+   381,
+   1.35695
+  ],
+  [
+   508,
+   1.26856
+  ],
+  [
+   510,
+   1.26715
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.4649
+  ],
+  [
+   50,
+   7.6377
+  ],
+  [
+   100,
+   5.7034
+  ],
+  [
+   150,
+   4.6699
+  ],
+  [
+   200,
+   4.1759
+  ],
+  [
+   250,
+   3.8791
+  ],
+  [
+   300,
+   3.674
+  ],
+  [
+   350,
+   3.5034
+  ],
+  [
+   400,
+   3.3584
+  ],
+  [
+   450,
+   3.2307
+  ],
+  [
+   500,
+   3.1451
+  ],
+  [
+   509,
+   3.1299
+  ]
+ ],
+ "train_seconds": 78.47,
+ "wall_seconds": 94.05,
+ "chars_per_sec": 53243,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big gield bower. Everyone was a cake, and his confused the street. Then, there was a bigger and fast. The hole was singing and flower. It was a big! The bear said, \"That's my tear doll more sudth and the toys and welcome. When they are supon, my toys. We can make some red, it is fun. The kids can be glad that they have to get it!\"\n<|eot|>\nOne day, a little girl named Lily found a big tree. She saw a big farm. The sun was dinner like the present. She was pall. She did not like a new friend.\n\"Thank you, Lily. But a party again. He likes to play a box. It sille some round us. It likes to see it.\nSara put their warm and the old people. She said, \"Thank you, try to play too.\" She said, \"Thank you, M",
+ "rule_init": {},
+ "ngram_init": {}
+}

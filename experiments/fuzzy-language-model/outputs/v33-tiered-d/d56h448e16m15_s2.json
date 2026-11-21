@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 56,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v33-tiered-d\\d56h448e16m15_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 56,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96608,
+ "params_nonemb": 61408,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10185,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.22929
+  ],
+  [
+   100,
+   1.59826
+  ],
+  [
+   200,
+   1.44824
+  ],
+  [
+   300,
+   1.37841
+  ],
+  [
+   400,
+   1.31664
+  ],
+  [
+   500,
+   1.27162
+  ],
+  [
+   600,
+   1.22926
+  ],
+  [
+   700,
+   1.19326
+  ],
+  [
+   800,
+   1.16614
+  ],
+  [
+   900,
+   1.14013
+  ],
+  [
+   1000,
+   1.12056
+  ],
+  [
+   1100,
+   1.10581
+  ],
+  [
+   1160,
+   1.10185
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.204
+  ],
+  [
+   50,
+   8.0454
+  ],
+  [
+   100,
+   6.2706
+  ],
+  [
+   150,
+   5.3884
+  ],
+  [
+   200,
+   4.9073
+  ],
+  [
+   250,
+   4.6619
+  ],
+  [
+   300,
+   4.4997
+  ],
+  [
+   350,
+   4.3714
+  ],
+  [
+   400,
+   4.2609
+  ],
+  [
+   450,
+   4.1639
+  ],
+  [
+   500,
+   4.1049
+  ],
+  [
+   550,
+   4.0173
+  ],
+  [
+   600,
+   3.9671
+  ],
+  [
+   650,
+   3.905
+  ],
+  [
+   700,
+   3.8367
+  ],
+  [
+   750,
+   3.7921
+  ],
+  [
+   800,
+   3.7484
+  ],
+  [
+   850,
+   3.7031
+  ],
+  [
+   900,
+   3.6626
+  ],
+  [
+   950,
+   3.6185
+  ],
+  [
+   1000,
+   3.5918
+  ],
+  [
+   1050,
+   3.5629
+  ],
+  [
+   1100,
+   3.5445
+  ],
+  [
+   1150,
+   3.5049
+  ],
+  [
+   1159,
+   3.507
+  ]
+ ],
+ "train_seconds": 82.02,
+ "wall_seconds": 96.52,
+ "chars_per_sec": 115852,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Ben. \n\"What are you sad, at night?\" Mom said. She said, \"I want to play!\"\nJiller took the mos. They decided to play with the ball and give it to the class.\nTom and the cat became friends and played together every day. They had lots of fun. They played together and had lots of fun. They had a lot of fun.\n<|eot|>\nOnce upon a time, there was a small sheep. The sheep were very like a busy sound. It was a big, pretty place for it. The sun was so tired and the dool father saw many bake. They liked to play together in the woods.\nOne day, a little girl named Lily came to the pond. She saw a little girl called him. She missed her friend, a little girl named Lucy. She saw her friend, Sam, and the girl, and her dad had an idea. She said, \"Tom, I can't take youies, please. I will find some courtiniion in if you can get water.\"\nLily looked at her circle and asked, \"Wow you are you we can help.\" She said, \"I don't know you who I am so nicely.\"\nLily thought, \"I will be careful and listen to your friend",
+ "rule_init": {},
+ "ngram_init": {}
+}

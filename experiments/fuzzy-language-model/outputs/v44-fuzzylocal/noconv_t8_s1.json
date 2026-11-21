@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.2,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v44-fuzzylocal\\noconv_t8_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 8,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.2,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 8,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99524,
+ "params_nonemb": 48260,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06745,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05343
+  ],
+  [
+   100,
+   1.40867
+  ],
+  [
+   200,
+   1.28235
+  ],
+  [
+   300,
+   1.22188
+  ],
+  [
+   400,
+   1.18042
+  ],
+  [
+   500,
+   1.15041
+  ],
+  [
+   600,
+   1.12766
+  ],
+  [
+   700,
+   1.10339
+  ],
+  [
+   800,
+   1.08352
+  ],
+  [
+   900,
+   1.07196
+  ],
+  [
+   953,
+   1.06745
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7248
+  ],
+  [
+   50,
+   9.1469
+  ],
+  [
+   100,
+   6.9442
+  ],
+  [
+   150,
+   5.8333
+  ],
+  [
+   200,
+   5.3078
+  ],
+  [
+   250,
+   5.0367
+  ],
+  [
+   300,
+   4.861
+  ],
+  [
+   350,
+   4.7364
+  ],
+  [
+   400,
+   4.6577
+  ],
+  [
+   450,
+   4.599
+  ],
+  [
+   500,
+   4.5204
+  ],
+  [
+   550,
+   4.454
+  ],
+  [
+   600,
+   4.3791
+  ],
+  [
+   650,
+   4.3337
+  ],
+  [
+   700,
+   4.2899
+  ],
+  [
+   750,
+   4.2535
+  ],
+  [
+   800,
+   4.2189
+  ],
+  [
+   850,
+   4.194
+  ],
+  [
+   900,
+   4.1475
+  ],
+  [
+   950,
+   4.1294
+  ],
+  [
+   952,
+   4.131
+  ]
+ ],
+ "train_seconds": 73.43,
+ "wall_seconds": 84.85,
+ "chars_per_sec": 106324,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl called Lucy. She was very excited to play with her ball. She had an idea.\nLucy went to the park and show her mom her her a little song. She was a happy boat. She decided to go to the farm with her friends. But she thought the leaves, a lot on it. She opened a chair and smiled. \"We are not nice!\"\nLucy and her family went for a walk. They found a big tree with songs. In the sun, the sun was shining, and the dirt lung, and the sun flew away. The wind blew the swings and the tree were fit, but it could not find it.\nAfter the seek, Lucy saw a red ball. She had a fun day. The small cat said, \"Let's play with my ball!\" The dog smiled and said, \"Thank you, Lucy.\" They laughed and played together. And they lived happily ever after.\n<|eot|>\nOnce upon a time, there was a clumsy swale. It was a long space. The window was very deep, but it was a lot. The costom had many times. One day, the slip wanted to know what to stay in the stream.\nThe refina shook his voice to help. But when the little girl was tired, she told her mom, \"I will explore my toyroom.\"\nThe little girl looked at the tina and asked, \"Can I have an envally",
+ "rule_init": {},
+ "ngram_init": {}
+}

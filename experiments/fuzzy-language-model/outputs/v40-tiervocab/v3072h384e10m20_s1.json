@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v3072h384e10m20_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99248,
+ "params_nonemb": 53456,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06784,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06297
+  ],
+  [
+   100,
+   1.41751
+  ],
+  [
+   200,
+   1.28602
+  ],
+  [
+   300,
+   1.22968
+  ],
+  [
+   400,
+   1.18995
+  ],
+  [
+   500,
+   1.15868
+  ],
+  [
+   600,
+   1.12963
+  ],
+  [
+   700,
+   1.10465
+  ],
+  [
+   800,
+   1.08546
+  ],
+  [
+   900,
+   1.07205
+  ],
+  [
+   953,
+   1.06784
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.777
+  ],
+  [
+   50,
+   9.0985
+  ],
+  [
+   100,
+   6.937
+  ],
+  [
+   150,
+   5.8368
+  ],
+  [
+   200,
+   5.3132
+  ],
+  [
+   250,
+   5.0483
+  ],
+  [
+   300,
+   4.8818
+  ],
+  [
+   350,
+   4.76
+  ],
+  [
+   400,
+   4.6797
+  ],
+  [
+   450,
+   4.6203
+  ],
+  [
+   500,
+   4.539
+  ],
+  [
+   550,
+   4.4705
+  ],
+  [
+   600,
+   4.3943
+  ],
+  [
+   650,
+   4.347
+  ],
+  [
+   700,
+   4.2989
+  ],
+  [
+   750,
+   4.2624
+  ],
+  [
+   800,
+   4.2252
+  ],
+  [
+   850,
+   4.1973
+  ],
+  [
+   900,
+   4.1535
+  ],
+  [
+   950,
+   4.1339
+  ],
+  [
+   952,
+   4.1356
+  ]
+ ],
+ "train_seconds": 74.01,
+ "wall_seconds": 86.18,
+ "chars_per_sec": 105487,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. She was very excited to play with her ball. One day, a little girl named Amy came to the park. She saw her friend, Sam. Tim thought about what it wanted.\nSue saw her friend, Tom, asked, \"What are you for the fast friend?\" Tim said, \"I want to help you. Let's play together.\" They both put the hole on the hole. The big, shiny truck were happy too. The big truck was happy that he was good at him.\n<|eot|>\n\n\nLily and Lily liked to play in the park. They liked to dig and screwather. They liked to play and run away. One day, they saw a red car. They had a big, red car. Lily liked to sleep in the car.\nLily said, \"Let's play a toys and cross the car.\" They laughed and talked about their house. They were happy to have fun like a lot of fun.\nOne day, Lily and Lily came to their house. They saw a big tree. They knew the car was fun and the pag broke. They both wanted to play with the car and run away. They put the car on the box and ran away.\nLily and Lily listened to the car. They hopped into the car. They saw a big dog. The car is not very nice. It comes to drive it. They stopped and looked around.\nMom smiled and gave Mom a",
+ "rule_init": {},
+ "ngram_init": {}
+}

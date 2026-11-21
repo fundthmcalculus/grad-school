@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v34-mrl\\m2_s3.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.14466,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.27134
+  ],
+  [
+   100,
+   1.59308
+  ],
+  [
+   200,
+   1.44592
+  ],
+  [
+   300,
+   1.38488
+  ],
+  [
+   400,
+   1.33812
+  ],
+  [
+   500,
+   1.29839
+  ],
+  [
+   600,
+   1.26056
+  ],
+  [
+   700,
+   1.23284
+  ],
+  [
+   800,
+   1.20162
+  ],
+  [
+   900,
+   1.18082
+  ],
+  [
+   1000,
+   1.16206
+  ],
+  [
+   1100,
+   1.14909
+  ],
+  [
+   1160,
+   1.14466
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2757
+  ],
+  [
+   50,
+   8.2237
+  ],
+  [
+   100,
+   6.3977
+  ],
+  [
+   150,
+   5.495
+  ],
+  [
+   200,
+   5.0515
+  ],
+  [
+   250,
+   4.8088
+  ],
+  [
+   300,
+   4.6381
+  ],
+  [
+   350,
+   4.5467
+  ],
+  [
+   400,
+   4.4589
+  ],
+  [
+   450,
+   4.3915
+  ],
+  [
+   500,
+   4.323
+  ],
+  [
+   550,
+   4.2707
+  ],
+  [
+   600,
+   4.2029
+  ],
+  [
+   650,
+   4.1619
+  ],
+  [
+   700,
+   4.1047
+  ],
+  [
+   750,
+   4.0693
+  ],
+  [
+   800,
+   4.0288
+  ],
+  [
+   850,
+   3.9953
+  ],
+  [
+   900,
+   3.954
+  ],
+  [
+   950,
+   3.9281
+  ],
+  [
+   1000,
+   3.8827
+  ],
+  [
+   1050,
+   3.8525
+  ],
+  [
+   1100,
+   3.8402
+  ],
+  [
+   1150,
+   3.8233
+  ],
+  [
+   1159,
+   3.8151
+  ]
+ ],
+ "train_seconds": 81.81,
+ "wall_seconds": 96.13,
+ "chars_per_sec": 116162,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and big, trick. We can help others when you make a big box. We need to school with the new!\"\nOne day, they saw a magic window. Kitty wanted to walk to the tree and stretch it. She picked it up and said, \"I can't play with my prick. It is a chair. I will sign. I will help you. Thank you, let's play.\"\nLucy's friend, Molly, Sue and Sue found the cricket. They looked at the piece and said, \"Yes, Spot! I am sorry thank you. I like to play with you!\" Sue said.\nThey played with the piece and a lot of fun. They made the big pieces and a nice paw. What is a black ball, Tim, and it was okay. They were both sad. Tom and Sue felt sorry and they went up to make their paw. They all had fun playing with the pass. They wanted to play with one, but they could go inside. They had a great time with a powgan.\n<|eot|>\nOnce upon a time, there was a little cat. The tree lived in a small house with many colorful bugs. The cat liked to play with the cat and a small cat. But playing",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v50-fuzzyinit\\c_full2_di_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99019,
+ "params_nonemb": 47755,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.10685,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06448
+  ],
+  [
+   100,
+   1.45002
+  ],
+  [
+   200,
+   1.31453
+  ],
+  [
+   300,
+   1.26504
+  ],
+  [
+   400,
+   1.22091
+  ],
+  [
+   500,
+   1.19406
+  ],
+  [
+   600,
+   1.16551
+  ],
+  [
+   700,
+   1.14249
+  ],
+  [
+   800,
+   1.1227
+  ],
+  [
+   900,
+   1.11059
+  ],
+  [
+   953,
+   1.10685
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7787
+  ],
+  [
+   50,
+   9.1181
+  ],
+  [
+   100,
+   6.9968
+  ],
+  [
+   150,
+   5.9678
+  ],
+  [
+   200,
+   5.4474
+  ],
+  [
+   250,
+   5.1638
+  ],
+  [
+   300,
+   4.9996
+  ],
+  [
+   350,
+   4.8608
+  ],
+  [
+   400,
+   4.8201
+  ],
+  [
+   450,
+   4.7324
+  ],
+  [
+   500,
+   4.6748
+  ],
+  [
+   550,
+   4.5977
+  ],
+  [
+   600,
+   4.5208
+  ],
+  [
+   650,
+   4.4715
+  ],
+  [
+   700,
+   4.4425
+  ],
+  [
+   750,
+   4.4249
+  ],
+  [
+   800,
+   4.372
+  ],
+  [
+   850,
+   4.3306
+  ],
+  [
+   900,
+   4.3037
+  ],
+  [
+   950,
+   4.289
+  ],
+  [
+   952,
+   4.2899
+  ]
+ ],
+ "train_seconds": 76.28,
+ "wall_seconds": 90.39,
+ "chars_per_sec": 102342,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. She had a big, hairy cat named Max. Sue was very happy to see a doll. They were all a pretty toy, a family. Sue found a big, red toy car and a soft hair and a fariop. Sue was so happy because the new friend learned that it is our own things. They would always be fun to have fun together and make things with things.\n<|eot|>\nOnce upon a time, in a big tree, there was a lucky dog named Max. Tom loved to play with his toy car and play with his toys. One day, Max and his mom were playing with their toys.\nThey found a big button in the box with the lock. They hit them and blew the apple in the floor. Tom and Max opened their hands and nodded. Max felt happy and proud. But Tom did not want to do the table. But Sam followed Tom's bag. Tom and Max were very happy and said they had a great time. And they both had a fun day at the park.\n<|eot|>\n\nOnce upon a time there was a nosy lady. One day, he had many people in the woods. He wanted to know what to do. His girl called outment and said, \"Is to help you help me higher at you?\"\nThe spool said, \"Yes, you can't go away.\"\nThe girl was very excited. She Tustrhing around the sky and light. There was a",
+ "rule_init": {},
+ "ngram_init": {}
+}

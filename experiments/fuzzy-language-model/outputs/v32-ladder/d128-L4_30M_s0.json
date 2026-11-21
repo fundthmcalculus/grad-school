@@ -1,0 +1,206 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 128,
+  "layers": 4,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.02,
+  "wd": 0.01,
+  "warmup": 300,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 2000,
+  "out": "outputs\\v32-ladder\\d128-L4_30M_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 128,
+  "n_layers": 4,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 653248,
+ "params_nonemb": 522176,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 0.86301,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   1160,
+   0.86301
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.0884
+  ],
+  [
+   50,
+   8.7756
+  ],
+  [
+   100,
+   6.4867
+  ],
+  [
+   150,
+   5.2569
+  ],
+  [
+   200,
+   4.62
+  ],
+  [
+   250,
+   4.2629
+  ],
+  [
+   300,
+   4.0302
+  ],
+  [
+   350,
+   3.85
+  ],
+  [
+   400,
+   3.7037
+  ],
+  [
+   450,
+   3.5643
+  ],
+  [
+   500,
+   3.4635
+  ],
+  [
+   550,
+   3.3688
+  ],
+  [
+   600,
+   3.2831
+  ],
+  [
+   650,
+   3.2024
+  ],
+  [
+   700,
+   3.1427
+  ],
+  [
+   750,
+   3.1011
+  ],
+  [
+   800,
+   3.0294
+  ],
+  [
+   850,
+   2.9678
+  ],
+  [
+   900,
+   2.9291
+  ],
+  [
+   950,
+   2.8748
+  ],
+  [
+   1000,
+   2.8263
+  ],
+  [
+   1050,
+   2.7968
+  ],
+  [
+   1100,
+   2.7728
+  ],
+  [
+   1150,
+   2.7715
+  ],
+  [
+   1159,
+   2.7679
+  ]
+ ],
+ "train_seconds": 160.57,
+ "wall_seconds": 168.34,
+ "chars_per_sec": 59181,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big warm bird. The bird loved to fly high and be happy at her wagon.\nOne day, the warm bird saw a big pizza. The bird wanted to fly the warm bird's warm wing. The warm bird was very tired. So, the bird flew down and took the warm place home. So, the bird picked up the warm bird and sang a song for it to fly.\nThe bird said, \"Thank you for flying like me. You can sing so others are flying to me.\" The bird stopped flying and laughed. The bird and the bird were very happy. They played together all day, even when they got to fly, the birds were in the warm nest.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. Tim had a ornament cat named Fluffy. They loved to play and splash together. All the kids loved to play with their balls.\nOne day, Tim and Fluffy went to the park. They saw a big, red ball in the sky. They had a lot of fun. Tim was scared and bit the ball.\nFluffy said, \"Tim, can you play with this ball?\" Tim said, \"OK, let's play with the ball!\" They played with the ball all",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,189 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-attrib\\fuzzydelta-tsk_lr3e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "max_len": 256
+ },
+ "params_total": 101832,
+ "params_nonemb": 95560,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.78925,
+ "evals": [
+  [
+   305,
+   2.22271
+  ],
+  [
+   610,
+   1.99679
+  ],
+  [
+   915,
+   1.86556
+  ],
+  [
+   1220,
+   1.7898
+  ],
+  [
+   1221,
+   1.78925
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.8034
+  ],
+  [
+   50,
+   5.3952
+  ],
+  [
+   100,
+   3.7796
+  ],
+  [
+   150,
+   2.9591
+  ],
+  [
+   200,
+   2.5735
+  ],
+  [
+   250,
+   2.3896
+  ],
+  [
+   300,
+   2.2851
+  ],
+  [
+   350,
+   2.2336
+  ],
+  [
+   400,
+   2.1617
+  ],
+  [
+   450,
+   2.1615
+  ],
+  [
+   500,
+   2.1442
+  ],
+  [
+   550,
+   2.0822
+  ],
+  [
+   600,
+   2.04
+  ],
+  [
+   650,
+   2.0076
+  ],
+  [
+   700,
+   1.9832
+  ],
+  [
+   750,
+   1.9617
+  ],
+  [
+   800,
+   1.9288
+  ],
+  [
+   850,
+   1.9146
+  ],
+  [
+   900,
+   1.8942
+  ],
+  [
+   950,
+   1.8753
+  ],
+  [
+   1000,
+   1.8439
+  ],
+  [
+   1050,
+   1.8354
+  ],
+  [
+   1100,
+   1.8218
+  ],
+  [
+   1150,
+   1.8094
+  ],
+  [
+   1200,
+   1.8092
+  ],
+  [
+   1220,
+   1.8068
+  ]
+ ],
+ "train_seconds": 87.09,
+ "wall_seconds": 104.16,
+ "chars_per_sec": 114858,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was shiny for betick to get happy. It was not sad asked, \"Bear would played together out?\" said your play ead them friends and sleeplay. It later. They lue. He knew what happy and red ball. They sleeplay with the bury day. Tim was a cold room. The more the man came dod not day on, she said t",
+ "rule_init": {}
+}

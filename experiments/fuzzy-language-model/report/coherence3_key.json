@@ -1,0 +1,162 @@
+{
+ "S001": {
+  "strategy": "D",
+  "prompt": "The little dog was sad because",
+  "seed": 5
+ },
+ "S002": {
+  "strategy": "C",
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 5
+ },
+ "S003": {
+  "strategy": "C",
+  "prompt": "The little dog was sad because",
+  "seed": 4
+ },
+ "S004": {
+  "strategy": "B",
+  "prompt": "The little dog was sad because",
+  "seed": 5
+ },
+ "S005": {
+  "strategy": "A",
+  "prompt": "The little dog was sad because",
+  "seed": 4
+ },
+ "S006": {
+  "strategy": "B",
+  "prompt": "The little dog was sad because",
+  "seed": 4
+ },
+ "S007": {
+  "strategy": "C",
+  "prompt": "One day, a girl named Mia found",
+  "seed": 5
+ },
+ "S008": {
+  "strategy": "A",
+  "prompt": "One day, a girl named Mia found",
+  "seed": 5
+ },
+ "S009": {
+  "strategy": "C",
+  "prompt": "One day, a girl named Mia found",
+  "seed": 4
+ },
+ "S010": {
+  "strategy": "A",
+  "prompt": "Once upon a time",
+  "seed": 4
+ },
+ "S011": {
+  "strategy": "B",
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 4
+ },
+ "S012": {
+  "strategy": "B",
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 5
+ },
+ "S013": {
+  "strategy": "B",
+  "prompt": "Once upon a time",
+  "seed": 4
+ },
+ "S014": {
+  "strategy": "A",
+  "prompt": "Once upon a time",
+  "seed": 5
+ },
+ "S015": {
+  "strategy": "A",
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 4
+ },
+ "S016": {
+  "strategy": "B",
+  "prompt": "Once upon a time",
+  "seed": 5
+ },
+ "S017": {
+  "strategy": "D",
+  "prompt": "Once upon a time",
+  "seed": 5
+ },
+ "S018": {
+  "strategy": "A",
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 5
+ },
+ "S019": {
+  "strategy": "C",
+  "prompt": "The little dog was sad because",
+  "seed": 5
+ },
+ "S020": {
+  "strategy": "B",
+  "prompt": "One day, a girl named Mia found",
+  "seed": 5
+ },
+ "S021": {
+  "strategy": "D",
+  "prompt": "One day, a girl named Mia found",
+  "seed": 5
+ },
+ "S022": {
+  "strategy": "A",
+  "prompt": "The little dog was sad because",
+  "seed": 5
+ },
+ "S023": {
+  "strategy": "A",
+  "prompt": "One day, a girl named Mia found",
+  "seed": 4
+ },
+ "S024": {
+  "strategy": "C",
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 4
+ },
+ "S025": {
+  "strategy": "C",
+  "prompt": "Once upon a time",
+  "seed": 4
+ },
+ "S026": {
+  "strategy": "D",
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 4
+ },
+ "S027": {
+  "strategy": "B",
+  "prompt": "One day, a girl named Mia found",
+  "seed": 4
+ },
+ "S028": {
+  "strategy": "D",
+  "prompt": "Once upon a time",
+  "seed": 4
+ },
+ "S029": {
+  "strategy": "D",
+  "prompt": "One day, a girl named Mia found",
+  "seed": 4
+ },
+ "S030": {
+  "strategy": "C",
+  "prompt": "Once upon a time",
+  "seed": 5
+ },
+ "S031": {
+  "strategy": "D",
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 5
+ },
+ "S032": {
+  "strategy": "D",
+  "prompt": "The little dog was sad because",
+  "seed": 4
+ }
+}

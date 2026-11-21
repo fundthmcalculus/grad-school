@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v22-tribble\\succcf_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.1715,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   2.87221
+  ],
+  [
+   100,
+   1.74089
+  ],
+  [
+   200,
+   1.53694
+  ],
+  [
+   300,
+   1.44066
+  ],
+  [
+   400,
+   1.37672
+  ],
+  [
+   500,
+   1.33865
+  ],
+  [
+   600,
+   1.29656
+  ],
+  [
+   700,
+   1.26817
+  ],
+  [
+   800,
+   1.24007
+  ],
+  [
+   900,
+   1.21018
+  ],
+  [
+   1000,
+   1.19041
+  ],
+  [
+   1100,
+   1.17644
+  ],
+  [
+   1160,
+   1.1715
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.0682
+  ],
+  [
+   50,
+   7.5438
+  ],
+  [
+   100,
+   6.3498
+  ],
+  [
+   150,
+   5.7187
+  ],
+  [
+   200,
+   5.2432
+  ],
+  [
+   250,
+   4.9368
+  ],
+  [
+   300,
+   4.718
+  ],
+  [
+   350,
+   4.579
+  ],
+  [
+   400,
+   4.4611
+  ],
+  [
+   450,
+   4.3802
+  ],
+  [
+   500,
+   4.3027
+  ],
+  [
+   550,
+   4.2369
+  ],
+  [
+   600,
+   4.1575
+  ],
+  [
+   650,
+   4.1063
+  ],
+  [
+   700,
+   4.0628
+  ],
+  [
+   750,
+   4.0182
+  ],
+  [
+   800,
+   3.9641
+  ],
+  [
+   850,
+   3.91
+  ],
+  [
+   900,
+   3.8748
+  ],
+  [
+   950,
+   3.8427
+  ],
+  [
+   1000,
+   3.8073
+  ],
+  [
+   1050,
+   3.7681
+  ],
+  [
+   1100,
+   3.7552
+  ],
+  [
+   1150,
+   3.7274
+  ],
+  [
+   1159,
+   3.7295
+  ]
+ ],
+ "train_seconds": 79.28,
+ "wall_seconds": 93.14,
+ "chars_per_sec": 119857,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and little bird. \nThe little girl was very sad, and he said to him. He needed that they was so happy to have his pizzy to move. They decided to play together and walk to the park to play. The sun was playing and tired about the box. The next day, the bird would tell the tree and danced.\n<|eot|>\nOnce upon a time, in a big forest, there lived a boy named Tim. Tim loved to play with his family. One day, Timo and her friend Tim were playing with the ball. They were all very happy. The boat said, \"I want to make a foolish and play you!\"\nAnd, while they played together, they saw a big pop in the park. Tim didn't listen to the big tree with the food. The sun was safe, so he started to pick the toys. It made the treasure. Tim buckar. The path's music.\nAt my ball, Tim met a big dog named Spot. Tim saw his friend, Tim, wanted to play. \"Mom, if you go!\" Tim said, \"Yes, but we need to play with. Can we have you?\" Tim smiled and said, \"That's a big book, Tim! I am so having a loud umbrect anymore. The cop is curi",
+ "rule_init": {
+  "variant": "succcf",
+  "L0.ffn": {
+   "gain": 1,
+   "ce_nats": 6.4335
+  },
+  "L1.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.292
+  }
+ },
+ "ngram_init": {}
+}

@@ -1,0 +1,238 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v51-fuzzytokens\\tok_dr05_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98528,
+ "params_nonemb": 47264,
+ "steps": 1025,
+ "chars_seen": 30024276,
+ "chars_per_token": 3.5756808,
+ "val_bpc": 1.10947,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.03155
+  ],
+  [
+   100,
+   1.4415
+  ],
+  [
+   200,
+   1.31345
+  ],
+  [
+   300,
+   1.26192
+  ],
+  [
+   400,
+   1.22676
+  ],
+  [
+   500,
+   1.19978
+  ],
+  [
+   600,
+   1.17334
+  ],
+  [
+   700,
+   1.15113
+  ],
+  [
+   800,
+   1.13553
+  ],
+  [
+   900,
+   1.11827
+  ],
+  [
+   1000,
+   1.1102
+  ],
+  [
+   1025,
+   1.10947
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.6492
+  ],
+  [
+   50,
+   9.2407
+  ],
+  [
+   100,
+   7.1629
+  ],
+  [
+   150,
+   6.1464
+  ],
+  [
+   200,
+   5.6373
+  ],
+  [
+   250,
+   5.3715
+  ],
+  [
+   300,
+   5.22
+  ],
+  [
+   350,
+   5.0983
+  ],
+  [
+   400,
+   5.0171
+  ],
+  [
+   450,
+   4.9601
+  ],
+  [
+   500,
+   4.9077
+  ],
+  [
+   550,
+   4.8567
+  ],
+  [
+   600,
+   4.82
+  ],
+  [
+   650,
+   4.7625
+  ],
+  [
+   700,
+   4.7148
+  ],
+  [
+   750,
+   4.6756
+  ],
+  [
+   800,
+   4.6291
+  ],
+  [
+   850,
+   4.5897
+  ],
+  [
+   900,
+   4.5547
+  ],
+  [
+   950,
+   4.5512
+  ],
+  [
+   1000,
+   4.53
+  ],
+  [
+   1024,
+   4.5167
+  ]
+ ],
+ "train_seconds": 76.0,
+ "wall_seconds": 88.26,
+ "chars_per_sec": 110478,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, the little girl saw the little girl running and smiled. She had a beautiful nest to grab them. The girl was so happy to see what was the pretty, her friend, said, \"I found a big toom and it is not tired.\"\nThen, it was time for the big blue cream on the bird. The little girl was happy that she could help the little girl feel looking for. Everywhere she saw her gan and thought it was more fun with her friends. They all laughed and played together together.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. Tim loved to play. One day, he found a whole place. He had a show on his head. One day, Tim and the cat went for a big day. They played together every day.\nAs they found a big, selfish friend came to the house. The ock of them looked like a song and saw this pieces. It was a big, heavy dog! The girl was sad.\nSuddenly, Tim's mom asked her friend, a little bird named Tam?\" Tim said, \"I like your teeth and gisea again!\" His mom smiled and said, \"I am through the help of the little fish! He is very happy.\"\nTim and Tim played with the cillet. They were very happy. Tim and Tim had a great day at the park and",
+ "rule_init": {},
+ "ngram_init": {}
+}

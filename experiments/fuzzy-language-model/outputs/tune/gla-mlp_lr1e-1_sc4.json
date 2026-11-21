@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "linear",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.1,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/gla-mlp_lr1e-1_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "linear",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 20068,
+ "params_nonemb": 16932,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.7442,
+ "evals": [
+  [
+   305,
+   2.13975
+  ],
+  [
+   610,
+   1.94261
+  ],
+  [
+   915,
+   1.81933
+  ],
+  [
+   1220,
+   1.74566
+  ],
+  [
+   1221,
+   1.7442
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8275
+  ],
+  [
+   50,
+   4.9378
+  ],
+  [
+   100,
+   3.5898
+  ],
+  [
+   150,
+   2.8766
+  ],
+  [
+   200,
+   2.5197
+  ],
+  [
+   250,
+   2.3273
+  ],
+  [
+   300,
+   2.2213
+  ],
+  [
+   350,
+   2.1556
+  ],
+  [
+   400,
+   2.0973
+  ],
+  [
+   450,
+   2.0648
+  ],
+  [
+   500,
+   2.0386
+  ],
+  [
+   550,
+   1.9898
+  ],
+  [
+   600,
+   1.9629
+  ],
+  [
+   650,
+   1.9468
+  ],
+  [
+   700,
+   1.9301
+  ],
+  [
+   750,
+   1.9105
+  ],
+  [
+   800,
+   1.8846
+  ],
+  [
+   850,
+   1.8651
+  ],
+  [
+   900,
+   1.8457
+  ],
+  [
+   950,
+   1.826
+  ],
+  [
+   1000,
+   1.7946
+  ],
+  [
+   1050,
+   1.7845
+  ],
+  [
+   1100,
+   1.7702
+  ],
+  [
+   1150,
+   1.7612
+  ],
+  [
+   1200,
+   1.7631
+  ],
+  [
+   1220,
+   1.7623
+  ]
+ ],
+ "train_seconds": 432.11,
+ "wall_seconds": 569.57,
+ "chars_per_sec": 23148,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was a feel dog, she liked to play in her day, Tom's do not dolly to play good fir. He silly too. She saw a mary as his go and chees the hug bad too red by like on the hungly and Max leap. The little is noticered. They this wet his mess, what so animals. And they played and the little lasted ",
+ "rule_init": {}
+}

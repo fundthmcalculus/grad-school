@@ -1,0 +1,286 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.25,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v36-cosmo\\tiered_30M_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.25,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98280,
+ "params_nonemb": 56552,
+ "steps": 1414,
+ "chars_seen": 30016616,
+ "chars_per_token": 2.591328,
+ "val_bpc": 1.85034,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.98891
+  ],
+  [
+   100,
+   2.42307
+  ],
+  [
+   200,
+   2.22679
+  ],
+  [
+   300,
+   2.15132
+  ],
+  [
+   400,
+   2.09518
+  ],
+  [
+   500,
+   2.05539
+  ],
+  [
+   600,
+   2.01926
+  ],
+  [
+   700,
+   1.99103
+  ],
+  [
+   800,
+   1.95971
+  ],
+  [
+   900,
+   1.93434
+  ],
+  [
+   1000,
+   1.90908
+  ],
+  [
+   1100,
+   1.88977
+  ],
+  [
+   1200,
+   1.87138
+  ],
+  [
+   1300,
+   1.85971
+  ],
+  [
+   1400,
+   1.85072
+  ],
+  [
+   1414,
+   1.85034
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2853
+  ],
+  [
+   50,
+   8.7509
+  ],
+  [
+   100,
+   7.2671
+  ],
+  [
+   150,
+   6.4988
+  ],
+  [
+   200,
+   6.069
+  ],
+  [
+   250,
+   5.844
+  ],
+  [
+   300,
+   5.6725
+  ],
+  [
+   350,
+   5.5546
+  ],
+  [
+   400,
+   5.4771
+  ],
+  [
+   450,
+   5.3943
+  ],
+  [
+   500,
+   5.3469
+  ],
+  [
+   550,
+   5.2919
+  ],
+  [
+   600,
+   5.2319
+  ],
+  [
+   650,
+   5.1888
+  ],
+  [
+   700,
+   5.1698
+  ],
+  [
+   750,
+   5.1126
+  ],
+  [
+   800,
+   5.0672
+  ],
+  [
+   850,
+   5.042
+  ],
+  [
+   900,
+   4.9939
+  ],
+  [
+   950,
+   4.9597
+  ],
+  [
+   1000,
+   4.9573
+  ],
+  [
+   1050,
+   4.9245
+  ],
+  [
+   1100,
+   4.8985
+  ],
+  [
+   1150,
+   4.8637
+  ],
+  [
+   1200,
+   4.8459
+  ],
+  [
+   1250,
+   4.8213
+  ],
+  [
+   1300,
+   4.7929
+  ],
+  [
+   1350,
+   4.7805
+  ],
+  [
+   1400,
+   4.7664
+  ],
+  [
+   1413,
+   4.7688
+  ]
+ ],
+ "train_seconds": 97.87,
+ "wall_seconds": 118.87,
+ "chars_per_sec": 118350,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time.\n\nAs sought location time from the well with a camerous lessons and market cat. Epply fellow, that your courage state to a were had experienced by the history, providing normation.\n\nHowever, if we best directly for marazen marked life on Indupe and his data lies, a bloing of the increaser spirit, you have collected a moment to most the body life? Well, write combining sure if they market, seen their dense circums and oil appropriation. In the clear quality,, labor, and underlying as a way. This chapter delved is the journey to journey into the wind!\n\nRecent perspectives, a Clogitical Rei, we'll discuss the printing to the pandometry of marginal complications. Decist and animal American wever science and services let's want to be a paness.\n",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,49 @@
+{
+ "ckpt": "outputs/v12-long512/D-d48-bpe1024-ctx512-r32_300M_s0.pt",
+ "window_tokens": 256,
+ "base_bpc": 1.0484,
+ "layers": [
+  {
+   "layer": 0,
+   "rules": 72,
+   "k": 8,
+   "cited_rules": [
+    63,
+    5,
+    3,
+    19,
+    14,
+    29,
+    50,
+    34
+   ],
+   "coverage_of_cited": 0.5265,
+   "cited_cost": 0.3874,
+   "random_cost_mean": 0.1726,
+   "random_cost_p95": 0.2542,
+   "random_cost_max": 0.2639,
+   "causal": true
+  },
+  {
+   "layer": 1,
+   "rules": 72,
+   "k": 8,
+   "cited_rules": [
+    62,
+    28,
+    14,
+    40,
+    2,
+    44,
+    66,
+    70
+   ],
+   "coverage_of_cited": 0.5589,
+   "cited_cost": 0.167,
+   "random_cost_mean": 0.0483,
+   "random_cost_p95": 0.0665,
+   "random_cost_max": 0.0692,
+   "causal": true
+  }
+ ]
+}

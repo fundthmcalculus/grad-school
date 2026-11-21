@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v44-fuzzylocal\\noconv_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 97760,
+ "params_nonemb": 46496,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06676,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.04903
+  ],
+  [
+   100,
+   1.40428
+  ],
+  [
+   200,
+   1.27741
+  ],
+  [
+   300,
+   1.22087
+  ],
+  [
+   400,
+   1.18397
+  ],
+  [
+   500,
+   1.15187
+  ],
+  [
+   600,
+   1.12686
+  ],
+  [
+   700,
+   1.10043
+  ],
+  [
+   800,
+   1.08241
+  ],
+  [
+   900,
+   1.06954
+  ],
+  [
+   953,
+   1.06676
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7193
+  ],
+  [
+   50,
+   9.0378
+  ],
+  [
+   100,
+   6.8821
+  ],
+  [
+   150,
+   5.8317
+  ],
+  [
+   200,
+   5.2953
+  ],
+  [
+   250,
+   5.0027
+  ],
+  [
+   300,
+   4.8471
+  ],
+  [
+   350,
+   4.7265
+  ],
+  [
+   400,
+   4.6265
+  ],
+  [
+   450,
+   4.5624
+  ],
+  [
+   500,
+   4.4908
+  ],
+  [
+   550,
+   4.4502
+  ],
+  [
+   600,
+   4.3856
+  ],
+  [
+   650,
+   4.3322
+  ],
+  [
+   700,
+   4.2834
+  ],
+  [
+   750,
+   4.2573
+  ],
+  [
+   800,
+   4.2147
+  ],
+  [
+   850,
+   4.1751
+  ],
+  [
+   900,
+   4.1472
+  ],
+  [
+   950,
+   4.1371
+  ],
+  [
+   952,
+   4.1356
+  ]
+ ],
+ "train_seconds": 71.48,
+ "wall_seconds": 82.55,
+ "chars_per_sec": 109218,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a little boy named Tim. He loved to put it on a beautiful cars. At the night, a meling, he was very bright and a pretty, red foot. In the end, he could see the water and other people in the water. \nTim didn't know it was, and a little alson than our glowing on the water. Tim was very curious because he was lovely and looking for. Every day, he would stay safe and strong and songs. In the muenton was in the collage, he never found things.\n<|eot|>\nOnce upon a time, a little girl named Lucy had a big, curious dog named Kitty. Kitty loved to play outside because she was very excited to talk. She had a fun day.\nOne day, Kitty opened it in her room. It was a big, round ball that she had many yummy pictures and candy on the ground. Kitty was very happy and played all day long.\nBut asling as she was going there, Kitty was too sunny of the park. Everyone was very happy, and Kitty laughed a lot. Kitty was very happy and felt happy.\nAt the end of the day, Kitty and Kitty played all day again. They were brave and had lots of fun together. And helpless friends feel polite and laughed every day.\n<|eot|>\n\nOnce upon a time there was an very nice friend. He was always always than his kowlsing a small, serit. Even",
+ "rule_init": {},
+ "ngram_init": {}
+}

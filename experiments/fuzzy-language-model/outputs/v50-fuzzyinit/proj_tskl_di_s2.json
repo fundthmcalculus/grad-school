@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v50-fuzzyinit\\proj_tskl_di_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98720,
+ "params_nonemb": 47456,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.09405,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06018
+  ],
+  [
+   100,
+   1.43571
+  ],
+  [
+   200,
+   1.31436
+  ],
+  [
+   300,
+   1.25964
+  ],
+  [
+   400,
+   1.22438
+  ],
+  [
+   500,
+   1.18837
+  ],
+  [
+   600,
+   1.15776
+  ],
+  [
+   700,
+   1.13245
+  ],
+  [
+   800,
+   1.11063
+  ],
+  [
+   900,
+   1.09917
+  ],
+  [
+   953,
+   1.09405
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7321
+  ],
+  [
+   50,
+   9.0528
+  ],
+  [
+   100,
+   6.9429
+  ],
+  [
+   150,
+   5.923
+  ],
+  [
+   200,
+   5.4266
+  ],
+  [
+   250,
+   5.1479
+  ],
+  [
+   300,
+   5.0061
+  ],
+  [
+   350,
+   4.9069
+  ],
+  [
+   400,
+   4.8105
+  ],
+  [
+   450,
+   4.7176
+  ],
+  [
+   500,
+   4.647
+  ],
+  [
+   550,
+   4.5715
+  ],
+  [
+   600,
+   4.5009
+  ],
+  [
+   650,
+   4.4574
+  ],
+  [
+   700,
+   4.41
+  ],
+  [
+   750,
+   4.3768
+  ],
+  [
+   800,
+   4.3182
+  ],
+  [
+   850,
+   4.284
+  ],
+  [
+   900,
+   4.271
+  ],
+  [
+   950,
+   4.2491
+  ],
+  [
+   952,
+   4.2502
+  ]
+ ],
+ "train_seconds": 71.6,
+ "wall_seconds": 82.84,
+ "chars_per_sec": 109030,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl called. She was very busy and had a beautiful nest. She was very happy and wanted to get her orneal. \nThe moral of the story is to always be careful when you go inside and go here to play with us.\" One day, it was the best friend, the big baking, a cat, and a small, cakey. The camz shook and asked, \"I want to step the curtage!\" The pairer said, \"I am still important to unlist-her!\"\nThe mule tried to shake, but the shut was just fit, but it was too hard. The whole guter was so happy! The old olderched away and the big tiricer looked for the vi noticed safe.\nThe moral of the story is that being important to know what to do selfish and plays. And we'll helping others and have to always be careful and not be together.\n<|eot|>\nOnce upon a time, there was a little girl named Amy. She loved to play with a dress. One day, she found a big hole in the yard. She was very thought it was very bright.\nAmy looked inside and saw a big shook dog. It was red and blue. The toy was very rude. Lucy said, \"A store, Lucy! You are too nice. I am a new toy. Can you help you get right?\" Her mom gave Mom a",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v44-fuzzylocal\\noconv_t3_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 3,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 3,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99296,
+ "params_nonemb": 48032,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.07072,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.07075
+  ],
+  [
+   100,
+   1.41273
+  ],
+  [
+   200,
+   1.28064
+  ],
+  [
+   300,
+   1.2237
+  ],
+  [
+   400,
+   1.18456
+  ],
+  [
+   500,
+   1.15464
+  ],
+  [
+   600,
+   1.12827
+  ],
+  [
+   700,
+   1.1049
+  ],
+  [
+   800,
+   1.08617
+  ],
+  [
+   900,
+   1.07464
+  ],
+  [
+   953,
+   1.07072
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7571
+  ],
+  [
+   50,
+   9.1246
+  ],
+  [
+   100,
+   6.9415
+  ],
+  [
+   150,
+   5.8332
+  ],
+  [
+   200,
+   5.3118
+  ],
+  [
+   250,
+   5.045
+  ],
+  [
+   300,
+   4.8725
+  ],
+  [
+   350,
+   4.751
+  ],
+  [
+   400,
+   4.6705
+  ],
+  [
+   450,
+   4.6141
+  ],
+  [
+   500,
+   4.5357
+  ],
+  [
+   550,
+   4.4694
+  ],
+  [
+   600,
+   4.3943
+  ],
+  [
+   650,
+   4.3501
+  ],
+  [
+   700,
+   4.3047
+  ],
+  [
+   750,
+   4.2708
+  ],
+  [
+   800,
+   4.2342
+  ],
+  [
+   850,
+   4.2062
+  ],
+  [
+   900,
+   4.1654
+  ],
+  [
+   950,
+   4.1473
+  ],
+  [
+   952,
+   4.1488
+  ]
+ ],
+ "train_seconds": 71.76,
+ "wall_seconds": 83.13,
+ "chars_per_sec": 108795,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was busy and had a beautiful thing. Her mom was very happy to see her doll or be bright and show her mom her new family.\nOne day, Lily saw a big, green bear in the garden. She asked her parents, \"Why are you sad?\" Her mom said, \"I can help you find your way, Sue.\" Sue smiled and said, \"It's time, please.\"\nSue was so happy and said, \"Thank you, Tim!\" They played together every day, and they played together. Tim and Sally played together to play with the wise owl were happy and learned that sharing for otherss would go away.\n<|eot|>\n \nOne day, a little girl named Lucy went to the park and saw a big red ball in the sky. She looked around and saw a big, red car. It was an pretty, selfish dog. Lucy said, \"Spot, please don't let me go!\"\nLucy and her mom went to the big red ball and found a big hole for a long time. They all laughed and played until they were tired. Lucy felt sad and wanted to help the ball. But she could not see the ball. But then, something unexpected happened. The dog started to bark out of the big tree.\nFin and the dog started to cry. The dog pushed the dog away from the tree. The dog started to pull the dog out of the tree and ran away. The dog",
+ "rule_init": {},
+ "ngram_init": {}
+}

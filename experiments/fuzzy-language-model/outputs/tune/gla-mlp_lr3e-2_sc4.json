@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "linear",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/gla-mlp_lr3e-2_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "linear",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 20068,
+ "params_nonemb": 16932,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.72861,
+ "evals": [
+  [
+   305,
+   2.0622
+  ],
+  [
+   610,
+   1.88492
+  ],
+  [
+   915,
+   1.78136
+  ],
+  [
+   1220,
+   1.72883
+  ],
+  [
+   1221,
+   1.72861
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8275
+  ],
+  [
+   50,
+   5.2751
+  ],
+  [
+   100,
+   3.8062
+  ],
+  [
+   150,
+   2.9815
+  ],
+  [
+   200,
+   2.5527
+  ],
+  [
+   250,
+   2.3159
+  ],
+  [
+   300,
+   2.1827
+  ],
+  [
+   350,
+   2.1047
+  ],
+  [
+   400,
+   2.0404
+  ],
+  [
+   450,
+   2.0049
+  ],
+  [
+   500,
+   1.9788
+  ],
+  [
+   550,
+   1.9334
+  ],
+  [
+   600,
+   1.9095
+  ],
+  [
+   650,
+   1.8925
+  ],
+  [
+   700,
+   1.8794
+  ],
+  [
+   750,
+   1.8635
+  ],
+  [
+   800,
+   1.8407
+  ],
+  [
+   850,
+   1.8272
+  ],
+  [
+   900,
+   1.8122
+  ],
+  [
+   950,
+   1.796
+  ],
+  [
+   1000,
+   1.7676
+  ],
+  [
+   1050,
+   1.7635
+  ],
+  [
+   1100,
+   1.7507
+  ],
+  [
+   1150,
+   1.7436
+  ],
+  [
+   1200,
+   1.7467
+  ],
+  [
+   1220,
+   1.7466
+  ]
+ ],
+ "train_seconds": 442.79,
+ "wall_seconds": 581.76,
+ "chars_per_sec": 22589,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was not for the stormped made a big party. Belly cald be had lots of the great it. He saw the on the squirn. He sselly good she she garden to meag. But the said, \"Yes, Tim, Max had fun. The smiled to gets to play, the good with her callady. Tim and Ranie the scared.\n<|eot|>\n\n\nMax was so did the was ",
+ "rule_init": {}
+}

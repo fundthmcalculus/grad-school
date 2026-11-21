@@ -1,0 +1,152 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 4000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 4,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "outputs\\v26-hybrid\\cf_s1.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 155,
+ "chars_seen": 4010100,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.45243,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   38,
+   1.92109
+  ],
+  [
+   76,
+   1.67752
+  ],
+  [
+   114,
+   1.57041
+  ],
+  [
+   152,
+   1.4568
+  ],
+  [
+   155,
+   1.45243
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.902
+  ],
+  [
+   50,
+   7.9423
+  ],
+  [
+   100,
+   6.2609
+  ],
+  [
+   150,
+   5.3207
+  ],
+  [
+   154,
+   5.2649
+  ]
+ ],
+ "train_seconds": 602.36,
+ "wall_seconds": 838.4,
+ "chars_per_sec": 2108,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 4,
+ "device": "cpu",
+ "device_name": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Ben.\nAsquur is a special one when he had a big box. He needed that the hop. He puts on the big birper. She was beautiful. He knew he could go inside and store.\nMom said, \"I am mom, a bird, Lily. Do you have a fun rove.\"\n\"Hi, the frog!\" Lily said, \"I'm sorry, then's mom, it's mom.\"\nSam and Mogether, and Sue were sad and played with others's mom. They loved to play with it together.\n\"Sue, the cool!\" he said, \"Why are you excited, I are you for a big dog.\"\nTim asked her \nHelloa was very happy, so he could talking for the park. He mon't carefull the toys and said, \"Delly, I can go home. Len, I can't help me.\"\nAnna nodding! She said, \"Lies, we can not to see the pushot. It is this if you go inside and say mouse! I don't know what's cars. He want to play with you're!\" Tim said, \"He is ve you?\" Lucy said, \"In you, towet me?\" Tim wanted to help the day.\n",
+ "rule_init": {
+  "variant": "cf",
+  "L0.ffn": {
+   "gain": 4,
+   "ce_nats": 6.8853
+  },
+  "L1.ffn": {
+   "gain": 16,
+   "ce_nats": 6.8477
+  }
+ },
+ "ngram_init": {}
+}

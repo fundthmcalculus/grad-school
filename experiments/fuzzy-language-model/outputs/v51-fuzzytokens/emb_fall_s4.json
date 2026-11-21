@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.35,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v51-fuzzytokens\\emb_fall_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.35,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99026,
+ "params_nonemb": 47762,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.17393,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05278
+  ],
+  [
+   100,
+   1.87679
+  ],
+  [
+   200,
+   1.4844
+  ],
+  [
+   300,
+   1.3789
+  ],
+  [
+   400,
+   1.30965
+  ],
+  [
+   500,
+   1.26907
+  ],
+  [
+   600,
+   1.2371
+  ],
+  [
+   700,
+   1.20888
+  ],
+  [
+   800,
+   1.19111
+  ],
+  [
+   900,
+   1.17785
+  ],
+  [
+   953,
+   1.17393
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7235
+  ],
+  [
+   50,
+   10.0118
+  ],
+  [
+   100,
+   8.5997
+  ],
+  [
+   150,
+   7.3172
+  ],
+  [
+   200,
+   6.4161
+  ],
+  [
+   250,
+   5.8809
+  ],
+  [
+   300,
+   5.5564
+  ],
+  [
+   350,
+   5.3429
+  ],
+  [
+   400,
+   5.1837
+  ],
+  [
+   450,
+   5.065
+  ],
+  [
+   500,
+   4.9662
+  ],
+  [
+   550,
+   4.8831
+  ],
+  [
+   600,
+   4.8407
+  ],
+  [
+   650,
+   4.7818
+  ],
+  [
+   700,
+   4.7276
+  ],
+  [
+   750,
+   4.6769
+  ],
+  [
+   800,
+   4.6203
+  ],
+  [
+   850,
+   4.6027
+  ],
+  [
+   900,
+   4.5586
+  ],
+  [
+   950,
+   4.5318
+  ],
+  [
+   952,
+   4.5334
+  ]
+ ],
+ "train_seconds": 70.57,
+ "wall_seconds": 84.3,
+ "chars_per_sec": 110631,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl at. He was very busy. He wanted to make a new friend. He knew he was a little ornachors. \nThe bee walked down and found a big, red boat. The car saw her best friend, a big mouse. The cat thought for the bird and said, \"This is not a cat!\"\nThe dog was very sad because then he could not find out. He went down the ground to ask her friends too. The dog's mom heard the bird. He saw him and said, \"I can't find the dog. You are a nice car!\" The cat and the dog became best friends and played together every day. The cat and the dog learned that their toys was not fun to play.\n<|eot|>\n\nOnce upon a time there was anvecobie. She would hit his arm and get to her. It was selfish and Duckys.\nOne day, Timmy and her mom went to the park. They saw a big swaach that they were very sad. Everyone was very excited. They knew the large dress was wonderful.\nThe next day, they heard something special with the batus. After a small, twins stopped and looked at all! She did not like to run through the tree.\nAs they got there, then they saw a big, round sound! The bird said, \"It's too important, it is Tun. It's not for this!\"\nThey went",
+ "rule_init": {},
+ "ngram_init": {}
+}

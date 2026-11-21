@@ -1,0 +1,215 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 56,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v16-factemb\\D-d56-e24-ctx512-r32_30M_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 24,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 56,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 24,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 87328,
+ "params_nonemb": 61408,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.19385,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.48527
+  ],
+  [
+   580,
+   1.34421
+  ],
+  [
+   870,
+   1.24154
+  ],
+  [
+   1160,
+   1.19385
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.15
+  ],
+  [
+   50,
+   8.3963
+  ],
+  [
+   100,
+   6.6649
+  ],
+  [
+   150,
+   5.7557
+  ],
+  [
+   200,
+   5.2952
+  ],
+  [
+   250,
+   5.0172
+  ],
+  [
+   300,
+   4.8274
+  ],
+  [
+   350,
+   4.6998
+  ],
+  [
+   400,
+   4.6155
+  ],
+  [
+   450,
+   4.5059
+  ],
+  [
+   500,
+   4.4453
+  ],
+  [
+   550,
+   4.3813
+  ],
+  [
+   600,
+   4.3146
+  ],
+  [
+   650,
+   4.2295
+  ],
+  [
+   700,
+   4.1725
+  ],
+  [
+   750,
+   4.1128
+  ],
+  [
+   800,
+   4.0477
+  ],
+  [
+   850,
+   3.9955
+  ],
+  [
+   900,
+   3.9623
+  ],
+  [
+   950,
+   3.9146
+  ],
+  [
+   1000,
+   3.8684
+  ],
+  [
+   1050,
+   3.8313
+  ],
+  [
+   1100,
+   3.8162
+  ],
+  [
+   1150,
+   3.795
+  ],
+  [
+   1159,
+   3.7931
+  ]
+ ],
+ "train_seconds": 80.23,
+ "wall_seconds": 87.25,
+ "chars_per_sec": 118437,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and wister.\nOne day, a little girl named Fin went to the garden to show the big tree. She saw a big tree on the tree. The tree was very surprised.\n\"Wow, first,\" said the tree. \"It's time, little girl! You have to learn this slide, he is fun!\"room was curious.\nThe little girl was happy, and the old tree became good friends. And the tree would dangerous and strong.\n<|eot|>\n\n\nSara and TV were everywhere. They like to take it up and got the shiny tight. They had an idea. One day, a barted and a snear.\nThey can not help it. They hoose off the floor and Pip. It was very happy and work. But the monsty and Lily learned that all on a big friend.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to make a bush. She would bit it, but it was so thanked her. One day, Lily went to play with her face. She saw her mom with a pain. She saw her mom and dad. Her mom wanted to jourse the pains. She ran to Tom. Her mom said, \"I use you, mom. You should cool more. It",
+ "rule_init": {},
+ "ngram_init": {}
+}

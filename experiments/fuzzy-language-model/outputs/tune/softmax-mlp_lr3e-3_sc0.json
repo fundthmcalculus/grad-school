@@ -1,0 +1,179 @@
+{
+ "args": {
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.003,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/softmax-mlp_lr3e-3_sc0.json",
+  "save_model": false
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 19680,
+ "params_nonemb": 16544,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.05928,
+ "evals": [
+  [
+   305,
+   2.49501
+  ],
+  [
+   610,
+   2.20267
+  ],
+  [
+   915,
+   2.09722
+  ],
+  [
+   1220,
+   2.05956
+  ],
+  [
+   1221,
+   2.05928
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.7136
+  ],
+  [
+   50,
+   6.0572
+  ],
+  [
+   100,
+   4.8709
+  ],
+  [
+   150,
+   3.9455
+  ],
+  [
+   200,
+   3.36
+  ],
+  [
+   250,
+   2.9722
+  ],
+  [
+   300,
+   2.7209
+  ],
+  [
+   350,
+   2.566
+  ],
+  [
+   400,
+   2.4568
+  ],
+  [
+   450,
+   2.3836
+  ],
+  [
+   500,
+   2.3253
+  ],
+  [
+   550,
+   2.266
+  ],
+  [
+   600,
+   2.2297
+  ],
+  [
+   650,
+   2.2049
+  ],
+  [
+   700,
+   2.1877
+  ],
+  [
+   750,
+   2.1702
+  ],
+  [
+   800,
+   2.1481
+  ],
+  [
+   850,
+   2.1331
+  ],
+  [
+   900,
+   2.1193
+  ],
+  [
+   950,
+   2.1085
+  ],
+  [
+   1000,
+   2.0847
+  ],
+  [
+   1050,
+   2.0812
+  ],
+  [
+   1100,
+   2.0722
+  ],
+  [
+   1150,
+   2.0676
+  ],
+  [
+   1200,
+   2.0732
+  ],
+  [
+   1220,
+   2.0729
+  ]
+ ],
+ "train_seconds": 319.02,
+ "wall_seconds": 352.29,
+ "chars_per_sec": 31354,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was new from the seelp because. One day, and looke and said, \"Do with the beat it. He sill friends. They came in sail dood as chesside in treade. The did alic, on the husty went like and under the reirands. Lily blew at is with her calla was and with a tumprince to surea.\nTom plays, they pir"
+}

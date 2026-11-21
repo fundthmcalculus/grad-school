@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/softmax-mlp_lr6e-2_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 19680,
+ "params_nonemb": 16544,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.81776,
+ "evals": [
+  [
+   305,
+   2.20716
+  ],
+  [
+   610,
+   2.02642
+  ],
+  [
+   915,
+   1.8847
+  ],
+  [
+   1220,
+   1.81841
+  ],
+  [
+   1221,
+   1.81776
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.7136
+  ],
+  [
+   50,
+   5.0521
+  ],
+  [
+   100,
+   3.7455
+  ],
+  [
+   150,
+   3.0513
+  ],
+  [
+   200,
+   2.6803
+  ],
+  [
+   250,
+   2.4683
+  ],
+  [
+   300,
+   2.3256
+  ],
+  [
+   350,
+   2.2533
+  ],
+  [
+   400,
+   2.1862
+  ],
+  [
+   450,
+   2.1488
+  ],
+  [
+   500,
+   2.1158
+  ],
+  [
+   550,
+   2.0679
+  ],
+  [
+   600,
+   2.038
+  ],
+  [
+   650,
+   2.0154
+  ],
+  [
+   700,
+   1.9979
+  ],
+  [
+   750,
+   1.9819
+  ],
+  [
+   800,
+   1.9587
+  ],
+  [
+   850,
+   1.9403
+  ],
+  [
+   900,
+   1.921
+  ],
+  [
+   950,
+   1.9036
+  ],
+  [
+   1000,
+   1.872
+  ],
+  [
+   1050,
+   1.8617
+  ],
+  [
+   1100,
+   1.8484
+  ],
+  [
+   1150,
+   1.8394
+  ],
+  [
+   1200,
+   1.8375
+  ],
+  [
+   1220,
+   1.837
+  ]
+ ],
+ "train_seconds": 163.22,
+ "wall_seconds": 195.91,
+ "chars_per_sec": 61280,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there were happy and became with a big time and a blue cald her again. He was so excited and Becrab. He could them his sail day. One day, Tim help and would goy liked to to hungry and Mia leag. The learned the started blew ago started to eat away a near the park.\nThe exeling and the littlet. Tom s",
+ "rule_init": {}
+}

@@ -1,0 +1,262 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v51-fuzzytokens\\tok_dr15_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98528,
+ "params_nonemb": 47264,
+ "steps": 1207,
+ "chars_seen": 30007060,
+ "chars_per_token": 3.0347732,
+ "val_bpc": 1.23757,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.07023
+  ],
+  [
+   100,
+   1.57595
+  ],
+  [
+   200,
+   1.46756
+  ],
+  [
+   300,
+   1.40899
+  ],
+  [
+   400,
+   1.37401
+  ],
+  [
+   500,
+   1.34238
+  ],
+  [
+   600,
+   1.32764
+  ],
+  [
+   700,
+   1.30304
+  ],
+  [
+   800,
+   1.28825
+  ],
+  [
+   900,
+   1.26633
+  ],
+  [
+   1000,
+   1.25332
+  ],
+  [
+   1100,
+   1.24418
+  ],
+  [
+   1200,
+   1.23891
+  ],
+  [
+   1207,
+   1.23757
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7646
+  ],
+  [
+   50,
+   9.497
+  ],
+  [
+   100,
+   7.4801
+  ],
+  [
+   150,
+   6.4613
+  ],
+  [
+   200,
+   5.9292
+  ],
+  [
+   250,
+   5.6893
+  ],
+  [
+   300,
+   5.5362
+  ],
+  [
+   350,
+   5.4074
+  ],
+  [
+   400,
+   5.3347
+  ],
+  [
+   450,
+   5.265
+  ],
+  [
+   500,
+   5.2159
+  ],
+  [
+   550,
+   5.1871
+  ],
+  [
+   600,
+   5.1348
+  ],
+  [
+   650,
+   5.0955
+  ],
+  [
+   700,
+   5.047
+  ],
+  [
+   750,
+   4.9973
+  ],
+  [
+   800,
+   4.9689
+  ],
+  [
+   850,
+   4.9391
+  ],
+  [
+   900,
+   4.8971
+  ],
+  [
+   950,
+   4.8745
+  ],
+  [
+   1000,
+   4.8573
+  ],
+  [
+   1050,
+   4.8187
+  ],
+  [
+   1100,
+   4.8054
+  ],
+  [
+   1150,
+   4.7829
+  ],
+  [
+   1200,
+   4.7635
+  ],
+  [
+   1206,
+   4.7639
+  ]
+ ],
+ "train_seconds": 89.88,
+ "wall_seconds": 104.39,
+ "chars_per_sec": 110007,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. Mia was very excited to play with her ball.\nOne sunny day, Lucy decided to play with her friends, but she wanted to play with her mom. But then, something unexpected happened. Tom saw something very beautiful. The pick was a start bipped a lon to play with a big fan. It was to ball. There she was very strong and orange.\nSue heard a new ball. She said, \"I am sad, Tim. I know osek to the shteurtle.\" Tom was happy and smiled. The whole guale said, \"While you can feels my family!\" Emily opened his oesve and looked at a big hole. His mommy said, \"Please, Loud!\"\nLucy smiled and said, \"I don't know not your red together. It swand of the bird in the picture for her house.\"\nSue looked at Lily and gave him her friend, Tom. Tom was very proud of the TV. But then, something unexpected happened. The crayy listened to the park to play with the spunk. The the wise old man gave the jar back. The sunnyino stopped and looked around a small, impressive tree. The b",
+ "rule_init": {},
+ "ngram_init": {}
+}

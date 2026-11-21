@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v47-fuzzyffn\\ffn_proj0_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99152,
+ "params_nonemb": 47888,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.09214,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.03442
+  ],
+  [
+   100,
+   1.46646
+  ],
+  [
+   200,
+   1.30868
+  ],
+  [
+   300,
+   1.25131
+  ],
+  [
+   400,
+   1.20915
+  ],
+  [
+   500,
+   1.17813
+  ],
+  [
+   600,
+   1.15056
+  ],
+  [
+   700,
+   1.12868
+  ],
+  [
+   800,
+   1.108
+  ],
+  [
+   900,
+   1.09508
+  ],
+  [
+   953,
+   1.09214
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.6449
+  ],
+  [
+   50,
+   9.5164
+  ],
+  [
+   100,
+   7.2459
+  ],
+  [
+   150,
+   6.0674
+  ],
+  [
+   200,
+   5.4712
+  ],
+  [
+   250,
+   5.1474
+  ],
+  [
+   300,
+   4.9655
+  ],
+  [
+   350,
+   4.8232
+  ],
+  [
+   400,
+   4.776
+  ],
+  [
+   450,
+   4.6867
+  ],
+  [
+   500,
+   4.6215
+  ],
+  [
+   550,
+   4.5417
+  ],
+  [
+   600,
+   4.4648
+  ],
+  [
+   650,
+   4.4182
+  ],
+  [
+   700,
+   4.3919
+  ],
+  [
+   750,
+   4.3697
+  ],
+  [
+   800,
+   4.3129
+  ],
+  [
+   850,
+   4.2733
+  ],
+  [
+   900,
+   4.2485
+  ],
+  [
+   950,
+   4.2319
+  ],
+  [
+   952,
+   4.2334
+  ]
+ ],
+ "train_seconds": 69.5,
+ "wall_seconds": 81.75,
+ "chars_per_sec": 112336,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was very excited to play with her friends. One day, Lucy decided to take a rock. She picked it up and saw her family. She found a big, red boat.\nSue saw her and said, \"Don't worry, come play!\" Her friends was sad and said, \"I can help you. I won't a big broken frog!\"\nSo her family came back to her castle, and they were happy too. The big frog was brave and bad. They laughed and became good friends.\n<|eot|>\nOnce upon a time, there was a big pink ball. In the park, there was a little boy named Tim. He loved to play with his ball. One day, he found a big, red ball under a big tree. It wanted to see what was inside.\nTim did not see a big cross box. It was selfish and wanted it. Tim put the ball closer and have fun. He put the ball in a big tree near his house. Tim and his friends went inside the tree and played with the ball all day. They were so happy they could play together.\nAt the end of the day, Tim and his friends played together again. They played together and had lots of fun together. And they all lived happily ever after.\n<|eot|>\nOnce upon a time, in a small town, there was a little girl named Lily. She had a big red ball that she had to go to the store.",
+ "rule_init": {},
+ "ngram_init": {}
+}

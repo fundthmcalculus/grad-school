@@ -1,0 +1,213 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 64,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v14-rule-seeds\\D-ctx512-r64_30M_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 64,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 102560,
+ "params_nonemb": 53408,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.116,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.36111
+  ],
+  [
+   580,
+   1.23608
+  ],
+  [
+   870,
+   1.15663
+  ],
+  [
+   1160,
+   1.116
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3137
+  ],
+  [
+   50,
+   8.1034
+  ],
+  [
+   100,
+   6.244
+  ],
+  [
+   150,
+   5.3425
+  ],
+  [
+   200,
+   4.8523
+  ],
+  [
+   250,
+   4.6023
+  ],
+  [
+   300,
+   4.4238
+  ],
+  [
+   350,
+   4.3114
+  ],
+  [
+   400,
+   4.2013
+  ],
+  [
+   450,
+   4.1359
+  ],
+  [
+   500,
+   4.0691
+  ],
+  [
+   550,
+   4.0168
+  ],
+  [
+   600,
+   3.9483
+  ],
+  [
+   650,
+   3.8946
+  ],
+  [
+   700,
+   3.8514
+  ],
+  [
+   750,
+   3.8122
+  ],
+  [
+   800,
+   3.7648
+  ],
+  [
+   850,
+   3.7133
+  ],
+  [
+   900,
+   3.6766
+  ],
+  [
+   950,
+   3.6524
+  ],
+  [
+   1000,
+   3.62
+  ],
+  [
+   1050,
+   3.5853
+  ],
+  [
+   1100,
+   3.5706
+  ],
+  [
+   1150,
+   3.5474
+  ],
+  [
+   1159,
+   3.5483
+  ]
+ ],
+ "train_seconds": 82.41,
+ "wall_seconds": 90.8,
+ "chars_per_sec": 115316,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there lived a little girl who was ready to pack. He took the pizzain outside. On the day, he found a big bag of clothes in the park. One day, he found a toy car in a big, big bag. The ball was very tired.\nThe bird wanted to play with the birds, but the bird was too fast. She was happy to have the ball too. So, the bird flew out of the tree, and it was too scared. The bird saw the bird and said and said, \"Don't worry, I don't need.\" The bird said, \"Yes, and you are not foolish anymore. We can take it to the bird to make it look better.\"\nThe bird laughed and said, \"Thank you, little bird!\" Pin and the bird became good friends.\n<|eot|>\nOnce upon a time, there was a nice stop. He loved to play. One day, he saw a big, yummy toy car. The stop was very small and had many toys. He was green, but it was so big and wanted to play.\nBut, his toy car found a big market and it was a shiny thing. He wanted to play with it. He tried to make the markh in the rich. But he knew the gray giant, he was unive. He decided to make the",
+ "rule_init": {},
+ "ngram_init": {}
+}

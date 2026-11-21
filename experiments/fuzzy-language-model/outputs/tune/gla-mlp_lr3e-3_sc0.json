@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "linear",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.003,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/gla-mlp_lr3e-3_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "linear",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 19812,
+ "params_nonemb": 16676,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.96856,
+ "evals": [
+  [
+   305,
+   2.37727
+  ],
+  [
+   610,
+   2.09645
+  ],
+  [
+   915,
+   2.00548
+  ],
+  [
+   1220,
+   1.9692
+  ],
+  [
+   1221,
+   1.96856
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.5685
+  ],
+  [
+   50,
+   5.9564
+  ],
+  [
+   100,
+   4.7528
+  ],
+  [
+   150,
+   3.8126
+  ],
+  [
+   200,
+   3.179
+  ],
+  [
+   250,
+   2.7951
+  ],
+  [
+   300,
+   2.5627
+  ],
+  [
+   350,
+   2.4264
+  ],
+  [
+   400,
+   2.3261
+  ],
+  [
+   450,
+   2.265
+  ],
+  [
+   500,
+   2.213
+  ],
+  [
+   550,
+   2.1577
+  ],
+  [
+   600,
+   2.1238
+  ],
+  [
+   650,
+   2.1046
+  ],
+  [
+   700,
+   2.0878
+  ],
+  [
+   750,
+   2.0709
+  ],
+  [
+   800,
+   2.0503
+  ],
+  [
+   850,
+   2.0377
+  ],
+  [
+   900,
+   2.0263
+  ],
+  [
+   950,
+   2.0162
+  ],
+  [
+   1000,
+   1.9935
+  ],
+  [
+   1050,
+   1.9921
+  ],
+  [
+   1100,
+   1.985
+  ],
+  [
+   1150,
+   1.9805
+  ],
+  [
+   1200,
+   1.9835
+  ],
+  [
+   1220,
+   1.9846
+  ]
+ ],
+ "train_seconds": 499.9,
+ "wall_seconds": 563.09,
+ "chars_per_sec": 20009,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was need the bed. The dog and a big party and said Tim said, \"Max, Tim's great it. He sill frog. She saw and sad sail happay to she take up tage. The bird liked to to he flower her flew fun the mest in to the tree togething the keepes. The laugh. The sat the scares.\n<|eot|>\n\n\nMane Mia was sat.\"\nThey",
+ "rule_init": {}
+}

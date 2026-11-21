@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 300,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v23-wu30\\wu300_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.08752,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.39233
+  ],
+  [
+   580,
+   1.2355
+  ],
+  [
+   870,
+   1.13607
+  ],
+  [
+   1160,
+   1.08752
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3771
+  ],
+  [
+   50,
+   8.6627
+  ],
+  [
+   100,
+   6.5669
+  ],
+  [
+   150,
+   5.4864
+  ],
+  [
+   200,
+   4.9705
+  ],
+  [
+   250,
+   4.6967
+  ],
+  [
+   300,
+   4.5157
+  ],
+  [
+   350,
+   4.4064
+  ],
+  [
+   400,
+   4.2832
+  ],
+  [
+   450,
+   4.1797
+  ],
+  [
+   500,
+   4.098
+  ],
+  [
+   550,
+   4.0265
+  ],
+  [
+   600,
+   3.9455
+  ],
+  [
+   650,
+   3.8926
+  ],
+  [
+   700,
+   3.82
+  ],
+  [
+   750,
+   3.7792
+  ],
+  [
+   800,
+   3.7274
+  ],
+  [
+   850,
+   3.6867
+  ],
+  [
+   900,
+   3.6408
+  ],
+  [
+   950,
+   3.6013
+  ],
+  [
+   1000,
+   3.5454
+  ],
+  [
+   1050,
+   3.5121
+  ],
+  [
+   1100,
+   3.4962
+  ],
+  [
+   1150,
+   3.4724
+  ],
+  [
+   1159,
+   3.462
+  ]
+ ],
+ "train_seconds": 79.39,
+ "wall_seconds": 86.07,
+ "chars_per_sec": 119701,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called her. She loved to play with her special things. One day, she decided to spive the same day.\nSo, she found a small mole. She was beautiful and a big smile on her head. Her friend was better playing and tired it. The bele game was so happy that it could glroy more organized the new things.\nThe moral of the story is to take turns to play with her friend.\n<|eot|>\nOne day, a little girl named Lily found a big box. It was a big, red box. She wanted to see her room. She ran to her car throw. She did not start to snap her.\nLily asked, \"Can I bury my toys?\" Her mom said, \"It's okay, Lily. I like the toys!\"\nLily was excited. She learned that that the teell her mom never break. There were tiresing things. Lily was very happy to use her family.\n<|eot|>\nOne day, a little boy named Tim went to the park. He saw a big tree in the tree. Tim thought for a friend, Sam. \"I bed the tree!\" said Tim. Tim smiled and said, \"I cannot go outside!\" Tim felt fast and having fun to use his friend, Max.\nTim decided to play with",
+ "rule_init": {},
+ "ngram_init": {}
+}

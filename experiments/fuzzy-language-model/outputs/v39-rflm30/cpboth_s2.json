@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta_cpboth",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v39-rflm30\\cpboth_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta_cpboth",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98464,
+ "params_nonemb": 49312,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11647,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.25588
+  ],
+  [
+   100,
+   1.58294
+  ],
+  [
+   200,
+   1.44318
+  ],
+  [
+   300,
+   1.36445
+  ],
+  [
+   400,
+   1.30514
+  ],
+  [
+   500,
+   1.26753
+  ],
+  [
+   600,
+   1.23468
+  ],
+  [
+   700,
+   1.20423
+  ],
+  [
+   800,
+   1.17431
+  ],
+  [
+   900,
+   1.15144
+  ],
+  [
+   1000,
+   1.13273
+  ],
+  [
+   1100,
+   1.12112
+  ],
+  [
+   1160,
+   1.11647
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2981
+  ],
+  [
+   50,
+   8.0928
+  ],
+  [
+   100,
+   6.2477
+  ],
+  [
+   150,
+   5.3358
+  ],
+  [
+   200,
+   4.8594
+  ],
+  [
+   250,
+   4.6117
+  ],
+  [
+   300,
+   4.4521
+  ],
+  [
+   350,
+   4.3213
+  ],
+  [
+   400,
+   4.2152
+  ],
+  [
+   450,
+   4.1316
+  ],
+  [
+   500,
+   4.0771
+  ],
+  [
+   550,
+   4.0052
+  ],
+  [
+   600,
+   3.9662
+  ],
+  [
+   650,
+   3.9137
+  ],
+  [
+   700,
+   3.8537
+  ],
+  [
+   750,
+   3.8122
+  ],
+  [
+   800,
+   3.7736
+  ],
+  [
+   850,
+   3.7289
+  ],
+  [
+   900,
+   3.6919
+  ],
+  [
+   950,
+   3.6496
+  ],
+  [
+   1000,
+   3.6243
+  ],
+  [
+   1050,
+   3.5992
+  ],
+  [
+   1100,
+   3.5839
+  ],
+  [
+   1150,
+   3.5445
+  ],
+  [
+   1159,
+   3.5458
+  ]
+ ],
+ "train_seconds": 80.31,
+ "wall_seconds": 94.12,
+ "chars_per_sec": 118332,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy. Lucy loved to meet a special shaper. One day, she found a big, smart.\nSo, Lucy found a small bart. It was so pretty and shiny. Lucy was so excited. The bench was tired and hungry. After one day, Lucy decided to remember to stwic her supple and wanted to show her mom her puppy. She would see her puit up and said, \"Dadre to make a other apple!\" Lucy was happy and thanked Lucy. The ciral helped Lucy and the crit through the barf all day, even exploring and the best of friends were so proud of their important march. The marched now, and Lucy became the best of friends, and they lived happily ever after.\n<|eot|>\n\nMax and Jara loved to play outside. Tom was so excited; he had an open scary busen. He wanted to play with his friends.\nOne day, Max decided to be realized to get a big mark, and he decided to use away. He promised to keep his precase and not to his mom. He pushed and kept grow, and he knew that he had been cooling.\n",
+ "rule_init": {},
+ "ngram_init": {}
+}

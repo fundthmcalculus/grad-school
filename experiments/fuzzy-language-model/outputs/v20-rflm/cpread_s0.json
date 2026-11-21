@@ -1,0 +1,142 @@
+{
+ "args": {
+  "mixer": "fuzzydelta_cpread",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 4000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 6,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "outputs\\v20-rflm\\cpread_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta_cpread",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98464,
+ "params_nonemb": 49312,
+ "steps": 155,
+ "chars_seen": 4010100,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.41919,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   38,
+   1.89583
+  ],
+  [
+   76,
+   1.6451
+  ],
+  [
+   114,
+   1.54269
+  ],
+  [
+   152,
+   1.42394
+  ],
+  [
+   155,
+   1.41919
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3706
+  ],
+  [
+   50,
+   8.1333
+  ],
+  [
+   100,
+   6.2551
+  ],
+  [
+   150,
+   5.28
+  ],
+  [
+   154,
+   5.217
+  ]
+ ],
+ "train_seconds": 541.11,
+ "wall_seconds": 763.24,
+ "chars_per_sec": 2347,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 6,
+ "device": "cpu",
+ "device_name": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, in a small bear. The bird was a pquur of a special shile. The boy was so happy and said, \"I'm very happy!\" The dog laughed and jumped to the home. They decided to play with the ball and go inside. The bird was happy.\nTom and Sam became best friends. They played together all day. They would get fun.\n<|eot|>\nOne day, a little girl called the room. He met a big box. He was hurt ate. He saw a red hole. He said, \"Can you play with a big, other, too!\" said, \"Sue! I will wear?\" asked. She ran and went inside the play outside. She did not know what was even. He started to unstridy. The hit was very happy and wanted to watch it with the food.\nThe big car, marry, Tim was very sad. He thanked the roell and explore it was. The pare tike was very brave and thronging. It was her tridal, but it was so happy.\nAfter a while, the wind was a small box. He thought for her friend to buday with. He prot down the dellops and crytohs. \nThegen thought about the growlo towet with the unphone. He was playing",
+ "rule_init": {},
+ "ngram_init": {}
+}

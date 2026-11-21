@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.003,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-acc_lr3e-3_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 28004,
+ "params_nonemb": 24868,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.09272,
+ "evals": [
+  [
+   305,
+   2.5711
+  ],
+  [
+   610,
+   2.24675
+  ],
+  [
+   915,
+   2.13616
+  ],
+  [
+   1220,
+   2.09344
+  ],
+  [
+   1221,
+   2.09272
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8624
+  ],
+  [
+   50,
+   6.2629
+  ],
+  [
+   100,
+   5.0498
+  ],
+  [
+   150,
+   4.0269
+  ],
+  [
+   200,
+   3.3998
+  ],
+  [
+   250,
+   3.0232
+  ],
+  [
+   300,
+   2.7849
+  ],
+  [
+   350,
+   2.6282
+  ],
+  [
+   400,
+   2.5095
+  ],
+  [
+   450,
+   2.4347
+  ],
+  [
+   500,
+   2.3711
+  ],
+  [
+   550,
+   2.3119
+  ],
+  [
+   600,
+   2.2734
+  ],
+  [
+   650,
+   2.2483
+  ],
+  [
+   700,
+   2.2296
+  ],
+  [
+   750,
+   2.2111
+  ],
+  [
+   800,
+   2.1885
+  ],
+  [
+   850,
+   2.176
+  ],
+  [
+   900,
+   2.1598
+  ],
+  [
+   950,
+   2.1475
+  ],
+  [
+   1000,
+   2.1238
+  ],
+  [
+   1050,
+   2.1199
+  ],
+  [
+   1100,
+   2.1111
+  ],
+  [
+   1150,
+   2.1067
+  ],
+  [
+   1200,
+   2.1113
+  ],
+  [
+   1220,
+   2.1105
+  ]
+ ],
+ "train_seconds": 629.58,
+ "wall_seconds": 710.09,
+ "chars_per_sec": 15888,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there beshile for toy.\nThey woumm sometting at on all wantddy mom big lever didg named Fin. Bind. He cat what them his sailld an saw he sitted threated, \"But in and poling and Ben and Miay a waud somed treice said a big togething the went said. Bob and very at the sceepent what was to dad. He was ",
+ "rule_init": {}
+}

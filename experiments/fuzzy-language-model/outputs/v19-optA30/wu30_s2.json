@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 30,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-optA30\\wu30_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.12627,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.36429
+  ],
+  [
+   580,
+   1.24213
+  ],
+  [
+   870,
+   1.16207
+  ],
+  [
+   1160,
+   1.12627
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2981
+  ],
+  [
+   50,
+   7.7583
+  ],
+  [
+   100,
+   6.0436
+  ],
+  [
+   150,
+   5.2268
+  ],
+  [
+   200,
+   4.8104
+  ],
+  [
+   250,
+   4.5932
+  ],
+  [
+   300,
+   4.4523
+  ],
+  [
+   350,
+   4.3298
+  ],
+  [
+   400,
+   4.2302
+  ],
+  [
+   450,
+   4.1419
+  ],
+  [
+   500,
+   4.0847
+  ],
+  [
+   550,
+   4.0115
+  ],
+  [
+   600,
+   3.9709
+  ],
+  [
+   650,
+   3.9197
+  ],
+  [
+   700,
+   3.8585
+  ],
+  [
+   750,
+   3.8196
+  ],
+  [
+   800,
+   3.7876
+  ],
+  [
+   850,
+   3.7459
+  ],
+  [
+   900,
+   3.7124
+  ],
+  [
+   950,
+   3.6739
+  ],
+  [
+   1000,
+   3.6536
+  ],
+  [
+   1050,
+   3.6263
+  ],
+  [
+   1100,
+   3.6158
+  ],
+  [
+   1150,
+   3.578
+  ],
+  [
+   1159,
+   3.5786
+  ]
+ ],
+ "train_seconds": 79.4,
+ "wall_seconds": 86.27,
+ "chars_per_sec": 119688,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and clear. The pquip was a special pian. The phag is hoped that was ???llhere is okay to come to the magic toy cross. But you can fall, but soon you have a new adventuring. The cross said one to have to be fun to go home.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She liked to play with her friends. One day, she found a big tree. She had many toys and found a big tree. It was a very pretty door.\nLily got there, but she wanted to play too. She threw a bit to play and hurt her to make a fair. She felt sad that her shoulders were impatient. Lily said, \"Yes, you can't work. But you are ornen. I can help you on your leave. I can't get else? I can't help me find the door.\"\nSue was happy. She gave her a big, egg. Sue was very happy. She came to the park to play. They had mad, and her friends came to play with. They both enjoyed the big snag and played for Max to play. \nThey learned that being kind and good friends. And they lived happily ever after.\n<|eot|>\nOnce upon a time,",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,82 @@
+seed 0 triangle   test RMSE 0.0436  nfev 52  7.20s
+seed 0 trapezoid  test RMSE 0.0452  nfev 34  4.42s
+seed 0 pentagon   test RMSE 0.0397  nfev 60  14.73s
+seed 0 hexagon    test RMSE 0.0350  nfev 38  10.55s
+seed 0 heptagon   test RMSE 0.0366  nfev 39  10.30s
+seed 0 gaussian   test RMSE 0.0284  nfev 200  27.35s
+seed 0 elliptic   test RMSE 0.0563  nfev 52  4.76s
+seed 1 triangle   test RMSE 0.1708  nfev 47  6.61s
+seed 1 trapezoid  test RMSE 0.0363  nfev 36  5.18s
+seed 1 pentagon   test RMSE 0.0341  nfev 47  12.04s
+seed 1 hexagon    test RMSE 0.0387  nfev 37  7.98s
+seed 1 heptagon   test RMSE 0.0341  nfev 36  8.49s
+seed 1 gaussian   test RMSE 0.0366  nfev 42  4.99s
+seed 1 elliptic   test RMSE 0.0484  nfev 35  2.97s
+seed 2 triangle   test RMSE 0.1702  nfev 41  4.47s
+seed 2 trapezoid  test RMSE 0.0410  nfev 46  7.29s
+seed 2 pentagon   test RMSE 0.0369  nfev 49  10.80s
+seed 2 hexagon    test RMSE 0.0401  nfev 56  15.54s
+seed 2 heptagon   test RMSE 0.0395  nfev 47  13.66s
+seed 2 gaussian   test RMSE 0.0917  nfev 118  13.79s
+seed 2 elliptic   test RMSE 0.0554  nfev 48  3.39s
+seed 3 triangle   test RMSE 0.0326  nfev 45  5.53s
+seed 3 trapezoid  test RMSE 0.0421  nfev 37  4.66s
+seed 3 pentagon   test RMSE 0.0371  nfev 47  10.22s
+seed 3 hexagon    test RMSE 0.0387  nfev 41  11.09s
+seed 3 heptagon   test RMSE 0.0327  nfev 60  18.78s
+seed 3 gaussian   test RMSE 0.0349  nfev 78  9.31s
+seed 3 elliptic   test RMSE 0.1699  nfev 38  2.77s
+seed 4 triangle   test RMSE 0.0332  nfev 44  5.48s
+seed 4 trapezoid  test RMSE 0.0369  nfev 39  4.82s
+seed 4 pentagon   test RMSE 0.0459  nfev 41  7.95s
+seed 4 hexagon    test RMSE 0.0329  nfev 44  11.29s
+seed 4 heptagon   test RMSE 0.0310  nfev 35  7.91s
+seed 4 gaussian   test RMSE 0.0328  nfev 72  7.67s
+seed 4 elliptic   test RMSE 0.0485  nfev 39  2.66s
+seed 5 triangle   test RMSE 0.0348  nfev 91  14.06s
+seed 5 trapezoid  test RMSE 0.0274  nfev 46  7.67s
+seed 5 pentagon   test RMSE 0.0343  nfev 49  11.01s
+seed 5 hexagon    test RMSE 0.0332  nfev 44  11.72s
+seed 5 heptagon   test RMSE 0.0359  nfev 39  8.51s
+seed 5 gaussian   test RMSE 0.0304  nfev 63  7.66s
+seed 5 elliptic   test RMSE 0.8130  nfev 63  6.41s
+seed 6 triangle   test RMSE 0.0341  nfev 64  8.51s
+seed 6 trapezoid  test RMSE 0.0369  nfev 45  7.73s
+seed 6 pentagon   test RMSE 0.0353  nfev 39  7.74s
+seed 6 hexagon    test RMSE 0.0306  nfev 57  15.73s
+seed 6 heptagon   test RMSE 0.0349  nfev 44  12.79s
+seed 6 gaussian   test RMSE 3.3731  nfev 200  28.00s
+seed 6 elliptic   test RMSE 0.0623  nfev 41  2.90s
+seed 7 triangle   test RMSE 0.0334  nfev 56  6.23s
+seed 7 trapezoid  test RMSE 0.0349  nfev 82  16.63s
+seed 7 pentagon   test RMSE 0.0336  nfev 45  9.81s
+seed 7 hexagon    test RMSE 0.0355  nfev 47  12.30s
+seed 7 heptagon   test RMSE 0.0390  nfev 37  10.29s
+seed 7 gaussian   test RMSE 0.0348  nfev 119  12.59s
+seed 7 elliptic   test RMSE 0.0740  nfev 41  2.91s
+seed 8 triangle   test RMSE 0.0511  nfev 49  6.85s
+seed 8 trapezoid  test RMSE 0.0584  nfev 44  6.68s
+seed 8 pentagon   test RMSE 0.0327  nfev 40  8.29s
+seed 8 hexagon    test RMSE 0.0441  nfev 42  12.60s
+seed 8 heptagon   test RMSE 0.0400  nfev 41  10.26s
+seed 8 gaussian   test RMSE 0.1079  nfev 33  3.73s
+seed 8 elliptic   test RMSE 0.0699  nfev 39  2.94s
+seed 9 triangle   test RMSE 0.0348  nfev 45  6.04s
+seed 9 trapezoid  test RMSE 0.0421  nfev 43  5.81s
+seed 9 pentagon   test RMSE 0.0382  nfev 47  11.05s
+seed 9 hexagon    test RMSE 0.0418  nfev 37  8.67s
+seed 9 heptagon   test RMSE 0.0342  nfev 34  8.16s
+seed 9 gaussian   test RMSE 0.0582  nfev 33  2.69s
+seed 9 elliptic   test RMSE 0.0691  nfev 34  2.42s
+| shape | antecedent params | test RMSE (mean ± sd) | train RMSE | gain vs previous | nfev | seconds |
+|---|---:|---:|---:|---:|---:|---:|
+| triangle | 30 | 0.0639 ± 0.0565 | 0.0447 |  | 53 | 7.10 |
+| trapezoid | 40 | 0.0401 ± 0.0081 | 0.0447 | +0.0237 | 45 | 7.09 |
+| pentagon | 50 | 0.0368 ± 0.0039 | 0.0433 | +0.0033 | 46 | 10.36 |
+| hexagon | 60 | 0.0370 ± 0.0043 | 0.0437 | -0.0003 | 44 | 11.75 |
+| heptagon | 70 | 0.0358 ± 0.0030 | 0.0435 | +0.0012 | 41 | 10.91 |
+| gaussian | 20 | 0.3829 ± 1.0510 | 0.0449 | -0.3471 | 96 | 11.78 |
+| elliptic | 20 | 0.1467 ± 0.2368 | 0.0534 | +0.2362 | 43 | 3.41 |
+
+Seeds 0..9 (n=10), K=5, N_train=500, noise sd=0.05.
+

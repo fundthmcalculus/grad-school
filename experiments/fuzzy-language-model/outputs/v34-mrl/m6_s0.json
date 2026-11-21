@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v34-mrl\\m6_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.21284,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.28517
+  ],
+  [
+   100,
+   1.72306
+  ],
+  [
+   200,
+   1.57617
+  ],
+  [
+   300,
+   1.48337
+  ],
+  [
+   400,
+   1.43207
+  ],
+  [
+   500,
+   1.37958
+  ],
+  [
+   600,
+   1.34871
+  ],
+  [
+   700,
+   1.31063
+  ],
+  [
+   800,
+   1.27652
+  ],
+  [
+   900,
+   1.25249
+  ],
+  [
+   1000,
+   1.23357
+  ],
+  [
+   1100,
+   1.21905
+  ],
+  [
+   1160,
+   1.21284
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2718
+  ],
+  [
+   50,
+   8.5558
+  ],
+  [
+   100,
+   6.8978
+  ],
+  [
+   150,
+   6.0528
+  ],
+  [
+   200,
+   5.6159
+  ],
+  [
+   250,
+   5.4073
+  ],
+  [
+   300,
+   5.1998
+  ],
+  [
+   350,
+   5.0804
+  ],
+  [
+   400,
+   4.9537
+  ],
+  [
+   450,
+   4.8847
+  ],
+  [
+   500,
+   4.8182
+  ],
+  [
+   550,
+   4.7025
+  ],
+  [
+   600,
+   4.6778
+  ],
+  [
+   650,
+   4.6055
+  ],
+  [
+   700,
+   4.5637
+  ],
+  [
+   750,
+   4.5208
+  ],
+  [
+   800,
+   4.4642
+  ],
+  [
+   850,
+   4.4244
+  ],
+  [
+   900,
+   4.3675
+  ],
+  [
+   950,
+   4.318
+  ],
+  [
+   1000,
+   4.2865
+  ],
+  [
+   1050,
+   4.2688
+  ],
+  [
+   1100,
+   4.2197
+  ],
+  [
+   1150,
+   4.22
+  ],
+  [
+   1159,
+   4.2119
+  ]
+ ],
+ "train_seconds": 82.88,
+ "wall_seconds": 96.95,
+ "chars_per_sec": 114656,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and little bird. The bug was not small. It loved to play. One day, the little bird became that the first clothes was not sarn. The magic wind said, \"Hi, my arelie.\" The little masks was tired.\nThe little bird and the little bird flew home, and the little bird was curious. They all had lots of fun, and each other bright again. They were both very happy and envorite anymore.\n<|eot|>\n\n\nBut sometis time, shelly's playing, Anna's dad. She likegggs. One day, she went inside thread. She did not like it, even exple.\nBut Ben was not bit in a fudaive yase with his shin. She was very happy. She mister, she was very nice. She read it and found them.\n\"We need to crink and have what you do up?\" Her mom smiled and said, \"Yes, green, but I am sols. You have behan to be a new girl and say goodbye. And you have to deesting.\"\nLily nodded and said, \"Lily, I will help you to make. Let having a loud friend towet with us.\"\nAmy decided to work",
+ "rule_init": {},
+ "ngram_init": {}
+}

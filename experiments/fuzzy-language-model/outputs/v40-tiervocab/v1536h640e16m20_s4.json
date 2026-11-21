@@ -1,0 +1,242 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v1536h640e16m20_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1536",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1536
+ },
+ "config": {
+  "vocab_size": 1536,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99280,
+ "params_nonemb": 53456,
+ "steps": 1052,
+ "chars_seen": 30013285,
+ "chars_per_token": 3.4826342,
+ "val_bpc": 1.08189,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.10486
+  ],
+  [
+   100,
+   1.50894
+  ],
+  [
+   200,
+   1.36264
+  ],
+  [
+   300,
+   1.29985
+  ],
+  [
+   400,
+   1.25105
+  ],
+  [
+   500,
+   1.21164
+  ],
+  [
+   600,
+   1.17389
+  ],
+  [
+   700,
+   1.14264
+  ],
+  [
+   800,
+   1.11607
+  ],
+  [
+   900,
+   1.0991
+  ],
+  [
+   1000,
+   1.08579
+  ],
+  [
+   1052,
+   1.08189
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.8169
+  ],
+  [
+   50,
+   8.4593
+  ],
+  [
+   100,
+   6.5412
+  ],
+  [
+   150,
+   5.6008
+  ],
+  [
+   200,
+   5.1081
+  ],
+  [
+   250,
+   4.8302
+  ],
+  [
+   300,
+   4.6578
+  ],
+  [
+   350,
+   4.5577
+  ],
+  [
+   400,
+   4.4653
+  ],
+  [
+   450,
+   4.3832
+  ],
+  [
+   500,
+   4.3155
+  ],
+  [
+   550,
+   4.2199
+  ],
+  [
+   600,
+   4.1739
+  ],
+  [
+   650,
+   4.1105
+  ],
+  [
+   700,
+   4.053
+  ],
+  [
+   750,
+   3.9827
+  ],
+  [
+   800,
+   3.9407
+  ],
+  [
+   850,
+   3.8982
+  ],
+  [
+   900,
+   3.8594
+  ],
+  [
+   950,
+   3.8608
+  ],
+  [
+   1000,
+   3.8242
+  ],
+  [
+   1050,
+   3.8223
+  ],
+  [
+   1051,
+   3.8216
+  ]
+ ],
+ "train_seconds": 74.66,
+ "wall_seconds": 87.47,
+ "chars_per_sec": 115435,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little boy named Tom. He asked his friend, a big cat named Tim, to come back to the birds to play.\nOne day, Tim's friend, Tim, in the park, and a magic cat named Tim, came to play. They went to each other and saw the bird parents. Tim saw Tim and a toy. Tim was sad and gave Tim a big smile. They were all there, and they had a dream. Tim was very happy and didn't know.\nWhen Tim opened the toy, something unexpected happened. The dog jumped as the dog went around, the toy was not a stribor. They laughed and had fun.\n<|eot|>\n\nOnce upon a time, there was a little girl named Sue. She loved to learn some food to fit her things for her feet. She's mom asked, \"Mom, can I make something sun and only other people in the forest?\" Sue was stirred and she hugged her mom.\nShe hopped around and they used and felt something special to feet. Lily asked her mom, \"Can I go ready?\" Her mom said, \"The moral of the story is to go, Lily. We can see something special to share to or leave, and you are very brave. I will for being a new idea! You are a good way to the big thing!\" \nThe moral of the story is that not things can we do.\n<|eot|>\n\n\n",
+ "rule_init": {},
+ "ngram_init": {}
+}

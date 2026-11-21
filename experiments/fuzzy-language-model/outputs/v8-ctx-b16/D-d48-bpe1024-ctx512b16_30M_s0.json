@@ -1,0 +1,207 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "outputs/v8-ctx-b16/D-d48-bpe1024-ctx512b16_30M_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512
+ },
+ "params_total": 93344,
+ "params_nonemb": 44192,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.12604,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.35266
+  ],
+  [
+   580,
+   1.23248
+  ],
+  [
+   870,
+   1.16092
+  ],
+  [
+   1160,
+   1.12604
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3344
+  ],
+  [
+   50,
+   8.4162
+  ],
+  [
+   100,
+   6.4041
+  ],
+  [
+   150,
+   5.3901
+  ],
+  [
+   200,
+   4.8769
+  ],
+  [
+   250,
+   4.5912
+  ],
+  [
+   300,
+   4.4209
+  ],
+  [
+   350,
+   4.3015
+  ],
+  [
+   400,
+   4.222
+  ],
+  [
+   450,
+   4.13
+  ],
+  [
+   500,
+   4.0722
+  ],
+  [
+   550,
+   4.0039
+  ],
+  [
+   600,
+   3.9459
+  ],
+  [
+   650,
+   3.8862
+  ],
+  [
+   700,
+   3.842
+  ],
+  [
+   750,
+   3.8196
+  ],
+  [
+   800,
+   3.7643
+  ],
+  [
+   850,
+   3.7182
+  ],
+  [
+   900,
+   3.6905
+  ],
+  [
+   950,
+   3.6556
+  ],
+  [
+   1000,
+   3.6214
+  ],
+  [
+   1050,
+   3.6021
+  ],
+  [
+   1100,
+   3.5881
+  ],
+  [
+   1150,
+   3.5946
+  ],
+  [
+   1159,
+   3.5919
+  ]
+ ],
+ "train_seconds": 79.64,
+ "wall_seconds": 85.94,
+ "chars_per_sec": 119321,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big red ir. \nThe mean was special and a little girl. She decided to go fast and climb the fence of the tree. A big end of the home, Lily's mom told him about the first fair. The seat was just tired anymore. The bird and the wind slides together, and the little girl was happy. She was happy to have the vodle.\n<|eot|>\nOnce upon a time, there was a little girl named Mia. She was a little barful and loved to make a favorite toy. Mia liked to see her favorite water. She had an idea.\nOne day, Mia found a start in the expensive. She thought it was a hoop, but she wanted to watch it with her food. Her friends played and the monstered a toy. Wake was on a valace.\nMax said, \"What's a pretty me! That can make careless!\" The animals all worked together. They both laughed and thanked Tuchi. They became good friends and played together all day long.\n<|eot|>\n\n\nAnna and Ben are twins. They like to play in the park. They like to make a big sun on a big tree and Ben.\n\"Yest!\" Ben says. \"A small milk,",
+ "rule_init": {},
+ "ngram_init": {}
+}

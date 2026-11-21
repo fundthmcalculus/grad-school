@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 3,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\b3_smallemb_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 3,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98382,
+ "params_nonemb": 55022,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.15111,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.10711
+  ],
+  [
+   100,
+   1.53139
+  ],
+  [
+   200,
+   1.37081
+  ],
+  [
+   300,
+   1.30929
+  ],
+  [
+   400,
+   1.26595
+  ],
+  [
+   500,
+   1.23738
+  ],
+  [
+   600,
+   1.21033
+  ],
+  [
+   700,
+   1.1854
+  ],
+  [
+   800,
+   1.16584
+  ],
+  [
+   900,
+   1.1556
+  ],
+  [
+   953,
+   1.15111
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.9233
+  ],
+  [
+   50,
+   9.3606
+  ],
+  [
+   100,
+   7.3959
+  ],
+  [
+   150,
+   6.2518
+  ],
+  [
+   200,
+   5.68
+  ],
+  [
+   250,
+   5.3921
+  ],
+  [
+   300,
+   5.2082
+  ],
+  [
+   350,
+   5.0759
+  ],
+  [
+   400,
+   4.9897
+  ],
+  [
+   450,
+   4.9268
+  ],
+  [
+   500,
+   4.8504
+  ],
+  [
+   550,
+   4.7786
+  ],
+  [
+   600,
+   4.7025
+  ],
+  [
+   650,
+   4.6513
+  ],
+  [
+   700,
+   4.6052
+  ],
+  [
+   750,
+   4.5703
+  ],
+  [
+   800,
+   4.5408
+  ],
+  [
+   850,
+   4.5144
+  ],
+  [
+   900,
+   4.4682
+  ],
+  [
+   950,
+   4.4532
+  ],
+  [
+   952,
+   4.4538
+  ]
+ ],
+ "train_seconds": 112.7,
+ "wall_seconds": 127.7,
+ "chars_per_sec": 69269,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. Lucy was very excited to play with her friends.\nOne sunny day, Lucy decided to spin in the park outside, but her friend was very slow. She played with her toy, and Amy saw her best friend. Amy was very happy to see it for the big blue cream on the table. She decided to fly down and hear it to her friend, a lovely dog named Max.\nLily's friend, Sue, came to tows. They saw a big, red ball. Lily said, \"I am sae, Tim. I know what to do?\" Lily replied, \"Yes, let's play!\" They played together every day and had a lot of fun.\n<|eot|>\nOne day, a little boy named Tim and his dog went for a hat. They wanted to fly with the house. Tim looked at the box and saw a big tree on the apple. Tim thought it was a big, old toy box of the park.\nTim was scared and said, \"I want to play with my window. I like the crab inside.\" Tim and his mom looked at the cave and started to read the orange doll. Sam and his mom laughed and played all day. They learned that making good things to help you.\" They became friends and lived happily ever after.\n<|eot|>\nOnce upon a time, in a wise old man named Sam went for a walk with his mom. They all lived in a small house with a boy named Tim.",
+ "rule_init": {},
+ "ngram_init": {}
+}

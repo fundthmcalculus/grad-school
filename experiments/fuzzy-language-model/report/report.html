@@ -1,0 +1,1175 @@
+<title>Fuzzy LM Under 100K</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column (~880px), each finding = a heading, a one-line claim, then its chart. */
+:root {
+  --bg: #f6f7f8;
+  --surface: #ffffff;
+  --ink: #14181d;
+  --ink2: #4a5360;
+  --ink3: #7b8491;
+  --rule: #dfe3e8;
+  --grid: #eceff2;
+  --fuzzy: #2a78d6;   /* the fuzzy models (blue) */
+  --neural: #eb6834;  /* neural references (orange) */
+  --old: #1baf7a;     /* the original TSK designs (aqua) */
+  --plum: #6250d6;
+  --warn: #9a6200;
+  --warnbg: #fbf1dc;
+  --display: "Newsreader", Georgia, serif;
+  --body: "Instrument Sans", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1317; --surface: #171c22; --ink: #eceff3; --ink2: #b4bcc7; --ink3: #8a94a1;
+    --rule: #2a323b; --grid: #232a32;
+    --fuzzy: #3987e5; --neural: #d95926; --old: #199e70; --plum: #9085e9;
+    --warn: #e9b44c; --warnbg: #2c2412; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1317; --surface: #171c22; --ink: #eceff3; --ink2: #b4bcc7; --ink3: #8a94a1;
+  --rule: #2a323b; --grid: #232a32;
+  --fuzzy: #3987e5; --neural: #d95926; --old: #199e70; --plum: #9085e9;
+  --warn: #e9b44c; --warnbg: #2c2412; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; padding-inline: 16px; padding-block: 28px 64px; }
+main { max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 44px; }
+h1, h2 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.08; }
+h2 { font-size: 24px; line-height: 1.2; }
+p { margin: 0; max-width: 68ch; }
+.kicker { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink3); }
+.lede { font-size: 17px; color: var(--ink2); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.stat { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.stat b { font-family: var(--mono); font-weight: 500; font-size: 26px; font-variant-numeric: tabular-nums; }
+.stat span { color: var(--ink2); font-size: 13px; }
+section { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.chart { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 12px 8px; position: relative; min-width: 0; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { fill: var(--ink2); font-family: var(--body); font-size: 11.5px; }
+.chart .lbl { fill: var(--ink); font-weight: 500; }
+.chart .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.chart .axis { stroke: var(--rule); }
+.chart .grid { stroke: var(--grid); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--ink2); padding: 0 4px 8px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.note { font-size: 13px; color: var(--ink2); }
+.caveat { background: var(--warnbg); color: var(--ink); border-radius: 6px; padding: 12px 16px; font-size: 14px; }
+.caveat b { color: var(--warn); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th { font-weight: 600; color: var(--ink2); font-size: 12px; letter-spacing: 0.03em; text-transform: uppercase; }
+td.n, th.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.scroll { overflow-x: auto; }
+#tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 12px; padding: 6px 9px; border-radius: 4px; opacity: 0; transition: opacity 0.1s; z-index: 5; max-width: 260px; line-height: 1.4; }
+ul.plain { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; max-width: 70ch; }
+code { font-family: var(--mono); font-size: 0.9em; }
+</style>
+
+<main>
+  <header style="display:flex;flex-direction:column;gap:14px">
+    <div class="kicker">fuzzy-language-model · goal track · 2026-10-10 · RTX 4080 Laptop</div>
+    <h1>A fully fuzzy language model, under 100K parameters</h1>
+    <p class="lede" id="lede"></p>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <section>
+    <h2>Where the gap was</h2>
+    <p>The original fuzzy models trailed neural ones by about 0.3 bits per character. Crossing every sequence mixer with both feed-forward layers shows the gap sat in one place: the zero-order, softmax-normalised TSK feed-forward layer. The fuzzy attention and recurrent mixers cost nothing.</p>
+    <div class="chart"><div class="legend"><span><i style="background:var(--neural)"></i>GELU MLP feed-forward</span><span><i style="background:var(--old)"></i>original TSK feed-forward</span></div><div id="c-attrib"></div></div>
+    <p class="note">d = 64, 2 layers, 10M characters, seed 0, best of lr 1e-2 / 3e-2. The TSK variants also carry about 25K more parameters (97K vs 73K).</p>
+  </section>
+
+  <section>
+    <h2>How the feed-forward layer was fixed</h2>
+    <p>Each step is still a fuzzy system: first-order TSK consequents (a rank-one linear function of the input, gated by the rule's membership), raw Gaussian firing instead of a softmax across rules, the HTSK exponent, and fewer antecedent dimensions. Then the mixer got more heads and the delta form.</p>
+    <div class="chart"><div id="c-ladder"></div></div>
+    <p class="note">All bars: 10M characters. Steps 1–3 are d = 64 with the accumulating fuzzy mixer; the last bars add 8 heads, the delta-rule form, short-conv 8 and d = 72. Single-seed except the 3-seed row and the final bar (2 seeds).</p>
+  </section>
+
+  <section>
+    <h2>Heads did most of the mixer work</h2>
+    <p>With the new feed-forward layer fixed, going from 1 to 8 heads (each with its own 16-rule base) lowered loss by 0.11 bits per character. Everything after that was worth a few hundredths.</p>
+    <div class="chart"><div id="c-heads"></div></div>
+    <p class="note">Accumulating fuzzy mixer, d = 64, 10M characters, mean of 2 seeds. 16 heads were attempted but stalled the GPU (VRAM spill) and were not measured.</p>
+  </section>
+
+  <section>
+    <h2>Against the field at equal size</h2>
+    <p id="field-claim"></p>
+    <div class="chart"><div class="legend"><span><i style="background:var(--fuzzy)"></i>fuzzy, this work</span><span><i style="background:var(--neural)"></i>neural (delta-rule + MLP)</span><span><i style="background:var(--old)"></i>original fuzzy designs</span></div><div id="c-field"></div></div>
+    <p class="note">30M characters, mean over 3 seeds, GPU. Lower is better. Curves for the original arms come from the earlier GPU scaling run (<code>scaling-gpu</code>); the new points are 97.5K parameters (fuzzy) and 91–96K (neural reference).</p>
+    <div class="scroll"><table id="t-field"></table></div>
+  </section>
+
+  <section>
+    <h2>Learning rate</h2>
+    <p id="lr-claim"></p>
+    <div class="chart"><div class="legend"><span><i style="background:var(--fuzzy)"></i>fuzzy D (97.5K)</span><span><i style="background:var(--neural)"></i>neural delta-mlp d72 / 8 heads (93K)</span></div><div id="c-lr"></div></div>
+    <p class="note">30M characters, mean over seeds 0–1 (3 seeds at 3e-2). The neural reference gets the same learning-rate search as the fuzzy model.</p>
+    <h2 style="font-size:19px;margin-top:8px">Does the d = 32 learning rate carry to d = 96? (upstream question H10)</h2>
+    <p id="lw-claim"></p>
+    <div class="scroll"><table id="t-lw"></table></div>
+  </section>
+
+  <section>
+    <h2>Limits of this result</h2>
+    <ul class="plain" id="caveats"></ul>
+  </section>
+</main>
+<div id="tip"></div>
+
+<script>
+const D = {
+ "scaling30": {
+  "delta-mlp": [
+   {
+    "params": 6008,
+    "bpc": 1.9933400000000001,
+    "sd": 0.006882824032812951
+   },
+   {
+    "params": 12080,
+    "bpc": 1.7654433333333333,
+    "sd": 0.007820760122193291
+   },
+   {
+    "params": 20200,
+    "bpc": 1.63289,
+    "sd": 0.004293258280917507
+   },
+   {
+    "params": 42584,
+    "bpc": 1.47906,
+    "sd": 0.0035948388930057513
+   },
+   {
+    "params": 73160,
+    "bpc": 1.3910966666666666,
+    "sd": 0.017035958701784055
+   },
+   {
+    "params": 158888,
+    "bpc": 1.2924200000000001,
+    "sd": 0.0047741875399555204
+   }
+  ],
+  "flm": [
+   {
+    "params": 7424,
+    "bpc": 2.1742266666666668,
+    "sd": 0.024460281183084315
+   },
+   {
+    "params": 15360,
+    "bpc": 1.88691,
+    "sd": 0.015370309040484496
+   },
+   {
+    "params": 26112,
+    "bpc": 1.7625966666666666,
+    "sd": 0.00513581758069953
+   },
+   {
+    "params": 56064,
+    "bpc": 1.65958,
+    "sd": 0.009763185955414356
+   },
+   {
+    "params": 97280,
+    "bpc": 1.62309,
+    "sd": 0.0066717364056642905
+   },
+   {
+    "params": 213504,
+    "bpc": 1.5521099999999999,
+    "sd": 0.004016441210823372
+   }
+  ],
+  "frlm-acc": [
+   {
+    "params": 8500,
+    "bpc": 1.9909666666666666,
+    "sd": 0.002558571650137866
+   },
+   {
+    "params": 16972,
+    "bpc": 1.81081,
+    "sd": 0.007013971770687375
+   },
+   {
+    "params": 28260,
+    "bpc": 1.7332133333333333,
+    "sd": 0.011010529304059592
+   },
+   {
+    "params": 59284,
+    "bpc": 1.6804,
+    "sd": 0.005856181918850131
+   },
+   {
+    "params": 101572,
+    "bpc": 1.6550866666666666,
+    "sd": 0.023343439240085282
+   },
+   {
+    "params": 219940,
+    "bpc": 1.74051,
+    "sd": 0.04214241173291658
+   }
+  ],
+  "frlm-delta": [
+   {
+    "params": 8568,
+    "bpc": 1.9987866666666667,
+    "sd": 0.010258831425762933
+   },
+   {
+    "params": 17072,
+    "bpc": 1.8118866666666666,
+    "sd": 0.007372282926987713
+   },
+   {
+    "params": 28392,
+    "bpc": 1.7289266666666667,
+    "sd": 0.018248134760084925
+   },
+   {
+    "params": 59480,
+    "bpc": 1.6723,
+    "sd": 0.003922482207310365
+   },
+   {
+    "params": 101832,
+    "bpc": 1.63198,
+    "sd": 0.02514410202545849
+   },
+   {
+    "params": 220328,
+    "bpc": 1.7583933333333335,
+    "sd": 0.0121951474866941
+   }
+  ],
+  "gla-mlp": [
+   {
+    "params": 5940,
+    "bpc": 2.02358,
+    "sd": 0.0013565642877013465
+   },
+   {
+    "params": 11980,
+    "bpc": 1.78558,
+    "sd": 0.003317539248700303
+   },
+   {
+    "params": 20068,
+    "bpc": 1.6502766666666666,
+    "sd": 0.00419763690134773
+   },
+   {
+    "params": 42388,
+    "bpc": 1.48464,
+    "sd": 0.005420479683570416
+   },
+   {
+    "params": 72900,
+    "bpc": 1.38543,
+    "sd": 0.0034437285994495916
+   },
+   {
+    "params": 158500,
+    "bpc": 1.2889966666666666,
+    "sd": 0.0024506507072386404
+   }
+  ],
+  "gru": [
+   {
+    "params": 4848,
+    "bpc": 2.0681133333333332,
+    "sd": 0.0003094439457407022
+   },
+   {
+    "params": 9576,
+    "bpc": 1.81775,
+    "sd": 0.008866036318445802
+   },
+   {
+    "params": 15840,
+    "bpc": 1.6827533333333333,
+    "sd": 0.005932376327315137
+   },
+   {
+    "params": 32976,
+    "bpc": 1.7190466666666666,
+    "sd": 0.012930543513540156
+   },
+   {
+    "params": 56256,
+    "bpc": 1.7683,
+    "sd": 0.010664542496828794
+   },
+   {
+    "params": 121248,
+    "bpc": 1.8263366666666667,
+    "sd": 0.04074241388146868
+   }
+  ],
+  "linear-mlp": [
+   {
+    "params": 5876,
+    "bpc": 2.03776,
+    "sd": 0.0023424773211282086
+   },
+   {
+    "params": 11884,
+    "bpc": 1.7949599999999999,
+    "sd": 0.002214332103968831
+   },
+   {
+    "params": 19940,
+    "bpc": 1.6612433333333334,
+    "sd": 0.0016119208693012837
+   },
+   {
+    "params": 42196,
+    "bpc": 1.4899233333333333,
+    "sd": 0.00282514109775465
+   },
+   {
+    "params": 72644,
+    "bpc": 1.3933433333333334,
+    "sd": 0.0022805018940770605
+   },
+   {
+    "params": 158116,
+    "bpc": 1.2885066666666667,
+    "sd": 0.0030742189613335263
+   }
+  ],
+  "softmax-mlp": [
+   {
+    "params": 5872,
+    "bpc": 2.09422,
+    "sd": 0.03416820256710415
+   },
+   {
+    "params": 11880,
+    "bpc": 1.81423,
+    "sd": 0.005770967567632592
+   },
+   {
+    "params": 19936,
+    "bpc": 1.6726066666666666,
+    "sd": 0.002764408717168154
+   },
+   {
+    "params": 42192,
+    "bpc": 1.4868333333333332,
+    "sd": 0.003273777973874011
+   },
+   {
+    "params": 72640,
+    "bpc": 1.3950566666666666,
+    "sd": 0.002939130634879799
+   },
+   {
+    "params": 158112,
+    "bpc": 1.2929533333333334,
+    "sd": 0.006542585285819475
+   }
+  ]
+ },
+ "attrib": {
+  "fuzzy|mlp": {
+   "bpc": 1.50673,
+   "params": 76996
+  },
+  "fuzzy|tsk": {
+   "bpc": 1.72096,
+   "params": 101572
+  },
+  "fuzzydelta|mlp": {
+   "bpc": 1.51436,
+   "params": 77256
+  },
+  "fuzzydelta|tsk": {
+   "bpc": 1.71326,
+   "params": 101832
+  },
+  "gauss|mlp": {
+   "bpc": 1.49215,
+   "params": 72704
+  },
+  "gauss|tsk": {
+   "bpc": 1.78098,
+   "params": 97280
+  },
+  "linear|mlp": {
+   "bpc": 1.50298,
+   "params": 72644
+  },
+  "linear|tsk": {
+   "bpc": 1.71961,
+   "params": 97220
+  },
+  "softmax|mlp": {
+   "bpc": 1.51175,
+   "params": 72640
+  },
+  "softmax|tsk": {
+   "bpc": 1.8258,
+   "params": 97216
+  }
+ },
+ "ffn3": {
+  "fuzzy-mlp": {
+   "bpc": 1.4957433333333332,
+   "sd": 0.008574338976789317,
+   "n": 3,
+   "params": 76996,
+   "seeds": [
+    1.50761,
+    1.49197,
+    1.48765
+   ]
+  },
+  "o1r-da16-htsk-m2.5": {
+   "bpc": 1.4901266666666666,
+   "sd": 0.009342681033241379,
+   "n": 3,
+   "params": 92996,
+   "seeds": [
+    1.47754,
+    1.4999,
+    1.49294
+   ]
+  },
+  "o1r-da16-htsk-wdim": {
+   "bpc": 1.4674733333333334,
+   "sd": 0.0003094439457407022,
+   "n": 3,
+   "params": 87492,
+   "seeds": [
+    1.46723,
+    1.46728,
+    1.46791
+   ]
+  },
+  "o1r-da16-htsk": {
+   "bpc": 1.4951666666666668,
+   "sd": 0.0019007776186485707,
+   "n": 3,
+   "params": 83652,
+   "seeds": [
+    1.49731,
+    1.49269,
+    1.4955
+   ]
+  },
+  "o1r-da16": {
+   "bpc": 1.5542533333333333,
+   "sd": 0.029063317467595134,
+   "n": 3,
+   "params": 83652,
+   "seeds": [
+    1.51736,
+    1.58839,
+    1.55701
+   ]
+  },
+  "o1r-da8-htsk": {
+   "bpc": 1.50413,
+   "sd": 0.0006780855403265632,
+   "n": 3,
+   "params": 80580,
+   "seeds": [
+    1.50325,
+    1.50424,
+    1.5049
+   ]
+  }
+ },
+ "mix": {
+  "acc-fixeddecay": {
+   "bpc": 1.4678900000000001,
+   "sd": 0.00548000000000004,
+   "n": 2,
+   "params": 87236,
+   "seeds": [
+    1.46241,
+    1.47337
+   ]
+  },
+  "acc-h1": {
+   "bpc": 1.533535,
+   "sd": 0.004724999999999979,
+   "n": 2,
+   "params": 87362,
+   "seeds": [
+    1.53826,
+    1.52881
+   ]
+  },
+  "acc-h4": {
+   "bpc": 1.44143,
+   "sd": 0.0011099999999999444,
+   "n": 2,
+   "params": 87752,
+   "seeds": [
+    1.44032,
+    1.44254
+   ]
+  },
+  "acc-L1d80": {
+   "bpc": 1.585445,
+   "sd": 0.0025249999999999995,
+   "n": 2,
+   "params": 68882,
+   "seeds": [
+    1.58797,
+    1.58292
+   ]
+  },
+  "acc-L3d48": {
+   "bpc": 1.4645299999999999,
+   "sd": 0.0025000000000000577,
+   "n": 2,
+   "params": 77622,
+   "seeds": [
+    1.46703,
+    1.46203
+   ]
+  },
+  "acc-L4d40": {
+   "bpc": 1.478325,
+   "sd": 0.004954999999999932,
+   "n": 2,
+   "params": 74688,
+   "seeds": [
+    1.47337,
+    1.48328
+   ]
+  },
+  "acc-mean": {
+   "bpc": 1.4630999999999998,
+   "sd": 0.00034999999999996145,
+   "n": 2,
+   "params": 87492,
+   "seeds": [
+    1.46275,
+    1.46345
+   ]
+  },
+  "acc-r32": {
+   "bpc": 1.46282,
+   "sd": 0.0006699999999999484,
+   "n": 2,
+   "params": 91588,
+   "seeds": [
+    1.46215,
+    1.46349
+   ]
+  },
+  "acc-r8": {
+   "bpc": 1.482265,
+   "sd": 0.015804999999999958,
+   "n": 2,
+   "params": 85444,
+   "seeds": [
+    1.49807,
+    1.46646
+   ]
+  },
+  "acc": {
+   "bpc": 1.4642,
+   "sd": 0.0024600000000000177,
+   "n": 2,
+   "params": 87492,
+   "seeds": [
+    1.46174,
+    1.46666
+   ]
+  },
+  "delta-mean": {
+   "bpc": 1.449445,
+   "sd": 0.0019649999999999945,
+   "n": 2,
+   "params": 87752,
+   "seeds": [
+    1.44748,
+    1.45141
+   ]
+  },
+  "delta": {
+   "bpc": 1.50414,
+   "sd": 0.006669999999999954,
+   "n": 2,
+   "params": 87752,
+   "seeds": [
+    1.51081,
+    1.49747
+   ]
+  },
+  "gauss": {
+   "bpc": 1.47238,
+   "sd": 0.0020000000000000018,
+   "n": 2,
+   "params": 83200,
+   "seeds": [
+    1.47438,
+    1.47038
+   ]
+  }
+ },
+ "heads": {
+  "acc-h4-d72": {
+   "bpc": 1.4011,
+   "sd": 0.005830000000000002,
+   "n": 2,
+   "params": 107936,
+   "seeds": [
+    1.39527,
+    1.40693
+   ]
+  },
+  "acc-h4-L3d48": {
+   "bpc": 1.451,
+   "sd": 0.010889999999999955,
+   "n": 2,
+   "params": 77916,
+   "seeds": [
+    1.46189,
+    1.44011
+   ]
+  },
+  "acc-h4-r32": {
+   "bpc": 1.430205,
+   "sd": 0.006504999999999983,
+   "n": 2,
+   "params": 91848,
+   "seeds": [
+    1.4237,
+    1.43671
+   ]
+  },
+  "acc-h8": {
+   "bpc": 1.420525,
+   "sd": 0.0010850000000000026,
+   "n": 2,
+   "params": 88272,
+   "seeds": [
+    1.41944,
+    1.42161
+   ]
+  },
+  "acc-mean-h4": {
+   "bpc": 1.4427599999999998,
+   "sd": 0.00380999999999998,
+   "n": 2,
+   "params": 87752,
+   "seeds": [
+    1.43895,
+    1.44657
+   ]
+  },
+  "acc-mean-h8": {
+   "bpc": 1.424855,
+   "sd": 0.0011049999999999116,
+   "n": 2,
+   "params": 88272,
+   "seeds": [
+    1.42375,
+    1.42596
+   ]
+  },
+  "delta-mean-h4": {
+   "bpc": 1.42415,
+   "sd": 0.0019899999999999363,
+   "n": 2,
+   "params": 88272,
+   "seeds": [
+    1.42614,
+    1.42216
+   ]
+  },
+  "delta-mean-h8": {
+   "bpc": 1.406525,
+   "sd": 0.001395000000000035,
+   "n": 2,
+   "params": 89312,
+   "seeds": [
+    1.40513,
+    1.40792
+   ]
+  }
+ },
+ "fill": {
+  "A-lr2e-2": {
+   "bpc": 1.4024999999999999,
+   "sd": 0.0010299999999999754,
+   "n": 2,
+   "params": 98196,
+   "seeds": [
+    1.40353,
+    1.40147
+   ]
+  },
+  "A-lr4e-2": {
+   "bpc": 1.394405,
+   "sd": 0.0002849999999999797,
+   "n": 2,
+   "params": 98196,
+   "seeds": [
+    1.39412,
+    1.39469
+   ]
+  },
+  "A-sc8-m2.4": {
+   "bpc": 1.39704,
+   "sd": 0.0006500000000000394,
+   "n": 2,
+   "params": 98196,
+   "seeds": [
+    1.39639,
+    1.39769
+   ]
+  },
+  "B-sc16-m2.25": {
+   "bpc": 1.401605,
+   "sd": 0.0004150000000000542,
+   "n": 2,
+   "params": 96000,
+   "seeds": [
+    1.40202,
+    1.40119
+   ]
+  },
+  "C-sc8-r24-m2.25": {
+   "bpc": 1.393275,
+   "sd": 0.001735000000000042,
+   "n": 2,
+   "params": 97024,
+   "seeds": [
+    1.39501,
+    1.39154
+   ]
+  },
+  "D-d72-m1.5-sc8": {
+   "bpc": 1.38595,
+   "sd": 0.004229999999999956,
+   "n": 2,
+   "params": 97520,
+   "seeds": [
+    1.39018,
+    1.38172
+   ]
+  }
+ },
+ "final": {
+  "delta-mlp-d64_100M": {
+   "bpc": 1.327,
+   "sd": null,
+   "n": 1,
+   "params": 73160,
+   "seeds": [
+    1.327
+   ]
+  },
+  "D_100M": {
+   "bpc": 1.20802,
+   "sd": null,
+   "n": 1,
+   "params": 97520,
+   "seeds": [
+    1.20802
+   ]
+  },
+  "D_30M": {
+   "bpc": 1.27356,
+   "sd": 0.008681163516487834,
+   "n": 3,
+   "params": 97520,
+   "seeds": [
+    1.28581,
+    1.26814,
+    1.26673
+   ]
+  }
+ },
+ "ref": {
+  "delta-mlp-d72-h4_30M": {
+   "bpc": 1.31081,
+   "sd": 0.005815015047272007,
+   "n": 3,
+   "params": 92104,
+   "seeds": [
+    1.30725,
+    1.30617,
+    1.31901
+   ]
+  },
+  "delta-mlp-d72-h8_30M": {
+   "bpc": 1.29286,
+   "sd": 0.004080743396327048,
+   "n": 3,
+   "params": 93272,
+   "seeds": [
+    1.29857,
+    1.28928,
+    1.29073
+   ]
+  },
+  "delta-mlp-d74-h2_30M": {
+   "bpc": 1.3426033333333334,
+   "sd": 0.006662533718905661,
+   "n": 3,
+   "params": 96430,
+   "seeds": [
+    1.33353,
+    1.34494,
+    1.34934
+   ]
+  }
+ },
+ "lr": {},
+ "lr_existing": {
+  "D|3e-2": {
+   "bpc": 1.27356,
+   "sd": 0.008681163516487834,
+   "n": 3,
+   "params": 97520,
+   "seeds": [
+    1.28581,
+    1.26814,
+    1.26673
+   ]
+  },
+  "delta-mlp-d72-h8|3e-2": {
+   "bpc": 1.29286,
+   "sd": 0.004080743396327048,
+   "n": 3,
+   "params": 93272,
+   "seeds": [
+    1.29857,
+    1.28928,
+    1.29073
+   ]
+  }
+ },
+ "lrwidth": {
+  "delta-mlp": {
+   "lrdiv10": {
+    "bpc": 1.27967,
+    "lr": 0.006,
+    "device": "cuda"
+   },
+   "lrdiv3": {
+    "bpc": 1.27122,
+    "lr": 0.02,
+    "device": "cuda"
+   },
+   "x1": {
+    "bpc": 1.29318,
+    "lr": 0.06,
+    "device": "cpu"
+   }
+  },
+  "flm": {
+   "lrdiv10": {
+    "bpc": 1.62477,
+    "lr": 0.001,
+    "device": "cuda"
+   },
+   "lrdiv3": {
+    "bpc": 1.56957,
+    "lr": 0.003333,
+    "device": "cuda"
+   },
+   "x1": {
+    "bpc": 1.5505,
+    "lr": 0.01,
+    "device": "cpu"
+   }
+  },
+  "frlm-acc": {
+   "lrdiv10": {
+    "bpc": 1.53697,
+    "lr": 0.003,
+    "device": "cuda"
+   },
+   "lrdiv3": {
+    "bpc": 1.53552,
+    "lr": 0.01,
+    "device": "cuda"
+   },
+   "x1": {
+    "bpc": 1.76103,
+    "lr": 0.03,
+    "device": "cpu"
+   }
+  },
+  "gla-mlp": {
+   "lrdiv10": {
+    "bpc": 1.31532,
+    "lr": 0.003,
+    "device": "cpu"
+   },
+   "lrdiv3": {
+    "bpc": 1.28414,
+    "lr": 0.01,
+    "device": "cpu"
+   },
+   "x1": {
+    "bpc": 1.29254,
+    "lr": 0.03,
+    "device": null
+   }
+  },
+  "gru": {
+   "lrdiv10": {
+    "bpc": 1.29534,
+    "lr": 0.006,
+    "device": "cuda"
+   },
+   "lrdiv3": {
+    "bpc": 1.29019,
+    "lr": 0.02,
+    "device": "cuda"
+   },
+   "x1": {
+    "bpc": 1.84273,
+    "lr": 0.06,
+    "device": "cpu"
+   }
+  },
+  "linear-mlp": {
+   "lrdiv10": {
+    "bpc": 1.30841,
+    "lr": 0.003,
+    "device": "cpu"
+   },
+   "lrdiv3": {
+    "bpc": 1.28275,
+    "lr": 0.01,
+    "device": "cpu"
+   },
+   "x1": {
+    "bpc": 1.2921,
+    "lr": 0.03,
+    "device": null
+   }
+  },
+  "softmax-mlp": {
+   "lrdiv10": {
+    "bpc": 1.33263,
+    "lr": 0.003,
+    "device": "cpu"
+   },
+   "lrdiv3": {
+    "bpc": 1.30681,
+    "lr": 0.01,
+    "device": "cpu"
+   },
+   "x1": {
+    "bpc": 1.30005,
+    "lr": 0.03,
+    "device": null
+   }
+  }
+ }
+};
+const $ = (id) => document.getElementById(id);
+const f3 = (x) => x.toFixed(3);
+const k = (n) => (n / 1000).toFixed(1) + "K";
+const NS = "http://www.w3.org/2000/svg";
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const tip = $("tip");
+function showTip(e, html) { tip.innerHTML = html; tip.style.opacity = 1; const x = Math.min(e.clientX + 12, innerWidth - 270); tip.style.left = x + "px"; tip.style.top = e.clientY + 14 + "px"; }
+function hideTip() { tip.style.opacity = 0; }
+function el(tag, attrs, parent, text) {
+  const n = document.createElementNS(NS, tag);
+  for (const a in attrs) n.setAttribute(a, attrs[a]);
+  if (text !== undefined) n.textContent = text;
+  if (parent) parent.appendChild(n);
+  return n;
+}
+function mk(host, w, h) { host.innerHTML = ""; return el("svg", { viewBox: `0 0 ${w} ${h}`, role: "img" }, host); }
+function hover(node, html) {
+  node.addEventListener("mousemove", (e) => showTip(e, html));
+  node.addEventListener("mouseleave", hideTip);
+}
+const get = (o, path) => path.split(".").reduce((a, p) => (a == null ? a : a[p]), o);
+
+/* ---------- horizontal bars: rows = [{label, sub, value, color, note}] ---------- */
+function hbars(host, rows, { min, max, w = 840, labelW = 250, rowH = 30, ticks = 5 }) {
+  const top = 6, h = top + rows.length * rowH + 26;
+  const svg = mk(host, w, h);
+  const x0 = labelW, x1 = w - 70;
+  const sx = (v) => x0 + ((v - min) / (max - min)) * (x1 - x0);
+  for (let i = 0; i <= ticks; i++) {
+    const v = min + ((max - min) * i) / ticks;
+    el("line", { x1: sx(v), x2: sx(v), y1: top, y2: h - 22, class: "grid" }, svg);
+    el("text", { x: sx(v), y: h - 6, "text-anchor": "middle", class: "mono" }, svg, v.toFixed(2));
+  }
+  rows.forEach((r, i) => {
+    const y = top + i * rowH;
+    el("text", { x: x0 - 10, y: y + rowH / 2 - 1, "text-anchor": "end", class: "lbl" }, svg, r.label);
+    if (r.sub) el("text", { x: x0 - 10, y: y + rowH / 2 + 11, "text-anchor": "end" }, svg, r.sub);
+    const bw = Math.max(1, sx(r.value) - x0);
+    const b = el("path", { d: `M${x0},${y + 5} h${bw - 4} a4,4 0 0 1 4,4 v${rowH - 20} a4,4 0 0 1 -4,4 h${-(bw - 4)} z`, fill: css(r.color) }, svg);
+    el("text", { x: x0 + bw + 6, y: y + rowH / 2 + 4, class: "mono lbl" }, svg, f3(r.value));
+    hover(b, r.note || `${r.label}: ${f3(r.value)} BPC`);
+  });
+}
+
+/* ---------- line/scatter chart: series = [{name,color,pts:[{x,y,note}],line:true,label:'text'}] ---------- */
+function lineChart(host, series, { xlog, xmin, xmax, ymin, ymax, xticks, yticks = 5, xfmt, w = 840, h = 360, xlabel, ylabel }) {
+  const m = { l: 52, r: 110, t: 12, b: 44 };
+  const svg = mk(host, w, h);
+  const tx = (x) => (xlog ? Math.log(x) : x);
+  const sx = (x) => m.l + ((tx(x) - tx(xmin)) / (tx(xmax) - tx(xmin))) * (w - m.l - m.r);
+  const sy = (y) => h - m.b - ((y - ymin) / (ymax - ymin)) * (h - m.t - m.b);
+  for (let i = 0; i <= yticks; i++) {
+    const v = ymin + ((ymax - ymin) * i) / yticks;
+    el("line", { x1: m.l, x2: w - m.r, y1: sy(v), y2: sy(v), class: "grid" }, svg);
+    el("text", { x: m.l - 8, y: sy(v) + 4, "text-anchor": "end", class: "mono" }, svg, v.toFixed(2));
+  }
+  xticks.forEach((t) => {
+    el("line", { x1: sx(t), x2: sx(t), y1: h - m.b, y2: h - m.b + 4, class: "axis" }, svg);
+    el("text", { x: sx(t), y: h - m.b + 17, "text-anchor": "middle", class: "mono" }, svg, xfmt ? xfmt(t) : t);
+  });
+  el("line", { x1: m.l, x2: w - m.r, y1: h - m.b, y2: h - m.b, class: "axis" }, svg);
+  el("text", { x: (m.l + w - m.r) / 2, y: h - 6, "text-anchor": "middle" }, svg, xlabel);
+  el("text", { x: 12, y: (h - m.b + m.t) / 2, transform: `rotate(-90 12 ${(h - m.b + m.t) / 2})`, "text-anchor": "middle" }, svg, ylabel);
+  series.forEach((s) => {
+    const col = css(s.color);
+    const pts = s.pts.filter((p) => p.y != null);
+    if (s.line !== false && pts.length > 1)
+      el("path", { d: pts.map((p, i) => (i ? "L" : "M") + sx(p.x) + "," + sy(p.y)).join(""), fill: "none", stroke: col, "stroke-width": 2, "stroke-linejoin": "round" }, svg);
+    pts.forEach((p) => {
+      const c = el("circle", { cx: sx(p.x), cy: sy(p.y), r: s.big ? 6 : 4, fill: col, stroke: css("--surface"), "stroke-width": 2 }, svg);
+      const hit = el("circle", { cx: sx(p.x), cy: sy(p.y), r: 12, fill: "transparent" }, svg);
+      hover(hit, p.note || `${s.name}: ${f3(p.y)}`);
+    });
+    if (s.label && pts.length) {
+      const last = s.labelAt === "first" ? pts[0] : pts[pts.length - 1];
+      el("text", { x: sx(last.x) + 10, y: sy(last.y) + 4 + (s.dy || 0), class: "lbl", fill: col, style: `fill:${col}` }, svg, s.label);
+    }
+  });
+}
+
+/* ---------- build ---------- */
+const final = D.final, ref = D.ref;
+const d30 = final["D_30M"], d100 = final["D_100M"], n100 = final["delta-mlp-d64_100M"];
+const refBest = Object.entries(ref).sort((a, b) => a[1].bpc - b[1].bpc)[0];
+const sd = (g) => (g.sd == null ? "" : ` ± ${g.sd.toFixed(3)}`);
+
+$("lede").textContent =
+  `Every sublayer is a Takagi–Sugeno–Kang fuzzy system: attention-like rule memory in the mixer, rule-gated first-order consequents in the feed-forward layer. At ${k(d30.params)} parameters it reaches ${f3(d30.bpc)} bits per character on TinyStories after 30M characters and ${f3(d100.bpc)} after 100M. The original fuzzy design was at about 1.62.`;
+
+$("stats").innerHTML = [
+  [f3(d100.bpc), `val BPC after 100M characters (${k(d100.params)} params)`],
+  [f3(d30.bpc), `val BPC after 30M characters, mean of ${d30.n} seeds`],
+  [f3(refBest[1].bpc), `best size-matched neural reference at 30M (${k(refBest[1].params)})`],
+  [f3(n100.bpc), `neural delta-mlp d64 at 100M (${k(n100.params)}, one seed)`],
+].map(([b, s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
+
+/* attribution */
+(function () {
+  const names = { softmax: "softmax attention", gauss: "Gaussian-TSK attention (FLM)", linear: "linear attention", fuzzy: "fuzzy recurrent (FRLM)", fuzzydelta: "fuzzy delta-rule" };
+  const rows = [];
+  for (const m of Object.keys(names)) {
+    const a = D.attrib[`${m}|mlp`], b = D.attrib[`${m}|tsk`];
+    if (a) rows.push({ label: names[m], sub: `MLP · ${k(a.params)}`, value: a.bpc, color: "--neural", note: `${names[m]} + MLP: ${f3(a.bpc)} (${k(a.params)})` });
+    if (b) rows.push({ label: "", sub: `TSK · ${k(b.params)}`, value: b.bpc, color: "--old", note: `${names[m]} + original TSK FFN: ${f3(b.bpc)} (${k(b.params)})` });
+  }
+  hbars($("c-attrib"), rows, { min: 1.3, max: 1.95, rowH: 26, labelW: 260 });
+})();
+
+/* ladder */
+(function () {
+  const f = D.ffn3, mx = D.mix, hd = D.heads, fl = D.fill;
+  const rows = [
+    ["Original TSK FFN, zero-order, softmax", "fuzzy mixer, d 64, 101.6K", 1.7154, "--old"],
+    ["Tied widths, 4× rules, 16-dim antecedents", "87.7K", 1.6141, "--old"],
+    [`First-order, raw firing, HTSK, 3 seeds`, `${k(f["o1r-da16-htsk-wdim"].params)}`, f["o1r-da16-htsk-wdim"].bpc, "--fuzzy"],
+    ["+ 4 heads", `${k(mx["acc-h4"].params)}`, mx["acc-h4"].bpc, "--fuzzy"],
+    ["+ 8 heads", `${k(hd["acc-h8"].params)}`, hd["acc-h8"].bpc, "--fuzzy"],
+    ["+ delta-rule form with HTSK mixer", `${k(hd["delta-mean-h8"].params)}`, hd["delta-mean-h8"].bpc, "--fuzzy"],
+    ["+ short-conv 8, d 72 (final D)", `${k(fl["D-d72-m1.5-sc8"].params)}`, fl["D-d72-m1.5-sc8"].bpc, "--fuzzy"],
+  ].map(([label, sub, value, color]) => ({ label, sub, value, color }));
+  hbars($("c-ladder"), rows, { min: 1.3, max: 1.8, rowH: 34, labelW: 290 });
+})();
+
+/* heads */
+(function () {
+  const pts = [[1, D.mix["acc-h1"]], [2, D.mix["acc"]], [4, D.mix["acc-h4"]], [8, D.heads["acc-h8"]]].map(([x, g]) => ({ x, y: g.bpc, note: `${x} head${x > 1 ? "s" : ""}: ${f3(g.bpc)} BPC (${k(g.params)} params)` }));
+  lineChart($("c-heads"), [{ name: "fuzzy accumulating mixer", color: "--fuzzy", pts }], { xlog: true, xmin: 1, xmax: 8, ymin: 1.4, ymax: 1.55, xticks: [1, 2, 4, 8], xlabel: "attention / rule heads (16 rules each)", ylabel: "val bits per character", h: 300 });
+})();
+
+/* field */
+(function () {
+  const sc = D.scaling30;
+  const S = (arm, label, color, extra = {}) => ({ name: label, color, label, pts: (sc[arm] || []).map((p) => ({ x: p.params, y: p.bpc, note: `${label}<br>${k(p.params)} params: ${f3(p.bpc)}${p.sd ? " ± " + p.sd.toFixed(3) : ""}` })), ...extra });
+  const series = [
+    S("delta-mlp", "delta-mlp (neural)", "--neural", { dy: 12 }),
+    S("flm", "original FLM", "--old", { dy: 0 }),
+    S("frlm-delta", "original FRLM", "--old", { dy: 14 }),
+  ];
+  const newPts = [
+    { name: "fuzzy D", color: "--fuzzy", big: true, line: false, label: "fuzzy D", pts: [{ x: d30.params, y: d30.bpc, note: `fuzzy D<br>${k(d30.params)}: ${f3(d30.bpc)}${sd(d30)} (3 seeds)` }] },
+    { name: "neural matched", color: "--neural", big: true, line: false, label: "matched neural", dy: 14, pts: Object.entries(ref).map(([n, g]) => ({ x: g.params, y: g.bpc, note: `${n}<br>${k(g.params)}: ${f3(g.bpc)}${sd(g)}` })) },
+  ];
+  lineChart($("c-field"), [...series, ...newPts], { xlog: true, xmin: 5000, xmax: 250000, ymin: 1.2, ymax: 2.2, xticks: [5000, 10000, 20000, 50000, 100000, 200000], xfmt: (v) => k(v), xlabel: "total parameters (log scale); 100K budget at right of 'D'", ylabel: "val bits per character" });
+  const gap = refBest[1].bpc - d30.bpc;
+  $("field-claim").textContent = `At 30M characters the fuzzy model scores ${f3(d30.bpc)}${sd(d30)}; the best neural reference of similar size scores ${f3(refBest[1].bpc)}${sd(refBest[1])}. That is a ${gap.toFixed(3)} bit lead, about ${(gap / (d30.sd || 0.01)).toFixed(1)} fuzzy-model seed standard deviations. The original fuzzy designs sat at 1.55–1.66 with up to 100K parameters.`;
+  const rows = [["fuzzy D (this work)", d30, "fuzzy"], ...Object.entries(ref).map(([n, g]) => [n.replace("_30M", ""), g, "neural"])];
+  $("t-field").innerHTML = `<tr><th>model</th><th>kind</th><th class="n">params</th><th class="n">val BPC</th><th class="n">seeds</th></tr>` +
+    rows.map(([n, g, kind]) => `<tr><td>${n}</td><td>${kind}</td><td class="n">${g.params.toLocaleString()}</td><td class="n">${f3(g.bpc)}${sd(g)}</td><td class="n">${g.n}</td></tr>`).join("");
+})();
+
+/* learning rate */
+(function () {
+  const lrs = ["1e-2", "2e-2", "3e-2", "4e-2", "6e-2"];
+  const val = (arm, lr) => (lr === "3e-2" ? D.lr_existing[`${arm}|3e-2`] : D.lr[`${arm === "D" ? "D" : "delta-mlp-d72-h8"}_lr${lr}_30M`]);
+  const S = (arm, name, color) => ({ name, color, label: name, pts: lrs.map((lr) => { const g = val(arm, lr); return g ? { x: parseFloat(lr), y: g.bpc, note: `${name}<br>lr ${lr}: ${f3(g.bpc)}${sd(g)} (n=${g.n})` } : { x: parseFloat(lr), y: null }; }) });
+  const sers = [S("D", "fuzzy D", "--fuzzy"), S("delta-mlp-d72-h8", "neural", "--neural")];
+  const all = sers.flatMap((s) => s.pts.filter((p) => p.y != null));
+  if (all.length < 4) { $("c-lr").innerHTML = '<p class="note" style="padding:12px">LR runs still in progress.</p>'; $("lr-claim").textContent = "Pending."; return; }
+  const ys = all.map((p) => p.y), lo = Math.floor(Math.min(...ys) * 50) / 50, hi = Math.ceil(Math.max(...ys) * 50) / 50;
+  lineChart($("c-lr"), sers, { xlog: true, xmin: 0.01, xmax: 0.06, ymin: lo, ymax: hi, xticks: [0.01, 0.02, 0.03, 0.04, 0.06], xfmt: (v) => v.toExponential(0).replace("e-", "e-"), xlabel: "peak learning rate (log scale)", ylabel: "val bits per character", h: 320 });
+  const best = (s) => s.pts.filter((p) => p.y != null).sort((a, b) => a.y - b.y)[0];
+  const bf = best(sers[0]), bn = best(sers[1]);
+  $("lr-claim").textContent = `The fuzzy model's best learning rate is ${bf.x} (${f3(bf.y)}); the neural reference's is ${bn.x} (${f3(bn.y)}). The tuned-vs-tuned gap is ${(bn.y - bf.y).toFixed(3)} bits per character in favour of the fuzzy model.`;
+})();
+
+/* lrwidth */
+(function () {
+  const lw = D.lrwidth, arms = Object.keys(lw).sort();
+  const cell = (c, base) => (c ? `${f3(c.bpc)}${base != null ? ` (${c.bpc - base >= 0 ? "+" : ""}${(c.bpc - base).toFixed(3)})` : ""}` : "–");
+  $("t-lw").innerHTML = `<tr><th>arm</th><th class="n">×1 (tuned lr)</th><th class="n">÷3</th><th class="n">÷10</th></tr>` +
+    arms.map((a) => { const b = lw[a].x1 ? lw[a].x1.bpc : null; return `<tr><td>${a}</td><td class="n">${cell(lw[a].x1)}</td><td class="n">${cell(lw[a].lrdiv3, b)}</td><td class="n">${cell(lw[a].lrdiv10, b)}</td></tr>`; }).join("");
+  const worse = ["gru", "flm", "frlm-acc", "frlm-delta"];
+  const imp = worse.filter((a) => lw[a] && lw[a].x1 && lw[a].lrdiv3 && lw[a].lrdiv10).map((a) => [a, lw[a].x1.bpc - Math.min(lw[a].lrdiv3.bpc, lw[a].lrdiv10.bpc)]);
+  $("lw-claim").textContent = imp.length
+    ? `d = 96, seed 0, 30M characters. For the arms that got worse with width, the best divided learning rate changes d = 96 by: ` + imp.map(([a, v]) => `${a} ${v >= 0 ? "−" : "+"}${Math.abs(v).toFixed(3)}`).join(", ") + `. Registered threshold for "LR-limited" was an improvement above 0.05. Cells marked ×1 are CPU runs from the earlier scaling sweep; ÷3 and ÷10 are GPU runs unless noted.`
+    : "Cells pending.";
+})();
+
+$("caveats").innerHTML = [
+  "<b>Seed counts differ by stage.</b> The final comparison has 3 seeds per arm at 30M characters. The design search before it used 1–2 seeds at 10M, and differences under about 0.02 between filled configurations are inside that noise.",
+  "<b>The design was searched on the fuzzy side more than the neural side.</b> The fuzzy model got heads, rules, antecedent size, short-conv and learning-rate search. The neural reference got a heads search and the learning-rate study above, but not a full re-tune of every other knob.",
+  "<b>Parameter counts are matched approximately</b> (97.5K fuzzy against 91–96K neural), not exactly, and the embedding is included in both.",
+  "<b>The 100M-character figures are one seed each.</b> The neural row at 100M is also d = 64 (73K), smaller than the fuzzy model, so it is not a matched comparison.",
+  "<b>Held-out data:</b> validation BPC is the first 1M characters of the TinyStories V2 validation file, the same slice the earlier arms used. Nothing here was selected on a separate test set.",
+  "<b>Speed.</b> The fuzzy delta-rule model trains about 3× slower per character than the neural delta-rule model on this GPU (34K vs 114K characters/s in the final runs).",
+  "<b>Not run:</b> 16-head variants (GPU memory stall), more than 2 layers at the best width, and 3-seed repeats of the 100M run.",
+].map((t) => `<li>${t}</li>`).join("");
+</script>

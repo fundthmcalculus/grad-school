@@ -1,0 +1,213 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 64,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v13-state\\D-ctx512-r64_30M_s1.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 64,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 102560,
+ "params_nonemb": 53408,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11433,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.35716
+  ],
+  [
+   580,
+   1.23555
+  ],
+  [
+   870,
+   1.15251
+  ],
+  [
+   1160,
+   1.11433
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3585
+  ],
+  [
+   50,
+   8.1374
+  ],
+  [
+   100,
+   6.2907
+  ],
+  [
+   150,
+   5.3533
+  ],
+  [
+   200,
+   4.8775
+  ],
+  [
+   250,
+   4.6021
+  ],
+  [
+   300,
+   4.4173
+  ],
+  [
+   350,
+   4.296
+  ],
+  [
+   400,
+   4.2187
+  ],
+  [
+   450,
+   4.1129
+  ],
+  [
+   500,
+   4.0591
+  ],
+  [
+   550,
+   4.0052
+  ],
+  [
+   600,
+   3.9552
+  ],
+  [
+   650,
+   3.8835
+  ],
+  [
+   700,
+   3.8444
+  ],
+  [
+   750,
+   3.8048
+  ],
+  [
+   800,
+   3.7499
+  ],
+  [
+   850,
+   3.7103
+  ],
+  [
+   900,
+   3.6822
+  ],
+  [
+   950,
+   3.6438
+  ],
+  [
+   1000,
+   3.6063
+  ],
+  [
+   1050,
+   3.5771
+  ],
+  [
+   1100,
+   3.5625
+  ],
+  [
+   1150,
+   3.5473
+  ],
+  [
+   1159,
+   3.544
+  ]
+ ],
+ "train_seconds": 82.27,
+ "wall_seconds": 91.08,
+ "chars_per_sec": 115500,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Mia. Mia loved to play with her friends, a little girl named Sue. They liked to play together, hop.\nOne day, Lucy found a small barrel in the beautiful tree. It was a big, flying. The bird was playing and tired it. The bird said, \"Well, I can't glow it.\" Sue thought the bird was sign.\nThe bird planged, then they found the bird and went to the bird. Sue was very happy and had a magic figgle on the ground. The bird was happy and were not sad anymore. They laughed and said, \"Thank you, Lucy! I told you to play too.\" Lucy smiled and said, \"Thank you for helping me.\" So, Lucy didn't listen to the big tree with her friends.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to play outside in the sandt in her yard, and her mud were brave and thin they would use her family. They green and stumbred on the branch.\nOne day, Lily found a big mistacip on the scary car. It was a smart popher. Lily saw the roses and said, \"Hello,\" she said, \"I am crying, and I need to share your ha",
+ "rule_init": {},
+ "ngram_init": {}
+}

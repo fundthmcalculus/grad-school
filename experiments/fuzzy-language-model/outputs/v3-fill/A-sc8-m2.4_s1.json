@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.4,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-fill\\A-sc8-m2.4_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.4,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 98196,
+ "params_nonemb": 91924,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.39769,
+ "evals": [
+  [
+   305,
+   1.82221
+  ],
+  [
+   610,
+   1.5972
+  ],
+  [
+   915,
+   1.4697
+  ],
+  [
+   1220,
+   1.39861
+  ],
+  [
+   1221,
+   1.39769
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.252
+  ],
+  [
+   50,
+   5.0672
+  ],
+  [
+   100,
+   3.5669
+  ],
+  [
+   150,
+   2.7329
+  ],
+  [
+   200,
+   2.2967
+  ],
+  [
+   250,
+   2.0776
+  ],
+  [
+   300,
+   1.9468
+  ],
+  [
+   350,
+   1.8624
+  ],
+  [
+   400,
+   1.7936
+  ],
+  [
+   450,
+   1.739
+  ],
+  [
+   500,
+   1.6982
+  ],
+  [
+   550,
+   1.6608
+  ],
+  [
+   600,
+   1.6381
+  ],
+  [
+   650,
+   1.6113
+  ],
+  [
+   700,
+   1.5863
+  ],
+  [
+   750,
+   1.5638
+  ],
+  [
+   800,
+   1.5498
+  ],
+  [
+   850,
+   1.5188
+  ],
+  [
+   900,
+   1.4982
+  ],
+  [
+   950,
+   1.4752
+  ],
+  [
+   1000,
+   1.4574
+  ],
+  [
+   1050,
+   1.4409
+  ],
+  [
+   1100,
+   1.4321
+  ],
+  [
+   1150,
+   1.421
+  ],
+  [
+   1200,
+   1.4222
+  ],
+  [
+   1220,
+   1.4174
+  ]
+ ],
+ "train_seconds": 245.26,
+ "wall_seconds": 288.82,
+ "chars_per_sec": 40782,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Max. He loved to play with his friends. One day, she found watch a clappin to play together. But then, something unexpected happened. He knew word a sking and kind. The farmer was so happy to see her pillow far old running together. Mia found down and the wohd was so t",
+ "rule_init": {}
+}

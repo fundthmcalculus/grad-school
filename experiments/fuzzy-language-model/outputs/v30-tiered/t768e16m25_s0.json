@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t768e16m25_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 101376,
+ "params_nonemb": 59648,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.08557,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.24937
+  ],
+  [
+   100,
+   1.58516
+  ],
+  [
+   200,
+   1.41868
+  ],
+  [
+   300,
+   1.34022
+  ],
+  [
+   400,
+   1.29117
+  ],
+  [
+   500,
+   1.24401
+  ],
+  [
+   600,
+   1.20872
+  ],
+  [
+   700,
+   1.17531
+  ],
+  [
+   800,
+   1.14569
+  ],
+  [
+   900,
+   1.12255
+  ],
+  [
+   1000,
+   1.10327
+  ],
+  [
+   1100,
+   1.09084
+  ],
+  [
+   1160,
+   1.08557
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2858
+  ],
+  [
+   50,
+   8.0598
+  ],
+  [
+   100,
+   6.2275
+  ],
+  [
+   150,
+   5.3305
+  ],
+  [
+   200,
+   4.855
+  ],
+  [
+   250,
+   4.5845
+  ],
+  [
+   300,
+   4.4099
+  ],
+  [
+   350,
+   4.2871
+  ],
+  [
+   400,
+   4.2001
+  ],
+  [
+   450,
+   4.0976
+  ],
+  [
+   500,
+   4.0294
+  ],
+  [
+   550,
+   3.9548
+  ],
+  [
+   600,
+   3.8897
+  ],
+  [
+   650,
+   3.8225
+  ],
+  [
+   700,
+   3.7692
+  ],
+  [
+   750,
+   3.7409
+  ],
+  [
+   800,
+   3.6789
+  ],
+  [
+   850,
+   3.6262
+  ],
+  [
+   900,
+   3.5929
+  ],
+  [
+   950,
+   3.5494
+  ],
+  [
+   1000,
+   3.5116
+  ],
+  [
+   1050,
+   3.4872
+  ],
+  [
+   1100,
+   3.473
+  ],
+  [
+   1150,
+   3.4727
+  ],
+  [
+   1159,
+   3.4699
+  ]
+ ],
+ "train_seconds": 80.46,
+ "wall_seconds": 94.79,
+ "chars_per_sec": 118104,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big warm bird. \nThe little boy took the beach at the wagon. He put the sand first to put it on the big, shiny tall. They decided to play and have fun.\nAt the end of the end of them time, the little girl said, \"Let's slide for myself!\"\nEveryone and Mr. Today sat down the clear, then they found the sand. They saw something accos like a new and full of jef too. The little boy said sorry and stopped the sand. He said, \"Don't worry, you can take you too.\" \nThe man and the boy were happy to see the boy. They both didn't listen to the boy. They both thought how to fix the right jump, but they couldn't find the read.\n<|eot|>\nOnce upon a time, there was a parenti. The parents liked to eat to the bird. They all had green all day long. One day, the neighbor was going to get a big mess!\nThe little pile was dry. He was very happy. He wanted to help his friend, Max,. Sam said, \"I am hurt,\" said the fary, towers.\nThe grateontin was scared",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,207 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.56,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.04,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 8,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-final10\\ref1-delta-h8-sc4-lr4e-2_30M_s8.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.56,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93392,
+ "params_nonemb": 44240,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.1633,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.39077
+  ],
+  [
+   580,
+   1.27175
+  ],
+  [
+   870,
+   1.19958
+  ],
+  [
+   1160,
+   1.1633
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3269
+  ],
+  [
+   50,
+   8.317
+  ],
+  [
+   100,
+   6.4049
+  ],
+  [
+   150,
+   5.4285
+  ],
+  [
+   200,
+   4.9383
+  ],
+  [
+   250,
+   4.6665
+  ],
+  [
+   300,
+   4.5217
+  ],
+  [
+   350,
+   4.4093
+  ],
+  [
+   400,
+   4.3174
+  ],
+  [
+   450,
+   4.2272
+  ],
+  [
+   500,
+   4.1767
+  ],
+  [
+   550,
+   4.1042
+  ],
+  [
+   600,
+   4.0622
+  ],
+  [
+   650,
+   4.0283
+  ],
+  [
+   700,
+   3.9744
+  ],
+  [
+   750,
+   3.9205
+  ],
+  [
+   800,
+   3.8786
+  ],
+  [
+   850,
+   3.8691
+  ],
+  [
+   900,
+   3.8352
+  ],
+  [
+   950,
+   3.7894
+  ],
+  [
+   1000,
+   3.7568
+  ],
+  [
+   1050,
+   3.7225
+  ],
+  [
+   1100,
+   3.708
+  ],
+  [
+   1150,
+   3.6975
+  ],
+  [
+   1159,
+   3.6995
+  ]
+ ],
+ "train_seconds": 208.17,
+ "wall_seconds": 220.3,
+ "chars_per_sec": 45648,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big warm bird.\nAsquuring a special storm, there was a big, spaw that the father was heavy. It had a magic toy sweet. He had a new friend, but he loved to play.\nOne day, a little girl named Lucy found the rug in the tree. Lucy said, \"Can I have a chairs. I want to show you to you,\" Mia said.\nThe bird said, \"Yes, Moxy, Sue and Lily. I will believe your to sleep.\" Sue said, \"Yes, a little bird? I am thank you. I did not like your toy!\" Sue said.\nThey walked to the pope and saw a big hug. They read Pape and it was a good friend. They missed the blue blocks.\nDellaisy bucket. They did not know what happened. They put the door on the water and grabbed her trip. The bird not touch the tree. They behind the leopard. They say might keep them to buy the tree. They hug each other.\nThey sang it hard for Max and his dad. They pull. They say sorryly to the bird towards the uncle. They says they are",
+ "rule_init": {},
+ "ngram_init": {}
+}

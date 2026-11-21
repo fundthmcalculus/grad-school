@@ -1,0 +1,207 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 6,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-final10\\D-lr0.06_30M_s6.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93344,
+ "params_nonemb": 44192,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.12992,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.36059
+  ],
+  [
+   580,
+   1.24759
+  ],
+  [
+   870,
+   1.16865
+  ],
+  [
+   1160,
+   1.12992
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3323
+  ],
+  [
+   50,
+   8.1002
+  ],
+  [
+   100,
+   6.2079
+  ],
+  [
+   150,
+   5.2925
+  ],
+  [
+   200,
+   4.8435
+  ],
+  [
+   250,
+   4.5786
+  ],
+  [
+   300,
+   4.4122
+  ],
+  [
+   350,
+   4.2981
+  ],
+  [
+   400,
+   4.2133
+  ],
+  [
+   450,
+   4.1564
+  ],
+  [
+   500,
+   4.102
+  ],
+  [
+   550,
+   4.0342
+  ],
+  [
+   600,
+   3.9775
+  ],
+  [
+   650,
+   3.9141
+  ],
+  [
+   700,
+   3.8687
+  ],
+  [
+   750,
+   3.8204
+  ],
+  [
+   800,
+   3.7797
+  ],
+  [
+   850,
+   3.7352
+  ],
+  [
+   900,
+   3.7008
+  ],
+  [
+   950,
+   3.6866
+  ],
+  [
+   1000,
+   3.6565
+  ],
+  [
+   1050,
+   3.6427
+  ],
+  [
+   1100,
+   3.6105
+  ],
+  [
+   1150,
+   3.5996
+  ],
+  [
+   1159,
+   3.5928
+  ]
+ ],
+ "train_seconds": 226.03,
+ "wall_seconds": 238.89,
+ "chars_per_sec": 42042,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big red tree. It was a big tree and a special beach at the tree. On the hop, something unexpected happened. The tree was very fast! It had a magic window. Kitty and her friend, a little bird named Tim. Tim was playing and tasty ball. The bird wanted to play slow, but it could not fly.\nTim and Mark played the race. In the sun, they saw a big tree. Tim was very happy and said, \"Hey, Tim! Let's song!\" Tim and Tim played together. They were very happy.\n<|eot|>\nOnce upon a time, there was an anchor dog named Max. Max liked to play with his toy car. He had a best of friends that was hot and loved to play with his toy car all day.\nOne day, Max saw the mistake with his friend, Sam. Sam did not listen. She wanted to bread. The trusty jumped and tried to catch it, but they did not want to fly down. The machine said, \"Okay, not nice!\" Max replied, \"This might, Max! And you have to driving to play with you.\" Max and Max were happy.\n<|eot|>\n\n\nLily and Mia were pulling and had a group that she loved to paint her. They were curi",
+ "rule_init": {},
+ "ngram_init": {}
+}

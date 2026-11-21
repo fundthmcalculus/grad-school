@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn\\o1-da16-htsk_lr3e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "max_len": 256
+ },
+ "params_total": 83652,
+ "params_nonemb": 77380,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.55022,
+ "evals": [
+  [
+   305,
+   2.02415
+  ],
+  [
+   610,
+   1.76192
+  ],
+  [
+   915,
+   1.61879
+  ],
+  [
+   1220,
+   1.54916
+  ],
+  [
+   1221,
+   1.55022
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9722
+  ],
+  [
+   50,
+   5.0719
+  ],
+  [
+   100,
+   3.6668
+  ],
+  [
+   150,
+   2.93
+  ],
+  [
+   200,
+   2.5324
+  ],
+  [
+   250,
+   2.3057
+  ],
+  [
+   300,
+   2.1556
+  ],
+  [
+   350,
+   2.0618
+  ],
+  [
+   400,
+   1.9791
+  ],
+  [
+   450,
+   1.9287
+  ],
+  [
+   500,
+   1.8838
+  ],
+  [
+   550,
+   1.8306
+  ],
+  [
+   600,
+   1.7956
+  ],
+  [
+   650,
+   1.7691
+  ],
+  [
+   700,
+   1.7415
+  ],
+  [
+   750,
+   1.7223
+  ],
+  [
+   800,
+   1.6945
+  ],
+  [
+   850,
+   1.6739
+  ],
+  [
+   900,
+   1.6536
+  ],
+  [
+   950,
+   1.6352
+  ],
+  [
+   1000,
+   1.604
+  ],
+  [
+   1050,
+   1.5942
+  ],
+  [
+   1100,
+   1.5797
+  ],
+  [
+   1150,
+   1.5692
+  ],
+  [
+   1200,
+   1.5692
+  ],
+  [
+   1220,
+   1.5678
+  ]
+ ],
+ "train_seconds": 58.48,
+ "wall_seconds": 70.49,
+ "chars_per_sec": 171029,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Max. He wanted to climb at Asticed decided to play with his toys and saw a big, shat up. The new sad and learned to is things to her park do the box with his wind.\n\"That's so some. They were very happy. And that he was not towl. His didn't want down and follow it. Max ",
+ "rule_init": {}
+}

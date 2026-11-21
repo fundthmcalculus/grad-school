@@ -1,0 +1,642 @@
+{
+ "S001": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "The little dog was sad because"
+ },
+ "S002": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Once upon a time"
+ },
+ "S003": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Once upon a time"
+ },
+ "S004": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Once upon a time"
+ },
+ "S005": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S006": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S007": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Once upon a time"
+ },
+ "S008": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S009": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S010": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S011": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "The little dog was sad because"
+ },
+ "S012": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Once upon a time"
+ },
+ "S013": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S014": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Once upon a time"
+ },
+ "S015": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S016": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S017": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S018": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S019": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S020": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S021": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Once upon a time"
+ },
+ "S022": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "The little dog was sad because"
+ },
+ "S023": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Once upon a time"
+ },
+ "S024": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S025": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Once upon a time"
+ },
+ "S026": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S027": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S028": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "The little dog was sad because"
+ },
+ "S029": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S030": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S031": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S032": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S033": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "The little dog was sad because"
+ },
+ "S034": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Once upon a time"
+ },
+ "S035": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S036": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S037": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S038": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S039": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Once upon a time"
+ },
+ "S040": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S041": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Once upon a time"
+ },
+ "S042": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Once upon a time"
+ },
+ "S043": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S044": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Once upon a time"
+ },
+ "S045": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Once upon a time"
+ },
+ "S046": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "The little dog was sad because"
+ },
+ "S047": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S048": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S049": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S050": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Once upon a time"
+ },
+ "S051": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S052": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S053": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S054": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S055": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "The little dog was sad because"
+ },
+ "S056": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Once upon a time"
+ },
+ "S057": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Once upon a time"
+ },
+ "S058": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S059": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S060": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S061": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S062": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Once upon a time"
+ },
+ "S063": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Once upon a time"
+ },
+ "S064": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S065": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Once upon a time"
+ },
+ "S066": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Once upon a time"
+ },
+ "S067": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S068": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "The little dog was sad because"
+ },
+ "S069": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S070": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "The little dog was sad because"
+ },
+ "S071": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S072": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S073": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S074": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S075": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "The little dog was sad because"
+ },
+ "S076": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S077": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Once upon a time"
+ },
+ "S078": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S079": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "The little dog was sad because"
+ },
+ "S080": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S081": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "The little dog was sad because"
+ },
+ "S082": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S083": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Once upon a time"
+ },
+ "S084": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "The little dog was sad because"
+ },
+ "S085": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S086": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S087": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S088": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S089": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S090": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Once upon a time"
+ },
+ "S091": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S092": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Once upon a time"
+ },
+ "S093": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S094": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S095": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S096": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "The little dog was sad because"
+ },
+ "S097": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S098": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S099": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Once upon a time"
+ },
+ "S100": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Once upon a time"
+ },
+ "S101": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Once upon a time"
+ },
+ "S102": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S103": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S104": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S105": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S106": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S107": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S108": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Once upon a time"
+ },
+ "S109": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S110": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S111": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S112": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S113": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Once upon a time"
+ },
+ "S114": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S115": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S116": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S117": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Once upon a time"
+ },
+ "S118": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S119": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S120": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S121": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "The little dog was sad because"
+ },
+ "S122": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S123": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S124": {
+  "group": "S0",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S125": {
+  "group": "S9",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S126": {
+  "group": "S4",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S127": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s0",
+  "prompt": "The little dog was sad because"
+ },
+ "S128": {
+  "group": "S8",
+  "ckpt": "F7_v6144_h640_d32_s1",
+  "prompt": "The little dog was sad because"
+ }
+}

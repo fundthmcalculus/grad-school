@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.35,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v51-fuzzytokens\\emb_fall_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.35,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99026,
+ "params_nonemb": 47762,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.17801,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.08745
+  ],
+  [
+   100,
+   1.83598
+  ],
+  [
+   200,
+   1.49475
+  ],
+  [
+   300,
+   1.37978
+  ],
+  [
+   400,
+   1.31797
+  ],
+  [
+   500,
+   1.27493
+  ],
+  [
+   600,
+   1.24136
+  ],
+  [
+   700,
+   1.21525
+  ],
+  [
+   800,
+   1.19556
+  ],
+  [
+   900,
+   1.18172
+  ],
+  [
+   953,
+   1.17801
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.8484
+  ],
+  [
+   50,
+   10.0939
+  ],
+  [
+   100,
+   8.506
+  ],
+  [
+   150,
+   7.2128
+  ],
+  [
+   200,
+   6.3936
+  ],
+  [
+   250,
+   5.8733
+  ],
+  [
+   300,
+   5.5627
+  ],
+  [
+   350,
+   5.3335
+  ],
+  [
+   400,
+   5.2305
+  ],
+  [
+   450,
+   5.0981
+  ],
+  [
+   500,
+   5.0138
+  ],
+  [
+   550,
+   4.9185
+  ],
+  [
+   600,
+   4.8252
+  ],
+  [
+   650,
+   4.7653
+  ],
+  [
+   700,
+   4.7287
+  ],
+  [
+   750,
+   4.7045
+  ],
+  [
+   800,
+   4.6459
+  ],
+  [
+   850,
+   4.6062
+  ],
+  [
+   900,
+   4.5771
+  ],
+  [
+   950,
+   4.5642
+  ],
+  [
+   952,
+   4.5652
+  ]
+ ],
+ "train_seconds": 70.52,
+ "wall_seconds": 84.72,
+ "chars_per_sec": 110706,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She had a big, red ball and a big box. She knew he had a fun day. He loved to play with her toys and play.\nOne day, Amy saw a big, soft hill and wanted to play outside. She saw a pretty stick on the grass. She saw a big, red ball on the table. The bird said it was a lovely dog.\nThe little boy said, \"I ask how to go home.\" He hugged his mom and said, \"Yes, Bop! I found something without! You are a big bird,\"\nThe dog and Dad played with their toys. They were so happy. They put the cars on the lock and laughing. They had lots of fun.\n<|eot|>\nOnce upon a time, there was a little girl named Amy. She loved to play with her toys and cross her. One day, she went to the park with her mom and said, \"Be careful!\"\nSue and Mia were hungry. They looked at each other and said, \"Thank you for the park, Mom.\" Lily and Lily and the murse broke. They became good friends. They were always careful and know what they should love.\n<|eot|>\nOnce upon a time, in a small house, there was a nice lady. The bird loved to spunk. One day, he saw a big bird on the ground. He asked his mom about the big tree. \"What can I have anings and help",
+ "rule_init": {},
+ "ngram_init": {}
+}

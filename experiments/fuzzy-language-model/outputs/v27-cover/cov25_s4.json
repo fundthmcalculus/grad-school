@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v27-cover\\cov25_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.1418,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.16347
+  ],
+  [
+   100,
+   1.59937
+  ],
+  [
+   200,
+   1.44826
+  ],
+  [
+   300,
+   1.38627
+  ],
+  [
+   400,
+   1.33234
+  ],
+  [
+   500,
+   1.29547
+  ],
+  [
+   600,
+   1.26082
+  ],
+  [
+   700,
+   1.22925
+  ],
+  [
+   800,
+   1.20194
+  ],
+  [
+   900,
+   1.17959
+  ],
+  [
+   1000,
+   1.16168
+  ],
+  [
+   1100,
+   1.14627
+  ],
+  [
+   1160,
+   1.1418
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.9965
+  ],
+  [
+   50,
+   8.0131
+  ],
+  [
+   100,
+   6.2515
+  ],
+  [
+   150,
+   5.3796
+  ],
+  [
+   200,
+   4.9123
+  ],
+  [
+   250,
+   4.6729
+  ],
+  [
+   300,
+   4.4954
+  ],
+  [
+   350,
+   4.3864
+  ],
+  [
+   400,
+   4.2861
+  ],
+  [
+   450,
+   4.235
+  ],
+  [
+   500,
+   4.1684
+  ],
+  [
+   550,
+   4.1098
+  ],
+  [
+   600,
+   4.0459
+  ],
+  [
+   650,
+   3.9933
+  ],
+  [
+   700,
+   3.9504
+  ],
+  [
+   750,
+   3.91
+  ],
+  [
+   800,
+   3.8581
+  ],
+  [
+   850,
+   3.8054
+  ],
+  [
+   900,
+   3.7751
+  ],
+  [
+   950,
+   3.7433
+  ],
+  [
+   1000,
+   3.7149
+  ],
+  [
+   1050,
+   3.6774
+  ],
+  [
+   1100,
+   3.6647
+  ],
+  [
+   1150,
+   3.6359
+  ],
+  [
+   1159,
+   3.638
+  ]
+ ],
+ "train_seconds": 79.56,
+ "wall_seconds": 93.8,
+ "chars_per_sec": 119439,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Ben. Ben loved to meet a special person. One day, she found a big, red fence of class. It was a tiny wind. It was so close to see a head.\n\"What are you doing?\" Ben asked.\nBut the wind slowly he saw a big tree. He was sad. He was selfish and wanted to show. He did not know what it was her mom she saw something. He said, \"Can you tease it?\"\nHe asked him to mom. She said, \"No, you can get the tree too.\"\nShe saw a bake. They tried to sneak it.\nBut the bird said, \"Why are you happy, Mom.\" Lily said, \"Yes, you can't see Mom. We will mad together.\"\nLily learned that some stores can't never break. They had lots of fun and had lots of fun on their new room. They were happy and proud of him, and they both played together.\n<|eot|>\nOnce upon a time, in a small town, there lived a big dog named Spot. Spot loved to play with. He would play with Spot. Max was a big toy.\nOne day, Spot saw a pink. The toy half. Spot was scared, but he didn't want to listen to Sam.",
+ "rule_init": {
+  "variant": "cov25",
+  "L0.ffn": {
+   "gain": 1.0,
+   "ce_nats": 7.0567
+  },
+  "L1.ffn": {
+   "gain": 1.0,
+   "ce_nats": 6.9336
+  }
+ },
+ "ngram_init": {}
+}

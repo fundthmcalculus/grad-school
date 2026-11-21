@@ -1,0 +1,143 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 36,
+  "layers": 2,
+  "heads": 4,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v7-vocab\\b1536-d36-h4_10M_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1536",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1536
+ },
+ "config": {
+  "vocab_size": 1536,
+  "d_model": 36,
+  "n_layers": 2,
+  "n_heads": 4,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 81808,
+ "params_nonemb": 26512,
+ "steps": 351,
+ "chars_seen": 10013938,
+ "chars_per_token": 3.4826342,
+ "val_bpc": 1.27892,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   87,
+   1.58732
+  ],
+  [
+   174,
+   1.40757
+  ],
+  [
+   261,
+   1.32453
+  ],
+  [
+   348,
+   1.27994
+  ],
+  [
+   351,
+   1.27892
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.8657
+  ],
+  [
+   50,
+   9.0935
+  ],
+  [
+   100,
+   6.9337
+  ],
+  [
+   150,
+   5.8187
+  ],
+  [
+   200,
+   5.2297
+  ],
+  [
+   250,
+   4.9116
+  ],
+  [
+   300,
+   4.6939
+  ],
+  [
+   350,
+   4.5336
+  ]
+ ],
+ "train_seconds": 18.32,
+ "wall_seconds": 22.97,
+ "chars_per_sec": 156957,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little boy named Kitty. Sue asked his friend, Sue. Lily saw that she was too poet. She had a toy carts and the sky.\n\"Hello, Tom,,, a girl named Tom. Tom, Mia and Ben. They played, and the bug. They pillows for her mom. They were a little boy. They found a big tree and had a shop. But the bird they had a fuous day. The dog and Sue played together until they did not move. Sue didn't know what to do.\nThe bunny looked around, but it was a great stood game. Tim wanted to help Tom, and the cat weren't happy. The little girl did not listen to his friends. They knew that they would be fun.\nTim felt sad and said. They played with the big party, Tim and Tim played all day. They knew they were more careful to break. They were happy.\nAfter playing, Tim and the bird were happy. They had lots of fun, and the bug lived together. They all sat down and saw the set of music. Tim was very happy to go home, Tim and the dog flew away. They were right and Sue could play with the best day.\n<|eot|>\n\nTom and Sue were playing in the house. They liked the spots at the window. The farmer had a lot of friends. They loved to play together",
+ "rule_init": {},
+ "ngram_init": {}
+}

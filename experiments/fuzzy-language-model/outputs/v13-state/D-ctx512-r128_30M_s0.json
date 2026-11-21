@@ -1,0 +1,213 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 128,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v13-state\\D-ctx512-r128_30M_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 128,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 114848,
+ "params_nonemb": 65696,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10403,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.37194
+  ],
+  [
+   580,
+   1.23158
+  ],
+  [
+   870,
+   1.14642
+  ],
+  [
+   1160,
+   1.10403
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3962
+  ],
+  [
+   50,
+   8.1081
+  ],
+  [
+   100,
+   6.2667
+  ],
+  [
+   150,
+   5.3681
+  ],
+  [
+   200,
+   4.9003
+  ],
+  [
+   250,
+   4.6358
+  ],
+  [
+   300,
+   4.4651
+  ],
+  [
+   350,
+   4.3379
+  ],
+  [
+   400,
+   4.2448
+  ],
+  [
+   450,
+   4.1501
+  ],
+  [
+   500,
+   4.0795
+  ],
+  [
+   550,
+   4.0034
+  ],
+  [
+   600,
+   3.9363
+  ],
+  [
+   650,
+   3.8688
+  ],
+  [
+   700,
+   3.8208
+  ],
+  [
+   750,
+   3.7861
+  ],
+  [
+   800,
+   3.7308
+  ],
+  [
+   850,
+   3.6769
+  ],
+  [
+   900,
+   3.6444
+  ],
+  [
+   950,
+   3.5986
+  ],
+  [
+   1000,
+   3.5613
+  ],
+  [
+   1050,
+   3.5357
+  ],
+  [
+   1100,
+   3.5182
+  ],
+  [
+   1150,
+   3.5216
+  ],
+  [
+   1159,
+   3.5175
+  ]
+ ],
+ "train_seconds": 91.01,
+ "wall_seconds": 102.26,
+ "chars_per_sec": 104418,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Spy. She had a big vowal at her house. She was very fast and thought about it.\nOne day, the girl saw a small cat named Spy. Spy loved to go inside and play with her friends. She was so excited because she loved ant, and a slow birds, and the cat was very curious.\nOne day, Spy met a clear fish. She wanted to play with it, but she wanted to be a little like a light. Tuchy, but her friends looked up and found a big tree.\nStffant's mom gave her a shiny sun bit. They tried, but the rock started to rain can fall it. The bird was scared, but she was very happy. The bird was too high to the large mistle, and the bird had learned that it would be more careful.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to explore her red toys in the bedroom. She was so excited because she would have a lot of fun pictures. But she had an unccious peron with her mom. Everything was happy.\nOne day she ran to her mom and said, \"Hello, has a gift!\" Sue was happy and thanked the mina.",
+ "rule_init": {},
+ "ngram_init": {}
+}

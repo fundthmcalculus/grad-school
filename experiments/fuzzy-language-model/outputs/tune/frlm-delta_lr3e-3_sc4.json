@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.003,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-delta_lr3e-3_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 28392,
+ "params_nonemb": 25256,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.04856,
+ "evals": [
+  [
+   305,
+   2.54536
+  ],
+  [
+   610,
+   2.1965
+  ],
+  [
+   915,
+   2.08587
+  ],
+  [
+   1220,
+   2.04934
+  ],
+  [
+   1221,
+   2.04856
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9086
+  ],
+  [
+   50,
+   6.2958
+  ],
+  [
+   100,
+   5.0267
+  ],
+  [
+   150,
+   4.0186
+  ],
+  [
+   200,
+   3.395
+  ],
+  [
+   250,
+   3.0127
+  ],
+  [
+   300,
+   2.7665
+  ],
+  [
+   350,
+   2.6036
+  ],
+  [
+   400,
+   2.4757
+  ],
+  [
+   450,
+   2.3963
+  ],
+  [
+   500,
+   2.3317
+  ],
+  [
+   550,
+   2.2662
+  ],
+  [
+   600,
+   2.2253
+  ],
+  [
+   650,
+   2.1969
+  ],
+  [
+   700,
+   2.1748
+  ],
+  [
+   750,
+   2.1574
+  ],
+  [
+   800,
+   2.1361
+  ],
+  [
+   850,
+   2.1223
+  ],
+  [
+   900,
+   2.108
+  ],
+  [
+   950,
+   2.096
+  ],
+  [
+   1000,
+   2.0736
+  ],
+  [
+   1050,
+   2.0708
+  ],
+  [
+   1100,
+   2.062
+  ],
+  [
+   1150,
+   2.0577
+  ],
+  [
+   1200,
+   2.0645
+  ],
+  [
+   1220,
+   2.0626
+  ]
+ ],
+ "train_seconds": 828.52,
+ "wall_seconds": 1089.6,
+ "chars_per_sec": 12073,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there new the for the sheed and bag beet bagething looke and said, \"Max said, \"Thak, it was sincked on the saw and sad said, \"Hi saw he sit with them took togetherry on it the for an the fleve. The lever time, there was too the ball and pest away a near a said,\" They excited to the plays, they pig",
+ "rule_init": {}
+}

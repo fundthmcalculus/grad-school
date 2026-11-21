@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v45-fuzzystage\\scaleonly_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98628,
+ "params_nonemb": 47364,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.05782,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.02115
+  ],
+  [
+   100,
+   1.44404
+  ],
+  [
+   200,
+   1.28947
+  ],
+  [
+   300,
+   1.21991
+  ],
+  [
+   400,
+   1.18457
+  ],
+  [
+   500,
+   1.15455
+  ],
+  [
+   600,
+   1.11795
+  ],
+  [
+   700,
+   1.09339
+  ],
+  [
+   800,
+   1.07395
+  ],
+  [
+   900,
+   1.06215
+  ],
+  [
+   953,
+   1.05782
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.599
+  ],
+  [
+   50,
+   9.3995
+  ],
+  [
+   100,
+   7.1584
+  ],
+  [
+   150,
+   5.9756
+  ],
+  [
+   200,
+   5.3783
+  ],
+  [
+   250,
+   5.0588
+  ],
+  [
+   300,
+   4.8796
+  ],
+  [
+   350,
+   4.7751
+  ],
+  [
+   400,
+   4.6707
+  ],
+  [
+   450,
+   4.5744
+  ],
+  [
+   500,
+   4.5023
+  ],
+  [
+   550,
+   4.4336
+  ],
+  [
+   600,
+   4.3552
+  ],
+  [
+   650,
+   4.3143
+  ],
+  [
+   700,
+   4.2656
+  ],
+  [
+   750,
+   4.2332
+  ],
+  [
+   800,
+   4.181
+  ],
+  [
+   850,
+   4.151
+  ],
+  [
+   900,
+   4.1383
+  ],
+  [
+   950,
+   4.1172
+  ],
+  [
+   952,
+   4.119
+  ]
+ ],
+ "train_seconds": 76.08,
+ "wall_seconds": 87.96,
+ "chars_per_sec": 102620,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a little boy named Tim. He loved to play outside and play with his friends. One day, while he was playing with the trash, a little bird saw a big tree. The other animals were were sad.\nThe little bird tried to play with the bird. But it was too big, blue ball on the ground. The little bird flew down and fixed the tree. Tim and his friends were surprised to have his friend, Tim, and they were friends.\n<|eot|>\n\n\nLily and Ben were very happy. They had a big room in the yard. They liked to play together to play with the sun. They were fit, but they could not find it.\nOne night, they found a big, shiny peched. It was big and pretty. She looked for Anna's hand and wanted to take a fit climb. But he did not get cross. It was a selfish prince. Anna said, \"I want to stretch my pastball.\"\nAnna and Ben were hungry. They looked at the stter and looked at the picture. They looked at each other a dress. They looked at the train and had many nest. They looked at Sam and thought about their face. They saw a big box. They said, \"I'm sorry, Ben. I will help you.\" He says, \"Maybe we can play with you!\"\nBen and Ben say, \"I have a good toy. I am not a good fairy. You can have important",
+ "rule_init": {},
+ "ngram_init": {}
+}

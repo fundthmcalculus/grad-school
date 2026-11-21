@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v25-rep\\weight_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11598,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.28161
+  ],
+  [
+   100,
+   1.58582
+  ],
+  [
+   200,
+   1.43622
+  ],
+  [
+   300,
+   1.36552
+  ],
+  [
+   400,
+   1.30785
+  ],
+  [
+   500,
+   1.26635
+  ],
+  [
+   600,
+   1.22971
+  ],
+  [
+   700,
+   1.19667
+  ],
+  [
+   800,
+   1.17223
+  ],
+  [
+   900,
+   1.15212
+  ],
+  [
+   1000,
+   1.13325
+  ],
+  [
+   1100,
+   1.11996
+  ],
+  [
+   1160,
+   1.11598
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.9333
+  ],
+  [
+   50,
+   8.6013
+  ],
+  [
+   100,
+   6.608
+  ],
+  [
+   150,
+   5.644
+  ],
+  [
+   200,
+   5.1119
+  ],
+  [
+   250,
+   4.8481
+  ],
+  [
+   300,
+   4.6511
+  ],
+  [
+   350,
+   4.5128
+  ],
+  [
+   400,
+   4.3873
+  ],
+  [
+   450,
+   4.3094
+  ],
+  [
+   500,
+   4.2258
+  ],
+  [
+   550,
+   4.1702
+  ],
+  [
+   600,
+   4.0882
+  ],
+  [
+   650,
+   4.0243
+  ],
+  [
+   700,
+   3.9825
+  ],
+  [
+   750,
+   3.9402
+  ],
+  [
+   800,
+   3.8895
+  ],
+  [
+   850,
+   3.8311
+  ],
+  [
+   900,
+   3.7985
+  ],
+  [
+   950,
+   3.7754
+  ],
+  [
+   1000,
+   3.7362
+  ],
+  [
+   1050,
+   3.6942
+  ],
+  [
+   1100,
+   3.6819
+  ],
+  [
+   1150,
+   3.6607
+  ],
+  [
+   1159,
+   3.6631
+  ]
+ ],
+ "train_seconds": 83.35,
+ "wall_seconds": 102.26,
+ "chars_per_sec": 114006,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Spiant. She had a special persa. She would play with her friends in the room.\nOne day, Sara's mom saw a small barround. She wanted to help her favorite face. She grabbed them to the pond and said, \"Let's slum, please. GEndma. I will success the piece. Let's see you.\"\nThe next day, something unexpected happened. The bathoom became a gift, and the money were very happy. There were very happy. She knew that day, three friends.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. Tim lived in a big house with his friends. They liked to play together with the food.\nOne day, the monweet was a nice ball in the store. They saw a bucket. The ball contlebision was a few bird. Tim was scared, but he was scared. He wanted to see his friends.\nWhile one, Tim met a little girl named Lily. \"What is to build the tree. Do you want you?\" said, \"I want to play with you?\" Sam said, \"Yes, you will come over my own towets.\" Tim and Sue did not want to learn",
+ "rule_init": {},
+ "ngram_init": {}
+}

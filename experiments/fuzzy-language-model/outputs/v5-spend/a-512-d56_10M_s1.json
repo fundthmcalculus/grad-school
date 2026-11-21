@@ -1,0 +1,159 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 56,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v5-spend\\a-512-d56_10M_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe512",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 512
+ },
+ "config": {
+  "vocab_size": 512,
+  "d_model": 56,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 86496,
+ "params_nonemb": 57824,
+ "steps": 510,
+ "chars_seen": 10018634,
+ "chars_per_token": 2.3979958,
+ "val_bpc": 1.34165,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   127,
+   1.71859
+  ],
+  [
+   254,
+   1.51795
+  ],
+  [
+   381,
+   1.402
+  ],
+  [
+   508,
+   1.34222
+  ],
+  [
+   510,
+   1.34165
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.4351
+  ],
+  [
+   50,
+   7.5081
+  ],
+  [
+   100,
+   5.6606
+  ],
+  [
+   150,
+   4.6862
+  ],
+  [
+   200,
+   4.1864
+  ],
+  [
+   250,
+   3.8789
+  ],
+  [
+   300,
+   3.7042
+  ],
+  [
+   350,
+   3.5604
+  ],
+  [
+   400,
+   3.4452
+  ],
+  [
+   450,
+   3.3505
+  ],
+  [
+   500,
+   3.2836
+  ],
+  [
+   509,
+   3.2773
+  ]
+ ],
+ "train_seconds": 102.6,
+ "wall_seconds": 122.72,
+ "chars_per_sec": 40722,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, in a small house, he watched the yard. OK, \"Tim, is not always be with a fun at his net. Let's play!\" They dress became friends, and they flugged the sharp! The bear was not too big and bad. Jemy do not head. They took rocks and laugh the flowers. The flowers made a small, sound nodded. The family came to the magic ball, and they came to play with them.\nFrom that day on, Lily saw a big tree came to Max. He was sad because it was like the yard. The plane picked its favorite. He felt under the truck next a log. The little boy was very happy and she shoped them to some more.\nAnna's mom said, \"We do not jog. I like it! Can you help you?\" Pase they said, \"Thank you, tired!\"\nThey played together every day and played together all day",
+ "rule_init": {},
+ "ngram_init": {}
+}

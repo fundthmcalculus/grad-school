@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v5-spend\\d-768-d48_10M_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe768",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 768
+ },
+ "config": {
+  "vocab_size": 768,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 81056,
+ "params_nonemb": 44192,
+ "steps": 424,
+ "chars_seen": 10003770,
+ "chars_per_token": 2.8801024,
+ "val_bpc": 1.30953,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   106,
+   1.64801
+  ],
+  [
+   212,
+   1.46385
+  ],
+  [
+   318,
+   1.36446
+  ],
+  [
+   424,
+   1.30953
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.9072
+  ],
+  [
+   50,
+   8.1075
+  ],
+  [
+   100,
+   6.1607
+  ],
+  [
+   150,
+   5.1695
+  ],
+  [
+   200,
+   4.6462
+  ],
+  [
+   250,
+   4.3336
+  ],
+  [
+   300,
+   4.1517
+  ],
+  [
+   350,
+   3.9958
+  ],
+  [
+   400,
+   3.8887
+  ],
+  [
+   423,
+   3.852
+  ]
+ ],
+ "train_seconds": 86.02,
+ "wall_seconds": 99.97,
+ "chars_per_sec": 40379,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little dog named Fluffy. Spot loved to play with the other bird with the ball.\nOne day, Tim and his mom saw a big dog. The dog was cookies and said, \"Please, can I have to keep the book and remember to stay.\" Tim was surprised and happy. He poppeded, and jumped up to the tree.\nTim had a teet of fun, and that the park went to the park, but they had helping the big ball. They took paper and played together, and the little dog was excited.\n<|eot|>\nOnce upon a time, there was a dog named Bohn. Thisny loved to play with her mom. One day, Beoppy had a bad. Joe was very happy.\nJohn saw Bella and Tim named Spot. When he expenerst of his mom was in her pop man, and she wanted to see something enough. He jumped on the street with the family. He was so happy, but he said, \"We learned that being stopped to be a sleep and shrown. If you have fun!\"\nHer mom smiled and said, \"I'm sorry, Bluey!",
+ "rule_init": {},
+ "ngram_init": {}
+}

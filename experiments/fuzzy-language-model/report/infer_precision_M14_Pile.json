@@ -1,0 +1,76 @@
+{
+ "name": "M14_Pile",
+ "ckpt": "outputs/v84-pile14m/M14_v6144_h1024_d384_l4_lr4e-2_pile14m_s0.pt",
+ "params": 14067715,
+ "device": "cuda",
+ "formats": {
+  "fp32": {
+   "bytes": 56270860,
+   "bpc": 1.96941,
+   "top1_agreement": 1.0,
+   "kl_bits": 0.0,
+   "max_dlogit": 0.0,
+   "greedy_identical": 1.0,
+   "mean_first_difference": 64.0,
+   "pieces_per_s": 101596,
+   "ms_per_piece_decode": 15.49,
+   "cpu_ms_per_piece_decode": 12.65,
+   "cpu_pieces_per_s": 2814,
+   "cpu_bpc_300k": 1.92601
+  },
+  "fp16": {
+   "bytes": 28135430,
+   "bpc": 1.96943,
+   "top1_agreement": 0.99802,
+   "kl_bits": 1.3e-05,
+   "max_dlogit": 0.3719,
+   "greedy_identical": 0.95,
+   "mean_first_difference": 63.9,
+   "pieces_per_s": 115384,
+   "ms_per_piece_decode": 17.4,
+   "cpu_ms_per_piece_decode": 14.47,
+   "cpu_pieces_per_s": 3004,
+   "cpu_bpc_300k": 1.926
+  },
+  "bf16": {
+   "bytes": 28135430,
+   "bpc": 1.96963,
+   "top1_agreement": 0.98207,
+   "kl_bits": 0.000679,
+   "max_dlogit": 2.2274,
+   "greedy_identical": 0.5,
+   "mean_first_difference": 48.0,
+   "pieces_per_s": 114828,
+   "ms_per_piece_decode": 16.7
+  },
+  "int8": {
+   "bytes": 14157469,
+   "bpc": 1.97046,
+   "top1_agreement": 0.96877,
+   "kl_bits": 0.002535,
+   "max_dlogit": 5.1835,
+   "greedy_identical": 0.6,
+   "mean_first_difference": 45.8,
+   "pieces_per_s": 102348,
+   "ms_per_piece_decode": 11.64,
+   "cpu_ms_per_piece_decode": 14.17,
+   "cpu_pieces_per_s": 2640,
+   "cpu_bpc_300k": 1.92744
+  },
+  "int8-lazy": {
+   "bytes": 14157469,
+   "bpc": 1.97046,
+   "top1_agreement": 0.96877,
+   "kl_bits": 0.002535,
+   "max_dlogit": 5.1835,
+   "greedy_identical": 0.6,
+   "mean_first_difference": 45.8,
+   "pieces_per_s": 86344,
+   "ms_per_piece_decode": 35.53,
+   "cpu_ms_per_piece_decode": 22.22,
+   "cpu_pieces_per_s": 2943,
+   "cpu_bpc_300k": 1.92744
+  }
+ },
+ "cpu_threads": 3
+}

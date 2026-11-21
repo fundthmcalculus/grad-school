@@ -1,0 +1,106 @@
+{
+ "ckpt": "outputs/v18-3b/D-d48-bpe1024-ctx512-r32_3000M_s0.pt",
+ "rules": 72,
+ "model_hit_top10": 0.8137,
+ "windows": 128,
+ "rows": [
+  {
+   "context": false,
+   "m": 1,
+   "hit": 0.2989,
+   "overlap": 0.2222,
+   "bpc": 2.4325
+  },
+  {
+   "context": false,
+   "m": 2,
+   "hit": 0.4188,
+   "overlap": 0.3078,
+   "bpc": 2.1463
+  },
+  {
+   "context": false,
+   "m": 4,
+   "hit": 0.5364,
+   "overlap": 0.399,
+   "bpc": 1.8769
+  },
+  {
+   "context": false,
+   "m": 8,
+   "hit": 0.6185,
+   "overlap": 0.479,
+   "bpc": 1.6566
+  },
+  {
+   "context": false,
+   "m": 16,
+   "hit": 0.6624,
+   "overlap": 0.5403,
+   "bpc": 1.5257
+  },
+  {
+   "context": false,
+   "m": 32,
+   "hit": 0.6783,
+   "overlap": 0.5791,
+   "bpc": 1.4632
+  },
+  {
+   "context": false,
+   "m": 72,
+   "hit": 0.6795,
+   "overlap": 0.5864,
+   "bpc": 1.4542
+  },
+  {
+   "context": true,
+   "m": 1,
+   "hit": 0.5114,
+   "overlap": 0.365,
+   "bpc": 1.9613
+  },
+  {
+   "context": true,
+   "m": 2,
+   "hit": 0.6196,
+   "overlap": 0.4728,
+   "bpc": 1.6847
+  },
+  {
+   "context": true,
+   "m": 4,
+   "hit": 0.7085,
+   "overlap": 0.5893,
+   "bpc": 1.4307
+  },
+  {
+   "context": true,
+   "m": 8,
+   "hit": 0.7667,
+   "overlap": 0.704,
+   "bpc": 1.2368
+  },
+  {
+   "context": true,
+   "m": 16,
+   "hit": 0.7977,
+   "overlap": 0.8141,
+   "bpc": 1.1121
+  },
+  {
+   "context": true,
+   "m": 32,
+   "hit": 0.8114,
+   "overlap": 0.9185,
+   "bpc": 1.0486
+  },
+  {
+   "context": true,
+   "m": 72,
+   "hit": 0.8137,
+   "overlap": 1.0,
+   "bpc": 1.0359
+  }
+ ]
+}

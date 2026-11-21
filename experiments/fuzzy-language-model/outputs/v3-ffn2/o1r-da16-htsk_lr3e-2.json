@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn2\\o1r-da16-htsk_lr3e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 83652,
+ "params_nonemb": 77380,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.50226,
+ "evals": [
+  [
+   305,
+   1.93192
+  ],
+  [
+   610,
+   1.71851
+  ],
+  [
+   915,
+   1.57254
+  ],
+  [
+   1220,
+   1.50179
+  ],
+  [
+   1221,
+   1.50226
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.154
+  ],
+  [
+   50,
+   4.9993
+  ],
+  [
+   100,
+   3.5363
+  ],
+  [
+   150,
+   2.7788
+  ],
+  [
+   200,
+   2.4006
+  ],
+  [
+   250,
+   2.19
+  ],
+  [
+   300,
+   2.0612
+  ],
+  [
+   350,
+   1.9823
+  ],
+  [
+   400,
+   1.9076
+  ],
+  [
+   450,
+   1.8648
+  ],
+  [
+   500,
+   1.8251
+  ],
+  [
+   550,
+   1.774
+  ],
+  [
+   600,
+   1.7427
+  ],
+  [
+   650,
+   1.7199
+  ],
+  [
+   700,
+   1.6943
+  ],
+  [
+   750,
+   1.6758
+  ],
+  [
+   800,
+   1.651
+  ],
+  [
+   850,
+   1.6298
+  ],
+  [
+   900,
+   1.608
+  ],
+  [
+   950,
+   1.5878
+  ],
+  [
+   1000,
+   1.5574
+  ],
+  [
+   1050,
+   1.5485
+  ],
+  [
+   1100,
+   1.5351
+  ],
+  [
+   1150,
+   1.523
+  ],
+  [
+   1200,
+   1.5211
+  ],
+  [
+   1220,
+   1.5199
+  ]
+ ],
+ "train_seconds": 59.46,
+ "wall_seconds": 71.48,
+ "chars_per_sec": 168226,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, the flowers with green passo something he could not daper and felt so much funny very happy. They saw a big, redelu them for her scared of homing bathroom. The eape was now. The sky wanted to play with lots of fun. He played together all adventured. It walked and dad, \"Oh no!\" The house showed so ",
+ "rule_init": {}
+}

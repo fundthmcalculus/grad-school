@@ -1,0 +1,149 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 10000000.0,
+  "lr": 0.02,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v10-fib\\D-lr2e-2_10M_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8
+ },
+ "params_total": 93344,
+ "params_nonemb": 44192,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.27716,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.6171
+  ],
+  [
+   192,
+   1.4196
+  ],
+  [
+   288,
+   1.32384
+  ],
+  [
+   384,
+   1.27798
+  ],
+  [
+   387,
+   1.27716
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3344
+  ],
+  [
+   50,
+   8.6437
+  ],
+  [
+   100,
+   6.5674
+  ],
+  [
+   150,
+   5.4703
+  ],
+  [
+   200,
+   4.9015
+  ],
+  [
+   250,
+   4.569
+  ],
+  [
+   300,
+   4.3541
+  ],
+  [
+   350,
+   4.2106
+  ],
+  [
+   386,
+   4.1398
+  ]
+ ],
+ "train_seconds": 26.85,
+ "wall_seconds": 33.6,
+ "chars_per_sec": 118059,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Sally. She was scared of a special voice. She would be fast and put the suzious on the slide.\nAmy she would go to the might and make a new friend. She was very masken and tired. She said, \"Let's slide, he're glow it.\"\nA Molla said, \"I will help you. Thank you, you can make her a mailse. I will make some baro and before. If you like your pences.\"\nAnna said, \"I want to make a first.\" The bunny was safe and not to exad.\nThey walked to the pop and hooed the peear in the Pila. Everyone was the world, so the mad were excited. They learned to read it and before than it.\n<|eot|>\nOnce upon a time, there was a brave boy named Mark. He loved to play all day playing with his friends. One day, Tre to play near the big, shiny toy car. Bead was dripeing to play with. He wanted to play with it with his toys and said she was so happy. Sam said, \"I am fast to go inside.\" \nLeter was unusty and decided to play with",
+ "rule_init": {},
+ "ngram_init": {}
+}

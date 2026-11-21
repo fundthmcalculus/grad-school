@@ -1,0 +1,215 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 56,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v16-factemb\\D-d56-e24-ctx512-r32_30M_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 24,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 56,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 24,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 87328,
+ "params_nonemb": 61408,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.18097,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.48308
+  ],
+  [
+   580,
+   1.32835
+  ],
+  [
+   870,
+   1.23111
+  ],
+  [
+   1160,
+   1.18097
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.1004
+  ],
+  [
+   50,
+   8.2702
+  ],
+  [
+   100,
+   6.5856
+  ],
+  [
+   150,
+   5.7314
+  ],
+  [
+   200,
+   5.2736
+  ],
+  [
+   250,
+   5.0106
+  ],
+  [
+   300,
+   4.8265
+  ],
+  [
+   350,
+   4.7016
+  ],
+  [
+   400,
+   4.6101
+  ],
+  [
+   450,
+   4.5048
+  ],
+  [
+   500,
+   4.4275
+  ],
+  [
+   550,
+   4.3419
+  ],
+  [
+   600,
+   4.2646
+  ],
+  [
+   650,
+   4.1864
+  ],
+  [
+   700,
+   4.1246
+  ],
+  [
+   750,
+   4.0846
+  ],
+  [
+   800,
+   4.0195
+  ],
+  [
+   850,
+   3.9551
+  ],
+  [
+   900,
+   3.9169
+  ],
+  [
+   950,
+   3.8646
+  ],
+  [
+   1000,
+   3.8224
+  ],
+  [
+   1050,
+   3.7952
+  ],
+  [
+   1100,
+   3.7733
+  ],
+  [
+   1150,
+   3.7719
+  ],
+  [
+   1159,
+   3.7682
+  ]
+ ],
+ "train_seconds": 80.49,
+ "wall_seconds": 87.64,
+ "chars_per_sec": 118059,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and fast bird. \nThe meets asked, \"What is this time, Lily?\"\nMom said, \"I will put this oberarn to play with it.\" So, the people and the animals played together every day. They were very happy and happy.\n<|eot|>\n\nOnce upon a time there was a little bird. She liked to play with her hands. One day, they saw a big, soft. She liked to play with the birds.\nOne day, a kind bird said, \"Don't sraw you, a big, pretty place,\"'s sorry. His dad said, \"I want to make a fourse.\" The bird and the bird went to the tree, and they both played together all day. The bird was not important and it was very beautiful.\n<|eot|>\nOnce upon a time, in the marcle, there lived a little girl named Lucy. She liked to play with it and hand together. Lily was not a while, but she didn't like to play in the kitchen. She was very happy to see Kitty. Kitty was very happy.\nOne day, Lucy saw a big, fine on the ground. It bed the noise, but she could not find it. But Max thought about it to fill Tom. The whine gray was still too fast.\nThen, something unexpected happened. It",
+ "rule_init": {},
+ "ngram_init": {}
+}

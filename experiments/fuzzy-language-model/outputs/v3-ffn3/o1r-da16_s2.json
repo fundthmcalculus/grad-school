@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn3\\o1r-da16_s2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 83652,
+ "params_nonemb": 77380,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.55701,
+ "evals": [
+  [
+   305,
+   2.00183
+  ],
+  [
+   610,
+   1.7613
+  ],
+  [
+   915,
+   1.62572
+  ],
+  [
+   1220,
+   1.55744
+  ],
+  [
+   1221,
+   1.55701
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.7749
+  ],
+  [
+   50,
+   4.974
+  ],
+  [
+   100,
+   3.6479
+  ],
+  [
+   150,
+   2.9061
+  ],
+  [
+   200,
+   2.5062
+  ],
+  [
+   250,
+   2.2704
+  ],
+  [
+   300,
+   2.1347
+  ],
+  [
+   350,
+   2.0379
+  ],
+  [
+   400,
+   1.961
+  ],
+  [
+   450,
+   1.9041
+  ],
+  [
+   500,
+   1.8669
+  ],
+  [
+   550,
+   1.8335
+  ],
+  [
+   600,
+   1.8051
+  ],
+  [
+   650,
+   1.7727
+  ],
+  [
+   700,
+   1.7494
+  ],
+  [
+   750,
+   1.7257
+  ],
+  [
+   800,
+   1.7031
+  ],
+  [
+   850,
+   1.6758
+  ],
+  [
+   900,
+   1.6515
+  ],
+  [
+   950,
+   1.6378
+  ],
+  [
+   1000,
+   1.6254
+  ],
+  [
+   1050,
+   1.5982
+  ],
+  [
+   1100,
+   1.5842
+  ],
+  [
+   1150,
+   1.5725
+  ],
+  [
+   1200,
+   1.5655
+  ],
+  [
+   1220,
+   1.5643
+  ]
+ ],
+ "train_seconds": 59.63,
+ "wall_seconds": 71.34,
+ "chars_per_sec": 167734,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Tom. He wanted to climb the spicy. Ben was good to do.\n\"Look and Tim were her park to his mom careful with the other bathran toys begret. The weady the toy was inside up and thought it with the nice. Tim was very happy the towlap water and said, \"Your thought you have ",
+ "rule_init": {}
+}

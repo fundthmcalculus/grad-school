@@ -1,0 +1,79 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+Table 4.1c -- top_n sweep: MoG quality and cost vs features kept
+  seeds=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  scorers=['wasserstein', 'bhattacharyya', 'composite', 'higher_order']
+== Concrete (regression): N=1030 M=8 metric=R2
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+  baselines (Table 4.1 harness) 246s wall | sweep 39s wall, 38s of fits over 280 runs
+  [bikeshare] loaded data/bikeshare-hour.csv: 17379 rows × 12 features
+== Bike Sharing (regression): N=17379 M=12 metric=R2
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+  baselines (Table 4.1 harness) 166s wall | sweep 85s wall, 83s of fits over 360 runs
+  [phiusiil] loaded data/PhiUSIIL_Phishing_URL_Dataset.csv: 20000 rows × 47 features  (3 leaks dropped: URLSimilarityIndex, TLDLegitimateProb, URLCharProb)
+== PhiUSIIL (classification): N=20000 M=47 metric=acc
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+  baselines (Table 4.1 harness) 468s wall | sweep 236s wall, 232s of fits over 480 runs
+  wrote /tmp/claude-0/-home-user/11fe4ed0-1714-5166-a34d-936e154befee/scratchpad/c41_full/table_4_1c_comparison.md
+  wrote /tmp/claude-0/-home-user/11fe4ed0-1714-5166-a34d-936e154befee/scratchpad/c41_full/table_4_1c_comparison.csv
+  wrote /tmp/claude-0/-home-user/11fe4ed0-1714-5166-a34d-936e154befee/scratchpad/c41_full/table_4_1c_topn_sweep.md
+  wrote /tmp/claude-0/-home-user/11fe4ed0-1714-5166-a34d-936e154befee/scratchpad/c41_full/table_4_1c_topn_sweep.csv
+  wrote /tmp/claude-0/-home-user/11fe4ed0-1714-5166-a34d-936e154befee/scratchpad/c41_full/table_4_1c_sweep_cost.md
+  wrote /tmp/claude-0/-home-user/11fe4ed0-1714-5166-a34d-936e154befee/scratchpad/c41_full/table_4_1c_sweep_cost.csv
+  wrote /tmp/claude-0/-home-user/11fe4ed0-1714-5166-a34d-936e154befee/scratchpad/c41_full/table_4_1c_topn_runs.csv  (1120 runs)
+Total wall-clock: 1240 s

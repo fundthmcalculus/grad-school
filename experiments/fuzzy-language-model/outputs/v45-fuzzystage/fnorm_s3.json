@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v45-fuzzystage\\fnorm_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98628,
+ "params_nonemb": 47364,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.05192,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.07023
+  ],
+  [
+   100,
+   1.41057
+  ],
+  [
+   200,
+   1.27703
+  ],
+  [
+   300,
+   1.22034
+  ],
+  [
+   400,
+   1.17683
+  ],
+  [
+   500,
+   1.1424
+  ],
+  [
+   600,
+   1.1132
+  ],
+  [
+   700,
+   1.08825
+  ],
+  [
+   800,
+   1.06807
+  ],
+  [
+   900,
+   1.0553
+  ],
+  [
+   953,
+   1.05192
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7791
+  ],
+  [
+   50,
+   9.1358
+  ],
+  [
+   100,
+   6.9268
+  ],
+  [
+   150,
+   5.8536
+  ],
+  [
+   200,
+   5.3019
+  ],
+  [
+   250,
+   5.0062
+  ],
+  [
+   300,
+   4.8463
+  ],
+  [
+   350,
+   4.7195
+  ],
+  [
+   400,
+   4.6099
+  ],
+  [
+   450,
+   4.5376
+  ],
+  [
+   500,
+   4.4604
+  ],
+  [
+   550,
+   4.412
+  ],
+  [
+   600,
+   4.3431
+  ],
+  [
+   650,
+   4.284
+  ],
+  [
+   700,
+   4.2365
+  ],
+  [
+   750,
+   4.208
+  ],
+  [
+   800,
+   4.1637
+  ],
+  [
+   850,
+   4.1274
+  ],
+  [
+   900,
+   4.0978
+  ],
+  [
+   950,
+   4.0901
+  ],
+  [
+   952,
+   4.0893
+  ]
+ ],
+ "train_seconds": 73.1,
+ "wall_seconds": 84.3,
+ "chars_per_sec": 106804,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl called Lucy. She was very excited to see the cars, so she felt very quiet.\nOne day, Lucy found a big, round ball in a tree. The other animals were scared and asked the other people who could not play with. So, they all jumped for the big smile and had found a big, red ball.\nThe small, a big ball, and the small bird was surprised. The little girl thought it was a strong ball. She wanted to play with the ball. But, and the big red ball sat on the ball. The big bird started to sing and laugh. The big big, red ball was not so happy.\nAfter night, it was so much better. The little bird thought the big ball was very lonely. They opened the ball and found lots of fun. And they all lived happily ever after.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She had a big box of toys. Lily loved to play with her toys. One sunny day, Lily went for a walk.\n\"Hi, a?\" asked Lily. \"Why are you sad?\"?\" Lily looked up and saw the box. She thought it was bad.\nLily picked up the box and started to run through. But when they started to sail. It remembered it's blue and right. Lily was sad and he could not. He asked, \"Why are you doing?\"\n\"I don't know. Ee",
+ "rule_init": {},
+ "ngram_init": {}
+}

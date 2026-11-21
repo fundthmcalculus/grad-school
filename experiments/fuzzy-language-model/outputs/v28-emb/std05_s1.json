@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v28-emb\\std05_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.12284,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.17106
+  ],
+  [
+   100,
+   1.61386
+  ],
+  [
+   200,
+   1.44797
+  ],
+  [
+   300,
+   1.37052
+  ],
+  [
+   400,
+   1.3121
+  ],
+  [
+   500,
+   1.27496
+  ],
+  [
+   600,
+   1.24072
+  ],
+  [
+   700,
+   1.20561
+  ],
+  [
+   800,
+   1.17759
+  ],
+  [
+   900,
+   1.15633
+  ],
+  [
+   1000,
+   1.13817
+  ],
+  [
+   1100,
+   1.12869
+  ],
+  [
+   1160,
+   1.12284
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.0244
+  ],
+  [
+   50,
+   8.1896
+  ],
+  [
+   100,
+   6.3515
+  ],
+  [
+   150,
+   5.4011
+  ],
+  [
+   200,
+   4.9264
+  ],
+  [
+   250,
+   4.6557
+  ],
+  [
+   300,
+   4.4716
+  ],
+  [
+   350,
+   4.3456
+  ],
+  [
+   400,
+   4.2616
+  ],
+  [
+   450,
+   4.1593
+  ],
+  [
+   500,
+   4.1059
+  ],
+  [
+   550,
+   4.05
+  ],
+  [
+   600,
+   3.9969
+  ],
+  [
+   650,
+   3.9234
+  ],
+  [
+   700,
+   3.878
+  ],
+  [
+   750,
+   3.8395
+  ],
+  [
+   800,
+   3.7851
+  ],
+  [
+   850,
+   3.7427
+  ],
+  [
+   900,
+   3.7157
+  ],
+  [
+   950,
+   3.6738
+  ],
+  [
+   1000,
+   3.6341
+  ],
+  [
+   1050,
+   3.6072
+  ],
+  [
+   1100,
+   3.5962
+  ],
+  [
+   1150,
+   3.5808
+  ],
+  [
+   1159,
+   3.577
+  ]
+ ],
+ "train_seconds": 79.45,
+ "wall_seconds": 93.9,
+ "chars_per_sec": 119614,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Mia. Mia loved to cry. She loved to play with her.\nAs Miaaw, they saw a big, red tree. Mia was sad, but she wanted to see the tree. She wanted to go inside the tree. So, Mia was just tired. She said, \"Let's slide!\" Mia said.\nSip was curious. He put on the tree and yellow. She opened it's house and fall down to the tree. She said, \"Can I play with Titty, you have to make your moon.\"\nMax got the tree and picked up the tree and went inside to play outside. She did not like the tree. Lily picked up the tree and said, \"You're welcome, you can be Pin. It's now you for him?\" Mia mother, but she was too sad. She remembered them.\n\"Wow, on the tree!\" Tom said, \"Yes, you can't play with my friend.\" Max was happy and said, \"Yes, I have to stop back!\" They played together and had fun together.\n<|eot|>\nOne day, a little boy named Tim went to the park. He saw a big, red car that she was not a big, vegetable. The cat has a loud bird named Sam. Tim saw the cat and decided to play.",
+ "rule_init": {},
+ "ngram_init": {}
+}

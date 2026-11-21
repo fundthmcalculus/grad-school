@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.35,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v51-fuzzytokens\\emb_fall_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.35,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99026,
+ "params_nonemb": 47762,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.19166,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   2.84583
+  ],
+  [
+   100,
+   1.94575
+  ],
+  [
+   200,
+   1.5417
+  ],
+  [
+   300,
+   1.40821
+  ],
+  [
+   400,
+   1.34169
+  ],
+  [
+   500,
+   1.29561
+  ],
+  [
+   600,
+   1.25812
+  ],
+  [
+   700,
+   1.23113
+  ],
+  [
+   800,
+   1.20882
+  ],
+  [
+   900,
+   1.19618
+  ],
+  [
+   953,
+   1.19166
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.9242
+  ],
+  [
+   50,
+   9.7469
+  ],
+  [
+   100,
+   8.6572
+  ],
+  [
+   150,
+   7.4943
+  ],
+  [
+   200,
+   6.605
+  ],
+  [
+   250,
+   6.0417
+  ],
+  [
+   300,
+   5.7019
+  ],
+  [
+   350,
+   5.4668
+  ],
+  [
+   400,
+   5.293
+  ],
+  [
+   450,
+   5.1777
+  ],
+  [
+   500,
+   5.0733
+  ],
+  [
+   550,
+   5.0034
+  ],
+  [
+   600,
+   4.9121
+  ],
+  [
+   650,
+   4.8381
+  ],
+  [
+   700,
+   4.7812
+  ],
+  [
+   750,
+   4.7489
+  ],
+  [
+   800,
+   4.7029
+  ],
+  [
+   850,
+   4.6595
+  ],
+  [
+   900,
+   4.6269
+  ],
+  [
+   950,
+   4.62
+  ],
+  [
+   952,
+   4.617
+  ]
+ ],
+ "train_seconds": 70.85,
+ "wall_seconds": 86.22,
+ "chars_per_sec": 110190,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. Mia was very excited to play. She was so happy. She knew he was a little orary.\nOne day, Lily saw a butterfly on the ground. She wanted to play with her friends. Lily and dad were very happy. The dog became the best friend, the cat, and Tom decided to play with her new friends. They both had many fun things with their.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to play in the park in the beach. One day, she saw a big tree. Mia thought the ball flew away to her mommy, but she could not find it.\nAfter a while, Lily saw a red ball. She had a big, red ball. She liked to sleep and play anymore. She looked around and saw a bird near the tree. Mia was not happy.\nLily came to his friend, the bird named Max, to get a lot of fun. When she got swountain and making a big plan. Amy was sad. She knew the crab was not a lot. Lily thought the bird could fly.\n\"Oh, what are you doing?\" Lily said. \" moment, it's inside. You are not full of you.\" They became the best of friends.\n\"Let's do not go for me.\" The lesson and the other birds were very happy. Sue and Lily were happy and thanked Mom for help.\n<|eot|>\nOne day, a",
+ "rule_init": {},
+ "ngram_init": {}
+}

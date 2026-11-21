@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn\\o1-raw_lr3e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 102084,
+ "params_nonemb": 95812,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.75464,
+ "evals": [
+  [
+   305,
+   2.1686
+  ],
+  [
+   610,
+   1.95271
+  ],
+  [
+   915,
+   1.81611
+  ],
+  [
+   1220,
+   1.75517
+  ],
+  [
+   1221,
+   1.75464
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.3565
+  ],
+  [
+   50,
+   5.2448
+  ],
+  [
+   100,
+   3.7444
+  ],
+  [
+   150,
+   2.9867
+  ],
+  [
+   200,
+   2.6115
+  ],
+  [
+   250,
+   2.4035
+  ],
+  [
+   300,
+   2.2776
+  ],
+  [
+   350,
+   2.2011
+  ],
+  [
+   400,
+   2.133
+  ],
+  [
+   450,
+   2.0907
+  ],
+  [
+   500,
+   2.0534
+  ],
+  [
+   550,
+   2.0023
+  ],
+  [
+   600,
+   1.975
+  ],
+  [
+   650,
+   1.9537
+  ],
+  [
+   700,
+   1.9327
+  ],
+  [
+   750,
+   1.9147
+  ],
+  [
+   800,
+   1.889
+  ],
+  [
+   850,
+   1.8689
+  ],
+  [
+   900,
+   1.8508
+  ],
+  [
+   950,
+   1.8335
+  ],
+  [
+   1000,
+   1.8027
+  ],
+  [
+   1050,
+   1.7957
+  ],
+  [
+   1100,
+   1.781
+  ],
+  [
+   1150,
+   1.7718
+  ],
+  [
+   1200,
+   1.7729
+  ],
+  [
+   1220,
+   1.772
+  ]
+ ],
+ "train_seconds": 60.99,
+ "wall_seconds": 72.68,
+ "chars_per_sec": 164009,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was so drapped things and of soon. It was now sad As her. Ben said, \"Hi, dove fun was so see things and was a by magic her at something unexpected. The like the swing. The skints was scopoon what to make the big on the room. You are cold room. The wlip their varyed dod looked at they look tV",
+ "rule_init": {}
+}

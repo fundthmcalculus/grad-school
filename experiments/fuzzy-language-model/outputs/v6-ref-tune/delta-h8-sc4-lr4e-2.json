@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.56,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.04,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-ref-tune\\delta-h8-sc4-lr4e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.56,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93392,
+ "params_nonemb": 44240,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.26656,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.61496
+  ],
+  [
+   192,
+   1.43373
+  ],
+  [
+   288,
+   1.32757
+  ],
+  [
+   384,
+   1.26744
+  ],
+  [
+   387,
+   1.26656
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3553
+  ],
+  [
+   50,
+   8.3431
+  ],
+  [
+   100,
+   6.4148
+  ],
+  [
+   150,
+   5.42
+  ],
+  [
+   200,
+   4.9106
+  ],
+  [
+   250,
+   4.5965
+  ],
+  [
+   300,
+   4.3595
+  ],
+  [
+   350,
+   4.1874
+  ],
+  [
+   386,
+   4.12
+  ]
+ ],
+ "train_seconds": 72.4,
+ "wall_seconds": 87.47,
+ "chars_per_sec": 43791,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Mia. Mia loved to play with her special piver. One day, Lily found a toy that he was doing. She listened to the birthday. So Kitty and her friend, Max, and they were making a new adventure.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. Lily was curious. She had a happy voice. She was very pretty. She liked to play her toy car in the park.\nOne day, Lilyo had a friendly friend Tim. It was a very pretty door. He wanted to play with her hand. She ran to her mom think. She said goodbye, \"Whar is it, can you help it?\" The cat said, \"Why are you work?\" So, Tim and Lily became good friends, and they were happy.\n<|eot|>\nOnce upon a time, there was a big, red bucket. The pare yes a pretty juice on the stand. The bird wanted to take a green gun.\nOne day, the box was a little girl named Sue. He saw a big mouse, and her friend, Tim. Tim saw a princeful toy yellow tree. Tim was so happy. Sam said, \"Hello, little gray, bird! That's unpiveone. Jrow",
+ "rule_init": {},
+ "ngram_init": {}
+}

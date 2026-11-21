@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.56,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-ref-tune\\delta-h8-sc4-lr6e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.56,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93392,
+ "params_nonemb": 44240,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.27444,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.60927
+  ],
+  [
+   192,
+   1.43966
+  ],
+  [
+   288,
+   1.34085
+  ],
+  [
+   384,
+   1.27431
+  ],
+  [
+   387,
+   1.27444
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3553
+  ],
+  [
+   50,
+   8.183
+  ],
+  [
+   100,
+   6.3399
+  ],
+  [
+   150,
+   5.4045
+  ],
+  [
+   200,
+   4.9199
+  ],
+  [
+   250,
+   4.6221
+  ],
+  [
+   300,
+   4.3947
+  ],
+  [
+   350,
+   4.2153
+  ],
+  [
+   386,
+   4.1441
+  ]
+ ],
+ "train_seconds": 72.28,
+ "wall_seconds": 87.36,
+ "chars_per_sec": 43861,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a little girl who was sad.\nTim and Sue were happy. They wanted to make a fun time. They needed that they was day. They put the push on the tert and had beautiful saved about the field. They were making better. They were sad.\nShe went to the park with her mom. She said, \"Let's origge. Daisy. I will help you. Let's threw it? I want to succe up!\" said the contreious. \"Hello, Anna, let's see it.\" But then, something unexpected happened. He knew it was not angry. Suddenly, Mimi exad started to unormed it. The hoocoiga was very worried. So, it was a good friend. The monster was a zipping on the ground. The bird bucket flew outside on the tike. The cat tried tonal and down. It was scared and fun playing in the sky. It was a big tree to do.\nBut this is a new friend. It's not nice and dead. It was bed the box! It is happy. The man is sad. She makes Sam and Sam pullen food. They are happy and fun towers.\n<|eot|>\nOnce upon a time, there was a",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,207 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.56,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.04,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-final10\\ref1-delta-h8-sc4-lr4e-2_30M_s4.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.56,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93392,
+ "params_nonemb": 44240,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.15898,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.37727
+  ],
+  [
+   580,
+   1.26497
+  ],
+  [
+   870,
+   1.1942
+  ],
+  [
+   1160,
+   1.15898
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3484
+  ],
+  [
+   50,
+   8.3338
+  ],
+  [
+   100,
+   6.4017
+  ],
+  [
+   150,
+   5.4179
+  ],
+  [
+   200,
+   4.8993
+  ],
+  [
+   250,
+   4.6345
+  ],
+  [
+   300,
+   4.4618
+  ],
+  [
+   350,
+   4.358
+  ],
+  [
+   400,
+   4.2763
+  ],
+  [
+   450,
+   4.1981
+  ],
+  [
+   500,
+   4.1484
+  ],
+  [
+   550,
+   4.0877
+  ],
+  [
+   600,
+   4.0309
+  ],
+  [
+   650,
+   3.992
+  ],
+  [
+   700,
+   3.9471
+  ],
+  [
+   750,
+   3.8977
+  ],
+  [
+   800,
+   3.8706
+  ],
+  [
+   850,
+   3.8371
+  ],
+  [
+   900,
+   3.8002
+  ],
+  [
+   950,
+   3.7753
+  ],
+  [
+   1000,
+   3.7462
+  ],
+  [
+   1050,
+   3.7245
+  ],
+  [
+   1100,
+   3.7019
+  ],
+  [
+   1150,
+   3.698
+  ],
+  [
+   1159,
+   3.682
+  ]
+ ],
+ "train_seconds": 208.28,
+ "wall_seconds": 219.92,
+ "chars_per_sec": 45624,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a little girl who was having a pield of a special pix. Then she decided to go fast and play with her friend.\nSam was very happy to see the magic wind. So Kitty and her friend, Sue, went to visit. They had a lot of fun. The bird was not happy that it made them, but then he found more organized the frogs. In the end, Tim was not hurt, but it was her. He saw the hill and saw some bike and full of jeep. Tim was very happy and could see it. But soon, a special girl named Sally threw a bit. They went to the top of the story about the birds. The hoop was happy to be ready to come with the food. The cat was not the dog anymore, but they could not play with the ball anymore.\n<|eot|>\nOnce upon a time, there was a big, yummy toy named Pouisny. Maybe it was a big, red green boot. It was a big tree to play. The bunny liked to play with water and make things heep. One day, the tree came to the park.\nThen, a big cat saw the bear and said, ???Let's go fast,\" said the leaf tower.\nThen, the minray",
+ "rule_init": {},
+ "ngram_init": {}
+}

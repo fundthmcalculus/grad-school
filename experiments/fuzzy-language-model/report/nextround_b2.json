@@ -1,0 +1,56 @@
+[
+ {
+  "arm": "fz_lr3",
+  "n": 5,
+  "params": 99019,
+  "bpc": 1.3143,
+  "delta": 0.07,
+  "se": 0.0013,
+  "per_seed": [
+   0.0689,
+   0.0673,
+   0.0718,
+   0.0676,
+   0.0743
+  ],
+  "gain_seeds": 0,
+  "worse_seeds": 5,
+  "verdict": "no"
+ },
+ {
+  "arm": "fz_lr6",
+  "n": 5,
+  "params": 99019,
+  "bpc": 1.2984,
+  "delta": 0.0542,
+  "se": 0.0017,
+  "per_seed": [
+   0.0518,
+   0.0541,
+   0.0525,
+   0.0517,
+   0.0608
+  ],
+  "gain_seeds": 0,
+  "worse_seeds": 5,
+  "verdict": "no"
+ },
+ {
+  "arm": "hyb_lr3",
+  "n": 5,
+  "params": 98528,
+  "bpc": 1.2481,
+  "delta": 0.0039,
+  "se": 0.0009,
+  "per_seed": [
+   0.0051,
+   0.0039,
+   0.0009,
+   0.0063,
+   0.003
+  ],
+  "gain_seeds": 0,
+  "worse_seeds": 5,
+  "verdict": "no"
+ }
+]

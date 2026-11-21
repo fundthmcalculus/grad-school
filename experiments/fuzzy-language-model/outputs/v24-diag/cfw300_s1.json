@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 300,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v24-diag\\cfw300_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.119,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.13313
+  ],
+  [
+   100,
+   1.66958
+  ],
+  [
+   200,
+   1.4843
+  ],
+  [
+   300,
+   1.42361
+  ],
+  [
+   400,
+   1.3537
+  ],
+  [
+   500,
+   1.30922
+  ],
+  [
+   600,
+   1.27101
+  ],
+  [
+   700,
+   1.22997
+  ],
+  [
+   800,
+   1.19733
+  ],
+  [
+   900,
+   1.1651
+  ],
+  [
+   1000,
+   1.13971
+  ],
+  [
+   1100,
+   1.12363
+  ],
+  [
+   1160,
+   1.119
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.902
+  ],
+  [
+   50,
+   8.4141
+  ],
+  [
+   100,
+   6.6178
+  ],
+  [
+   150,
+   5.6014
+  ],
+  [
+   200,
+   5.0885
+  ],
+  [
+   250,
+   4.7943
+  ],
+  [
+   300,
+   4.6069
+  ],
+  [
+   350,
+   4.484
+  ],
+  [
+   400,
+   4.393
+  ],
+  [
+   450,
+   4.2839
+  ],
+  [
+   500,
+   4.2225
+  ],
+  [
+   550,
+   4.1626
+  ],
+  [
+   600,
+   4.1023
+  ],
+  [
+   650,
+   4.0273
+  ],
+  [
+   700,
+   3.9712
+  ],
+  [
+   750,
+   3.9144
+  ],
+  [
+   800,
+   3.8392
+  ],
+  [
+   850,
+   3.7867
+  ],
+  [
+   900,
+   3.7417
+  ],
+  [
+   950,
+   3.6964
+  ],
+  [
+   1000,
+   3.6495
+  ],
+  [
+   1050,
+   3.6046
+  ],
+  [
+   1100,
+   3.5851
+  ],
+  [
+   1150,
+   3.5576
+  ],
+  [
+   1159,
+   3.5598
+  ]
+ ],
+ "train_seconds": 79.1,
+ "wall_seconds": 93.13,
+ "chars_per_sec": 120143,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there were two friends, Tim. Tim loved to meet a special before. He would leave the ume time. He would play outside and play with his friends, laughing. They had beautiful things, and they were very happy and problem.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to expen and dances. One day, she had to go to the show. She liked to play with it in her room and play with a big box. Lily was playing with the treme.\nOne day, Lily saw a big tree on her collar. The air ran and went inside the tree. The bit was not a hurt snead. Lily wanted to play with it. The horn was happy to be scared. Poe said, \"Yand! What do you do?\" The blocks readed and found the red bucket. The ball was tiving and the cat went up to the raven. The animals wanted to play with the ball.\nLily thanked the ball, happy. They realized the ball is happy to share the ball with them. They played with the ball all day long.\n<|eot|>\nOnce upon a time, there was a little girl named Sue. Sue was a little boy with a big, umbrella. Sue was very happy.\n",
+ "rule_init": {
+  "variant": "cfw300",
+  "L0.ffn": {
+   "gain": 4,
+   "ce_nats": 6.8853
+  },
+  "L1.ffn": {
+   "gain": 16,
+   "ce_nats": 6.8477
+  }
+ },
+ "ngram_init": {}
+}

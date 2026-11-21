@@ -1,0 +1,130 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 24,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 3000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 2,
+  "device": "cpu",
+  "eval_chars": 100000,
+  "eval_every": 500,
+  "out": "outputs/rules-smoke/D-d24-char.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 24,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 16400,
+ "params_nonemb": 14048,
+ "steps": 367,
+ "chars_seen": 3006464,
+ "chars_per_token": 1.0,
+ "val_bpc": 2.00016,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   367,
+   2.00016
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.7306
+  ],
+  [
+   50,
+   5.1613
+  ],
+  [
+   100,
+   3.7966
+  ],
+  [
+   150,
+   2.9876
+  ],
+  [
+   200,
+   2.5506
+  ],
+  [
+   250,
+   2.3072
+  ],
+  [
+   300,
+   2.1704
+  ],
+  [
+   350,
+   2.0914
+  ],
+  [
+   366,
+   2.0719
+  ]
+ ],
+ "train_seconds": 293.1,
+ "wall_seconds": 300.57,
+ "chars_per_sec": 10258,
+ "torch": "2.14.1+cpu",
+ "diverged_step": null,
+ "threads": 2,
+ "device": "cpu",
+ "device_name": "11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz",
+ "host": "localhost.localdomain",
+ "sample": "Once upon a time, there was not was sat the little boy named Bely awall the down, they wate them grean it. And Ben frog. She saw and sad sail the asked Lisil with that a bird goy liked to to hus to the like cowled to the reights to play, the good. At they callaw a big big girl with his pond what was very day, the p",
+ "rule_init": {},
+ "ngram_init": {}
+}

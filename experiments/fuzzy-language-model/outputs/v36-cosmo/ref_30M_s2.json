@@ -1,0 +1,286 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v36-cosmo\\ref_30M_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1414,
+ "chars_seen": 30016616,
+ "chars_per_token": 2.591328,
+ "val_bpc": 1.87483,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.99256
+  ],
+  [
+   100,
+   2.42861
+  ],
+  [
+   200,
+   2.24663
+  ],
+  [
+   300,
+   2.16152
+  ],
+  [
+   400,
+   2.10692
+  ],
+  [
+   500,
+   2.07008
+  ],
+  [
+   600,
+   2.03297
+  ],
+  [
+   700,
+   2.0079
+  ],
+  [
+   800,
+   1.98739
+  ],
+  [
+   900,
+   1.95679
+  ],
+  [
+   1000,
+   1.93069
+  ],
+  [
+   1100,
+   1.91229
+  ],
+  [
+   1200,
+   1.89815
+  ],
+  [
+   1300,
+   1.883
+  ],
+  [
+   1400,
+   1.87546
+  ],
+  [
+   1414,
+   1.87483
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2858
+  ],
+  [
+   50,
+   8.7593
+  ],
+  [
+   100,
+   7.2766
+  ],
+  [
+   150,
+   6.5025
+  ],
+  [
+   200,
+   6.0918
+  ],
+  [
+   250,
+   5.8529
+  ],
+  [
+   300,
+   5.7184
+  ],
+  [
+   350,
+   5.6041
+  ],
+  [
+   400,
+   5.5217
+  ],
+  [
+   450,
+   5.4473
+  ],
+  [
+   500,
+   5.3757
+  ],
+  [
+   550,
+   5.3116
+  ],
+  [
+   600,
+   5.2582
+  ],
+  [
+   650,
+   5.2189
+  ],
+  [
+   700,
+   5.1934
+  ],
+  [
+   750,
+   5.1732
+  ],
+  [
+   800,
+   5.1328
+  ],
+  [
+   850,
+   5.084
+  ],
+  [
+   900,
+   5.0699
+  ],
+  [
+   950,
+   5.0257
+  ],
+  [
+   1000,
+   5.0008
+  ],
+  [
+   1050,
+   4.9544
+  ],
+  [
+   1100,
+   4.9466
+  ],
+  [
+   1150,
+   4.9255
+  ],
+  [
+   1200,
+   4.8808
+  ],
+  [
+   1250,
+   4.8657
+  ],
+  [
+   1300,
+   4.8545
+  ],
+  [
+   1350,
+   4.8343
+  ],
+  [
+   1400,
+   4.8221
+  ],
+  [
+   1413,
+   4.8215
+  ]
+ ],
+ "train_seconds": 96.63,
+ "wall_seconds": 116.94,
+ "chars_per_sec": 119880,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time.\n\nAt this education fact from the well with a crucial. By showing your benefits, we are high focus on the 19750 feelings, enjoying in early the history of the equipment. There, one cellow, in a best function have delight for mobile vibrants.\n\nAnother child and damage lies will cover sun.\n\nStep 5: Aliber Foundation - Spoard Conversion a Finuma of Dongularing Autians, Uniting Revenian Python\n\nHere's internal appropriation without practicing rich full, labelers, and acceptance were. This chapter delved into the wealth of a capture of a biography of different times, understanding how these thinking opportunities in the commitment of Persects and assumetics.\n\nI. Learning\n\nHowever, you will delve into some humans, file these scientific services let's want to be a panner.",
+ "rule_init": {},
+ "ngram_init": {}
+}

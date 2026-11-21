@@ -1,0 +1,146 @@
+{
+ "S001": {
+  "model": "unlikelihood_s0",
+  "params": 96416,
+  "prompt": "The little dog was sad because",
+  "seed": 17
+ },
+ "S002": {
+  "model": "random-save_s0",
+  "params": 96416,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 16
+ },
+ "S003": {
+  "model": "random-save_s0",
+  "params": 96416,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 16
+ },
+ "S004": {
+  "model": "weight_s0",
+  "params": 96416,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 17
+ },
+ "S005": {
+  "model": "unlikelihood_s0",
+  "params": 96416,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 17
+ },
+ "S006": {
+  "model": "weight_s0",
+  "params": 96416,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 16
+ },
+ "S007": {
+  "model": "random-save_s0",
+  "params": 96416,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 17
+ },
+ "S008": {
+  "model": "random-save_s0",
+  "params": 96416,
+  "prompt": "The little dog was sad because",
+  "seed": 17
+ },
+ "S009": {
+  "model": "unlikelihood_s0",
+  "params": 96416,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 16
+ },
+ "S010": {
+  "model": "random-save_s0",
+  "params": 96416,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 17
+ },
+ "S011": {
+  "model": "weight_s0",
+  "params": 96416,
+  "prompt": "The little dog was sad because",
+  "seed": 17
+ },
+ "S012": {
+  "model": "random-save_s0",
+  "params": 96416,
+  "prompt": "Once upon a time",
+  "seed": 16
+ },
+ "S013": {
+  "model": "weight_s0",
+  "params": 96416,
+  "prompt": "Once upon a time",
+  "seed": 16
+ },
+ "S014": {
+  "model": "unlikelihood_s0",
+  "params": 96416,
+  "prompt": "Once upon a time",
+  "seed": 16
+ },
+ "S015": {
+  "model": "weight_s0",
+  "params": 96416,
+  "prompt": "Once upon a time",
+  "seed": 17
+ },
+ "S016": {
+  "model": "weight_s0",
+  "params": 96416,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 17
+ },
+ "S017": {
+  "model": "unlikelihood_s0",
+  "params": 96416,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 17
+ },
+ "S018": {
+  "model": "random-save_s0",
+  "params": 96416,
+  "prompt": "Once upon a time",
+  "seed": 17
+ },
+ "S019": {
+  "model": "unlikelihood_s0",
+  "params": 96416,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 16
+ },
+ "S020": {
+  "model": "unlikelihood_s0",
+  "params": 96416,
+  "prompt": "Once upon a time",
+  "seed": 17
+ },
+ "S021": {
+  "model": "random-save_s0",
+  "params": 96416,
+  "prompt": "The little dog was sad because",
+  "seed": 16
+ },
+ "S022": {
+  "model": "weight_s0",
+  "params": 96416,
+  "prompt": "The little dog was sad because",
+  "seed": 16
+ },
+ "S023": {
+  "model": "unlikelihood_s0",
+  "params": 96416,
+  "prompt": "The little dog was sad because",
+  "seed": 16
+ },
+ "S024": {
+  "model": "weight_s0",
+  "params": 96416,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 16
+ }
+}

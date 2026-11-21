@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-mix\\acc-fixeddecay_s1.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 87236,
+ "params_nonemb": 80964,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.47337,
+ "evals": [
+  [
+   305,
+   1.9157
+  ],
+  [
+   610,
+   1.68425
+  ],
+  [
+   915,
+   1.55098
+  ],
+  [
+   1220,
+   1.47359
+  ],
+  [
+   1221,
+   1.47337
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.1183
+  ],
+  [
+   50,
+   4.9717
+  ],
+  [
+   100,
+   3.5366
+  ],
+  [
+   150,
+   2.7785
+  ],
+  [
+   200,
+   2.3762
+  ],
+  [
+   250,
+   2.1653
+  ],
+  [
+   300,
+   2.0307
+  ],
+  [
+   350,
+   1.9493
+  ],
+  [
+   400,
+   1.8778
+  ],
+  [
+   450,
+   1.8237
+  ],
+  [
+   500,
+   1.7844
+  ],
+  [
+   550,
+   1.7467
+  ],
+  [
+   600,
+   1.7204
+  ],
+  [
+   650,
+   1.6924
+  ],
+  [
+   700,
+   1.6667
+  ],
+  [
+   750,
+   1.6421
+  ],
+  [
+   800,
+   1.6262
+  ],
+  [
+   850,
+   1.5969
+  ],
+  [
+   900,
+   1.5779
+  ],
+  [
+   950,
+   1.5542
+  ],
+  [
+   1000,
+   1.5342
+  ],
+  [
+   1050,
+   1.5162
+  ],
+  [
+   1100,
+   1.5068
+  ],
+  [
+   1150,
+   1.4958
+  ],
+  [
+   1200,
+   1.4962
+  ],
+  [
+   1220,
+   1.4916
+  ]
+ ],
+ "train_seconds": 59.26,
+ "wall_seconds": 73.54,
+ "chars_per_sec": 168791,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Mom. He wanted to climb. The bird could not bush found fun with the sky. They played togy together and solding of the kitchen to hurt my toy kids. But Tim liked to play with the bunny and kind. Tim and Sam was very running the woods. The car was too rathounthiy. I can ",
+ "rule_init": {}
+}

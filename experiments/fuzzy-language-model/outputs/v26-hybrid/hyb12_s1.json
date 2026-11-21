@@ -1,0 +1,152 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 4000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 4,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "outputs\\v26-hybrid\\hyb12_s1.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 155,
+ "chars_seen": 4010100,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.56318,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   38,
+   2.18313
+  ],
+  [
+   76,
+   1.81476
+  ],
+  [
+   114,
+   1.6742
+  ],
+  [
+   152,
+   1.56705
+  ],
+  [
+   155,
+   1.56318
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.9843
+  ],
+  [
+   50,
+   8.38
+  ],
+  [
+   100,
+   6.6824
+  ],
+  [
+   150,
+   5.6908
+  ],
+  [
+   154,
+   5.6337
+  ]
+ ],
+ "train_seconds": 636.78,
+ "wall_seconds": 894.75,
+ "chars_per_sec": 1994,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 4,
+ "device": "cpu",
+ "device_name": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and dirrel.\nThe little boy took the shiver. One day, Lily is fast and subby. He puts the late. The moral. They decided to play with her friend to go. The prob's friend, Tom and the bird became best friends. They see the bird and shared the tight.\n<|eot|>\nOne day, a little girl named Tim found a busion. She was sad, but they found the misple. The hidlo said, \"But then, something unexpected happened. Whister to a door. I'm a boat!\"\nAnna and the end of the thon and a bgred and the snowce. It was good friends. She had a hoons on a big dog with Pace. It was very happy and worked the marble. He wanted ton't both stuck and found the sand and sprow on each other. Tom had a braves. They played down up and said, \"L green, I can a big mus tree to do. I replemure the tree and say mouse!\nThe little boy was scared and bed the park. It is happy and shoutes. But Max thoughts Sam are sad, who I am a having leding towet. She saw the rock and decided to make the",
+ "rule_init": {
+  "variant": "hyb12",
+  "L0.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.955
+  },
+  "L1.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.9036
+  }
+ },
+ "ngram_init": {}
+}

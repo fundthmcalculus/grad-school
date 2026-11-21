@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn\\o1_lr1e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "max_len": 256
+ },
+ "params_total": 102084,
+ "params_nonemb": 95812,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.72541,
+ "evals": [
+  [
+   305,
+   2.14471
+  ],
+  [
+   610,
+   1.90821
+  ],
+  [
+   915,
+   1.78189
+  ],
+  [
+   1220,
+   1.72561
+  ],
+  [
+   1221,
+   1.72541
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.3262
+  ],
+  [
+   50,
+   5.5713
+  ],
+  [
+   100,
+   3.9572
+  ],
+  [
+   150,
+   3.1157
+  ],
+  [
+   200,
+   2.6786
+  ],
+  [
+   250,
+   2.4377
+  ],
+  [
+   300,
+   2.2819
+  ],
+  [
+   350,
+   2.1834
+  ],
+  [
+   400,
+   2.1008
+  ],
+  [
+   450,
+   2.0552
+  ],
+  [
+   500,
+   2.0123
+  ],
+  [
+   550,
+   1.9609
+  ],
+  [
+   600,
+   1.9298
+  ],
+  [
+   650,
+   1.9062
+  ],
+  [
+   700,
+   1.8845
+  ],
+  [
+   750,
+   1.8661
+  ],
+  [
+   800,
+   1.8417
+  ],
+  [
+   850,
+   1.8253
+  ],
+  [
+   900,
+   1.8093
+  ],
+  [
+   950,
+   1.7928
+  ],
+  [
+   1000,
+   1.7654
+  ],
+  [
+   1050,
+   1.7599
+  ],
+  [
+   1100,
+   1.7487
+  ],
+  [
+   1150,
+   1.7388
+  ],
+  [
+   1200,
+   1.7429
+  ],
+  [
+   1220,
+   1.7417
+  ]
+ ],
+ "train_seconds": 62.47,
+ "wall_seconds": 71.69,
+ "chars_per_sec": 160109,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, Tim found his smaged things around and help his new sad asking. Ben should play dog. She thought said.\nOne day, the piging the bazk. He loved to in the park was a girl with a lot in the bird sad. They something said. So, Manime. Tim was all learned. The wlite and dragentid dog and happy. It was tr",
+ "rule_init": {}
+}

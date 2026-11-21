@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v28-emb\\nowd_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11151,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.23998
+  ],
+  [
+   100,
+   1.60187
+  ],
+  [
+   200,
+   1.43581
+  ],
+  [
+   300,
+   1.35949
+  ],
+  [
+   400,
+   1.30726
+  ],
+  [
+   500,
+   1.26328
+  ],
+  [
+   600,
+   1.22687
+  ],
+  [
+   700,
+   1.19321
+  ],
+  [
+   800,
+   1.17034
+  ],
+  [
+   900,
+   1.14515
+  ],
+  [
+   1000,
+   1.12764
+  ],
+  [
+   1100,
+   1.11761
+  ],
+  [
+   1160,
+   1.11151
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2386
+  ],
+  [
+   50,
+   8.2043
+  ],
+  [
+   100,
+   6.3352
+  ],
+  [
+   150,
+   5.3765
+  ],
+  [
+   200,
+   4.8905
+  ],
+  [
+   250,
+   4.6142
+  ],
+  [
+   300,
+   4.4284
+  ],
+  [
+   350,
+   4.3078
+  ],
+  [
+   400,
+   4.2332
+  ],
+  [
+   450,
+   4.126
+  ],
+  [
+   500,
+   4.0701
+  ],
+  [
+   550,
+   4.0117
+  ],
+  [
+   600,
+   3.9554
+  ],
+  [
+   650,
+   3.8853
+  ],
+  [
+   700,
+   3.8406
+  ],
+  [
+   750,
+   3.7977
+  ],
+  [
+   800,
+   3.7417
+  ],
+  [
+   850,
+   3.7023
+  ],
+  [
+   900,
+   3.6759
+  ],
+  [
+   950,
+   3.6365
+  ],
+  [
+   1000,
+   3.5961
+  ],
+  [
+   1050,
+   3.566
+  ],
+  [
+   1100,
+   3.5578
+  ],
+  [
+   1150,
+   3.5384
+  ],
+  [
+   1159,
+   3.535
+  ]
+ ],
+ "train_seconds": 79.5,
+ "wall_seconds": 93.52,
+ "chars_per_sec": 119538,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Sally.\nThe little girl took the shipp and said, \"Hi, I can cook us. We have listened to the bushter. They will welcome my field.\"\nThe mark was playing and tired. She said, \"Let's slide, please. It's a chair. We will sit memorrow each other.\" They put the floor together on the hospitine. They all had fun and watch it. They decided to make your favorite bush boats.\nThe mark is not full of people. She did not like the toy even expuped to the birds. The bird told them to make a big dog with Pink. It was not nice for him. They marched the bird and the birds in the stctor.\n\"Hi, Blruggpp! I can share the door.\"\nSue agreed her friend, and the bird attin. They have to bring their bells if they go inside. They all enjoyed to build a tree. They promised you to share and learn their new toys.\nThey all ate the pight. They knew that the park are fun too. They knew they should not wrong.\n",
+ "rule_init": {},
+ "ngram_init": {}
+}

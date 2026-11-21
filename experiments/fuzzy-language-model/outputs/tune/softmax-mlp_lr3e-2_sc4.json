@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/softmax-mlp_lr3e-2_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 19936,
+ "params_nonemb": 16800,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.76278,
+ "evals": [
+  [
+   305,
+   2.12922
+  ],
+  [
+   610,
+   1.94793
+  ],
+  [
+   915,
+   1.81357
+  ],
+  [
+   1220,
+   1.76215
+  ],
+  [
+   1221,
+   1.76278
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.021
+  ],
+  [
+   50,
+   5.3909
+  ],
+  [
+   100,
+   3.9507
+  ],
+  [
+   150,
+   3.1464
+  ],
+  [
+   200,
+   2.6786
+  ],
+  [
+   250,
+   2.4049
+  ],
+  [
+   300,
+   2.2569
+  ],
+  [
+   350,
+   2.1663
+  ],
+  [
+   400,
+   2.0996
+  ],
+  [
+   450,
+   2.0607
+  ],
+  [
+   500,
+   2.0253
+  ],
+  [
+   550,
+   1.9779
+  ],
+  [
+   600,
+   1.954
+  ],
+  [
+   650,
+   1.9364
+  ],
+  [
+   700,
+   1.9188
+  ],
+  [
+   750,
+   1.9035
+  ],
+  [
+   800,
+   1.8792
+  ],
+  [
+   850,
+   1.8656
+  ],
+  [
+   900,
+   1.8488
+  ],
+  [
+   950,
+   1.8317
+  ],
+  [
+   1000,
+   1.8041
+  ],
+  [
+   1050,
+   1.7972
+  ],
+  [
+   1100,
+   1.7854
+  ],
+  [
+   1150,
+   1.7785
+  ],
+  [
+   1200,
+   1.7811
+  ],
+  [
+   1220,
+   1.781
+  ]
+ ],
+ "train_seconds": 186.68,
+ "wall_seconds": 208.28,
+ "chars_per_sec": 53582,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there were house and became to make a way a little little down hear had a park. They it. He saw a big feel saw a mark as the good stumd sight hugged happened. He said, \"Yes, I found a little girl smiled to gets to play, the ground. He plays. The mad saw a sail the scared.\n<|eot|>\n\nLily was very day, the p",
+ "rule_init": {}
+}

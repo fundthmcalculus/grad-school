@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "linear",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.6,
+  "tsk_dim": 0,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-ref-tune\\gla-h8-sc8-lr3e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "linear",
+  "ffn": "mlp",
+  "ffn_mult": 2.6,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93376,
+ "params_nonemb": 44224,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.28171,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.6153
+  ],
+  [
+   192,
+   1.43506
+  ],
+  [
+   288,
+   1.33859
+  ],
+  [
+   384,
+   1.28311
+  ],
+  [
+   387,
+   1.28171
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3906
+  ],
+  [
+   50,
+   8.6612
+  ],
+  [
+   100,
+   6.5829
+  ],
+  [
+   150,
+   5.4844
+  ],
+  [
+   200,
+   4.9304
+  ],
+  [
+   250,
+   4.6098
+  ],
+  [
+   300,
+   4.3798
+  ],
+  [
+   350,
+   4.2179
+  ],
+  [
+   386,
+   4.16
+  ]
+ ],
+ "train_seconds": 34.09,
+ "wall_seconds": 40.44,
+ "chars_per_sec": 92991,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and big bird. The bugquet was happy and shied. They would always go home and became best friends.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. Lily had an idea. She liked to play outside with her friend, a little girl named Lucy. She loved to store her yummy toys. One day, she went to the park with her. She put on the bench and shows her mom.\nThen, her mom said, \"What is a little bike and fike. It is a big, pretty place. It were many toys and shiny?\" Lily asked her mom, \"Yes, my name are maring and hurt!\" Lily said.\nThey walked to the pope and saw a big huge. Mom said, \"I can help you. I will help me with you, but you wish.\" Whisken was bad. She buckared the paremib and said, \"Let's make a bumpet. They all worked it, but it was so happy. They all ran back to the park if they were not fun anymore.\nBut then, something unexpected happened. The baby cat saw you like the other colors. It was not a big tree. It was Tom. The bug having so loudly tower.\nThen, something unexpected happened. It",
+ "rule_init": {},
+ "ngram_init": {}
+}

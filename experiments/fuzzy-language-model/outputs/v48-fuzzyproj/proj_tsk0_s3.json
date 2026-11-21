@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v48-fuzzyproj\\proj_tsk0_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98144,
+ "params_nonemb": 46880,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.19835,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05558
+  ],
+  [
+   100,
+   1.54481
+  ],
+  [
+   200,
+   1.396
+  ],
+  [
+   300,
+   1.35129
+  ],
+  [
+   400,
+   1.30864
+  ],
+  [
+   500,
+   1.27885
+  ],
+  [
+   600,
+   1.25043
+  ],
+  [
+   700,
+   1.2308
+  ],
+  [
+   800,
+   1.21227
+  ],
+  [
+   900,
+   1.20035
+  ],
+  [
+   953,
+   1.19835
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7184
+  ],
+  [
+   50,
+   9.2134
+  ],
+  [
+   100,
+   7.2099
+  ],
+  [
+   150,
+   6.2874
+  ],
+  [
+   200,
+   5.7484
+  ],
+  [
+   250,
+   5.4689
+  ],
+  [
+   300,
+   5.3243
+  ],
+  [
+   350,
+   5.2078
+  ],
+  [
+   400,
+   5.1128
+  ],
+  [
+   450,
+   5.0488
+  ],
+  [
+   500,
+   4.9751
+  ],
+  [
+   550,
+   4.9298
+  ],
+  [
+   600,
+   4.8668
+  ],
+  [
+   650,
+   4.8105
+  ],
+  [
+   700,
+   4.7683
+  ],
+  [
+   750,
+   4.7486
+  ],
+  [
+   800,
+   4.7071
+  ],
+  [
+   850,
+   4.6749
+  ],
+  [
+   900,
+   4.6488
+  ],
+  [
+   950,
+   4.6427
+  ],
+  [
+   952,
+   4.6409
+  ]
+ ],
+ "train_seconds": 71.07,
+ "wall_seconds": 84.76,
+ "chars_per_sec": 109851,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. She had many friends to play with her friends. One day, a little cat named Max went for a walk. He saw a big tree. Sue found a big, red boat.\nLily saw her best friend, the ball went on it. He thought the big blue car on the bippinighon. The little bird was not happy, but he was looking for.\nThe baby saw Tim was only how to go home. He saw a voice. The ball was still important. The rabbit was so happy. Tim said, \"Thank you, Tim! I can help you.\"\nThe moral of the story is that whole place is a good place.\n<|eot|>\nOnce upon a time, there was a small boy named Tom. Bob loved to play in his room. One day, Jane was playing in a tree and had an idea. He was so excited. Tim put the osh and showed it to the yiler and asked, \"It's a nice rock?\"\nThe girl was sad. He thought, \"Hi Anna, nod! It's a cave!\" Suddenly, he found a big red pieces. It was a little girl calledaan. She picked up and said, \"I am scared, I will try.\"\nThe lady walked until they saw that it was a magic ship. They both grabbed the big couch, and Tim had no. She asked his mom if he was not mean and sad",
+ "rule_init": {},
+ "ngram_init": {}
+}

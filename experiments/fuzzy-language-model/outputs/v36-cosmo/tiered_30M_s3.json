@@ -1,0 +1,286 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.25,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v36-cosmo\\tiered_30M_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.25,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98280,
+ "params_nonemb": 56552,
+ "steps": 1414,
+ "chars_seen": 30016616,
+ "chars_per_token": 2.591328,
+ "val_bpc": 1.85771,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.98483
+  ],
+  [
+   100,
+   2.44274
+  ],
+  [
+   200,
+   2.25416
+  ],
+  [
+   300,
+   2.16768
+  ],
+  [
+   400,
+   2.10135
+  ],
+  [
+   500,
+   2.06436
+  ],
+  [
+   600,
+   2.02597
+  ],
+  [
+   700,
+   1.99552
+  ],
+  [
+   800,
+   1.96787
+  ],
+  [
+   900,
+   1.94207
+  ],
+  [
+   1000,
+   1.91762
+  ],
+  [
+   1100,
+   1.89763
+  ],
+  [
+   1200,
+   1.87937
+  ],
+  [
+   1300,
+   1.86666
+  ],
+  [
+   1400,
+   1.86004
+  ],
+  [
+   1414,
+   1.85771
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2704
+  ],
+  [
+   50,
+   8.7213
+  ],
+  [
+   100,
+   7.2978
+  ],
+  [
+   150,
+   6.5447
+  ],
+  [
+   200,
+   6.1244
+  ],
+  [
+   250,
+   5.8785
+  ],
+  [
+   300,
+   5.6794
+  ],
+  [
+   350,
+   5.5873
+  ],
+  [
+   400,
+   5.4963
+  ],
+  [
+   450,
+   5.4458
+  ],
+  [
+   500,
+   5.3684
+  ],
+  [
+   550,
+   5.3157
+  ],
+  [
+   600,
+   5.2589
+  ],
+  [
+   650,
+   5.2088
+  ],
+  [
+   700,
+   5.1758
+  ],
+  [
+   750,
+   5.1409
+  ],
+  [
+   800,
+   5.0976
+  ],
+  [
+   850,
+   5.0889
+  ],
+  [
+   900,
+   5.0459
+  ],
+  [
+   950,
+   5.009
+  ],
+  [
+   1000,
+   4.9841
+  ],
+  [
+   1050,
+   4.9335
+  ],
+  [
+   1100,
+   4.893
+  ],
+  [
+   1150,
+   4.8773
+  ],
+  [
+   1200,
+   4.8545
+  ],
+  [
+   1250,
+   4.8304
+  ],
+  [
+   1300,
+   4.809
+  ],
+  [
+   1350,
+   4.7897
+  ],
+  [
+   1400,
+   4.802
+  ],
+  [
+   1413,
+   4.7922
+  ]
+ ],
+ "train_seconds": 97.85,
+ "wall_seconds": 118.91,
+ "chars_per_sec": 118375,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time.\n\nAs sought cause time from the well with a camp. It shows your returns. If you started, then use play share feelings, and even think in early win to management. What has a unique end but then god business have delightfully have to make mark, life online with human milioes, and cells age of mattage and spiritual connection.\n\nSo truly his life of people a since specific injuries of plates their surelost marketed seen reducing nowders, there were did learning about must breakers. While this, listeners might under activity, won't toing them in the teachings of the foundation behaviors toward the pollammens perspectives. This course unit will field that these challenge preserved the development between the number of prequent to the factors such as massage, and the reliefs.\n\nFor example, let's dive into the importance of Clral",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v22-tribble\\cfls_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.16848,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.01764
+  ],
+  [
+   100,
+   1.61057
+  ],
+  [
+   200,
+   1.46262
+  ],
+  [
+   300,
+   1.39771
+  ],
+  [
+   400,
+   1.3563
+  ],
+  [
+   500,
+   1.31945
+  ],
+  [
+   600,
+   1.28397
+  ],
+  [
+   700,
+   1.24846
+  ],
+  [
+   800,
+   1.22456
+  ],
+  [
+   900,
+   1.20215
+  ],
+  [
+   1000,
+   1.18449
+  ],
+  [
+   1100,
+   1.17315
+  ],
+  [
+   1160,
+   1.16848
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.5227
+  ],
+  [
+   50,
+   7.6868
+  ],
+  [
+   100,
+   6.1572
+  ],
+  [
+   150,
+   5.3672
+  ],
+  [
+   200,
+   4.9376
+  ],
+  [
+   250,
+   4.7201
+  ],
+  [
+   300,
+   4.5744
+  ],
+  [
+   350,
+   4.464
+  ],
+  [
+   400,
+   4.3722
+  ],
+  [
+   450,
+   4.2867
+  ],
+  [
+   500,
+   4.2283
+  ],
+  [
+   550,
+   4.1642
+  ],
+  [
+   600,
+   4.1269
+  ],
+  [
+   650,
+   4.0718
+  ],
+  [
+   700,
+   4.0041
+  ],
+  [
+   750,
+   3.9673
+  ],
+  [
+   800,
+   3.9351
+  ],
+  [
+   850,
+   3.8854
+  ],
+  [
+   900,
+   3.8525
+  ],
+  [
+   950,
+   3.8072
+  ],
+  [
+   1000,
+   3.7823
+  ],
+  [
+   1050,
+   3.758
+  ],
+  [
+   1100,
+   3.7452
+  ],
+  [
+   1150,
+   3.7041
+  ],
+  [
+   1159,
+   3.7057
+  ]
+ ],
+ "train_seconds": 79.38,
+ "wall_seconds": 94.15,
+ "chars_per_sec": 119708,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Ben.\n\"Look, a little girl named Lily. They wanted to go to the park.\nAnna saw a big tree. She saw an idea. \"Sure, Kitty! It is a big, fair!\" Lily said. \"Tom, I am try to play. I am happy.\"\nLily and Tom played on the hole. They played with the pretty rocks. In the sun, they were all hurt at the tree. The bird said, \"My kind is not like me. Youre are fun. If you say, \"That's okay, Tim!\"\nThey laughed and had an idea. They played together and had fun. They liked to play together, and they both played together all day.\n<|eot|>\nOne day, a little girl named Mia went to come with her friend. She was very sad. She had a big, friendly cat named Fin on the yard. She saw a big dog outside on the tiulf. She tried to sit inside the balls. She wanted to play, but she was a big, red ball. She thought one could not belong.\nMia thought for a moment and then said, \"Do you want you to play with?\" Sally said, \"I like it!\" Lily pulled and hugged her friend, another ball. They went outside and showed the ball to her friend",
+ "rule_init": {
+  "variant": "cfls",
+  "L0.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.594
+  },
+  "L1.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.5788
+  }
+ },
+ "ngram_init": {}
+}

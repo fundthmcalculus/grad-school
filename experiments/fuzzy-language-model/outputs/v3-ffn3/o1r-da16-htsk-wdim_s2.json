@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn3\\o1r-da16-htsk-wdim_s2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 87492,
+ "params_nonemb": 81220,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.46791,
+ "evals": [
+  [
+   305,
+   1.91713
+  ],
+  [
+   610,
+   1.67531
+  ],
+  [
+   915,
+   1.54127
+  ],
+  [
+   1220,
+   1.46861
+  ],
+  [
+   1221,
+   1.46791
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.6924
+  ],
+  [
+   50,
+   4.8148
+  ],
+  [
+   100,
+   3.4819
+  ],
+  [
+   150,
+   2.7589
+  ],
+  [
+   200,
+   2.3808
+  ],
+  [
+   250,
+   2.1625
+  ],
+  [
+   300,
+   2.0387
+  ],
+  [
+   350,
+   1.9488
+  ],
+  [
+   400,
+   1.8804
+  ],
+  [
+   450,
+   1.8236
+  ],
+  [
+   500,
+   1.7861
+  ],
+  [
+   550,
+   1.7524
+  ],
+  [
+   600,
+   1.7215
+  ],
+  [
+   650,
+   1.6885
+  ],
+  [
+   700,
+   1.6673
+  ],
+  [
+   750,
+   1.6402
+  ],
+  [
+   800,
+   1.6182
+  ],
+  [
+   850,
+   1.5918
+  ],
+  [
+   900,
+   1.5673
+  ],
+  [
+   950,
+   1.552
+  ],
+  [
+   1000,
+   1.5393
+  ],
+  [
+   1050,
+   1.5114
+  ],
+  [
+   1100,
+   1.4967
+  ],
+  [
+   1150,
+   1.4842
+  ],
+  [
+   1200,
+   1.4775
+  ],
+  [
+   1220,
+   1.4771
+  ]
+ ],
+ "train_seconds": 59.34,
+ "wall_seconds": 71.46,
+ "chars_per_sec": 168564,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Tom. He wanted to close and slipped them. He said, \"Of chole in the sky, a beautiful dog bug needed and sleep home. The bird came best friends and happy and run to the sky. It was so happy on the tree. She wanted to make eat to eat the barrel dad. And they were too str",
+ "rule_init": {}
+}

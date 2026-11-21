@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta_cpboth",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v39-rflm30\\cpboth_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta_cpboth",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98464,
+ "params_nonemb": 49312,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10491,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.27134
+  ],
+  [
+   100,
+   1.57632
+  ],
+  [
+   200,
+   1.41956
+  ],
+  [
+   300,
+   1.34869
+  ],
+  [
+   400,
+   1.29572
+  ],
+  [
+   500,
+   1.25893
+  ],
+  [
+   600,
+   1.2216
+  ],
+  [
+   700,
+   1.19469
+  ],
+  [
+   800,
+   1.16143
+  ],
+  [
+   900,
+   1.14229
+  ],
+  [
+   1000,
+   1.12104
+  ],
+  [
+   1100,
+   1.10881
+  ],
+  [
+   1160,
+   1.10491
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3771
+  ],
+  [
+   50,
+   8.0912
+  ],
+  [
+   100,
+   6.2191
+  ],
+  [
+   150,
+   5.3116
+  ],
+  [
+   200,
+   4.8501
+  ],
+  [
+   250,
+   4.5908
+  ],
+  [
+   300,
+   4.4072
+  ],
+  [
+   350,
+   4.3093
+  ],
+  [
+   400,
+   4.2062
+  ],
+  [
+   450,
+   4.1249
+  ],
+  [
+   500,
+   4.0554
+  ],
+  [
+   550,
+   3.9962
+  ],
+  [
+   600,
+   3.9269
+  ],
+  [
+   650,
+   3.879
+  ],
+  [
+   700,
+   3.8219
+  ],
+  [
+   750,
+   3.7835
+  ],
+  [
+   800,
+   3.7402
+  ],
+  [
+   850,
+   3.7053
+  ],
+  [
+   900,
+   3.6658
+  ],
+  [
+   950,
+   3.6363
+  ],
+  [
+   1000,
+   3.5859
+  ],
+  [
+   1050,
+   3.5557
+  ],
+  [
+   1100,
+   3.5435
+  ],
+  [
+   1150,
+   3.5233
+  ],
+  [
+   1159,
+   3.513
+  ]
+ ],
+ "train_seconds": 80.18,
+ "wall_seconds": 94.19,
+ "chars_per_sec": 118521,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big warm bird. \nThe little boy took the beach and gave her. So, he put the sand first on the woods to come to the farm. So, the pond could see a wrink. The trand started to tell the sand and went away.\nThe pond was so happy. He smiled and Fin played with the sign. Inside the trand, there was a kind boy named Tim. Tim saw something happy. He knew it was a great day. Tra was angry too.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to first and play with her toys. Lily was very happy that she had a good idea.\nOne day, she called out to a big tree with Park. It was very nice and needed the mess. Lily thought it would be fun to read it. She wore her new head and pushed her toylf. She tried to explore the letter, but her bush was scared. It was a big tree to puze.\nThe little girl put her mother, and her best friend was scared. She was very excited to play. She wanted to help her. But her her eyes were pight. Her mom told her about the funny messy, and they were making her m",
+ "rule_init": {},
+ "ngram_init": {}
+}

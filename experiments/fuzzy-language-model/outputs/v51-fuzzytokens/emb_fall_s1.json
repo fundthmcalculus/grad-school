@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.35,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v51-fuzzytokens\\emb_fall_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.35,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99026,
+ "params_nonemb": 47762,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.19081,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.00222
+  ],
+  [
+   100,
+   1.85022
+  ],
+  [
+   200,
+   1.51171
+  ],
+  [
+   300,
+   1.39322
+  ],
+  [
+   400,
+   1.33026
+  ],
+  [
+   500,
+   1.28862
+  ],
+  [
+   600,
+   1.25573
+  ],
+  [
+   700,
+   1.22958
+  ],
+  [
+   800,
+   1.20989
+  ],
+  [
+   900,
+   1.19549
+  ],
+  [
+   953,
+   1.19081
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.5175
+  ],
+  [
+   50,
+   9.974
+  ],
+  [
+   100,
+   8.5046
+  ],
+  [
+   150,
+   7.2455
+  ],
+  [
+   200,
+   6.4455
+  ],
+  [
+   250,
+   5.9438
+  ],
+  [
+   300,
+   5.6261
+  ],
+  [
+   350,
+   5.4139
+  ],
+  [
+   400,
+   5.2739
+  ],
+  [
+   450,
+   5.1746
+  ],
+  [
+   500,
+   5.0698
+  ],
+  [
+   550,
+   4.9833
+  ],
+  [
+   600,
+   4.8928
+  ],
+  [
+   650,
+   4.8365
+  ],
+  [
+   700,
+   4.7797
+  ],
+  [
+   750,
+   4.7367
+  ],
+  [
+   800,
+   4.7027
+  ],
+  [
+   850,
+   4.6721
+  ],
+  [
+   900,
+   4.6293
+  ],
+  [
+   950,
+   4.6092
+  ],
+  [
+   952,
+   4.6103
+  ]
+ ],
+ "train_seconds": 71.62,
+ "wall_seconds": 86.98,
+ "chars_per_sec": 109009,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. Mia was very excited to see the dog, so he picked up a melle, \"Mia, what can show you you.\"\nSo, Sue found a big, red boat. The car saw her and said, \"Don't worry, come into the leaves, a car!\" Tim said. Tom felt sad because she wanted to see a big gift.\nSam thought it was. He went to the park and saw the big tree. The big dog was very scared. The dog said, \"Okay! I found something beautiful!\" Tim felt sad. He said, \"Wow, I am fit to my family!\"\nThen, a whole place. The big man saw the red car. The bird thought the big red animal was favorite. Bob opened it and noticed that the book was fit. The bird looked at the tree and saw the big, selfish prince. The dog took the smile and ran to the shiny box. Tim and his mom helped the bird swaat. They all played together every day.\n<|eot|>\n\n\nLily was very hungry with her friend and dad. They had a big stick with a new doll in the air. They had a bad moment. It looked inside and saw a little bird on the branch. It was a big noise to sail and make spveing water. Lily felt so happy that she could not wait to the park.\nAnna and Tood looked around to see the light. They all had",
+ "rule_init": {},
+ "ngram_init": {}
+}

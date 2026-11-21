@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v45-fuzzystage\\fnorm_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98628,
+ "params_nonemb": 47364,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.05756,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06189
+  ],
+  [
+   100,
+   1.39187
+  ],
+  [
+   200,
+   1.27307
+  ],
+  [
+   300,
+   1.21531
+  ],
+  [
+   400,
+   1.17811
+  ],
+  [
+   500,
+   1.14604
+  ],
+  [
+   600,
+   1.1167
+  ],
+  [
+   700,
+   1.09295
+  ],
+  [
+   800,
+   1.07321
+  ],
+  [
+   900,
+   1.06094
+  ],
+  [
+   953,
+   1.05756
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7354
+  ],
+  [
+   50,
+   9.0241
+  ],
+  [
+   100,
+   6.8497
+  ],
+  [
+   150,
+   5.7796
+  ],
+  [
+   200,
+   5.2681
+  ],
+  [
+   250,
+   4.9937
+  ],
+  [
+   300,
+   4.8317
+  ],
+  [
+   350,
+   4.7423
+  ],
+  [
+   400,
+   4.6461
+  ],
+  [
+   450,
+   4.5511
+  ],
+  [
+   500,
+   4.4873
+  ],
+  [
+   550,
+   4.4135
+  ],
+  [
+   600,
+   4.3397
+  ],
+  [
+   650,
+   4.3018
+  ],
+  [
+   700,
+   4.2536
+  ],
+  [
+   750,
+   4.2281
+  ],
+  [
+   800,
+   4.1749
+  ],
+  [
+   850,
+   4.1432
+  ],
+  [
+   900,
+   4.1266
+  ],
+  [
+   950,
+   4.1075
+  ],
+  [
+   952,
+   4.1093
+  ]
+ ],
+ "train_seconds": 78.64,
+ "wall_seconds": 90.78,
+ "chars_per_sec": 99275,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was very upset to play with her friends. She was very happy to see a little bird.\nOne day, Lucy saw a big, round cat with a green dog. The dog was very happy and loved to play. So, it could not find the big dog. Lucy found a big, red cat on the swings. The cat was very happy to have the cat to eat.\nLucy's friend, Tom, came to the park. \"You are so small. You are important not a red cat! Is are very dangerous.\" Sue said, \"I am a cat. Now, let's play with your ball.\" Sue and Tom laughed and played together. They learned that being nice to each other.\n<|eot|>\n\nOnce upon a time there was anvectobobon. As the little girl was going to sing off the table, he was curious. Every day, she would stretch to all of things and???t together to be there. \nOne sunny day, one day, a little girl called Daisy, ???Yes, you will be important to let it feel better?\"\nDadny said, \"That sounds to come stay fast and look at your hands! You did not like you hiding through the ground!\"\nWobanoed, it stepped in a big branch and they were having fun. Then they still asked a newin. Tash asked her to help, but she gave all the",
+ "rule_init": {},
+ "ngram_init": {}
+}

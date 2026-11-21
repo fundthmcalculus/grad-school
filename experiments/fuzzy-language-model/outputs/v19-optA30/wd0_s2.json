@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.0,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-optA30\\wd0_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11248,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.35262
+  ],
+  [
+   580,
+   1.23474
+  ],
+  [
+   870,
+   1.14902
+  ],
+  [
+   1160,
+   1.11248
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2981
+  ],
+  [
+   50,
+   8.0875
+  ],
+  [
+   100,
+   6.2401
+  ],
+  [
+   150,
+   5.3272
+  ],
+  [
+   200,
+   4.842
+  ],
+  [
+   250,
+   4.5948
+  ],
+  [
+   300,
+   4.4337
+  ],
+  [
+   350,
+   4.3095
+  ],
+  [
+   400,
+   4.212
+  ],
+  [
+   450,
+   4.1275
+  ],
+  [
+   500,
+   4.0711
+  ],
+  [
+   550,
+   3.9955
+  ],
+  [
+   600,
+   3.9532
+  ],
+  [
+   650,
+   3.8952
+  ],
+  [
+   700,
+   3.8319
+  ],
+  [
+   750,
+   3.7849
+  ],
+  [
+   800,
+   3.7513
+  ],
+  [
+   850,
+   3.7091
+  ],
+  [
+   900,
+   3.674
+  ],
+  [
+   950,
+   3.6337
+  ],
+  [
+   1000,
+   3.6106
+  ],
+  [
+   1050,
+   3.585
+  ],
+  [
+   1100,
+   3.5686
+  ],
+  [
+   1150,
+   3.533
+  ],
+  [
+   1159,
+   3.5351
+  ]
+ ],
+ "train_seconds": 85.42,
+ "wall_seconds": 97.2,
+ "chars_per_sec": 111251,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Mia. Mia loved to play with her friends. One day, Mia and her mom looked at the park to play with.\nMia was excited to play with her home. She decided Kitty, \"Mia, come back!\" Her friend agreed. Lucy was very happy and said, \"Let's slide, please have glisplay you can't be more suppy.\" Lucy was sad. She said, \"Mia, mom. I am scared. I will let some bibble and set. If you make your new place for you?\"\nMia said, \"I am the new toy car through the bag. That was even explaces and can do how it can play in the park.\" Mia hugged her and said, \"Thank you, Mia. I need to be might, I can be the toys!\" Mia smiled and hugged Mia. They never saw the toy. They had a big hug and sat on the door. Mia and her mom were happy to see her mother.\n<|eot|>\nOnce upon a time, in a small town, there was a little boy named Tim. Tim loved to play with his friends. One day, Tim went for a walk. He wanted to jour. But he was too small and sad. Tom said, \"I grow, bird!\" Sam was scared anymore.\nTim decided to play with",
+ "rule_init": {},
+ "ngram_init": {}
+}

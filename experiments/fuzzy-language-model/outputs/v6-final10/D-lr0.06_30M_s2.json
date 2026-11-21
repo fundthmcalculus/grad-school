@@ -1,0 +1,207 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-final10\\D-lr0.06_30M_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93344,
+ "params_nonemb": 44192,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.13446,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.37218
+  ],
+  [
+   580,
+   1.24484
+  ],
+  [
+   870,
+   1.1694
+  ],
+  [
+   1160,
+   1.13446
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3151
+  ],
+  [
+   50,
+   8.1258
+  ],
+  [
+   100,
+   6.2333
+  ],
+  [
+   150,
+   5.3242
+  ],
+  [
+   200,
+   4.8431
+  ],
+  [
+   250,
+   4.5772
+  ],
+  [
+   300,
+   4.4297
+  ],
+  [
+   350,
+   4.31
+  ],
+  [
+   400,
+   4.2334
+  ],
+  [
+   450,
+   4.1601
+  ],
+  [
+   500,
+   4.1042
+  ],
+  [
+   550,
+   4.0391
+  ],
+  [
+   600,
+   3.9731
+  ],
+  [
+   650,
+   3.9147
+  ],
+  [
+   700,
+   3.8798
+  ],
+  [
+   750,
+   3.8229
+  ],
+  [
+   800,
+   3.7837
+  ],
+  [
+   850,
+   3.7547
+  ],
+  [
+   900,
+   3.7173
+  ],
+  [
+   950,
+   3.6923
+  ],
+  [
+   1000,
+   3.6574
+  ],
+  [
+   1050,
+   3.6484
+  ],
+  [
+   1100,
+   3.6332
+  ],
+  [
+   1150,
+   3.6192
+  ],
+  [
+   1159,
+   3.6102
+  ]
+ ],
+ "train_seconds": 220.33,
+ "wall_seconds": 232.99,
+ "chars_per_sec": 43129,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Lucy. Mia loved to play with her special path. One day she was going to school day.\nSuddenly, she found an old man. The girl was beautiful and close her first fair. The old man was very tired. She knew she could not talk to him. She could not hear the cup.\nThe old man was not happy that she was clevered anymore. She thanked the old man and said, \"I love a little like a bush and make a wheel. Do you want to see it?\" But she did not get the old man.\nMia saw a bit. She was not scared to make them use good. It thought that it could know what was only. She said, \"I can't count it like the mist, I can see the man!\" \nThe man and Blue bought the else in the park again. From that day on, Min and Dolly became best friends, and they lived happily ever after.\n<|eot|>\nOnce upon a time, in a small town, there was a little girl named Mefion. Me was very excited. She would pick many jears in her house and sun went outside. One day, she went to the town with her friends. The doll was mighty.",
+ "rule_init": {},
+ "ngram_init": {}
+}

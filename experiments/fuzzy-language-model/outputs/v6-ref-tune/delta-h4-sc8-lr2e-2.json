@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 4,
+  "rules": 16,
+  "ffn_mult": 2.6,
+  "tsk_dim": 0,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.02,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-ref-tune\\delta-h4-sc8-lr2e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 4,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.6,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93376,
+ "params_nonemb": 44224,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.2895,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.65049
+  ],
+  [
+   192,
+   1.44501
+  ],
+  [
+   288,
+   1.34457
+  ],
+  [
+   384,
+   1.28996
+  ],
+  [
+   387,
+   1.2895
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3998
+  ],
+  [
+   50,
+   8.7123
+  ],
+  [
+   100,
+   6.6981
+  ],
+  [
+   150,
+   5.568
+  ],
+  [
+   200,
+   4.988
+  ],
+  [
+   250,
+   4.6469
+  ],
+  [
+   300,
+   4.407
+  ],
+  [
+   350,
+   4.2401
+  ],
+  [
+   386,
+   4.1807
+  ]
+ ],
+ "train_seconds": 36.04,
+ "wall_seconds": 44.6,
+ "chars_per_sec": 87972,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Suisorquuring. She loved to hungry. One day, she found a big first on the slide. It was a terrilly beautiful. But then, a little boy named Tim went to the park. He saw a big ball. The bird wanted to play with his friends.\nOne day, Lily was curious. He saw a big tree in the sun. The sun was hurt his mom and dad, and she saw something hit her. In the park, and they found a friendly girl named Lily. She loved to play with her mom and dad. Every day, the cool car thit saw a berrianutlage. It was a big cannot to go in the park.\nStle replied, \"Help, I like the monstle. Let's Wake have on your toys?\"\nAfter the sprowled for a moment and said, \"You can't play with my toys!\" Max was playing in the stable to see what was. The sun was very happy. The conforteet and saved her friend, a boy named Tim. Tom was very happy.\nTim gave the cat in the tree and his dad said, \"Wen food,\" said the leal, towetly, uncomy. Jack started",
+ "rule_init": {},
+ "ngram_init": {}
+}

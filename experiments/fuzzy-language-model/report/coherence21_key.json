@@ -1,0 +1,194 @@
+{
+ "S001": {
+  "model": "v3072h384e12_1000M_s1",
+  "params": 98528,
+  "prompt": "The little dog was sad because",
+  "seed": 88
+ },
+ "S002": {
+  "model": "e2e_tail_1000M_s0",
+  "params": 99019,
+  "prompt": "Once upon a time",
+  "seed": 89
+ },
+ "S003": {
+  "model": "v3072h384e12_1000M_s0",
+  "params": 98528,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 89
+ },
+ "S004": {
+  "model": "e2e_tail_1000M_s0",
+  "params": 99019,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 88
+ },
+ "S005": {
+  "model": "v3072h384e12_1000M_s1",
+  "params": 98528,
+  "prompt": "The little dog was sad because",
+  "seed": 89
+ },
+ "S006": {
+  "model": "e2e_tail_1000M_s1",
+  "params": 99019,
+  "prompt": "The little dog was sad because",
+  "seed": 89
+ },
+ "S007": {
+  "model": "e2e_tail_1000M_s1",
+  "params": 99019,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 89
+ },
+ "S008": {
+  "model": "v3072h384e12_1000M_s0",
+  "params": 98528,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 88
+ },
+ "S009": {
+  "model": "e2e_tail_1000M_s1",
+  "params": 99019,
+  "prompt": "Once upon a time",
+  "seed": 88
+ },
+ "S010": {
+  "model": "e2e_tail_1000M_s0",
+  "params": 99019,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 88
+ },
+ "S011": {
+  "model": "e2e_tail_1000M_s0",
+  "params": 99019,
+  "prompt": "Once upon a time",
+  "seed": 88
+ },
+ "S012": {
+  "model": "e2e_tail_1000M_s0",
+  "params": 99019,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 89
+ },
+ "S013": {
+  "model": "v3072h384e12_1000M_s0",
+  "params": 98528,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 89
+ },
+ "S014": {
+  "model": "v3072h384e12_1000M_s1",
+  "params": 98528,
+  "prompt": "Once upon a time",
+  "seed": 88
+ },
+ "S015": {
+  "model": "v3072h384e12_1000M_s0",
+  "params": 98528,
+  "prompt": "The little dog was sad because",
+  "seed": 89
+ },
+ "S016": {
+  "model": "e2e_tail_1000M_s0",
+  "params": 99019,
+  "prompt": "The little dog was sad because",
+  "seed": 89
+ },
+ "S017": {
+  "model": "v3072h384e12_1000M_s1",
+  "params": 98528,
+  "prompt": "Once upon a time",
+  "seed": 89
+ },
+ "S018": {
+  "model": "v3072h384e12_1000M_s1",
+  "params": 98528,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 89
+ },
+ "S019": {
+  "model": "e2e_tail_1000M_s1",
+  "params": 99019,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 88
+ },
+ "S020": {
+  "model": "v3072h384e12_1000M_s0",
+  "params": 98528,
+  "prompt": "Once upon a time",
+  "seed": 88
+ },
+ "S021": {
+  "model": "v3072h384e12_1000M_s1",
+  "params": 98528,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 88
+ },
+ "S022": {
+  "model": "v3072h384e12_1000M_s0",
+  "params": 98528,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 88
+ },
+ "S023": {
+  "model": "e2e_tail_1000M_s0",
+  "params": 99019,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 89
+ },
+ "S024": {
+  "model": "e2e_tail_1000M_s1",
+  "params": 99019,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 89
+ },
+ "S025": {
+  "model": "v3072h384e12_1000M_s0",
+  "params": 98528,
+  "prompt": "Once upon a time",
+  "seed": 89
+ },
+ "S026": {
+  "model": "e2e_tail_1000M_s1",
+  "params": 99019,
+  "prompt": "Lily and Ben went to the park.",
+  "seed": 88
+ },
+ "S027": {
+  "model": "e2e_tail_1000M_s1",
+  "params": 99019,
+  "prompt": "Once upon a time",
+  "seed": 89
+ },
+ "S028": {
+  "model": "v3072h384e12_1000M_s1",
+  "params": 98528,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 89
+ },
+ "S029": {
+  "model": "e2e_tail_1000M_s0",
+  "params": 99019,
+  "prompt": "The little dog was sad because",
+  "seed": 88
+ },
+ "S030": {
+  "model": "e2e_tail_1000M_s1",
+  "params": 99019,
+  "prompt": "The little dog was sad because",
+  "seed": 88
+ },
+ "S031": {
+  "model": "v3072h384e12_1000M_s1",
+  "params": 98528,
+  "prompt": "One day, a girl named Mia found",
+  "seed": 88
+ },
+ "S032": {
+  "model": "v3072h384e12_1000M_s0",
+  "params": 98528,
+  "prompt": "The little dog was sad because",
+  "seed": 88
+ }
+}

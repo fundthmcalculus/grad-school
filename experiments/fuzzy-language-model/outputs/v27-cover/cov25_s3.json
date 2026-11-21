@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v27-cover\\cov25_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.13522,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.29475
+  ],
+  [
+   100,
+   1.59588
+  ],
+  [
+   200,
+   1.44256
+  ],
+  [
+   300,
+   1.36567
+  ],
+  [
+   400,
+   1.32134
+  ],
+  [
+   500,
+   1.28494
+  ],
+  [
+   600,
+   1.25072
+  ],
+  [
+   700,
+   1.22121
+  ],
+  [
+   800,
+   1.19048
+  ],
+  [
+   900,
+   1.16681
+  ],
+  [
+   1000,
+   1.15155
+  ],
+  [
+   1100,
+   1.13997
+  ],
+  [
+   1160,
+   1.13522
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.4159
+  ],
+  [
+   50,
+   8.244
+  ],
+  [
+   100,
+   6.3347
+  ],
+  [
+   150,
+   5.3878
+  ],
+  [
+   200,
+   4.9151
+  ],
+  [
+   250,
+   4.6628
+  ],
+  [
+   300,
+   4.4725
+  ],
+  [
+   350,
+   4.3651
+  ],
+  [
+   400,
+   4.2726
+  ],
+  [
+   450,
+   4.1919
+  ],
+  [
+   500,
+   4.1243
+  ],
+  [
+   550,
+   4.066
+  ],
+  [
+   600,
+   4.0027
+  ],
+  [
+   650,
+   3.955
+  ],
+  [
+   700,
+   3.9052
+  ],
+  [
+   750,
+   3.8696
+  ],
+  [
+   800,
+   3.8306
+  ],
+  [
+   850,
+   3.7892
+  ],
+  [
+   900,
+   3.7498
+  ],
+  [
+   950,
+   3.7225
+  ],
+  [
+   1000,
+   3.6848
+  ],
+  [
+   1050,
+   3.6583
+  ],
+  [
+   1100,
+   3.6458
+  ],
+  [
+   1150,
+   3.6169
+  ],
+  [
+   1159,
+   3.6094
+  ]
+ ],
+ "train_seconds": 79.33,
+ "wall_seconds": 93.7,
+ "chars_per_sec": 119791,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big warm bird. The bug was not small that it was a little bird. The bug was very fast and strong.\nOne day, the bird saw a big tree. The bird wanted to see the tree! It was a big tree and stuiting. The bird was sad. The bird said, \"Let's slide, he is very glad. Can I do it?\"\nThe bird said, \"Yes, but be careful. But you can play with my red ball.\" The bird said, \"I am Sue and kind and make a other people too. You should not find it.\"\nAnna said, \"I am the angel thing!\" The bird did not like the bird. The bird started to fly high and spiches. The bird and the bird were happy. They became best friends and played together.\n<|eot|>\nOnce upon a time, there was a friendly man named Tim. Tim loved to play outside. One day, Tim and his friends had to get the park.\nAnside the park, a plan happened. The big bird saw it was a big, red box. Tim came to the dog and said, \"Hadue, you can find my toys. It's hurt the box.\"\nTim said, \"I must be careful now!\" Sam said, pulling food and having fun. The dog would not perfect the big red ball",
+ "rule_init": {
+  "variant": "cov25",
+  "L0.ffn": {
+   "gain": 0.25,
+   "ce_nats": 7.2549
+  },
+  "L1.ffn": {
+   "gain": 1.0,
+   "ce_nats": 7.2251
+  }
+ },
+ "ngram_init": {}
+}

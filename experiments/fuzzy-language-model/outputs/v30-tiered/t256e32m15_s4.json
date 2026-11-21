@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t256e32m15_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 85664,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.13399,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.22276
+  ],
+  [
+   100,
+   1.62703
+  ],
+  [
+   200,
+   1.46286
+  ],
+  [
+   300,
+   1.39201
+  ],
+  [
+   400,
+   1.34642
+  ],
+  [
+   500,
+   1.30703
+  ],
+  [
+   600,
+   1.26566
+  ],
+  [
+   700,
+   1.22667
+  ],
+  [
+   800,
+   1.19967
+  ],
+  [
+   900,
+   1.17371
+  ],
+  [
+   1000,
+   1.15209
+  ],
+  [
+   1100,
+   1.13773
+  ],
+  [
+   1160,
+   1.13399
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2065
+  ],
+  [
+   50,
+   8.1478
+  ],
+  [
+   100,
+   6.3599
+  ],
+  [
+   150,
+   5.4732
+  ],
+  [
+   200,
+   4.9774
+  ],
+  [
+   250,
+   4.7204
+  ],
+  [
+   300,
+   4.5373
+  ],
+  [
+   350,
+   4.4288
+  ],
+  [
+   400,
+   4.3194
+  ],
+  [
+   450,
+   4.2589
+  ],
+  [
+   500,
+   4.1918
+  ],
+  [
+   550,
+   4.1335
+  ],
+  [
+   600,
+   4.0547
+  ],
+  [
+   650,
+   3.998
+  ],
+  [
+   700,
+   3.9507
+  ],
+  [
+   750,
+   3.9014
+  ],
+  [
+   800,
+   3.8458
+  ],
+  [
+   850,
+   3.788
+  ],
+  [
+   900,
+   3.7502
+  ],
+  [
+   950,
+   3.7231
+  ],
+  [
+   1000,
+   3.6822
+  ],
+  [
+   1050,
+   3.6418
+  ],
+  [
+   1100,
+   3.6285
+  ],
+  [
+   1150,
+   3.6063
+  ],
+  [
+   1159,
+   3.6079
+  ]
+ ],
+ "train_seconds": 81.34,
+ "wall_seconds": 95.6,
+ "chars_per_sec": 116833,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Alice. She had a big vaia. She would always go to hop and play. She would play outside and pushed the chair. She was beautiful and excited and loved to go.\nOne day, she saw a small table. The hot went to the hot monded on the glroke up. She picked it up the ground and it saved up. The cloud then, it started to move. The bird hit up the slide and the slide sound.\nHis mom said, \"Sue! I will well?\" The wind said, \"Don't worry, you can take start.\" But then, a little girl named \nThe benight little girl was happy to be very worried. She put it back to the lady, so she started to talk. She learned that that on it is bad.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to make a busht managring playing with her toys. One day, she wanted to play with her toys in her room. But one day, she could not find her path car. Her mom was very happy.\nLily said, \"Okay, you're dress you who. Let's play with the toys towet with us.\" The gone decided to make her",
+ "rule_init": {},
+ "ngram_init": {}
+}

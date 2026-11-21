@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v25-rep\\unlikelihood_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11363,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.23998
+  ],
+  [
+   100,
+   1.59985
+  ],
+  [
+   200,
+   1.44003
+  ],
+  [
+   300,
+   1.36095
+  ],
+  [
+   400,
+   1.3143
+  ],
+  [
+   500,
+   1.26787
+  ],
+  [
+   600,
+   1.22751
+  ],
+  [
+   700,
+   1.19523
+  ],
+  [
+   800,
+   1.16771
+  ],
+  [
+   900,
+   1.14821
+  ],
+  [
+   1000,
+   1.12939
+  ],
+  [
+   1100,
+   1.118
+  ],
+  [
+   1160,
+   1.11363
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2595
+  ],
+  [
+   50,
+   8.2568
+  ],
+  [
+   100,
+   6.4151
+  ],
+  [
+   150,
+   5.4749
+  ],
+  [
+   200,
+   5.0051
+  ],
+  [
+   250,
+   4.7382
+  ],
+  [
+   300,
+   4.5539
+  ],
+  [
+   350,
+   4.4361
+  ],
+  [
+   400,
+   4.3579
+  ],
+  [
+   450,
+   4.2504
+  ],
+  [
+   500,
+   4.189
+  ],
+  [
+   550,
+   4.1329
+  ],
+  [
+   600,
+   4.0764
+  ],
+  [
+   650,
+   3.9991
+  ],
+  [
+   700,
+   3.9591
+  ],
+  [
+   750,
+   3.9144
+  ],
+  [
+   800,
+   3.858
+  ],
+  [
+   850,
+   3.8172
+  ],
+  [
+   900,
+   3.7898
+  ],
+  [
+   950,
+   3.7452
+  ],
+  [
+   1000,
+   3.7104
+  ],
+  [
+   1050,
+   3.6826
+  ],
+  [
+   1100,
+   3.672
+  ],
+  [
+   1150,
+   3.6532
+  ],
+  [
+   1159,
+   3.6504
+  ]
+ ],
+ "train_seconds": 82.22,
+ "wall_seconds": 96.4,
+ "chars_per_sec": 115574,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big dog named Max. Max loved to crawling things at her house.\nOne day, Max saw something first on the tree. He wanted to help the ball. So, Kitty and Spot walked to the park to play. They tried to climb and higher. But, a big tree! Max slided higher. The tree was so happy and played with the ball all day.\nMax tried to be friends with his mom. He saw a red ball in a tree. The ball had an idea and fell down. Max was too fast and very happy. Max said, \"No, Max is a special place. Some thank you if you go to play with me!\" Barrel and Sam played with the ball all day long. They laughed and hugged him. They played together with the ball now.\n<|eot|>\n\nMax monstless was very nice and happy. He hugged and said, \"Yes, I is outside that's not safe again. We can share it.\"\nSam agreed her home, and he resticed about his favorite beha in his face. They had mad, and her friends could not play with. They promised to keep a snow. They all lived happily in the sun, and Tom.\nAt the park, Tom towards him to be a small milr.",
+ "rule_init": {},
+ "ngram_init": {}
+}

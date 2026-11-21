@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t512e24m20_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 91472,
+ "params_nonemb": 53456,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.12395,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.24069
+  ],
+  [
+   100,
+   1.60697
+  ],
+  [
+   200,
+   1.44928
+  ],
+  [
+   300,
+   1.37645
+  ],
+  [
+   400,
+   1.32795
+  ],
+  [
+   500,
+   1.28602
+  ],
+  [
+   600,
+   1.24949
+  ],
+  [
+   700,
+   1.21805
+  ],
+  [
+   800,
+   1.18617
+  ],
+  [
+   900,
+   1.16308
+  ],
+  [
+   1000,
+   1.1407
+  ],
+  [
+   1100,
+   1.12926
+  ],
+  [
+   1160,
+   1.12395
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2448
+  ],
+  [
+   50,
+   8.1157
+  ],
+  [
+   100,
+   6.2981
+  ],
+  [
+   150,
+   5.392
+  ],
+  [
+   200,
+   4.9419
+  ],
+  [
+   250,
+   4.684
+  ],
+  [
+   300,
+   4.4961
+  ],
+  [
+   350,
+   4.3965
+  ],
+  [
+   400,
+   4.2948
+  ],
+  [
+   450,
+   4.2106
+  ],
+  [
+   500,
+   4.1336
+  ],
+  [
+   550,
+   4.0798
+  ],
+  [
+   600,
+   4.0079
+  ],
+  [
+   650,
+   3.9588
+  ],
+  [
+   700,
+   3.8967
+  ],
+  [
+   750,
+   3.8547
+  ],
+  [
+   800,
+   3.8082
+  ],
+  [
+   850,
+   3.7736
+  ],
+  [
+   900,
+   3.7279
+  ],
+  [
+   950,
+   3.7007
+  ],
+  [
+   1000,
+   3.648
+  ],
+  [
+   1050,
+   3.6157
+  ],
+  [
+   1100,
+   3.6025
+  ],
+  [
+   1150,
+   3.5828
+  ],
+  [
+   1159,
+   3.5739
+  ]
+ ],
+ "train_seconds": 80.85,
+ "wall_seconds": 95.46,
+ "chars_per_sec": 117530,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy. She loved to meet a special shiver. One day she was going to her room. She would play with her pize on the mole. She was beautiful and blooming.\nWhile they mashed, they saw a polail box. The girl said, \"Look, Lucy, that is more origer. Do you can behind my show?\" She said, \"Yes, it's a shell!\"\nHer mom said, \"Yes, Lily. I will listen to my mom. I'm sorry. If help we come and get a special surround. We need to play with her. But you should have extra fair can do again.\" Lucy said, \"Hello, Lucy. I am so loud. I'm happy for you. Let's play with you.\"\nFrom that day on, Lucy and Lucy never bucket some building together. They were very happy. They learned that sharing is better than you now green.\n<|eot|>\nOnce upon a time, in a small room, there was a little boy named Tim. Tim loved to play with his toys. One day, Tim went for a walk. He wanted to join the pictures. Sam said, \"Hello,\" Sam said. \"I found a big perfect ball!\" Sam looked",
+ "rule_init": {},
+ "ngram_init": {}
+}

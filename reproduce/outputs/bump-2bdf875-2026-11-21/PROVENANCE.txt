@@ -1,0 +1,23 @@
+tribble-fis pin bump 31e8ae9 -> 2bdf875: the affected generators, one at a time, ten seeds each.
+NOT a whole-document sweep. Produced 2026-11-21. Wall-clock: see STATUS.txt.
+
+preflight --suite fis: 6 passed, 0 skipped (preflight.txt), captured right after the run at the same pin.
+
+tribble-fis: 2bdf8750d4ef399f330bd08356845720598cf935
+tribble-cluster: 20264b3b5bf1851285794eb33acfb4506a87ae2e
+tribble-opt: c21d543f1b4458ff59b181365af38c1e17dd716b
+grad-school: HEAD was c823d790ca9ec3b22dce950232bfbbb922c6837d (pin committed as WIP before the run finished; no generator changed)
+imported: tribble-fis editable; optimizers c21d543f1b4458ff59b181365af38c1e17dd716b;
+          tribble-clustering not installed in the tribble-fis environment.
+kernel: NumPy (compiled kernel not built in this environment)
+
+seeds: 0,1,2,3,4,5,6,7,8,9 (every table)
+tables: 6.1, G.5, A.1/A.2, 4.1 (+4.1b timing), A.7, 4.1c (sweep, comparison, cost, per-run CSV)
+RT-IOT2022: absent from data/, so its rows are N/A in 4.1 and unchecked.
+
+machine: Linux 6.18.44-fc-v726, Intel(R) Xeon(R) Processor @ 2.10GHz, 4 logical cores, 15.7 GiB
+TIMINGS ARE FROM THIS HOST, NOT THE RUN-OF-RECORD i9-14900HX: ratios transfer, seconds do not.
+ANFIS is not deterministic run to run, so its cells are a sample.
+
+Logs are not kept (the ranking printouts run to hundreds of KB); table_4_1c_topn_runs.csv is the
+complete per-fit record for 4.1c.

@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 3,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\b3_smallemb_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 3,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98382,
+ "params_nonemb": 55022,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.14993,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.09492
+  ],
+  [
+   100,
+   1.57637
+  ],
+  [
+   200,
+   1.38556
+  ],
+  [
+   300,
+   1.30863
+  ],
+  [
+   400,
+   1.2705
+  ],
+  [
+   500,
+   1.23862
+  ],
+  [
+   600,
+   1.20685
+  ],
+  [
+   700,
+   1.184
+  ],
+  [
+   800,
+   1.1658
+  ],
+  [
+   900,
+   1.1545
+  ],
+  [
+   953,
+   1.14993
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.8831
+  ],
+  [
+   50,
+   9.5784
+  ],
+  [
+   100,
+   7.5678
+  ],
+  [
+   150,
+   6.3858
+  ],
+  [
+   200,
+   5.7604
+  ],
+  [
+   250,
+   5.4221
+  ],
+  [
+   300,
+   5.2238
+  ],
+  [
+   350,
+   5.103
+  ],
+  [
+   400,
+   4.9995
+  ],
+  [
+   450,
+   4.905
+  ],
+  [
+   500,
+   4.8312
+  ],
+  [
+   550,
+   4.7544
+  ],
+  [
+   600,
+   4.6804
+  ],
+  [
+   650,
+   4.6481
+  ],
+  [
+   700,
+   4.6028
+  ],
+  [
+   750,
+   4.5722
+  ],
+  [
+   800,
+   4.5183
+  ],
+  [
+   850,
+   4.4839
+  ],
+  [
+   900,
+   4.477
+  ],
+  [
+   950,
+   4.4579
+  ],
+  [
+   952,
+   4.4591
+  ]
+ ],
+ "train_seconds": 111.88,
+ "wall_seconds": 127.1,
+ "chars_per_sec": 69779,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was very excited to play with her mom. One day, a little girl named Amy was playing with her friend, a little girl named Lily. Lucy was very happy and wanted to play with her friends.\nOne sunny day, Lily saw a small cat on the ground. She saw a big, brave cat worked not. \"Hello, Lily! I want to play with my ball. There is a sun who is my tower.\" Lily felt lucky and scared. She wanted to help her mom for her.\nLily said, \"Hi, I will do it!\" The cat felt sad, but she could not find it. She put the flower on the lock and picked it. She didn't know what to do. She looked gone for it and noticed a little bird. The bird was sad.\nLily said, \"Please, Lily! I am Sam. I'm sorry, I don't know. I can help you. I am hungry.\" Her mom said, \"Yes, we can move. We will never help you.\"\nBut the cat was very sad and felt sad. Two did not listen. He thought about it with his moment. But then, something unexpected happened. The bird started to fly away from the big bird. Lily laughed and remembered it was blue and not happy.\n<|eot|>\nOne day, a little girl named Lily went to the park. She saw a big tree and wanted to make a big",
+ "rule_init": {},
+ "ngram_init": {}
+}

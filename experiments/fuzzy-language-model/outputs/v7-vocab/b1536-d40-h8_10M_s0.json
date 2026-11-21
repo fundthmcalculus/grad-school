@@ -1,0 +1,143 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 40,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v7-vocab\\b1536-d40-h8_10M_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1536",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1536
+ },
+ "config": {
+  "vocab_size": 1536,
+  "d_model": 40,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93792,
+ "params_nonemb": 32352,
+ "steps": 351,
+ "chars_seen": 10013938,
+ "chars_per_token": 3.4826342,
+ "val_bpc": 1.23672,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   87,
+   1.55299
+  ],
+  [
+   174,
+   1.36725
+  ],
+  [
+   261,
+   1.28352
+  ],
+  [
+   348,
+   1.2372
+  ],
+  [
+   351,
+   1.23672
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.868
+  ],
+  [
+   50,
+   9.0706
+  ],
+  [
+   100,
+   6.8623
+  ],
+  [
+   150,
+   5.6994
+  ],
+  [
+   200,
+   5.0836
+  ],
+  [
+   250,
+   4.7644
+  ],
+  [
+   300,
+   4.5522
+  ],
+  [
+   350,
+   4.4261
+  ]
+ ],
+ "train_seconds": 71.4,
+ "wall_seconds": 84.77,
+ "chars_per_sec": 40269,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little boy named Kitty. Sue was very sad. She took a big hill and pulled, he laughed.\n\"Yes, but we can keep the ball!\" asked her mom. So, she put a magic box block in the bus. \"Yes, I can't wrong?\"\nAt pillally, Sally saw that she was playing a game. Sue stopped and gave them a bigerry shirt. Sally picked up the box, and saw her mom named Sam's mom. Sue was excited to go home. Sue didn't know what to do. She thought that the class the box was a great on the table.\nTim nodded and opened the box, but he was too scared. The box was very glad, Sue shouted, \"I knew it is to field, but I don't have to bark. I just like a cookielip. I don't have to wait to play toward too!\" Sue said, \"Thank you for our game!\" Tim and Sam were happy to play with each other and played together.\n<|eot|>\nOnce upon a time, there was a chocondarful cat named Tim. Tim loved to play all day long singing and liked to play with her friends. One day, Tim saw a big red ball playing for a place. He wanted to watch a big carrged his ball very much.\nTim went to the park and tried to eat it. He wanted to play",
+ "rule_init": {},
+ "ngram_init": {}
+}

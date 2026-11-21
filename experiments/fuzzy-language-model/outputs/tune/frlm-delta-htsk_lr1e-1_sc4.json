@@ -1,0 +1,183 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.1,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-delta-htsk_lr1e-1_sc4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "mean",
+  "max_len": 256
+ },
+ "params_total": 28392,
+ "params_nonemb": 25256,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.79138,
+ "evals": [
+  [
+   305,
+   2.22126
+  ],
+  [
+   610,
+   2.01183
+  ],
+  [
+   915,
+   1.86451
+  ],
+  [
+   1220,
+   1.79236
+  ],
+  [
+   1221,
+   1.79138
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9668
+  ],
+  [
+   50,
+   5.3206
+  ],
+  [
+   100,
+   3.8993
+  ],
+  [
+   150,
+   3.1127
+  ],
+  [
+   200,
+   2.7023
+  ],
+  [
+   250,
+   2.4691
+  ],
+  [
+   300,
+   2.3307
+  ],
+  [
+   350,
+   2.2574
+  ],
+  [
+   400,
+   2.2023
+  ],
+  [
+   450,
+   2.1558
+  ],
+  [
+   500,
+   2.1193
+  ],
+  [
+   550,
+   2.0685
+  ],
+  [
+   600,
+   2.0358
+  ],
+  [
+   650,
+   2.0156
+  ],
+  [
+   700,
+   1.9945
+  ],
+  [
+   750,
+   1.9775
+  ],
+  [
+   800,
+   1.9455
+  ],
+  [
+   850,
+   1.9288
+  ],
+  [
+   900,
+   1.9083
+  ],
+  [
+   950,
+   1.8874
+  ],
+  [
+   1000,
+   1.8543
+  ],
+  [
+   1050,
+   1.8429
+  ],
+  [
+   1100,
+   1.8263
+  ],
+  [
+   1150,
+   1.8143
+  ],
+  [
+   1200,
+   1.8134
+  ],
+  [
+   1220,
+   1.8124
+  ]
+ ],
+ "train_seconds": 1805.68,
+ "wall_seconds": 2273.95,
+ "chars_per_sec": 5539,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there were Ben very, but I played something and a blow thank you can with her from the nice since too. She saw and sad.\nOne day, she had it with them the rad and said, \"Yes. They were listen was happy to tights to play like to stay carefuls. The made and their the scared.\n<|eot|>\n\n\nMax was so endet and sa",
+ "rule_init": {}
+}

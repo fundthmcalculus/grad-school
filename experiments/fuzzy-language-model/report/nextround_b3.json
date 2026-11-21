@@ -1,0 +1,17 @@
+[
+ {
+  "arm": "fz_lr6",
+  "n": 2,
+  "params": 99019,
+  "bpc": 1.1874,
+  "delta": 0.0267,
+  "se": 0.0002,
+  "per_seed": [
+   0.0265,
+   0.0269
+  ],
+  "gain_seeds": 0,
+  "worse_seeds": 2,
+  "verdict": "no"
+ }
+]

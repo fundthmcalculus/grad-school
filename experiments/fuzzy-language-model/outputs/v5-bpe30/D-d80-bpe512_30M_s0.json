@@ -1,0 +1,235 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 80,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v5-bpe30\\D-d80-bpe512_30M_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe512",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 512
+ },
+ "config": {
+  "vocab_size": 512,
+  "d_model": 80,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 150432,
+ "params_nonemb": 109472,
+ "steps": 1528,
+ "chars_seen": 30016615,
+ "chars_per_token": 2.3979958,
+ "val_bpc": 1.10817,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   382,
+   1.3954
+  ],
+  [
+   764,
+   1.25099
+  ],
+  [
+   1146,
+   1.15281
+  ],
+  [
+   1528,
+   1.10817
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.5483
+  ],
+  [
+   50,
+   7.5648
+  ],
+  [
+   100,
+   5.6253
+  ],
+  [
+   150,
+   4.6095
+  ],
+  [
+   200,
+   4.1272
+  ],
+  [
+   250,
+   3.8335
+  ],
+  [
+   300,
+   3.6542
+  ],
+  [
+   350,
+   3.522
+  ],
+  [
+   400,
+   3.4213
+  ],
+  [
+   450,
+   3.3543
+  ],
+  [
+   500,
+   3.2944
+  ],
+  [
+   550,
+   3.228
+  ],
+  [
+   600,
+   3.1728
+  ],
+  [
+   650,
+   3.1356
+  ],
+  [
+   700,
+   3.096
+  ],
+  [
+   750,
+   3.0463
+  ],
+  [
+   800,
+   3.0144
+  ],
+  [
+   850,
+   2.982
+  ],
+  [
+   900,
+   2.9483
+  ],
+  [
+   950,
+   2.9185
+  ],
+  [
+   1000,
+   2.8835
+  ],
+  [
+   1050,
+   2.8572
+  ],
+  [
+   1100,
+   2.8293
+  ],
+  [
+   1150,
+   2.795
+  ],
+  [
+   1200,
+   2.7675
+  ],
+  [
+   1250,
+   2.7524
+  ],
+  [
+   1300,
+   2.7349
+  ],
+  [
+   1350,
+   2.7131
+  ],
+  [
+   1400,
+   2.7085
+  ],
+  [
+   1450,
+   2.6908
+  ],
+  [
+   1500,
+   2.6942
+  ],
+  [
+   1527,
+   2.6785
+  ]
+ ],
+ "train_seconds": 155.65,
+ "wall_seconds": 165.44,
+ "chars_per_sec": 80419,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big gift. It was very old and scary. Every day, the grass standing around and had fun.\nOne day, while playing with the universplice. It was a big cake. The little bird saw something shiny on the grass. It was the rock, and lit up in the field. The bird flew away made it. The grass tied and gave it home. The bird was not a good place.\nThe bird had an idea. They thought for a moment and the shelf. The bird looked at the sky and had an idea. They flew away.\nThe girl was happy. She thought it was gone. She used to tell the new pretty again.\nThe kingo was not sorry anymore. It would have delicious to be more careful and running. It did not fall any face. It trying to hide fire and play. The leaf back made it stares",
+ "rule_init": {},
+ "ngram_init": {}
+}

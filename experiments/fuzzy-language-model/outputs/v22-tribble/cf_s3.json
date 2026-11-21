@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v22-tribble\\cf_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.20629,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.23436
+  ],
+  [
+   100,
+   1.6184
+  ],
+  [
+   200,
+   1.47299
+  ],
+  [
+   300,
+   1.41435
+  ],
+  [
+   400,
+   1.37574
+  ],
+  [
+   500,
+   1.34327
+  ],
+  [
+   600,
+   1.30897
+  ],
+  [
+   700,
+   1.28178
+  ],
+  [
+   800,
+   1.25587
+  ],
+  [
+   900,
+   1.23876
+  ],
+  [
+   1000,
+   1.22143
+  ],
+  [
+   1100,
+   1.20983
+  ],
+  [
+   1160,
+   1.20629
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2196
+  ],
+  [
+   50,
+   8.1214
+  ],
+  [
+   100,
+   6.3353
+  ],
+  [
+   150,
+   5.4434
+  ],
+  [
+   200,
+   4.9975
+  ],
+  [
+   250,
+   4.7595
+  ],
+  [
+   300,
+   4.596
+  ],
+  [
+   350,
+   4.5094
+  ],
+  [
+   400,
+   4.4332
+  ],
+  [
+   450,
+   4.3619
+  ],
+  [
+   500,
+   4.2977
+  ],
+  [
+   550,
+   4.2492
+  ],
+  [
+   600,
+   4.1866
+  ],
+  [
+   650,
+   4.144
+  ],
+  [
+   700,
+   4.0991
+  ],
+  [
+   750,
+   4.0665
+  ],
+  [
+   800,
+   4.0305
+  ],
+  [
+   850,
+   3.9921
+  ],
+  [
+   900,
+   3.9591
+  ],
+  [
+   950,
+   3.9342
+  ],
+  [
+   1000,
+   3.8973
+  ],
+  [
+   1050,
+   3.8745
+  ],
+  [
+   1100,
+   3.8595
+  ],
+  [
+   1150,
+   3.8406
+  ],
+  [
+   1159,
+   3.8318
+  ]
+ ],
+ "train_seconds": 79.49,
+ "wall_seconds": 95.7,
+ "chars_per_sec": 119544,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy. Mia loved to play with her special person. One day, Mia's friend, Momzed, they saw a big pizzy. The magic wind became good friends. They all loved to play together and promise to make the movie together every day.\n<|eot|>\nOnce upon a time, there was a girl named Amy. She was an idea. She liked to play with her yellow. She liked to play with their mateleyee. She would run and seek. One day, she saw a girl's room. Her mom said, \"I will wear the water. Can I know, thank you. That is not your toy!\" Her mom smiled and thanked her friends.\nAfter they saw a big apple and it worked together. It was very happy and work together. The monsty wanted to help the read.\n<|eot|>\nOnce upon a time, there was a kind cool. It lived in a big door. The ring had many toys in the bed. The bunny was so excited to have to play with everyone. She liked to play with the animals who loved to play with. And they lived happily ever after.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to pight. Her mom would grow - towet with her uncomfectrad",
+ "rule_init": {
+  "variant": "cf",
+  "L0.ffn": {
+   "gain": 1024,
+   "ce_nats": 7.1164
+  },
+  "L1.ffn": {
+   "gain": 1024,
+   "ce_nats": 7.0909
+  }
+ },
+ "ngram_init": {}
+}

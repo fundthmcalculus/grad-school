@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v48-fuzzyproj\\proj_tskl_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98720,
+ "params_nonemb": 47456,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.08484,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.07469
+  ],
+  [
+   100,
+   1.43893
+  ],
+  [
+   200,
+   1.30726
+  ],
+  [
+   300,
+   1.25167
+  ],
+  [
+   400,
+   1.20989
+  ],
+  [
+   500,
+   1.17696
+  ],
+  [
+   600,
+   1.14965
+  ],
+  [
+   700,
+   1.12038
+  ],
+  [
+   800,
+   1.10206
+  ],
+  [
+   900,
+   1.0874
+  ],
+  [
+   953,
+   1.08484
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.8056
+  ],
+  [
+   50,
+   9.1155
+  ],
+  [
+   100,
+   6.9821
+  ],
+  [
+   150,
+   5.9265
+  ],
+  [
+   200,
+   5.3975
+  ],
+  [
+   250,
+   5.1363
+  ],
+  [
+   300,
+   4.9619
+  ],
+  [
+   350,
+   4.8392
+  ],
+  [
+   400,
+   4.7326
+  ],
+  [
+   450,
+   4.6602
+  ],
+  [
+   500,
+   4.5887
+  ],
+  [
+   550,
+   4.5209
+  ],
+  [
+   600,
+   4.4867
+  ],
+  [
+   650,
+   4.4352
+  ],
+  [
+   700,
+   4.3815
+  ],
+  [
+   750,
+   4.3334
+  ],
+  [
+   800,
+   4.2797
+  ],
+  [
+   850,
+   4.2601
+  ],
+  [
+   900,
+   4.2138
+  ],
+  [
+   950,
+   4.1855
+  ],
+  [
+   952,
+   4.1863
+  ]
+ ],
+ "train_seconds": 71.59,
+ "wall_seconds": 82.8,
+ "chars_per_sec": 109057,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was very excited to play with her mom. She just wanted to learn new things that was brave and loved each other.\nOne day, Lucy found an old place. But she had an idea. She looked at the top of the dough and thought for the new friend. She said, \"I can help you to be fun.\"\nLucy ran to her and saw her family. Every night she saw her and knew her friends were too high to see it. She said they were still important. Lucy said hello and went to clean the big tree. Her friends understood and flew away to leave at Lucy. They both became good friends and played together. \nAfter that that, Lucy loved her new friend when she could talk. She learned that she should have her safe and always seen a fun wish about welcome.\n<|eot|>\n\n\nLily and Ben are friends. They like to play with their blocks and run. One day, they see a big hole in the swe. It is a has a big window. The hat is an idea. Anna wants to clean and a mill and look at them. He is scared of Sam and Ben.\n\"What happened?\" Ben asks. Ben says, \"Yes, you can help you help you will. But it is rude about it. But you play with you!\"\nBen is angry. He comes to his mom. He Can you help you fix me for you?\"\nThey are",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v3072h384e10m20_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99248,
+ "params_nonemb": 53456,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06737,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.0868
+  ],
+  [
+   100,
+   1.41302
+  ],
+  [
+   200,
+   1.28859
+  ],
+  [
+   300,
+   1.22394
+  ],
+  [
+   400,
+   1.18463
+  ],
+  [
+   500,
+   1.15459
+  ],
+  [
+   600,
+   1.12571
+  ],
+  [
+   700,
+   1.10291
+  ],
+  [
+   800,
+   1.08273
+  ],
+  [
+   900,
+   1.07031
+  ],
+  [
+   953,
+   1.06737
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.8664
+  ],
+  [
+   50,
+   9.1021
+  ],
+  [
+   100,
+   6.9157
+  ],
+  [
+   150,
+   5.8512
+  ],
+  [
+   200,
+   5.3106
+  ],
+  [
+   250,
+   5.0235
+  ],
+  [
+   300,
+   4.8698
+  ],
+  [
+   350,
+   4.75
+  ],
+  [
+   400,
+   4.6487
+  ],
+  [
+   450,
+   4.5821
+  ],
+  [
+   500,
+   4.5113
+  ],
+  [
+   550,
+   4.4649
+  ],
+  [
+   600,
+   4.3976
+  ],
+  [
+   650,
+   4.3411
+  ],
+  [
+   700,
+   4.2937
+  ],
+  [
+   750,
+   4.2668
+  ],
+  [
+   800,
+   4.2232
+  ],
+  [
+   850,
+   4.1865
+  ],
+  [
+   900,
+   4.157
+  ],
+  [
+   950,
+   4.147
+  ],
+  [
+   952,
+   4.1459
+  ]
+ ],
+ "train_seconds": 72.61,
+ "wall_seconds": 84.28,
+ "chars_per_sec": 107520,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl at the lake. She loved to play with the big ball. She was very happy.\nOne day, the frog met a little bird named Ben. Ben said, \"Oh no! But is the five!\"\n\"No, that's something.\" Ben thought for the girl was sad and said, \"I can help you find your else.\"\n\"Of course, I will help you. I will be scared you!\" Tom said. They went together to play with.\nTim and Lily laughed and ran into the sky. They finally had fun, but it was not nice and shcks to leave.\nBut then, a big boy named Tim gu man came to see. Tim was sad. She didn't know what to do. Tom wished he had an idea.\nTim and his mom learned that the little girl was so happy to have the sweet selfish friend. They learned that even if they were all the shiny allic things they had about what they could play with it.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to play with her toys and play with her friend. One day, she wanted to know what was near the grass.\nLily picked up the bucket and started to run through the sea. She jumped up and down, but it was blue and right. She pushed up and down to open her head.\nLilyin jumped in the slide and started to ride it. She saw a",
+ "rule_init": {},
+ "ngram_init": {}
+}

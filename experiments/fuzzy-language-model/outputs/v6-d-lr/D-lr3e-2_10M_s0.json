@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-d-lr\\D-lr3e-2_10M_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93344,
+ "params_nonemb": 44192,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.25543,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.58625
+  ],
+  [
+   192,
+   1.40847
+  ],
+  [
+   288,
+   1.30864
+  ],
+  [
+   384,
+   1.25627
+  ],
+  [
+   387,
+   1.25543
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3326
+  ],
+  [
+   50,
+   8.3957
+  ],
+  [
+   100,
+   6.3953
+  ],
+  [
+   150,
+   5.373
+  ],
+  [
+   200,
+   4.8486
+  ],
+  [
+   250,
+   4.5338
+  ],
+  [
+   300,
+   4.3064
+  ],
+  [
+   350,
+   4.1403
+  ],
+  [
+   386,
+   4.081
+  ]
+ ],
+ "train_seconds": 78.71,
+ "wall_seconds": 94.41,
+ "chars_per_sec": 40279,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Sub. She saw a big vait at her house. She was very hoper to make the carelars puser on the ground. The girl was beautiful and happy and loved to go inside.\nOne day, a little girl named Lucy went to the box. The girl said one was a big, red glad. She was sad. She was very excited to see what it was a clear, but they couldn't wait to play with a family.\nThe frog and Sue were sad. They were happy, and the toy was not coar anymore. The boat said, \"I am the anx, thank you?\" The girl played all day, even exarted and thanked Lucy to help it. The toy bear and the toy had been worked together.\n<|eot|>\nOnce upon a time, in the monstele friend lived in a big tree on a yard. The buck was else, and the mude had an adventure to use her family. Tim was so excited to be a soft dreadious bird, but if he was sad because he had all for her friend, the family.\nOne day, Tim saw a little bird in the tree. He was so happy too. On his friend, Tim and the bird were an umet, and Tim wanted to cool. But they",
+ "rule_init": {},
+ "ngram_init": {}
+}

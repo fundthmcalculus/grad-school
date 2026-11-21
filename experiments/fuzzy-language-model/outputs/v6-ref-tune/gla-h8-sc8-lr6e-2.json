@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "linear",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.6,
+  "tsk_dim": 0,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-ref-tune\\gla-h8-sc8-lr6e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "linear",
+  "ffn": "mlp",
+  "ffn_mult": 2.6,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93376,
+ "params_nonemb": 44224,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.28007,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.62152
+  ],
+  [
+   192,
+   1.44332
+  ],
+  [
+   288,
+   1.34138
+  ],
+  [
+   384,
+   1.28086
+  ],
+  [
+   387,
+   1.28007
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3906
+  ],
+  [
+   50,
+   8.4347
+  ],
+  [
+   100,
+   6.4784
+  ],
+  [
+   150,
+   5.4575
+  ],
+  [
+   200,
+   4.9409
+  ],
+  [
+   250,
+   4.633
+  ],
+  [
+   300,
+   4.4039
+  ],
+  [
+   350,
+   4.2317
+  ],
+  [
+   386,
+   4.1664
+  ]
+ ],
+ "train_seconds": 14.66,
+ "wall_seconds": 17.69,
+ "chars_per_sec": 216285,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Ben. Mia loved to meet a special storm at her house. One day, Mia and Mia went to the park all day. She saw a big, scart. Lily had an idea. She saw a little girl named Sue. She picked up them for her. She was a cool. She slided held. She went to the cup. She was succeing and yelled. She liked to see what it was her mom she saw her a family. She said, \"Dad, Tose, Whister, Tom?\" Her mom said, \"Finally, Lily! Mr. Can I play you!\"\nLily and Tom were happy that they were best friends.\n<|eot|>\nOne day, a little girl named Lily found a yard with a ship. She was very happy and growled.\nLucy and Wign the store, Lily never saw it held outside. Lily was sad and said, \"Look, my friend, Sam! Howr. I am a magic. I will help you help me?\" Anna came and told her to go inside. They played all day and had fun.\nAfter playing, Tom and his friends went down. They were so happy. Max played in the sun, pight. They had fun together. \nLisker stopped playing, they found a big",
+ "rule_init": {},
+ "ngram_init": {}
+}

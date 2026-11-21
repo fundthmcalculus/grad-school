@@ -1,0 +1,23 @@
+{
+ "model": "EleutherAI/pythia-14m",
+ "revision": "cf967c0a9a04383db6f7b1108d86b2962634b4ac",
+ "params": 14067712,
+ "ctx": 512,
+ "corpora": {
+  "tinystories": {
+   "bpc": 1.2480689176891022,
+   "target_tokens": 244736,
+   "target_chars": 996800
+  },
+  "simplestories": {
+   "bpc": 1.3221288097863508,
+   "target_tokens": 229376,
+   "target_chars": 996588
+  },
+  "cosmopedia": {
+   "bpc": 1.2182991310592854,
+   "target_tokens": 197632,
+   "target_chars": 999283
+  }
+ }
+}

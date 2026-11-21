@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 1.0,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn\\o1-da16-m1_lr3e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 1.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "max_len": 256
+ },
+ "params_total": 64964,
+ "params_nonemb": 58692,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.63367,
+ "evals": [
+  [
+   305,
+   2.05875
+  ],
+  [
+   610,
+   1.84642
+  ],
+  [
+   915,
+   1.70721
+  ],
+  [
+   1220,
+   1.63407
+  ],
+  [
+   1221,
+   1.63367
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.2553
+  ],
+  [
+   50,
+   5.1387
+  ],
+  [
+   100,
+   3.6253
+  ],
+  [
+   150,
+   2.8714
+  ],
+  [
+   200,
+   2.5179
+  ],
+  [
+   250,
+   2.315
+  ],
+  [
+   300,
+   2.1827
+  ],
+  [
+   350,
+   2.1036
+  ],
+  [
+   400,
+   2.0335
+  ],
+  [
+   450,
+   1.9906
+  ],
+  [
+   500,
+   1.9533
+  ],
+  [
+   550,
+   1.9024
+  ],
+  [
+   600,
+   1.871
+  ],
+  [
+   650,
+   1.8466
+  ],
+  [
+   700,
+   1.8236
+  ],
+  [
+   750,
+   1.8063
+  ],
+  [
+   800,
+   1.7776
+  ],
+  [
+   850,
+   1.758
+  ],
+  [
+   900,
+   1.7392
+  ],
+  [
+   950,
+   1.7214
+  ],
+  [
+   1000,
+   1.6891
+  ],
+  [
+   1050,
+   1.6789
+  ],
+  [
+   1100,
+   1.6654
+  ],
+  [
+   1150,
+   1.6542
+  ],
+  [
+   1200,
+   1.6553
+  ],
+  [
+   1220,
+   1.6529
+  ]
+ ],
+ "train_seconds": 63.11,
+ "wall_seconds": 71.09,
+ "chars_per_sec": 158487,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was so pretend this colors. He was she saw a dog wishing. But shoutters and from the pear the finally, and a happy to play and slect home. The bird says, \"Yes, you know your.\nSam was inside the stopped and laughed and laughed. \"It's too loud the table. It is very sad. He is thought it of a t",
+ "rule_init": {}
+}

@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v22-tribble\\assocls_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.15518,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.00247
+  ],
+  [
+   100,
+   1.61597
+  ],
+  [
+   200,
+   1.45678
+  ],
+  [
+   300,
+   1.39467
+  ],
+  [
+   400,
+   1.34236
+  ],
+  [
+   500,
+   1.30437
+  ],
+  [
+   600,
+   1.26978
+  ],
+  [
+   700,
+   1.24044
+  ],
+  [
+   800,
+   1.21202
+  ],
+  [
+   900,
+   1.18898
+  ],
+  [
+   1000,
+   1.17239
+  ],
+  [
+   1100,
+   1.15997
+  ],
+  [
+   1160,
+   1.15518
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.5487
+  ],
+  [
+   50,
+   7.6887
+  ],
+  [
+   100,
+   6.155
+  ],
+  [
+   150,
+   5.3536
+  ],
+  [
+   200,
+   4.9355
+  ],
+  [
+   250,
+   4.6988
+  ],
+  [
+   300,
+   4.5283
+  ],
+  [
+   350,
+   4.4267
+  ],
+  [
+   400,
+   4.3423
+  ],
+  [
+   450,
+   4.2656
+  ],
+  [
+   500,
+   4.1939
+  ],
+  [
+   550,
+   4.1369
+  ],
+  [
+   600,
+   4.0732
+  ],
+  [
+   650,
+   4.0204
+  ],
+  [
+   700,
+   3.974
+  ],
+  [
+   750,
+   3.9354
+  ],
+  [
+   800,
+   3.8916
+  ],
+  [
+   850,
+   3.8544
+  ],
+  [
+   900,
+   3.8132
+  ],
+  [
+   950,
+   3.7865
+  ],
+  [
+   1000,
+   3.7487
+  ],
+  [
+   1050,
+   3.7216
+  ],
+  [
+   1100,
+   3.7077
+  ],
+  [
+   1150,
+   3.681
+  ],
+  [
+   1159,
+   3.6717
+  ]
+ ],
+ "train_seconds": 79.21,
+ "wall_seconds": 93.24,
+ "chars_per_sec": 119967,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Suzz. She had a special shiver. To her friend, Mia, Mia, they liked to play outside.\nOne day, they found the toy car's knee. It was a big, big baby grandma. They tried to hide. The next day slide, and they all became friends. They were happy. They chaught them their yellow.\n<|eot|>\nOnce upon a time, in a small house, there was a strong race. The radier was very happy. It was a very finished. The rabbit wanted to set down, thank you.\nOne day, the little girl said, \"Tim, can you help me go?\" The little girl said, \"Yes, I am so happy!\" Tim said. \"Wow, Tim!\"\nThen, the rabbit on the leap. The rabbit started to cool. The rabbit and the rabbit were happy. The rabbit was not a big, prepient. The magient man was happy and proud of the rabbit.\n<|eot|>\nOne day, Tom was playing in the house. He found a big, red plane in the park. Tom was sad and having a giant. Sue was sad and asked, \"Dray",
+ "rule_init": {
+  "variant": "assocls",
+  "L0.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.5799
+  },
+  "L1.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.5384
+  }
+ },
+ "ngram_init": {}
+}

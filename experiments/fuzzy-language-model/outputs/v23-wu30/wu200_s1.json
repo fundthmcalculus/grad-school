@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 200,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v23-wu30\\wu200_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10588,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.37414
+  ],
+  [
+   580,
+   1.24478
+  ],
+  [
+   870,
+   1.15227
+  ],
+  [
+   1160,
+   1.10588
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2386
+  ],
+  [
+   50,
+   8.4969
+  ],
+  [
+   100,
+   6.5006
+  ],
+  [
+   150,
+   5.4681
+  ],
+  [
+   200,
+   4.9756
+  ],
+  [
+   250,
+   4.694
+  ],
+  [
+   300,
+   4.4953
+  ],
+  [
+   350,
+   4.3672
+  ],
+  [
+   400,
+   4.2867
+  ],
+  [
+   450,
+   4.1752
+  ],
+  [
+   500,
+   4.1144
+  ],
+  [
+   550,
+   4.0505
+  ],
+  [
+   600,
+   3.9933
+  ],
+  [
+   650,
+   3.919
+  ],
+  [
+   700,
+   3.869
+  ],
+  [
+   750,
+   3.8212
+  ],
+  [
+   800,
+   3.7653
+  ],
+  [
+   850,
+   3.715
+  ],
+  [
+   900,
+   3.6837
+  ],
+  [
+   950,
+   3.6381
+  ],
+  [
+   1000,
+   3.5971
+  ],
+  [
+   1050,
+   3.5626
+  ],
+  [
+   1100,
+   3.5485
+  ],
+  [
+   1150,
+   3.5261
+  ],
+  [
+   1159,
+   3.5235
+  ]
+ ],
+ "train_seconds": 79.56,
+ "wall_seconds": 85.99,
+ "chars_per_sec": 119435,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big warm bird. \nThe meetle was a little boy. He wanted to go to the park with the mole. He put his pizzy on the farm and decided to play with it every day. He was so happy.\nThe next day, the pozack met a friendly bird named Buddy, came to play. He was happy. He chacked his bottort. He was happy to have the saomse to play with.\n<|eot|>\nOne day, a little girl named Lily found a bag. It was a very pretty door. Spot wanted to play with the water. Lily ran to the foolish and said, \"Look at my friend, my toy, I can't help it.\" The hark cat was happy and wanted to play with it.\nLily and Lily became good friends, and they had a great friend. They learned that munts and always explaining that being building its toys again.\n<|eot|>\nOnce upon a time, there was a small house. The bunny lived in a big tasty tuby. The bunny liked to play with water every day.\nOne day, the bunny saw a big bird in the sand. The bunny wanted to be friends, but it was too high. The food is having a great day tower.\nThe bunny did not like to play",
+ "rule_init": {},
+ "ngram_init": {}
+}

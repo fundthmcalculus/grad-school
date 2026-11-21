@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.001,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-acc_lr1e-3_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 28260,
+ "params_nonemb": 25124,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.34635,
+ "evals": [
+  [
+   305,
+   2.98798
+  ],
+  [
+   610,
+   2.52228
+  ],
+  [
+   915,
+   2.38911
+  ],
+  [
+   1220,
+   2.34639
+  ],
+  [
+   1221,
+   2.34635
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8605
+  ],
+  [
+   50,
+   6.5328
+  ],
+  [
+   100,
+   5.6824
+  ],
+  [
+   150,
+   4.8984
+  ],
+  [
+   200,
+   4.1983
+  ],
+  [
+   250,
+   3.656
+  ],
+  [
+   300,
+   3.2973
+  ],
+  [
+   350,
+   3.0621
+  ],
+  [
+   400,
+   2.8967
+  ],
+  [
+   450,
+   2.7929
+  ],
+  [
+   500,
+   2.7058
+  ],
+  [
+   550,
+   2.6275
+  ],
+  [
+   600,
+   2.5709
+  ],
+  [
+   650,
+   2.5323
+  ],
+  [
+   700,
+   2.5058
+  ],
+  [
+   750,
+   2.4782
+  ],
+  [
+   800,
+   2.4498
+  ],
+  [
+   850,
+   2.4327
+  ],
+  [
+   900,
+   2.4151
+  ],
+  [
+   950,
+   2.4003
+  ],
+  [
+   1000,
+   2.3753
+  ],
+  [
+   1050,
+   2.3722
+  ],
+  [
+   1100,
+   2.3623
+  ],
+  [
+   1150,
+   2.3569
+  ],
+  [
+   1200,
+   2.3607
+  ],
+  [
+   1220,
+   2.3603
+  ]
+ ],
+ "train_seconds": 520.78,
+ "wall_seconds": 590.13,
+ "chars_per_sec": 19207,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there no him toys to be somed wea see wanted to play, but day, he bird to pleceg a waitn his in the on the save was ands all lovaed car siters flied was frether lired, somethe for and Milone was her the leights to plik, the took. Azcare castimed. The bird said, \"Yunce pon uphther very dadetle was ",
+ "rule_init": {}
+}

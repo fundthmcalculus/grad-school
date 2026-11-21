@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v50-fuzzyinit\\ffn_raw1_di_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98488,
+ "params_nonemb": 47224,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.0623,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.07027
+  ],
+  [
+   100,
+   1.41771
+  ],
+  [
+   200,
+   1.2845
+  ],
+  [
+   300,
+   1.22677
+  ],
+  [
+   400,
+   1.18357
+  ],
+  [
+   500,
+   1.15268
+  ],
+  [
+   600,
+   1.12541
+  ],
+  [
+   700,
+   1.09781
+  ],
+  [
+   800,
+   1.07977
+  ],
+  [
+   900,
+   1.06607
+  ],
+  [
+   953,
+   1.0623
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7867
+  ],
+  [
+   50,
+   9.1308
+  ],
+  [
+   100,
+   6.9605
+  ],
+  [
+   150,
+   5.8651
+  ],
+  [
+   200,
+   5.3145
+  ],
+  [
+   250,
+   5.0442
+  ],
+  [
+   300,
+   4.8717
+  ],
+  [
+   350,
+   4.7416
+  ],
+  [
+   400,
+   4.6416
+  ],
+  [
+   450,
+   4.5644
+  ],
+  [
+   500,
+   4.4953
+  ],
+  [
+   550,
+   4.429
+  ],
+  [
+   600,
+   4.3966
+  ],
+  [
+   650,
+   4.3473
+  ],
+  [
+   700,
+   4.298
+  ],
+  [
+   750,
+   4.2469
+  ],
+  [
+   800,
+   4.1936
+  ],
+  [
+   850,
+   4.1753
+  ],
+  [
+   900,
+   4.1312
+  ],
+  [
+   950,
+   4.1035
+  ],
+  [
+   952,
+   4.1034
+  ]
+ ],
+ "train_seconds": 69.9,
+ "wall_seconds": 80.79,
+ "chars_per_sec": 111683,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a bright day. A big cat was ready to see the wind. It was so big and strong.\nThe cat jumped in the bright tree and shared it. The dog said, \"I found a tree and a tree!\" But the cat was tired and worried. He said, \"I am sorry, but I found a tree!\"\nThe cat smiled and said, ???I'm sorry, I'm looking for you for my friend. I will ask how to laugh and keep it at it.\" But he was scared and said, \"I don't like you! You are a answer to a tree and find a tree!\"\nThe dog was sad and said, \"Don't worry, let's get the tree.\" The cat smiled and cried, but the cat was too late for it. They did not know that the house would be happy to share and kiss again.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. Lily liked to play in the store. She had a lot of fun that her friends could make things.\nOne sunny day, Lily saw a small park and wanted to buy a small box. She thought she could get it and thought it was nice. She said, \"Uh! You can keep you here to help!\"\nLily started to feel better and she remembered it to go for her. She pushed up the box and saw her. She was so proud of her new friend. The sky helped her help. Mom and",
+ "rule_init": {},
+ "ngram_init": {}
+}

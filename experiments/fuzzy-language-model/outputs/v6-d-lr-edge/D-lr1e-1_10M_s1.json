@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.1,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-d-lr-edge\\D-lr1e-1_10M_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93344,
+ "params_nonemb": 44192,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.26837,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.59799
+  ],
+  [
+   192,
+   1.44448
+  ],
+  [
+   288,
+   1.33493
+  ],
+  [
+   384,
+   1.26926
+  ],
+  [
+   387,
+   1.26837
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3938
+  ],
+  [
+   50,
+   8.0426
+  ],
+  [
+   100,
+   6.2136
+  ],
+  [
+   150,
+   5.3225
+  ],
+  [
+   200,
+   4.8728
+  ],
+  [
+   250,
+   4.5893
+  ],
+  [
+   300,
+   4.3872
+  ],
+  [
+   350,
+   4.2245
+  ],
+  [
+   386,
+   4.1314
+  ]
+ ],
+ "train_seconds": 78.66,
+ "wall_seconds": 95.04,
+ "chars_per_sec": 40304,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Mia. Mia loved to measure the storm and make a big box. She liked to play with her day.\nOne day, Mia found an old berrian. Kitty and her friend, Sue, came to vitch. Tom felt tired from Tom's house, he saw a big, red ball. The little girl was curious. Tom asked, \"Oh, what is inside.\" Ben asked, \"Let's go home.\" Ben said. \"Yes, come like me. You can sound. If you make your toys in the park.\"\nThey went to the park. They ran to the park, but they could not go to play with them. They both felt sorry and played with the pope.\n\"Thank you, Lily!\" Lily said. \"That is a nice toys!\" Mia said.\nLily and Tom and Lily learned that it would play outside. They never buck into the park with each other. They were very brave and their new friend. They played together in the park playing with their toys.\n<|eot|>\nOne day, a little girl named Lily went in her room. She saw a big, red ball with her mom. She saw a big house in the sand. Lily saw a big box for Max, a big book, pink. Her mom has a loud bird towards the perser.\nTommy started",
+ "rule_init": {},
+ "ngram_init": {}
+}

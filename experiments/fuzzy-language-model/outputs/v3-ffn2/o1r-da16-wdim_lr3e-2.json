@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn2\\o1r-da16-wdim_lr3e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 87492,
+ "params_nonemb": 81220,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.50392,
+ "evals": [
+  [
+   305,
+   1.95902
+  ],
+  [
+   610,
+   1.71231
+  ],
+  [
+   915,
+   1.57238
+  ],
+  [
+   1220,
+   1.50317
+  ],
+  [
+   1221,
+   1.50392
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9672
+  ],
+  [
+   50,
+   5.0755
+  ],
+  [
+   100,
+   3.6337
+  ],
+  [
+   150,
+   2.8676
+  ],
+  [
+   200,
+   2.4802
+  ],
+  [
+   250,
+   2.2445
+  ],
+  [
+   300,
+   2.1038
+  ],
+  [
+   350,
+   2.0058
+  ],
+  [
+   400,
+   1.9255
+  ],
+  [
+   450,
+   1.8784
+  ],
+  [
+   500,
+   1.8333
+  ],
+  [
+   550,
+   1.7763
+  ],
+  [
+   600,
+   1.7446
+  ],
+  [
+   650,
+   1.7195
+  ],
+  [
+   700,
+   1.6959
+  ],
+  [
+   750,
+   1.6756
+  ],
+  [
+   800,
+   1.6467
+  ],
+  [
+   850,
+   1.6262
+  ],
+  [
+   900,
+   1.6076
+  ],
+  [
+   950,
+   1.5865
+  ],
+  [
+   1000,
+   1.5574
+  ],
+  [
+   1050,
+   1.5467
+  ],
+  [
+   1100,
+   1.5332
+  ],
+  [
+   1150,
+   1.5225
+  ],
+  [
+   1200,
+   1.5219
+  ],
+  [
+   1220,
+   1.5201
+  ]
+ ],
+ "train_seconds": 39.94,
+ "wall_seconds": 47.8,
+ "chars_per_sec": 250407,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was always green back and others.\nThen, the man pressier, Ben saw the small flowers and dark on the guil. She could not really, lettinued to started to lee perfect and having fun town, but you fell and his lady on the dream. She was told the bird and play with her friends, at the hill of a l",
+ "rule_init": {}
+}

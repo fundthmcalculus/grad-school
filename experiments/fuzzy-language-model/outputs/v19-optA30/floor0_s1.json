@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.0,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-optA30\\floor0_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11263,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.36584
+  ],
+  [
+   580,
+   1.23805
+  ],
+  [
+   870,
+   1.14693
+  ],
+  [
+   1160,
+   1.11263
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2386
+  ],
+  [
+   50,
+   8.2135
+  ],
+  [
+   100,
+   6.3445
+  ],
+  [
+   150,
+   5.3902
+  ],
+  [
+   200,
+   4.9072
+  ],
+  [
+   250,
+   4.6292
+  ],
+  [
+   300,
+   4.4461
+  ],
+  [
+   350,
+   4.3268
+  ],
+  [
+   400,
+   4.2484
+  ],
+  [
+   450,
+   4.1389
+  ],
+  [
+   500,
+   4.0791
+  ],
+  [
+   550,
+   4.0245
+  ],
+  [
+   600,
+   3.9688
+  ],
+  [
+   650,
+   3.8916
+  ],
+  [
+   700,
+   3.8453
+  ],
+  [
+   750,
+   3.7965
+  ],
+  [
+   800,
+   3.7392
+  ],
+  [
+   850,
+   3.6982
+  ],
+  [
+   900,
+   3.6674
+  ],
+  [
+   950,
+   3.6242
+  ],
+  [
+   1000,
+   3.5813
+  ],
+  [
+   1050,
+   3.5552
+  ],
+  [
+   1100,
+   3.5492
+  ],
+  [
+   1150,
+   3.5352
+  ],
+  [
+   1159,
+   3.5339
+  ]
+ ],
+ "train_seconds": 79.82,
+ "wall_seconds": 87.05,
+ "chars_per_sec": 119059,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Sara.\nBut then, the dog asked, \"What is this box? I need to climb the box?\" said, pointed. \"I will be the window?\"\nMax and Max looked at each other and felt making a new generly plane. They played games with their person. They played more orgerient together all day.\n<|eot|>\nOne day, a little girl named Mia found a big, red red ball. She wanted to run, but she wanted to go on it. So, she saw a big, coarful bird. But she could not get the ball. She decided to play with her bit.\nLucy saw a big stick and wanted to play again. She asked her friends to take something up and down the ball. She put it on a tree. She looked up and started to push it around the tree on it. She wished it was else, and All the bugs. She walked very much and leng her. \"Come, do not touch it. That be careful, this is a new friend!\"\nMom and her mom played with the ball in the bed. Everyone looked at the big red ball and she ran away. She said, \"Let's build out having so much fun! You have to unperrious werite",
+ "rule_init": {},
+ "ngram_init": {}
+}

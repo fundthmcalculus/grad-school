@@ -1,0 +1,207 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-final10\\D-lr0.06_30M_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93344,
+ "params_nonemb": 44192,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.13548,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.36362
+  ],
+  [
+   580,
+   1.24833
+  ],
+  [
+   870,
+   1.17167
+  ],
+  [
+   1160,
+   1.13548
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3938
+  ],
+  [
+   50,
+   8.211
+  ],
+  [
+   100,
+   6.2789
+  ],
+  [
+   150,
+   5.3233
+  ],
+  [
+   200,
+   4.84
+  ],
+  [
+   250,
+   4.5761
+  ],
+  [
+   300,
+   4.4242
+  ],
+  [
+   350,
+   4.3189
+  ],
+  [
+   400,
+   4.2394
+  ],
+  [
+   450,
+   4.169
+  ],
+  [
+   500,
+   4.1111
+  ],
+  [
+   550,
+   4.0569
+  ],
+  [
+   600,
+   3.9922
+  ],
+  [
+   650,
+   3.9541
+  ],
+  [
+   700,
+   3.9059
+  ],
+  [
+   750,
+   3.859
+  ],
+  [
+   800,
+   3.8246
+  ],
+  [
+   850,
+   3.779
+  ],
+  [
+   900,
+   3.7418
+  ],
+  [
+   950,
+   3.7109
+  ],
+  [
+   1000,
+   3.6735
+  ],
+  [
+   1050,
+   3.6492
+  ],
+  [
+   1100,
+   3.6396
+  ],
+  [
+   1150,
+   3.6139
+  ],
+  [
+   1159,
+   3.6086
+  ]
+ ],
+ "train_seconds": 229.63,
+ "wall_seconds": 242.26,
+ "chars_per_sec": 41383,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and red bird.\nAs they saw a big, green tree. The bird wanted to go fast and climb the fan. The bird said, \"Don't move, Lily. Kitty!\" They both saved the bird and Kit.\n\"Thank you, cat!\" Lily said. The bird said, \"Thank you, Lucy!\" They played more funny. They chapped the bird and the sun went away. They had a fun time in the forest, and they all lived happily ever after.\nBut then, something unexpected happened. With her friends, a little girl named Sue came from the sky. She said, \"Don't worry, you can sing your friends!\" Sue was scared and thanked her for helping her. She told her friends about her friends. They all played with the sun together.\n<|eot|>\n\nMax and Dad, Little Pear, Daddy, Daddy, Ben can buy on the tire. He had an idea.\n\"Tom, I can't take this green, but I am soft,\" Ben says.\n\"But this is a little girl. You don't know you don't know what. It's hurt the box.\"\n\"Okay, Ben. I can't make some mop this persons,\" Ben says.\n\"Look, Ben, don't cry,\" Sam says",
+ "rule_init": {},
+ "ngram_init": {}
+}

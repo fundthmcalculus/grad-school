@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.45,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v49-compose\\c_mid_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 4,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.45,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 4,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 100768,
+ "params_nonemb": 49504,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.09774,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06692
+  ],
+  [
+   100,
+   1.43165
+  ],
+  [
+   200,
+   1.31168
+  ],
+  [
+   300,
+   1.25583
+  ],
+  [
+   400,
+   1.2188
+  ],
+  [
+   500,
+   1.18393
+  ],
+  [
+   600,
+   1.15711
+  ],
+  [
+   700,
+   1.13447
+  ],
+  [
+   800,
+   1.11466
+  ],
+  [
+   900,
+   1.10254
+  ],
+  [
+   953,
+   1.09774
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7735
+  ],
+  [
+   50,
+   9.0783
+  ],
+  [
+   100,
+   6.9382
+  ],
+  [
+   150,
+   5.8886
+  ],
+  [
+   200,
+   5.3918
+  ],
+  [
+   250,
+   5.1404
+  ],
+  [
+   300,
+   4.9803
+  ],
+  [
+   350,
+   4.8649
+  ],
+  [
+   400,
+   4.7843
+  ],
+  [
+   450,
+   4.729
+  ],
+  [
+   500,
+   4.6479
+  ],
+  [
+   550,
+   4.5792
+  ],
+  [
+   600,
+   4.4997
+  ],
+  [
+   650,
+   4.4551
+  ],
+  [
+   700,
+   4.4107
+  ],
+  [
+   750,
+   4.3727
+  ],
+  [
+   800,
+   4.3397
+  ],
+  [
+   850,
+   4.3102
+  ],
+  [
+   900,
+   4.2677
+  ],
+  [
+   950,
+   4.251
+  ],
+  [
+   952,
+   4.2518
+  ]
+ ],
+ "train_seconds": 75.77,
+ "wall_seconds": 86.83,
+ "chars_per_sec": 103039,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. Lucy was very excited to play with her mom.\nOne sunny day, Lucy decided to play with her mom. Her mom saw her family and Sue found an old place in the water. Amy saw her and said, \"Don't worry, Lucy. I like a lot!\" Lucy said, \"I want to play with your else.\" Sue thought for a moment and said, \"Good sounds, Lucy. Let's ask,\" Lucy said, \"Okay at it!\" Tim and her mom laughed and smiled.\nAs they waited, Tim's mom came behind to find the big tree. Sue and Sue were curious and happy. They played with the guard every day. They learned that sometimes if they're lost the big tuoy.\n<|eot|>\nOnce upon a time, there was a boy named Tim. Tim loved to play with his toys. One day, he went to the park with his mom and said, \"Be careful, Tim! I can play with it.\"\nTim was very excited. He took the picture for Tim, but he was a lot. Tim thought the big dog, but he could not bite the ball. Tim thought, \"Look, Tim! I want to help you.\" So, Tim and Sam listened to the car. They both laughed and played together every day.\n<|eot|>\n\nOnce upon a time there was a little girl. She was always a lot of fun. After a while, she started to chew out",
+ "rule_init": {},
+ "ngram_init": {}
+}

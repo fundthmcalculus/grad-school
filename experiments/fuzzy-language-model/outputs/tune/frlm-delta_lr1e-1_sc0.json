@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.1,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-delta_lr1e-1_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 28136,
+ "params_nonemb": 25000,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.27467,
+ "evals": [
+  [
+   305,
+   2.89167
+  ],
+  [
+   610,
+   2.52747
+  ],
+  [
+   915,
+   2.34288
+  ],
+  [
+   1220,
+   2.27354
+  ],
+  [
+   1221,
+   2.27467
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8653
+  ],
+  [
+   50,
+   5.017
+  ],
+  [
+   100,
+   3.7835
+  ],
+  [
+   150,
+   3.3022
+  ],
+  [
+   200,
+   3.0828
+  ],
+  [
+   250,
+   3.0951
+  ],
+  [
+   300,
+   3.0091
+  ],
+  [
+   350,
+   2.8982
+  ],
+  [
+   400,
+   2.7791
+  ],
+  [
+   450,
+   2.7027
+  ],
+  [
+   500,
+   2.6485
+  ],
+  [
+   550,
+   2.5836
+  ],
+  [
+   600,
+   2.5406
+  ],
+  [
+   650,
+   2.5193
+  ],
+  [
+   700,
+   2.4975
+  ],
+  [
+   750,
+   2.4595
+  ],
+  [
+   800,
+   2.4221
+  ],
+  [
+   850,
+   2.3993
+  ],
+  [
+   900,
+   2.3789
+  ],
+  [
+   950,
+   2.3583
+  ],
+  [
+   1000,
+   2.3309
+  ],
+  [
+   1050,
+   2.3182
+  ],
+  [
+   1100,
+   2.3026
+  ],
+  [
+   1150,
+   2.2927
+  ],
+  [
+   1200,
+   2.2922
+  ],
+  [
+   1220,
+   2.2905
+  ]
+ ],
+ "train_seconds": 1498.55,
+ "wall_seconds": 1904.86,
+ "chars_per_sec": 6675,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, and the shing was to be somether asked the was verylla then him ack his the didgy. I it in a in to some. Then. The sad sail, Tim saw he side she reamed, \"Budget liked, int a dog, the this ma was her the reare said at belp.\" My omether plae goaw a a not it saited runce poolud and to plays, there sp",
+ "rule_init": {}
+}

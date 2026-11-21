@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v27-cover\\cov0_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.15116,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.32923
+  ],
+  [
+   100,
+   1.59741
+  ],
+  [
+   200,
+   1.44379
+  ],
+  [
+   300,
+   1.37378
+  ],
+  [
+   400,
+   1.33104
+  ],
+  [
+   500,
+   1.2909
+  ],
+  [
+   600,
+   1.26198
+  ],
+  [
+   700,
+   1.23193
+  ],
+  [
+   800,
+   1.20382
+  ],
+  [
+   900,
+   1.18286
+  ],
+  [
+   1000,
+   1.16655
+  ],
+  [
+   1100,
+   1.15474
+  ],
+  [
+   1160,
+   1.15116
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.5399
+  ],
+  [
+   50,
+   8.3286
+  ],
+  [
+   100,
+   6.3727
+  ],
+  [
+   150,
+   5.408
+  ],
+  [
+   200,
+   4.9307
+  ],
+  [
+   250,
+   4.6657
+  ],
+  [
+   300,
+   4.4803
+  ],
+  [
+   350,
+   4.3797
+  ],
+  [
+   400,
+   4.2911
+  ],
+  [
+   450,
+   4.2089
+  ],
+  [
+   500,
+   4.1438
+  ],
+  [
+   550,
+   4.0962
+  ],
+  [
+   600,
+   4.0315
+  ],
+  [
+   650,
+   3.9838
+  ],
+  [
+   700,
+   3.9349
+  ],
+  [
+   750,
+   3.9046
+  ],
+  [
+   800,
+   3.8682
+  ],
+  [
+   850,
+   3.8294
+  ],
+  [
+   900,
+   3.7962
+  ],
+  [
+   950,
+   3.7708
+  ],
+  [
+   1000,
+   3.7278
+  ],
+  [
+   1050,
+   3.7066
+  ],
+  [
+   1100,
+   3.6922
+  ],
+  [
+   1150,
+   3.6667
+  ],
+  [
+   1159,
+   3.6604
+  ]
+ ],
+ "train_seconds": 79.95,
+ "wall_seconds": 94.09,
+ "chars_per_sec": 118861,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy. Lucy loved to play with her toys all day at her house. One day, she found a big hill. The clown was very big to play with the wind.\n Kitty and her friend came to play outside. They played together. Lucy was so happy. She loved the stonet to slide and have fun. The moral of the story is to always learn new things and help others each other.\" \nMia and the day went to the silly party. The deliciousous bunny was not sad. She knew she could see it. But she could not get the table.\nShe saw a bake pretty star and was even exceher. She can't splop in her friends. She didn't listen to the star. She put it back to the penge monstle and wet and cheering on it. She explained that she could have some tikes and let him up off.\nFinally, her friend, playing, her friends. She had a big tree to play with her friends. She put her dream where she could fall on the scet and bed the rain.\nFinally, she saw her friends in her side sun. She was so happy and enjoyed her towet with her special day.\n<|eot|>\nOnce upon a time",
+ "rule_init": {
+  "variant": "cov0",
+  "L0.ffn": {
+   "gain": 0.25,
+   "ce_nats": 7.2825
+  },
+  "L1.ffn": {
+   "gain": 0.25,
+   "ce_nats": 7.3055
+  }
+ },
+ "ngram_init": {}
+}

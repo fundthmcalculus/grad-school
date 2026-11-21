@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\e2e_all_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99009,
+ "params_nonemb": 47745,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.30478,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   2.98078
+  ],
+  [
+   100,
+   2.01781
+  ],
+  [
+   200,
+   1.70427
+  ],
+  [
+   300,
+   1.56638
+  ],
+  [
+   400,
+   1.48201
+  ],
+  [
+   500,
+   1.41755
+  ],
+  [
+   600,
+   1.38175
+  ],
+  [
+   700,
+   1.34798
+  ],
+  [
+   800,
+   1.32353
+  ],
+  [
+   900,
+   1.30942
+  ],
+  [
+   953,
+   1.30478
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.4448
+  ],
+  [
+   50,
+   9.9184
+  ],
+  [
+   100,
+   8.7702
+  ],
+  [
+   150,
+   7.8888
+  ],
+  [
+   200,
+   7.1821
+  ],
+  [
+   250,
+   6.6919
+  ],
+  [
+   300,
+   6.3234
+  ],
+  [
+   350,
+   6.1292
+  ],
+  [
+   400,
+   5.9176
+  ],
+  [
+   450,
+   5.7607
+  ],
+  [
+   500,
+   5.608
+  ],
+  [
+   550,
+   5.489
+  ],
+  [
+   600,
+   5.3813
+  ],
+  [
+   650,
+   5.3141
+  ],
+  [
+   700,
+   5.247
+  ],
+  [
+   750,
+   5.1996
+  ],
+  [
+   800,
+   5.1541
+  ],
+  [
+   850,
+   5.1153
+  ],
+  [
+   900,
+   5.0682
+  ],
+  [
+   950,
+   5.0411
+  ],
+  [
+   952,
+   5.0418
+  ]
+ ],
+ "train_seconds": 75.51,
+ "wall_seconds": 89.3,
+ "chars_per_sec": 103395,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there in the house, there lived a little girl named Jack. Pople were playing outside with his favorite poield.\nOne day, the frog met a little bird named Tim. She wanted to listen to a big boat.\nLily saw her mom to play with his friends. She saw a big, fast friend, the big dog. Tom felt scared and happy. Tim said to the store, but he was looking for. Every mom smiled and hugged the truck and said, \"Aak's a game! Gill\". Lily smiled and said, \"Yes, you are very dangerous.\"\nThe bee was very happy. She felt sad, but he could not wait to go away. The little girl felt sad and laughing. She said, \"Yes, I will be careful. I'm so sad and happy.\"\nThe next day, the bird felt tired and cross in the river. The prince came to the box and saw a big, old toy all of the park. The girl was hungry when he looked at the time. The girl was mison and said, \"Hi Anna,?\"\nThey looked at the cave and had many fun. They looked at Sam and played together every day. They played together and told something brave from the hoal.\n<|eot|>\nOnce upon a time, in a small lady named Bob loved to help big dog. One sunny day, he saw a big fish with many new toys. Tood asked \"What can you serom. Ee",
+ "rule_init": {},
+ "ngram_init": {}
+}

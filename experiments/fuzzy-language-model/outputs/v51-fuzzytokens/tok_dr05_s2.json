@@ -1,0 +1,238 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v51-fuzzytokens\\tok_dr05_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98528,
+ "params_nonemb": 47264,
+ "steps": 1025,
+ "chars_seen": 30024276,
+ "chars_per_token": 3.5756808,
+ "val_bpc": 1.11406,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06189
+  ],
+  [
+   100,
+   1.45017
+  ],
+  [
+   200,
+   1.31984
+  ],
+  [
+   300,
+   1.26864
+  ],
+  [
+   400,
+   1.23345
+  ],
+  [
+   500,
+   1.20585
+  ],
+  [
+   600,
+   1.17813
+  ],
+  [
+   700,
+   1.15827
+  ],
+  [
+   800,
+   1.14202
+  ],
+  [
+   900,
+   1.12654
+  ],
+  [
+   1000,
+   1.11487
+  ],
+  [
+   1025,
+   1.11406
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7456
+  ],
+  [
+   50,
+   9.2824
+  ],
+  [
+   100,
+   7.2177
+  ],
+  [
+   150,
+   6.1905
+  ],
+  [
+   200,
+   5.6783
+  ],
+  [
+   250,
+   5.4063
+  ],
+  [
+   300,
+   5.2317
+  ],
+  [
+   350,
+   5.13
+  ],
+  [
+   400,
+   5.0434
+  ],
+  [
+   450,
+   4.9784
+  ],
+  [
+   500,
+   4.9197
+  ],
+  [
+   550,
+   4.8649
+  ],
+  [
+   600,
+   4.8173
+  ],
+  [
+   650,
+   4.7595
+  ],
+  [
+   700,
+   4.7197
+  ],
+  [
+   750,
+   4.6957
+  ],
+  [
+   800,
+   4.652
+  ],
+  [
+   850,
+   4.6112
+  ],
+  [
+   900,
+   4.5922
+  ],
+  [
+   950,
+   4.5421
+  ],
+  [
+   1000,
+   4.5438
+  ],
+  [
+   1024,
+   4.5397
+  ]
+ ],
+ "train_seconds": 77.1,
+ "wall_seconds": 89.56,
+ "chars_per_sec": 108906,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She had a big box with beautiful cars, and a fun day playing.\n<|eot|>\nOne day, a little girl named Lily found a new friend. Sue found a big box on the box. Amy thought it was not a pretty ball. She tried to hold the ball, but she could not show our friend.\nLily thought for a moment, \"I want to play with my ball. I want to gign me!\" She said. She said, \"I want to play with the red ball.\"\nThe little girl and Tom played to the park and found a big tree. Lily was very happy. He said, \"Thank you, Tom. I can show you if we will do you!\"\n<|eot|>\n\n\nLane and Anna are playing in their room. He likes to play with it and get crosss. He wanted to desk it do not see and run. Inside the box handed by a hole, Ben swiffs. Ben and Ben wook them.\n\"She, Mom, a boss. We are very funny and small. What?\" Ben asks.\n\"I want to have some fruits,\" Ben replied. She picked up them and shook her.\n\"Loo, it is a new spather. But you are a wise old cat. Let's have the nap for it.\"\n\"No, it's not for you!\" Ben and Ben",
+ "rule_init": {},
+ "ngram_init": {}
+}

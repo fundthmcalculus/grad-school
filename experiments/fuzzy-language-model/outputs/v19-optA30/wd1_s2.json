@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.1,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-optA30\\wd1_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11374,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.39952
+  ],
+  [
+   580,
+   1.28493
+  ],
+  [
+   870,
+   1.17679
+  ],
+  [
+   1160,
+   1.11374
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2981
+  ],
+  [
+   50,
+   8.088
+  ],
+  [
+   100,
+   6.2595
+  ],
+  [
+   150,
+   5.3774
+  ],
+  [
+   200,
+   4.9229
+  ],
+  [
+   250,
+   4.6963
+  ],
+  [
+   300,
+   4.5608
+  ],
+  [
+   350,
+   4.4458
+  ],
+  [
+   400,
+   4.3584
+  ],
+  [
+   450,
+   4.2805
+  ],
+  [
+   500,
+   4.2313
+  ],
+  [
+   550,
+   4.1617
+  ],
+  [
+   600,
+   4.1163
+  ],
+  [
+   650,
+   4.0593
+  ],
+  [
+   700,
+   3.9848
+  ],
+  [
+   750,
+   3.9284
+  ],
+  [
+   800,
+   3.8745
+  ],
+  [
+   850,
+   3.8173
+  ],
+  [
+   900,
+   3.7671
+  ],
+  [
+   950,
+   3.7094
+  ],
+  [
+   1000,
+   3.6662
+  ],
+  [
+   1050,
+   3.6207
+  ],
+  [
+   1100,
+   3.5888
+  ],
+  [
+   1150,
+   3.5427
+  ],
+  [
+   1159,
+   3.5423
+  ]
+ ],
+ "train_seconds": 85.47,
+ "wall_seconds": 96.71,
+ "chars_per_sec": 111184,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Mia. Mia loved to play with her friends, and they had fun.\nOne day, Mia saw something first of the sky. She wanted to play with the window. Kitty asked her friend to go, but she felt mask. So, she put it away from the tree.\nSo, Mia saw that the tree was chair. She was very excited to see what was inside the tree. Mia then said, \"Whisp is this, a family is a little bunny. Youre are a friendny, a little girl. It is very fun. It's okay. Why are not first.\" Mia said, \"It's not I want to make it unload it. I should know what was only.\"\nLily said, \"That is a nice man. He masks on a black car in the store and we can never bread. It is important than I have to share.\" They were happy to see its friend, and they both enjoyed a big, dresious birds in the tree. But they had mad, and her friend, a little girl. The bird was very happy.\nSoon, they saw the tree and said, ???Letly I am so having first!\"\nSoon, the little girl decided to play with",
+ "rule_init": {},
+ "ngram_init": {}
+}

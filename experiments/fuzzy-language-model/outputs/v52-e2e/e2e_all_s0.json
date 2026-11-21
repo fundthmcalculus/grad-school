@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\e2e_all_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99009,
+ "params_nonemb": 47745,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.48687,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   2.98779
+  ],
+  [
+   100,
+   2.21601
+  ],
+  [
+   200,
+   2.03653
+  ],
+  [
+   300,
+   1.95086
+  ],
+  [
+   400,
+   1.78675
+  ],
+  [
+   500,
+   1.67013
+  ],
+  [
+   600,
+   1.60491
+  ],
+  [
+   700,
+   1.55004
+  ],
+  [
+   800,
+   1.51238
+  ],
+  [
+   900,
+   1.49316
+  ],
+  [
+   953,
+   1.48687
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.4908
+  ],
+  [
+   50,
+   9.9479
+  ],
+  [
+   100,
+   9.0783
+  ],
+  [
+   150,
+   8.7978
+  ],
+  [
+   200,
+   8.3975
+  ],
+  [
+   250,
+   7.9344
+  ],
+  [
+   300,
+   7.7731
+  ],
+  [
+   350,
+   7.5216
+  ],
+  [
+   400,
+   7.2261
+  ],
+  [
+   450,
+   6.8878
+  ],
+  [
+   500,
+   6.6612
+  ],
+  [
+   550,
+   6.4616
+  ],
+  [
+   600,
+   6.2884
+  ],
+  [
+   650,
+   6.1539
+  ],
+  [
+   700,
+   6.0576
+  ],
+  [
+   750,
+   5.9827
+  ],
+  [
+   800,
+   5.8964
+  ],
+  [
+   850,
+   5.8333
+  ],
+  [
+   900,
+   5.7833
+  ],
+  [
+   950,
+   5.7546
+  ],
+  [
+   952,
+   5.7554
+  ]
+ ],
+ "train_seconds": 76.35,
+ "wall_seconds": 92.92,
+ "chars_per_sec": 102255,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Tim. Tim was very excited to play with her ball.\n<|eot|>\nOnce upon a time, there was a girl named Mom. They found her friend and said, \"I love, Spot and laughed.\nThe bird liked to play with the mouse. But it thought the leaves, a Wadport. She opened a voice and his friend. The cakey was having many water.\nThey saw his mom is fun to stay with her friends.\nThe day, it heard a village. He laughed and not and said, \"Yes, Tim, Tim. You will play with the sht were many mommy, but he could have so much. He put down a big man. They had a big cat, but the big man and the cat. Bob opened it wanted tove.\nThe bird learned, every day to play with their know. It's selfish and surse. Tim put the ock and have to all day.\nDon't can be hungry when he looked at the bummy.\nLily was a big sun,, but the large dress. Tim said. \"What felt sad and he had afraid with the pieces. You can have Max, they saw it and said, \"It is not like you to help that he could higher.\nThe lady says.\n\"Thank you in you. Tim saw the red jar, Tim and the drive itin. Ticy opened it's can try that she gave Mom out",
+ "rule_init": {},
+ "ngram_init": {}
+}

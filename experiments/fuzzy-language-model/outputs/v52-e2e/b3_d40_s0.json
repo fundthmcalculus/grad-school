@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 40,
+  "layers": 3,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\b3_d40_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 40,
+  "n_layers": 3,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99002,
+ "params_nonemb": 50906,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.1468,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06403
+  ],
+  [
+   100,
+   1.55169
+  ],
+  [
+   200,
+   1.366
+  ],
+  [
+   300,
+   1.30575
+  ],
+  [
+   400,
+   1.26365
+  ],
+  [
+   500,
+   1.23178
+  ],
+  [
+   600,
+   1.20333
+  ],
+  [
+   700,
+   1.18066
+  ],
+  [
+   800,
+   1.16175
+  ],
+  [
+   900,
+   1.15034
+  ],
+  [
+   953,
+   1.1468
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7755
+  ],
+  [
+   50,
+   9.3887
+  ],
+  [
+   100,
+   7.4121
+  ],
+  [
+   150,
+   6.289
+  ],
+  [
+   200,
+   5.6994
+  ],
+  [
+   250,
+   5.368
+  ],
+  [
+   300,
+   5.18
+  ],
+  [
+   350,
+   5.0327
+  ],
+  [
+   400,
+   4.9836
+  ],
+  [
+   450,
+   4.8884
+  ],
+  [
+   500,
+   4.8277
+  ],
+  [
+   550,
+   4.7456
+  ],
+  [
+   600,
+   4.668
+  ],
+  [
+   650,
+   4.6213
+  ],
+  [
+   700,
+   4.5959
+  ],
+  [
+   750,
+   4.5769
+  ],
+  [
+   800,
+   4.5233
+  ],
+  [
+   850,
+   4.4853
+  ],
+  [
+   900,
+   4.4559
+  ],
+  [
+   950,
+   4.4424
+  ],
+  [
+   952,
+   4.4423
+  ]
+ ],
+ "train_seconds": 112.57,
+ "wall_seconds": 128.07,
+ "chars_per_sec": 69351,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl called Lucy.\nOne day, Parl Katy was scared. He knew he was a little or trazors. He asked her friend, a butterfly and asked her mom if she could make a work.\nMia and the rabbit swam to the lake. The squirrel was excited and had found a big, shiny voice. The duck was very sad because it had to make the hole to. Every day, sheh got ask to be towing from the forest with her friends.\n<|eot|>\n\nOnce upon a time there was a little girl. She lived in a small house with her dad. She loved to go to the sand place so she laced the way out it.\nOne day, Anna and her mom started to laugh and sit on a big hole. She noticed a little book with a shut of animals rolling and crosss off the table. She was so happy of her smile. She walked down to get a song and stars and pieces.\nAt the end of the day, she went to the picture of the park, but the large dress. She put the teleaas and her nest in her hands. She wanted to know what she put it in it. She picked up the times and started to run through the grass.\n\"What is you so remembered it to me?\" she asked.\n\"It's too high and the redgestsin. Can you help you a surprise for you?\" the man said",
+ "rule_init": {},
+ "ngram_init": {}
+}

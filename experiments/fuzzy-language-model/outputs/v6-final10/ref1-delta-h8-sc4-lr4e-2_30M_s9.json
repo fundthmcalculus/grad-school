@@ -1,0 +1,207 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.56,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.04,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 9,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-final10\\ref1-delta-h8-sc4-lr4e-2_30M_s9.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.56,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93392,
+ "params_nonemb": 44240,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.15701,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.38287
+  ],
+  [
+   580,
+   1.266
+  ],
+  [
+   870,
+   1.19166
+  ],
+  [
+   1160,
+   1.15701
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.353
+  ],
+  [
+   50,
+   8.3209
+  ],
+  [
+   100,
+   6.3846
+  ],
+  [
+   150,
+   5.405
+  ],
+  [
+   200,
+   4.9074
+  ],
+  [
+   250,
+   4.6421
+  ],
+  [
+   300,
+   4.5018
+  ],
+  [
+   350,
+   4.3728
+  ],
+  [
+   400,
+   4.2831
+  ],
+  [
+   450,
+   4.2044
+  ],
+  [
+   500,
+   4.151
+  ],
+  [
+   550,
+   4.0877
+  ],
+  [
+   600,
+   4.0466
+  ],
+  [
+   650,
+   3.9964
+  ],
+  [
+   700,
+   3.9526
+  ],
+  [
+   750,
+   3.9236
+  ],
+  [
+   800,
+   3.8867
+  ],
+  [
+   850,
+   3.8365
+  ],
+  [
+   900,
+   3.8088
+  ],
+  [
+   950,
+   3.7546
+  ],
+  [
+   1000,
+   3.7439
+  ],
+  [
+   1050,
+   3.7288
+  ],
+  [
+   1100,
+   3.702
+  ],
+  [
+   1150,
+   3.6864
+  ],
+  [
+   1159,
+   3.6838
+  ]
+ ],
+ "train_seconds": 156.22,
+ "wall_seconds": 164.57,
+ "chars_per_sec": 60830,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and red bird. The pquur was a special vioinom. It was a harmless day. He put his pizza all day, so he decided to play with it every day.\n<|eot|>\nOnce upon a time, there was a tired little girl named Lucy. She loved to play with her toys. One day, she saw an idea. She asked her mom, \"Can I help me?\" she said, \"Yes, I want to play with don't organize and finally before you like your new place.\"\nAmy got the red and green rock and anxious other people. She did not know what was inside. She started to spot the birds. She hoons to behind the star. She put it back to the park and the monkele.\nAmy learned that if the treasure is never boring. They had fun and played with the park together.\n<|eot|>\nOnce upon a time, there was a dog named Spot. Spot loved to taste food. One day, Spot went to his toy car. He saw who was deep and the bug wanted to bed the box.\nTim said, \"I want to play with you!\" Sam said, please.\nA little girl came to the tower with the unpll. He wanted to learn",
+ "rule_init": {},
+ "ngram_init": {}
+}

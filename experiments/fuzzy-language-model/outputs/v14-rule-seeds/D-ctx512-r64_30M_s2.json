@@ -1,0 +1,213 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 64,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v14-rule-seeds\\D-ctx512-r64_30M_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 64,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 102560,
+ "params_nonemb": 53408,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10567,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.3617
+  ],
+  [
+   580,
+   1.23318
+  ],
+  [
+   870,
+   1.14719
+  ],
+  [
+   1160,
+   1.10567
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3454
+  ],
+  [
+   50,
+   8.0896
+  ],
+  [
+   100,
+   6.2494
+  ],
+  [
+   150,
+   5.3237
+  ],
+  [
+   200,
+   4.841
+  ],
+  [
+   250,
+   4.6002
+  ],
+  [
+   300,
+   4.4447
+  ],
+  [
+   350,
+   4.3183
+  ],
+  [
+   400,
+   4.2153
+  ],
+  [
+   450,
+   4.1249
+  ],
+  [
+   500,
+   4.0639
+  ],
+  [
+   550,
+   3.9878
+  ],
+  [
+   600,
+   3.9448
+  ],
+  [
+   650,
+   3.888
+  ],
+  [
+   700,
+   3.819
+  ],
+  [
+   750,
+   3.7766
+  ],
+  [
+   800,
+   3.7415
+  ],
+  [
+   850,
+   3.6964
+  ],
+  [
+   900,
+   3.6593
+  ],
+  [
+   950,
+   3.6191
+  ],
+  [
+   1000,
+   3.593
+  ],
+  [
+   1050,
+   3.5658
+  ],
+  [
+   1100,
+   3.5451
+  ],
+  [
+   1150,
+   3.5128
+  ],
+  [
+   1159,
+   3.5149
+  ]
+ ],
+ "train_seconds": 82.25,
+ "wall_seconds": 89.84,
+ "chars_per_sec": 115537,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and little bird. \nThe bird was a special shiver. He would feed the harce and fell. He put his pizzze healthys the tree. It was a big, fairy mark. He was so excited. He reached the tree and slided he could. \nEvery day, Molly and the bird sat on the slide, but they couldn't wait to play. The bird was a little bunny. There was a friendly bird too. The bird was sad and said, \"No!\"\nThe bird said, \"Don't worry, you did not play with me!\" The bird smiled and thanked the bird for help. The bird was happy and happy. They learned that Pinally can have more nice than work together with the big, happy friend.\n<|eot|>\nOnce upon a time, there was a little bucky dog named Spot. Spot loved to play with his friends and play. One day, Spot saw a big bunny in the bunny. The bunny wanted to play with Spot, but if he could not fly anymore.\nSpot ran to the bunny and bed the bunny. Spot said, \"I want to play with you!\" Sam said, \"Yes, let's go close to your towards!\" Spot and Spot were very happy.\n",
+ "rule_init": {},
+ "ngram_init": {}
+}

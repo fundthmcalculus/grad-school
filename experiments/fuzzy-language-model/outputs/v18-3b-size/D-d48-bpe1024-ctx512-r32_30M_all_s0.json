@@ -1,0 +1,215 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v18-3b-size\\D-d48-bpe1024-ctx512-r32_30M_all_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10521,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.35564
+  ],
+  [
+   580,
+   1.22531
+  ],
+  [
+   870,
+   1.1454
+  ],
+  [
+   1160,
+   1.10521
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.4056
+  ],
+  [
+   50,
+   8.1472
+  ],
+  [
+   100,
+   6.2652
+  ],
+  [
+   150,
+   5.3222
+  ],
+  [
+   200,
+   4.8382
+  ],
+  [
+   250,
+   4.5941
+  ],
+  [
+   300,
+   4.4219
+  ],
+  [
+   350,
+   4.3072
+  ],
+  [
+   400,
+   4.1988
+  ],
+  [
+   450,
+   4.1258
+  ],
+  [
+   500,
+   4.0532
+  ],
+  [
+   550,
+   3.9896
+  ],
+  [
+   600,
+   3.9091
+  ],
+  [
+   650,
+   3.8675
+  ],
+  [
+   700,
+   3.8352
+  ],
+  [
+   750,
+   3.7893
+  ],
+  [
+   800,
+   3.7297
+  ],
+  [
+   850,
+   3.6845
+  ],
+  [
+   900,
+   3.646
+  ],
+  [
+   950,
+   3.6277
+  ],
+  [
+   1000,
+   3.5907
+  ],
+  [
+   1050,
+   3.5577
+  ],
+  [
+   1100,
+   3.5336
+  ],
+  [
+   1150,
+   3.5276
+  ],
+  [
+   1159,
+   3.5231
+  ]
+ ],
+ "train_seconds": 81.98,
+ "wall_seconds": 88.89,
+ "chars_per_sec": 115921,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Mia. Mia loved to play with her special shiver. One day, Mia found a toy carrot on the floor. She was sad and could not see what was inside.\nSam saw a big, stuiting. Tom was scared of the carbit. He wanted to slide, but it could notrove it. They picked it up the truth and yelled. Tom was happy to help the missionion.\nSam and Tom walked back to the miss. They decided to make him very much. They were so happy.\nSam and Tom ran to their house through the bag. They went to the exarble and took the car to turn. After they finished it, they found a beautiful dog. The cat was sad, so the mad was a gunn. But the mellap was never boring. The light was not a pretty medal anymore. Mia and Tom were happy. They all had green, but it was time to have each other.\n<|eot|>\nOne day, a little boy named Tim saw an enormous clothes. He asked his mom, \"What is a snowmer for what you like it?\" Sam pushed and Ben said, \"I want to play with the unusual ball. But we",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,286 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.25,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v36-cosmo\\tiered_30M_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.25,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98280,
+ "params_nonemb": 56552,
+ "steps": 1414,
+ "chars_seen": 30016616,
+ "chars_per_token": 2.591328,
+ "val_bpc": 1.85823,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.97993
+  ],
+  [
+   100,
+   2.42746
+  ],
+  [
+   200,
+   2.24539
+  ],
+  [
+   300,
+   2.16519
+  ],
+  [
+   400,
+   2.10522
+  ],
+  [
+   500,
+   2.06807
+  ],
+  [
+   600,
+   2.02577
+  ],
+  [
+   700,
+   2.00145
+  ],
+  [
+   800,
+   1.96475
+  ],
+  [
+   900,
+   1.94011
+  ],
+  [
+   1000,
+   1.92053
+  ],
+  [
+   1100,
+   1.89511
+  ],
+  [
+   1200,
+   1.87998
+  ],
+  [
+   1300,
+   1.86579
+  ],
+  [
+   1400,
+   1.85709
+  ],
+  [
+   1414,
+   1.85823
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.256
+  ],
+  [
+   50,
+   8.7096
+  ],
+  [
+   100,
+   7.2547
+  ],
+  [
+   150,
+   6.4911
+  ],
+  [
+   200,
+   6.0671
+  ],
+  [
+   250,
+   5.8209
+  ],
+  [
+   300,
+   5.6769
+  ],
+  [
+   350,
+   5.5471
+  ],
+  [
+   400,
+   5.4771
+  ],
+  [
+   450,
+   5.4116
+  ],
+  [
+   500,
+   5.3942
+  ],
+  [
+   550,
+   5.313
+  ],
+  [
+   600,
+   5.2759
+  ],
+  [
+   650,
+   5.2042
+  ],
+  [
+   700,
+   5.186
+  ],
+  [
+   750,
+   5.153
+  ],
+  [
+   800,
+   5.1072
+  ],
+  [
+   850,
+   5.0684
+  ],
+  [
+   900,
+   5.0425
+  ],
+  [
+   950,
+   4.9982
+  ],
+  [
+   1000,
+   4.9767
+  ],
+  [
+   1050,
+   4.9426
+  ],
+  [
+   1100,
+   4.913
+  ],
+  [
+   1150,
+   4.8768
+  ],
+  [
+   1200,
+   4.8615
+  ],
+  [
+   1250,
+   4.8462
+  ],
+  [
+   1300,
+   4.8266
+  ],
+  [
+   1350,
+   4.8154
+  ],
+  [
+   1400,
+   4.7886
+  ],
+  [
+   1413,
+   4.7878
+  ]
+ ],
+ "train_seconds": 98.19,
+ "wall_seconds": 118.99,
+ "chars_per_sec": 117967,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time.\n\nAt this course unit time, National-aiking solidays, part of returning versions, focusing, and use the share feelings! Endory, let's dive into the concept of natural story, such as butter, investigate her own transligance. By compared to the life equipment and both two data lander cells within the treatments and energe.\n\nII. Interactioning Relue\n\nAs, we will delve into the change of the history of the United State Benny. A circuarch internal appropriation with the complexities of argugp, labor, and under acceptance wough to pringure in the Asi, the concept of publishing toward historical roles and perspective on the nuances of generary commitment. We have the Jew Decorame foundations of such education to the fact of the Sopmary and American websit. This services let's significant to be applications.\n",
+ "rule_init": {},
+ "ngram_init": {}
+}

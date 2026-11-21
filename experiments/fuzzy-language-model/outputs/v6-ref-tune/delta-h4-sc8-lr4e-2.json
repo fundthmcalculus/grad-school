@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 4,
+  "rules": 16,
+  "ffn_mult": 2.6,
+  "tsk_dim": 0,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.04,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-ref-tune\\delta-h4-sc8-lr4e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 4,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.6,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93376,
+ "params_nonemb": 44224,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.27768,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.61967
+  ],
+  [
+   192,
+   1.43892
+  ],
+  [
+   288,
+   1.33931
+  ],
+  [
+   384,
+   1.27833
+  ],
+  [
+   387,
+   1.27768
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3998
+  ],
+  [
+   50,
+   8.3977
+  ],
+  [
+   100,
+   6.4783
+  ],
+  [
+   150,
+   5.4646
+  ],
+  [
+   200,
+   4.9402
+  ],
+  [
+   250,
+   4.6279
+  ],
+  [
+   300,
+   4.3955
+  ],
+  [
+   350,
+   4.219
+  ],
+  [
+   386,
+   4.1524
+  ]
+ ],
+ "train_seconds": 36.92,
+ "wall_seconds": 45.43,
+ "chars_per_sec": 85866,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called her.\nBut then, her mom asked, \"What is. No is hop that? I am a new friend. I can have to play with the windows!\"\nLily and Lily are sad. They promised to be playing and tired their friends. They see how to slide. They get fun. They look for the ball. They are happy and happy.\nThe man is clever, but they are more careful. They see a silly parade. The treeo and they srawled the ball. They are happy. And they are the best of friends.\n<|eot|>\nOnce upon a time, there was a bake. They liked to play together every day.\nOne day, a big cat named Tom came to the garden. But the stared, the dog saw a big pile of monster. He wanted to take the mud andell down. Tim saw it hezy on the tipy and said, \"You can't play with its toys.\" Fred, Tim saw a trip in the box. He came over in his room. But he was finished! He opened the door and saw that the little bird did not find a snow. Tim was so happy to play with his pink.\nAfter the park, he towen, the persistent. He looked around",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,642 @@
+{
+ "S001": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "The little dog was sad because"
+ },
+ "S002": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "Once upon a time"
+ },
+ "S003": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "Once upon a time"
+ },
+ "S004": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "Once upon a time"
+ },
+ "S005": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S006": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S007": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "Once upon a time"
+ },
+ "S008": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S009": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S010": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S011": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "The little dog was sad because"
+ },
+ "S012": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "Once upon a time"
+ },
+ "S013": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S014": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "Once upon a time"
+ },
+ "S015": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S016": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S017": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S018": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S019": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S020": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S021": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "Once upon a time"
+ },
+ "S022": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "The little dog was sad because"
+ },
+ "S023": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "Once upon a time"
+ },
+ "S024": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S025": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "Once upon a time"
+ },
+ "S026": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S027": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S028": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "The little dog was sad because"
+ },
+ "S029": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S030": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S031": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S032": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S033": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "The little dog was sad because"
+ },
+ "S034": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "Once upon a time"
+ },
+ "S035": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S036": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S037": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S038": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S039": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "Once upon a time"
+ },
+ "S040": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S041": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "Once upon a time"
+ },
+ "S042": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "Once upon a time"
+ },
+ "S043": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S044": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "Once upon a time"
+ },
+ "S045": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "Once upon a time"
+ },
+ "S046": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "The little dog was sad because"
+ },
+ "S047": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S048": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S049": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S050": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "Once upon a time"
+ },
+ "S051": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S052": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S053": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S054": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S055": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "The little dog was sad because"
+ },
+ "S056": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "Once upon a time"
+ },
+ "S057": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "Once upon a time"
+ },
+ "S058": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S059": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S060": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S061": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S062": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "Once upon a time"
+ },
+ "S063": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "Once upon a time"
+ },
+ "S064": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S065": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "Once upon a time"
+ },
+ "S066": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "Once upon a time"
+ },
+ "S067": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S068": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "The little dog was sad because"
+ },
+ "S069": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S070": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "The little dog was sad because"
+ },
+ "S071": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S072": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S073": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S074": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S075": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "The little dog was sad because"
+ },
+ "S076": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S077": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "Once upon a time"
+ },
+ "S078": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S079": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "The little dog was sad because"
+ },
+ "S080": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S081": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "The little dog was sad because"
+ },
+ "S082": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S083": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "Once upon a time"
+ },
+ "S084": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "The little dog was sad because"
+ },
+ "S085": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S086": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S087": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S088": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S089": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S090": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "Once upon a time"
+ },
+ "S091": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S092": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "Once upon a time"
+ },
+ "S093": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S094": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S095": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S096": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "The little dog was sad because"
+ },
+ "S097": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S098": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S099": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "Once upon a time"
+ },
+ "S100": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "Once upon a time"
+ },
+ "S101": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "Once upon a time"
+ },
+ "S102": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S103": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S104": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S105": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S106": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S107": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S108": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "Once upon a time"
+ },
+ "S109": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S110": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S111": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S112": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S113": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "Once upon a time"
+ },
+ "S114": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S115": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S116": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S117": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "Once upon a time"
+ },
+ "S118": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S119": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S120": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S121": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "The little dog was sad because"
+ },
+ "S122": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "The little dog was sad because"
+ },
+ "S123": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S124": {
+  "group": "F7re_S0",
+  "ckpt": "reann_F7_1600_3e-3_s1",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S125": {
+  "group": "H3re_S8",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "One day, a girl named Mia found"
+ },
+ "S126": {
+  "group": "F7re_S8",
+  "ckpt": "reann_F7_1600_3e-3",
+  "prompt": "Lily and Ben went to the park."
+ },
+ "S127": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3",
+  "prompt": "The little dog was sad because"
+ },
+ "S128": {
+  "group": "H3re_S0",
+  "ckpt": "reann_H3_1600_3e-3_s1",
+  "prompt": "The little dog was sad because"
+ }
+}

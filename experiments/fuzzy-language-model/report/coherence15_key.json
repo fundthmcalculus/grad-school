@@ -1,0 +1,194 @@
+{
+ "S001": {
+  "model": "ref_300M_s0",
+  "params": 96416,
+  "prompt": "The Roman Empire was one of the largest",
+  "seed": 60
+ },
+ "S002": {
+  "model": "tiered_3000M_s0",
+  "params": 98280,
+  "prompt": "Photosynthesis is the process by which",
+  "seed": 61
+ },
+ "S003": {
+  "model": "tiered_300M_s0",
+  "params": 98280,
+  "prompt": "To make a simple paper airplane, first",
+  "seed": 61
+ },
+ "S004": {
+  "model": "tiered_3000M_s0",
+  "params": 98280,
+  "prompt": "To make a simple paper airplane, first",
+  "seed": 60
+ },
+ "S005": {
+  "model": "ref_300M_s0",
+  "params": 96416,
+  "prompt": "The Roman Empire was one of the largest",
+  "seed": 61
+ },
+ "S006": {
+  "model": "cosmo_d256-L4_1000M_s0",
+  "params": 2223936,
+  "prompt": "The Roman Empire was one of the largest",
+  "seed": 61
+ },
+ "S007": {
+  "model": "cosmo_d256-L4_1000M_s0",
+  "params": 2223936,
+  "prompt": "In this section, we will learn about fractions.",
+  "seed": 61
+ },
+ "S008": {
+  "model": "tiered_300M_s0",
+  "params": 98280,
+  "prompt": "In this section, we will learn about fractions.",
+  "seed": 60
+ },
+ "S009": {
+  "model": "cosmo_d256-L4_1000M_s0",
+  "params": 2223936,
+  "prompt": "Photosynthesis is the process by which",
+  "seed": 60
+ },
+ "S010": {
+  "model": "tiered_3000M_s0",
+  "params": 98280,
+  "prompt": "In this section, we will learn about fractions.",
+  "seed": 60
+ },
+ "S011": {
+  "model": "tiered_3000M_s0",
+  "params": 98280,
+  "prompt": "Photosynthesis is the process by which",
+  "seed": 60
+ },
+ "S012": {
+  "model": "tiered_3000M_s0",
+  "params": 98280,
+  "prompt": "In this section, we will learn about fractions.",
+  "seed": 61
+ },
+ "S013": {
+  "model": "tiered_300M_s0",
+  "params": 98280,
+  "prompt": "In this section, we will learn about fractions.",
+  "seed": 61
+ },
+ "S014": {
+  "model": "ref_300M_s0",
+  "params": 96416,
+  "prompt": "Photosynthesis is the process by which",
+  "seed": 60
+ },
+ "S015": {
+  "model": "tiered_300M_s0",
+  "params": 98280,
+  "prompt": "The Roman Empire was one of the largest",
+  "seed": 61
+ },
+ "S016": {
+  "model": "tiered_3000M_s0",
+  "params": 98280,
+  "prompt": "The Roman Empire was one of the largest",
+  "seed": 61
+ },
+ "S017": {
+  "model": "ref_300M_s0",
+  "params": 96416,
+  "prompt": "Photosynthesis is the process by which",
+  "seed": 61
+ },
+ "S018": {
+  "model": "ref_300M_s0",
+  "params": 96416,
+  "prompt": "To make a simple paper airplane, first",
+  "seed": 61
+ },
+ "S019": {
+  "model": "cosmo_d256-L4_1000M_s0",
+  "params": 2223936,
+  "prompt": "In this section, we will learn about fractions.",
+  "seed": 60
+ },
+ "S020": {
+  "model": "tiered_300M_s0",
+  "params": 98280,
+  "prompt": "Photosynthesis is the process by which",
+  "seed": 60
+ },
+ "S021": {
+  "model": "ref_300M_s0",
+  "params": 96416,
+  "prompt": "To make a simple paper airplane, first",
+  "seed": 60
+ },
+ "S022": {
+  "model": "tiered_300M_s0",
+  "params": 98280,
+  "prompt": "To make a simple paper airplane, first",
+  "seed": 60
+ },
+ "S023": {
+  "model": "tiered_3000M_s0",
+  "params": 98280,
+  "prompt": "To make a simple paper airplane, first",
+  "seed": 61
+ },
+ "S024": {
+  "model": "cosmo_d256-L4_1000M_s0",
+  "params": 2223936,
+  "prompt": "To make a simple paper airplane, first",
+  "seed": 61
+ },
+ "S025": {
+  "model": "tiered_300M_s0",
+  "params": 98280,
+  "prompt": "Photosynthesis is the process by which",
+  "seed": 61
+ },
+ "S026": {
+  "model": "cosmo_d256-L4_1000M_s0",
+  "params": 2223936,
+  "prompt": "To make a simple paper airplane, first",
+  "seed": 60
+ },
+ "S027": {
+  "model": "cosmo_d256-L4_1000M_s0",
+  "params": 2223936,
+  "prompt": "Photosynthesis is the process by which",
+  "seed": 61
+ },
+ "S028": {
+  "model": "ref_300M_s0",
+  "params": 96416,
+  "prompt": "In this section, we will learn about fractions.",
+  "seed": 61
+ },
+ "S029": {
+  "model": "tiered_3000M_s0",
+  "params": 98280,
+  "prompt": "The Roman Empire was one of the largest",
+  "seed": 60
+ },
+ "S030": {
+  "model": "cosmo_d256-L4_1000M_s0",
+  "params": 2223936,
+  "prompt": "The Roman Empire was one of the largest",
+  "seed": 60
+ },
+ "S031": {
+  "model": "ref_300M_s0",
+  "params": 96416,
+  "prompt": "In this section, we will learn about fractions.",
+  "seed": 60
+ },
+ "S032": {
+  "model": "tiered_300M_s0",
+  "params": 98280,
+  "prompt": "The Roman Empire was one of the largest",
+  "seed": 60
+ }
+}

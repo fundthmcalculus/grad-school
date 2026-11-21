@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v48-fuzzyproj\\proj_tskl_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98720,
+ "params_nonemb": 47456,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.08303,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06018
+  ],
+  [
+   100,
+   1.42877
+  ],
+  [
+   200,
+   1.30942
+  ],
+  [
+   300,
+   1.25224
+  ],
+  [
+   400,
+   1.21109
+  ],
+  [
+   500,
+   1.17674
+  ],
+  [
+   600,
+   1.14525
+  ],
+  [
+   700,
+   1.11955
+  ],
+  [
+   800,
+   1.09998
+  ],
+  [
+   900,
+   1.08735
+  ],
+  [
+   953,
+   1.08303
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7321
+  ],
+  [
+   50,
+   9.0506
+  ],
+  [
+   100,
+   6.9331
+  ],
+  [
+   150,
+   5.9126
+  ],
+  [
+   200,
+   5.4054
+  ],
+  [
+   250,
+   5.133
+  ],
+  [
+   300,
+   4.9711
+  ],
+  [
+   350,
+   4.8772
+  ],
+  [
+   400,
+   4.7752
+  ],
+  [
+   450,
+   4.6742
+  ],
+  [
+   500,
+   4.602
+  ],
+  [
+   550,
+   4.5251
+  ],
+  [
+   600,
+   4.4526
+  ],
+  [
+   650,
+   4.4109
+  ],
+  [
+   700,
+   4.3633
+  ],
+  [
+   750,
+   4.3291
+  ],
+  [
+   800,
+   4.2737
+  ],
+  [
+   850,
+   4.2399
+  ],
+  [
+   900,
+   4.2269
+  ],
+  [
+   950,
+   4.2047
+  ],
+  [
+   952,
+   4.206
+  ]
+ ],
+ "train_seconds": 71.73,
+ "wall_seconds": 82.97,
+ "chars_per_sec": 108831,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl called Lucy. She was very excited to see the big tree. One day, a little girl named Amy was laughing to the box with her mom.\nAmy showed her other to her friend, a wise old owl. They looked tired and laughed. The little girl thought for the big blue cream on the office, and they both smiled together to see a big red coin. They all had a fun day at the castle, and they all had fun together.\n<|eot|>\n\nOnce upon a time there was a little boy named Zip. He was very excited to know what to do. He flew up to the big, thick cloth for his family. The whole place was a big, blue door, and it was so beautiful!\nOuch said, \"Don't worry, Ive! I will fit a big hole of roll!\"\nYane and the hole started to roll it away. They saw a big, olderge of familer and a slow house. The little girl was very excited. \nThe little girl knew the crab knew the large dress was and the mill and he had to read something special with the pieces. He just wanted to stay up and look at the chive and if he could not to help.\nThe big little girl was so happy that it started to take his dream.\n<|eot|>\n\nOnce upon a time there was a little girl who was very independent. She was excited and gave all her",
+ "rule_init": {},
+ "ngram_init": {}
+}

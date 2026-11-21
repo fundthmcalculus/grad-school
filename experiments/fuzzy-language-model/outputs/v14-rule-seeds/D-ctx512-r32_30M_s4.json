@@ -1,0 +1,213 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v14-rule-seeds\\D-ctx512-r32_30M_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.12185,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.35912
+  ],
+  [
+   580,
+   1.2379
+  ],
+  [
+   870,
+   1.16321
+  ],
+  [
+   1160,
+   1.12185
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3559
+  ],
+  [
+   50,
+   8.1649
+  ],
+  [
+   100,
+   6.2639
+  ],
+  [
+   150,
+   5.347
+  ],
+  [
+   200,
+   4.8497
+  ],
+  [
+   250,
+   4.5968
+  ],
+  [
+   300,
+   4.4251
+  ],
+  [
+   350,
+   4.315
+  ],
+  [
+   400,
+   4.2091
+  ],
+  [
+   450,
+   4.1502
+  ],
+  [
+   500,
+   4.0798
+  ],
+  [
+   550,
+   4.0307
+  ],
+  [
+   600,
+   3.9594
+  ],
+  [
+   650,
+   3.9051
+  ],
+  [
+   700,
+   3.8697
+  ],
+  [
+   750,
+   3.8246
+  ],
+  [
+   800,
+   3.7774
+  ],
+  [
+   850,
+   3.7259
+  ],
+  [
+   900,
+   3.6934
+  ],
+  [
+   950,
+   3.6704
+  ],
+  [
+   1000,
+   3.6367
+  ],
+  [
+   1050,
+   3.6012
+  ],
+  [
+   1100,
+   3.5879
+  ],
+  [
+   1150,
+   3.5667
+  ],
+  [
+   1159,
+   3.5691
+  ]
+ ],
+ "train_seconds": 80.27,
+ "wall_seconds": 87.21,
+ "chars_per_sec": 118383,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Ben.\n\"quur, there is a little boy. Can I go to the park that? I do. We have to pizzy toper. They will wear it too!\"\nThey looked at each other. They saw the movable. They hoped the next to the most candage. They were very curious. They did not know how to go to the clear, but they couldn't wait to play.\n\"Mommy, likes not teacher. We have a new toy. It is a bed.\" But they did not grow the anggle. They did not like to play.\n\"Look, they want to play again,\" Lily said.\n\"Oh no!\" Anna said. \"You can teach them for pass with my mad. You are too stonching and yarn. You are very unzalient. It is too small. It's a new friend. Do you want to play playing, but I can be about the delicious one.\"\nThey put the delicate cheap and talked. They throwed the novel. They wanted to learn more. They did not like Sam. They pushed and Ben having a loud noise. They did not want to crimrow",
+ "rule_init": {},
+ "ngram_init": {}
+}

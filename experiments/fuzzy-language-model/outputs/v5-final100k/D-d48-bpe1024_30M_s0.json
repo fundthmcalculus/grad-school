@@ -1,0 +1,207 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v5-final100k\\D-d48-bpe1024_30M_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93344,
+ "params_nonemb": 44192,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.12613,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.34556
+  ],
+  [
+   580,
+   1.22381
+  ],
+  [
+   870,
+   1.15868
+  ],
+  [
+   1160,
+   1.12613
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3326
+  ],
+  [
+   50,
+   8.3957
+  ],
+  [
+   100,
+   6.3953
+  ],
+  [
+   150,
+   5.3754
+  ],
+  [
+   200,
+   4.8656
+  ],
+  [
+   250,
+   4.5768
+  ],
+  [
+   300,
+   4.3904
+  ],
+  [
+   350,
+   4.2561
+  ],
+  [
+   400,
+   4.1712
+  ],
+  [
+   450,
+   4.0843
+  ],
+  [
+   500,
+   4.0079
+  ],
+  [
+   550,
+   3.9657
+  ],
+  [
+   600,
+   3.9368
+  ],
+  [
+   650,
+   3.8743
+  ],
+  [
+   700,
+   3.8196
+  ],
+  [
+   750,
+   3.7827
+  ],
+  [
+   800,
+   3.7622
+  ],
+  [
+   850,
+   3.7182
+  ],
+  [
+   900,
+   3.687
+  ],
+  [
+   950,
+   3.6557
+  ],
+  [
+   1000,
+   3.6331
+  ],
+  [
+   1050,
+   3.6108
+  ],
+  [
+   1100,
+   3.5903
+  ],
+  [
+   1150,
+   3.5834
+  ],
+  [
+   1159,
+   3.578
+  ]
+ ],
+ "train_seconds": 175.17,
+ "wall_seconds": 185.77,
+ "chars_per_sec": 54250,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Suzi. She was a special girl named Lily. She would always go to the difficious new clown. One day, they found a toy car. Kitty was too small top and fairy. She thought it was time to poke Tom's house. After a while, Lily decided to help her mom channy Mr. \"It's this car!\"\nAnna said, \"Maybe it's a red car. It don't a little birthday sound. If you write, the girl! You are the best?\"\nLily and Tom played together, through the birthday, even if they started to spot with the car. The boy saw a big hug and wanted it to Poot. He knew he had to be the monkele. He wanted to stop.\nAfter the wolf, Lily and Tom got out of the mushroom and walked to the birthday. They grew, and it was so happy. They played together every day, and they were all playing together every day.\n<|eot|>\n\n\nAnna likes to bed. Everyone loved to play with her toys. She was so happy that she would have a lot. Her mom told her about the fun tower touch the gone. She was playing",
+ "rule_init": {},
+ "ngram_init": {}
+}

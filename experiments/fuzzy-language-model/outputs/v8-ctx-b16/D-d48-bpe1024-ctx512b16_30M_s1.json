@@ -1,0 +1,207 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v8-ctx-b16\\D-d48-bpe1024-ctx512b16_30M_s1.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512
+ },
+ "params_total": 93344,
+ "params_nonemb": 44192,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11919,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.34756
+  ],
+  [
+   580,
+   1.22595
+  ],
+  [
+   870,
+   1.15454
+  ],
+  [
+   1160,
+   1.11919
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.4016
+  ],
+  [
+   50,
+   8.5544
+  ],
+  [
+   100,
+   6.4974
+  ],
+  [
+   150,
+   5.422
+  ],
+  [
+   200,
+   4.8932
+  ],
+  [
+   250,
+   4.5952
+  ],
+  [
+   300,
+   4.3992
+  ],
+  [
+   350,
+   4.2717
+  ],
+  [
+   400,
+   4.1964
+  ],
+  [
+   450,
+   4.0924
+  ],
+  [
+   500,
+   4.0379
+  ],
+  [
+   550,
+   3.9882
+  ],
+  [
+   600,
+   3.9391
+  ],
+  [
+   650,
+   3.8748
+  ],
+  [
+   700,
+   3.8368
+  ],
+  [
+   750,
+   3.7939
+  ],
+  [
+   800,
+   3.7437
+  ],
+  [
+   850,
+   3.7108
+  ],
+  [
+   900,
+   3.6874
+  ],
+  [
+   950,
+   3.6515
+  ],
+  [
+   1000,
+   3.6153
+  ],
+  [
+   1050,
+   3.5897
+  ],
+  [
+   1100,
+   3.5798
+  ],
+  [
+   1150,
+   3.5656
+  ],
+  [
+   1159,
+   3.5632
+  ]
+ ],
+ "train_seconds": 79.69,
+ "wall_seconds": 85.81,
+ "chars_per_sec": 119248,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy. She loved to meet a special piat. One day, she found a toy that the moon would be lock.\nAt the mody stuck in the stitin fall, Lucy was very friendly. She picked up the pocket and went to the rug. Lucy was so happy, he could not organize the race.\nThen, Lucy's mom came to help. She saw a red board. Lucy was very sad. She showed the lock and barked too. The lock said, \"I will wear the stow, you make a fool!\" Lucy and barked all day, even more fun.\n<|eot|>\n\nOnce upon a time, there was a little girl called Susy who Pignie. She was very proud of the monster. He wanted to Wake some on it and found some red tower to else some tire. His name was Finally, and Kitty didn't know green, but it was so excited.\nMike came over to play with the drank of the deep forest. She wanted to bed the deep, so she gave it a hard cower. She said, \"Wello, little gray, that's a guitch from the marar.",
+ "rule_init": {},
+ "ngram_init": {}
+}

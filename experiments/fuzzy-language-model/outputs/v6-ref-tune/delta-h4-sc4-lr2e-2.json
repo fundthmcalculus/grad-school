@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 4,
+  "rules": 16,
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.02,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "outputs/v6-ref-tune/delta-h4-sc4-lr2e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 4,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93376,
+ "params_nonemb": 44224,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.28538,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.62466
+  ],
+  [
+   192,
+   1.43875
+  ],
+  [
+   288,
+   1.33806
+  ],
+  [
+   384,
+   1.28573
+  ],
+  [
+   387,
+   1.28538
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3342
+  ],
+  [
+   50,
+   8.6478
+  ],
+  [
+   100,
+   6.6213
+  ],
+  [
+   150,
+   5.5132
+  ],
+  [
+   200,
+   4.9522
+  ],
+  [
+   250,
+   4.6209
+  ],
+  [
+   300,
+   4.3902
+  ],
+  [
+   350,
+   4.2243
+  ],
+  [
+   386,
+   4.1649
+  ]
+ ],
+ "train_seconds": 18.64,
+ "wall_seconds": 23.55,
+ "chars_per_sec": 170039,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big red owl. Thequur green vaia. The man was very happy and became best friends. They would play outside and play together together.\nOne day, Lily's mom saw a big tree with a big tree. The mum was playing and the puzzy. The next day, the bird would tight around the hole. They played with the sign and sandwiches. They had a lot of fun day together, and they were playing with the other friends. Sue and Lily found a friend who loved to run. They were all worked together to play with the water. They had an idea. They were playing in the pond.\nThe snap, Tom and Sam were best friends. They played in the park, happy and the best friend Pigncireet became toys around the monstess. They were sad, and had fun. They loved to bucket. They had fun tikes and had an idea. They played together in the kite and fun playing together.\n<|eot|>\nOnce upon a time, there was a little bird who loved to play with. One day, the deep wanted to have a tree. The bird was very happy.\nTim had a toy. But Max was too excited. He was very happy and knew that he had an idea. Sam was too happy and thanked the milray",
+ "rule_init": {},
+ "ngram_init": {}
+}

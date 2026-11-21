@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta_cpread",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v39-rflm30\\cpread_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta_cpread",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98464,
+ "params_nonemb": 49312,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10704,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.28517
+  ],
+  [
+   100,
+   1.58637
+  ],
+  [
+   200,
+   1.42877
+  ],
+  [
+   300,
+   1.36398
+  ],
+  [
+   400,
+   1.30464
+  ],
+  [
+   500,
+   1.26458
+  ],
+  [
+   600,
+   1.23115
+  ],
+  [
+   700,
+   1.20018
+  ],
+  [
+   800,
+   1.16879
+  ],
+  [
+   900,
+   1.1433
+  ],
+  [
+   1000,
+   1.12664
+  ],
+  [
+   1100,
+   1.11176
+  ],
+  [
+   1160,
+   1.10704
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3706
+  ],
+  [
+   50,
+   8.1333
+  ],
+  [
+   100,
+   6.2551
+  ],
+  [
+   150,
+   5.3447
+  ],
+  [
+   200,
+   4.878
+  ],
+  [
+   250,
+   4.6128
+  ],
+  [
+   300,
+   4.4527
+  ],
+  [
+   350,
+   4.3373
+  ],
+  [
+   400,
+   4.2484
+  ],
+  [
+   450,
+   4.1569
+  ],
+  [
+   500,
+   4.0992
+  ],
+  [
+   550,
+   4.0277
+  ],
+  [
+   600,
+   3.9645
+  ],
+  [
+   650,
+   3.8984
+  ],
+  [
+   700,
+   3.8477
+  ],
+  [
+   750,
+   3.8173
+  ],
+  [
+   800,
+   3.7608
+  ],
+  [
+   850,
+   3.7006
+  ],
+  [
+   900,
+   3.6678
+  ],
+  [
+   950,
+   3.6228
+  ],
+  [
+   1000,
+   3.5829
+  ],
+  [
+   1050,
+   3.5553
+  ],
+  [
+   1100,
+   3.5396
+  ],
+  [
+   1150,
+   3.5416
+  ],
+  [
+   1159,
+   3.5364
+  ]
+ ],
+ "train_seconds": 83.14,
+ "wall_seconds": 97.84,
+ "chars_per_sec": 114292,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and strong bird. \nThe little bird was almost. He wanted to go to the sky, so he put him on the tree. He sickly could make a stick.\n\"Wow, first,\" the bird said. \"It's time to poke this box. I am a slider!\"\nThe bird jumped and chaired. He sucppored, \"I lost my ball!\" he started to move.\nThe bird was strong and said, \"But and full it!\"\nHis mom said, \"Sue, it's okay!\"\nThe bird came and went inside. He saw a bit. But the bird was not just scared. The bird was too sad. The bird was scared, but it was not work. \nThe bird was scared. The bird might, the bird was not nice anymore. But the bird felt bad.\n<|eot|>\nOnce upon a time, there was a gray cat named Tim. Tim loved to eat his friend, a little girl named Sue. Sue loved to tasty things. One day, Sue wanted to play with her toy box every day.\nA little girl named Sue wanted to bort in the sand. She gave Sue a big, red ball. She said, \"Hello, little girl! Now, Sue is unphlphrown",
+ "rule_init": {},
+ "ngram_init": {}
+}

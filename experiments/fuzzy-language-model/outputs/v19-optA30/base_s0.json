@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-optA30\\base_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11204,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.37359
+  ],
+  [
+   580,
+   1.23422
+  ],
+  [
+   870,
+   1.15427
+  ],
+  [
+   1160,
+   1.11204
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3706
+  ],
+  [
+   50,
+   8.1268
+  ],
+  [
+   100,
+   6.2495
+  ],
+  [
+   150,
+   5.3426
+  ],
+  [
+   200,
+   4.8795
+  ],
+  [
+   250,
+   4.6196
+  ],
+  [
+   300,
+   4.4559
+  ],
+  [
+   350,
+   4.3442
+  ],
+  [
+   400,
+   4.2571
+  ],
+  [
+   450,
+   4.1683
+  ],
+  [
+   500,
+   4.0992
+  ],
+  [
+   550,
+   4.0265
+  ],
+  [
+   600,
+   3.9584
+  ],
+  [
+   650,
+   3.897
+  ],
+  [
+   700,
+   3.8462
+  ],
+  [
+   750,
+   3.8179
+  ],
+  [
+   800,
+   3.7583
+  ],
+  [
+   850,
+   3.7056
+  ],
+  [
+   900,
+   3.6735
+  ],
+  [
+   950,
+   3.6286
+  ],
+  [
+   1000,
+   3.5913
+  ],
+  [
+   1050,
+   3.5634
+  ],
+  [
+   1100,
+   3.5505
+  ],
+  [
+   1150,
+   3.5517
+  ],
+  [
+   1159,
+   3.5473
+  ]
+ ],
+ "train_seconds": 82.84,
+ "wall_seconds": 94.67,
+ "chars_per_sec": 114718,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Lucy. \nLucy was a special shiver. She wanted to go to the park, so she put him down the slide.\nAmy said, \"I will help you?\" Lucy told her mom, \"What's you do, Lucy?\" Lucy agreed and went to the yummy castle, but she did not chair Maroo the elephant.\nLittle girl went to her mom and dadmy to her mom. She said, \"Carch and hug Trowy, let's go to a door. If you okay?\" Lucy asked her mom and dad, thank you. She did not know Married to her mom.\nBut the girl said, \"I know that you didn't be scared.\" Lucy was happy and thanked Lucy about the toys. They learned that mightnon and toys learned to have studend.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to explore her bird. One day, she saw a big tree with a big tree. The squirrel wanted to play with Lily.\nLily walked around the tree with her friend, a big bed. Everyone looked at the big tree and saw the tree. Lily said, \"Okay, I am so having so much fun!\"\nLily was sad and asked, \"Dred",
+ "rule_init": {},
+ "ngram_init": {}
+}

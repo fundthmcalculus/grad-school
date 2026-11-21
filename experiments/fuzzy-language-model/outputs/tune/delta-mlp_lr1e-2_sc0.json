@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/delta-mlp_lr1e-2_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 19944,
+ "params_nonemb": 16808,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.80645,
+ "evals": [
+  [
+   305,
+   2.16258
+  ],
+  [
+   610,
+   1.95704
+  ],
+  [
+   915,
+   1.85386
+  ],
+  [
+   1220,
+   1.80765
+  ],
+  [
+   1221,
+   1.80645
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9499
+  ],
+  [
+   50,
+   5.7142
+  ],
+  [
+   100,
+   4.1557
+  ],
+  [
+   150,
+   3.2271
+  ],
+  [
+   200,
+   2.7162
+  ],
+  [
+   250,
+   2.4403
+  ],
+  [
+   300,
+   2.2836
+  ],
+  [
+   350,
+   2.1925
+  ],
+  [
+   400,
+   2.1172
+  ],
+  [
+   450,
+   2.0771
+  ],
+  [
+   500,
+   2.0427
+  ],
+  [
+   550,
+   1.9984
+  ],
+  [
+   600,
+   1.97
+  ],
+  [
+   650,
+   1.956
+  ],
+  [
+   700,
+   1.9405
+  ],
+  [
+   750,
+   1.9268
+  ],
+  [
+   800,
+   1.9075
+  ],
+  [
+   850,
+   1.8927
+  ],
+  [
+   900,
+   1.8802
+  ],
+  [
+   950,
+   1.8698
+  ],
+  [
+   1000,
+   1.8417
+  ],
+  [
+   1050,
+   1.8363
+  ],
+  [
+   1100,
+   1.827
+  ],
+  [
+   1150,
+   1.8209
+  ],
+  [
+   1200,
+   1.8244
+  ],
+  [
+   1220,
+   1.8247
+  ]
+ ],
+ "train_seconds": 866.26,
+ "wall_seconds": 1144.9,
+ "chars_per_sec": 11547,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was not fish they something sad, there was a little down her friends, but you give happily. He careful, them in as his got so cheeside her read away together and give has to the list cow. The lived tireds to play, the go other a big slide and said, \"I want to care. They adver he did. He was ",
+ "rule_init": {}
+}

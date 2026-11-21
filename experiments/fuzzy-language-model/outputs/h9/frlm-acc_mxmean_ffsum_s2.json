@@ -1,0 +1,189 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 2,
+  "threads": 1,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/h9/frlm-acc_mxmean_ffsum_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "sum",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "sum",
+  "max_len": 256
+ },
+ "params_total": 28260,
+ "params_nonemb": 25124,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.86098,
+ "evals": [
+  [
+   305,
+   2.25713
+  ],
+  [
+   610,
+   2.0307
+  ],
+  [
+   915,
+   1.91982
+  ],
+  [
+   1220,
+   1.86051
+  ],
+  [
+   1221,
+   1.86098
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.7577
+  ],
+  [
+   50,
+   5.4282
+  ],
+  [
+   100,
+   4.0628
+  ],
+  [
+   150,
+   3.2667
+  ],
+  [
+   200,
+   2.8239
+  ],
+  [
+   250,
+   2.5466
+  ],
+  [
+   300,
+   2.3939
+  ],
+  [
+   350,
+   2.2968
+  ],
+  [
+   400,
+   2.2192
+  ],
+  [
+   450,
+   2.1588
+  ],
+  [
+   500,
+   2.12
+  ],
+  [
+   550,
+   2.0891
+  ],
+  [
+   600,
+   2.0637
+  ],
+  [
+   650,
+   2.0353
+  ],
+  [
+   700,
+   2.0191
+  ],
+  [
+   750,
+   1.9984
+  ],
+  [
+   800,
+   1.9816
+  ],
+  [
+   850,
+   1.9617
+  ],
+  [
+   900,
+   1.9392
+  ],
+  [
+   950,
+   1.9284
+  ],
+  [
+   1000,
+   1.9189
+  ],
+  [
+   1050,
+   1.8936
+  ],
+  [
+   1100,
+   1.8805
+  ],
+  [
+   1150,
+   1.8721
+  ],
+  [
+   1200,
+   1.8648
+  ],
+  [
+   1220,
+   1.8658
+  ]
+ ],
+ "train_seconds": 1060.43,
+ "wall_seconds": 1273.26,
+ "chars_per_sec": 9432,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "device": "cpu",
+ "device_name": "11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz",
+ "host": "localhost.localdomain",
+ "sample": "Once upon a time, there was inside the bird. He wead the the watcher looked at started to play with a girl what a big on the squirnf red sail.\nThe smiled and she wanted to her by liked to to huggy went Mia. He lokes, the red. Bobo. They leamed in a toy placs. The ball and playted windered.\n<|eot|>\n\n\nMarry lived started to ",
+ "rule_init": {}
+}

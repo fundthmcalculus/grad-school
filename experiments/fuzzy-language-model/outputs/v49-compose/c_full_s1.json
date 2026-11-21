@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v49-compose\\c_full_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99005,
+ "params_nonemb": 47741,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.11515,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05419
+  ],
+  [
+   100,
+   1.48847
+  ],
+  [
+   200,
+   1.33664
+  ],
+  [
+   300,
+   1.27349
+  ],
+  [
+   400,
+   1.23562
+  ],
+  [
+   500,
+   1.20325
+  ],
+  [
+   600,
+   1.17563
+  ],
+  [
+   700,
+   1.15234
+  ],
+  [
+   800,
+   1.13192
+  ],
+  [
+   900,
+   1.11913
+  ],
+  [
+   953,
+   1.11515
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7381
+  ],
+  [
+   50,
+   9.3084
+  ],
+  [
+   100,
+   7.1637
+  ],
+  [
+   150,
+   6.0596
+  ],
+  [
+   200,
+   5.5227
+  ],
+  [
+   250,
+   5.2523
+  ],
+  [
+   300,
+   5.0734
+  ],
+  [
+   350,
+   4.9469
+  ],
+  [
+   400,
+   4.8597
+  ],
+  [
+   450,
+   4.7987
+  ],
+  [
+   500,
+   4.7204
+  ],
+  [
+   550,
+   4.6515
+  ],
+  [
+   600,
+   4.5746
+  ],
+  [
+   650,
+   4.5225
+  ],
+  [
+   700,
+   4.4771
+  ],
+  [
+   750,
+   4.4417
+  ],
+  [
+   800,
+   4.4057
+  ],
+  [
+   850,
+   4.3795
+  ],
+  [
+   900,
+   4.3343
+  ],
+  [
+   950,
+   4.3161
+  ],
+  [
+   952,
+   4.3177
+  ]
+ ],
+ "train_seconds": 74.81,
+ "wall_seconds": 85.47,
+ "chars_per_sec": 104351,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a bright me-a. The little boy wanted to help. So, she went to the poles to sing, but the traorn was a pretty, blue boat. In the end of the day, the sunny day, the little boy went to the park to make it come into the jungle. He learned that it is our friend.\n<|eot|>\nOnce upon a time, a little girl named Mia lived in a big. Every night, she would stay in her house and draw with her friends. She loved to play and feel important.\nOne day, she found a muse. She wanted to sing and find a new friend. She asked her mom, \"Can we go on?\" \nAnna said, \"Yes, please, I have a bath. I want to play with this oceve.\" But the next day, her mom felt good for her to sleep. They laughed and had many toys.\nThe next day, Lily and Lucy all had a fun day together. They went to the park too, and they all had a picture of the park with them.\n<|eot|>\nOnce upon a time, there was a boy named Tim. Tim liked to cook and run to the park. One day, Tim went to the park to play with his hair. One day, he met a girl named Sue. Sue said, \"Mom, you can't go on the ground. I am a new ball. Can you help this!\"\nMom said, \"Yes,",
+ "rule_init": {},
+ "ngram_init": {}
+}

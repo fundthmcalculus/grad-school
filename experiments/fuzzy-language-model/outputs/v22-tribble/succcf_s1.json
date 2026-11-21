@@ -1,0 +1,264 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v22-tribble\\succcf_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.17591,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   2.84343
+  ],
+  [
+   100,
+   1.5696
+  ],
+  [
+   200,
+   1.4375
+  ],
+  [
+   300,
+   1.3784
+  ],
+  [
+   400,
+   1.33489
+  ],
+  [
+   500,
+   1.30342
+  ],
+  [
+   600,
+   1.27176
+  ],
+  [
+   700,
+   1.24294
+  ],
+  [
+   800,
+   1.22322
+  ],
+  [
+   900,
+   1.20564
+  ],
+  [
+   1000,
+   1.18829
+  ],
+  [
+   1100,
+   1.18087
+  ],
+  [
+   1160,
+   1.17591
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   8.9385
+  ],
+  [
+   50,
+   7.2483
+  ],
+  [
+   100,
+   5.8839
+  ],
+  [
+   150,
+   5.1723
+  ],
+  [
+   200,
+   4.818
+  ],
+  [
+   250,
+   4.6011
+  ],
+  [
+   300,
+   4.4553
+  ],
+  [
+   350,
+   4.3677
+  ],
+  [
+   400,
+   4.3057
+  ],
+  [
+   450,
+   4.2165
+  ],
+  [
+   500,
+   4.1697
+  ],
+  [
+   550,
+   4.1274
+  ],
+  [
+   600,
+   4.0864
+  ],
+  [
+   650,
+   4.0279
+  ],
+  [
+   700,
+   3.9927
+  ],
+  [
+   750,
+   3.9563
+  ],
+  [
+   800,
+   3.9009
+  ],
+  [
+   850,
+   3.8753
+  ],
+  [
+   900,
+   3.8489
+  ],
+  [
+   950,
+   3.8242
+  ],
+  [
+   1000,
+   3.7922
+  ],
+  [
+   1050,
+   3.7551
+  ],
+  [
+   1100,
+   3.7491
+  ],
+  [
+   1150,
+   3.7266
+  ],
+  [
+   1159,
+   3.7301
+  ]
+ ],
+ "train_seconds": 79.56,
+ "wall_seconds": 94.73,
+ "chars_per_sec": 119437,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and little bird. \nThe little boy took the bird back at her house. She was very fast and thought about it to help. She said, \"Don't worry, Lily. Kitty! It is good, but I promise you. We just want to help your friends.\"\nBut the bird slidets, and the bird flew away. They picked it back the frog and ran after it. They was sad, but they couldn't wait to play.\nAfter a while, the bird had a big lake on the ground. The bird was not sorry anymore. The bird said, \"I am the anxious other people. I like to play with you!\" The bird smiled and thanked the bird again.\n<|eot|>\n\n\nTim and Sue were playing in the park with their toys. They had a big toys in the monstless on the toys. They both had a lot of fun.\nOne day, the toys were yummy and pretty. They wanted to play with their toys. It was her dog. The mom said, \"Let's play in the box.\"\nThe bouncge stopped and walked around, and her friend, a little boy. The toys was sad. They said, \"I want to be careful now. It are you passing,\" the dog said, \"Let's have the toys and make the mightrook",
+ "rule_init": {
+  "variant": "succcf",
+  "L0.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.3128
+  },
+  "L1.ffn": {
+   "gain": 1024,
+   "ce_nats": 6.2385
+  }
+ },
+ "ngram_init": {}
+}

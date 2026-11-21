@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 3,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\b3_lean_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 3,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99439,
+ "params_nonemb": 48175,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.14102,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.03453
+  ],
+  [
+   100,
+   1.53138
+  ],
+  [
+   200,
+   1.36599
+  ],
+  [
+   300,
+   1.30137
+  ],
+  [
+   400,
+   1.26258
+  ],
+  [
+   500,
+   1.22854
+  ],
+  [
+   600,
+   1.20036
+  ],
+  [
+   700,
+   1.17608
+  ],
+  [
+   800,
+   1.158
+  ],
+  [
+   900,
+   1.14539
+  ],
+  [
+   953,
+   1.14102
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.6497
+  ],
+  [
+   50,
+   9.3933
+  ],
+  [
+   100,
+   7.3906
+  ],
+  [
+   150,
+   6.2603
+  ],
+  [
+   200,
+   5.6763
+  ],
+  [
+   250,
+   5.366
+  ],
+  [
+   300,
+   5.1825
+  ],
+  [
+   350,
+   5.0734
+  ],
+  [
+   400,
+   4.9691
+  ],
+  [
+   450,
+   4.8731
+  ],
+  [
+   500,
+   4.7963
+  ],
+  [
+   550,
+   4.7193
+  ],
+  [
+   600,
+   4.6524
+  ],
+  [
+   650,
+   4.6181
+  ],
+  [
+   700,
+   4.5748
+  ],
+  [
+   750,
+   4.5428
+  ],
+  [
+   800,
+   4.4892
+  ],
+  [
+   850,
+   4.458
+  ],
+  [
+   900,
+   4.4497
+  ],
+  [
+   950,
+   4.4333
+  ],
+  [
+   952,
+   4.4344
+  ]
+ ],
+ "train_seconds": 112.2,
+ "wall_seconds": 127.55,
+ "chars_per_sec": 69578,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was busy and had a beautiful nest outside.\nOne sunny day, Lucy decided to spin around the park. She saw her friend, a butterfly. Lucy was a little boat. She decided to go to her. She asked her to help her.\nLucy, excited to help her mom. She decided to help her friend, a nice cat. They both became good friends and played together. Lucy had a great time to play with her friends. From that day on, Lucy and Lily had a new friends.\n<|eot|>\nOnce upon a time, there was a big tree. It was a hero named Lucy. She loved to play with her whole place. One day, she went to the park with her friends.\nAs the sun came over, Lucy found a big sunflower. It was a house. Lucy wanted to play with her cat. She said, \"Mom, can I do you?\" Lucy said, \"Be careful, Kitty! I can be hungry. I have to be safe.\"\nTim took the picture and said, \"Thank you, Lily. I will help you.\" So, Lucy wanted to help the little bird. They both went to the bird, but they needed help. And they shook their new branch together. And they lived happily ever after.\n<|eot|>\nOnce upon a time, in a wise old cat named Kitty went for a walk with a new house. Lucy was very happy to have a light. There was a",
+ "rule_init": {},
+ "ngram_init": {}
+}

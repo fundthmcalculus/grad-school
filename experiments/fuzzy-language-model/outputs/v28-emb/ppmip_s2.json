@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v28-emb\\ppmip_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.09703,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.30798
+  ],
+  [
+   100,
+   1.55416
+  ],
+  [
+   200,
+   1.41307
+  ],
+  [
+   300,
+   1.34814
+  ],
+  [
+   400,
+   1.28961
+  ],
+  [
+   500,
+   1.2467
+  ],
+  [
+   600,
+   1.21285
+  ],
+  [
+   700,
+   1.18003
+  ],
+  [
+   800,
+   1.15482
+  ],
+  [
+   900,
+   1.13055
+  ],
+  [
+   1000,
+   1.11233
+  ],
+  [
+   1100,
+   1.10174
+  ],
+  [
+   1160,
+   1.09703
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.4594
+  ],
+  [
+   50,
+   7.8175
+  ],
+  [
+   100,
+   6.0619
+  ],
+  [
+   150,
+   5.2113
+  ],
+  [
+   200,
+   4.772
+  ],
+  [
+   250,
+   4.5449
+  ],
+  [
+   300,
+   4.4046
+  ],
+  [
+   350,
+   4.2827
+  ],
+  [
+   400,
+   4.1789
+  ],
+  [
+   450,
+   4.0919
+  ],
+  [
+   500,
+   4.0297
+  ],
+  [
+   550,
+   3.9543
+  ],
+  [
+   600,
+   3.9075
+  ],
+  [
+   650,
+   3.855
+  ],
+  [
+   700,
+   3.793
+  ],
+  [
+   750,
+   3.749
+  ],
+  [
+   800,
+   3.7085
+  ],
+  [
+   850,
+   3.6657
+  ],
+  [
+   900,
+   3.6316
+  ],
+  [
+   950,
+   3.5916
+  ],
+  [
+   1000,
+   3.5664
+  ],
+  [
+   1050,
+   3.5378
+  ],
+  [
+   1100,
+   3.5199
+  ],
+  [
+   1150,
+   3.4863
+  ],
+  [
+   1159,
+   3.4872
+  ]
+ ],
+ "train_seconds": 79.42,
+ "wall_seconds": 93.49,
+ "chars_per_sec": 119653,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Spy. She saw a big, green tree. She wanted to go to the garden, so she put him down the tree.\n\"I will play with my ball, Kitty! It is a big, big baby!\" said the most of pocket. \"I am a slide, snandage!\" \"Ema and Mr. It's a baby party. Let's play with it in her baby, a don't know. Can I play with it?\"\nSo Spy, a little girl named Sue came to see her. She said, \"Don't worry, you did not play too.\" Sue smiled and said, \"I will help you go in the park.\"\nSue was very sad. She ran away from the sky and started to pop with her toys. Sue and Sue learned to be stuck and found them.\nAs they played, they found lots of more fun. Sue and Sue were very happy. They played together in the park every day. They played with the baby to play together every day.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. Tim loved to run to his mom. One day, Tim found a big, red ball in the sunny person. He has a loud stand in many toys on the floor. His mom",
+ "rule_init": {},
+ "ngram_init": {}
+}

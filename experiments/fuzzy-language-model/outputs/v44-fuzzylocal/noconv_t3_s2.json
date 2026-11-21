@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v44-fuzzylocal\\noconv_t3_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 3,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 3,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99296,
+ "params_nonemb": 48032,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.05706,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.02974
+  ],
+  [
+   100,
+   1.39989
+  ],
+  [
+   200,
+   1.26953
+  ],
+  [
+   300,
+   1.20925
+  ],
+  [
+   400,
+   1.17569
+  ],
+  [
+   500,
+   1.14682
+  ],
+  [
+   600,
+   1.11623
+  ],
+  [
+   700,
+   1.09165
+  ],
+  [
+   800,
+   1.07227
+  ],
+  [
+   900,
+   1.06133
+  ],
+  [
+   953,
+   1.05706
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.6143
+  ],
+  [
+   50,
+   9.0228
+  ],
+  [
+   100,
+   6.8743
+  ],
+  [
+   150,
+   5.8009
+  ],
+  [
+   200,
+   5.281
+  ],
+  [
+   250,
+   4.9955
+  ],
+  [
+   300,
+   4.8304
+  ],
+  [
+   350,
+   4.7312
+  ],
+  [
+   400,
+   4.6378
+  ],
+  [
+   450,
+   4.5484
+  ],
+  [
+   500,
+   4.4811
+  ],
+  [
+   550,
+   4.4085
+  ],
+  [
+   600,
+   4.3372
+  ],
+  [
+   650,
+   4.3028
+  ],
+  [
+   700,
+   4.2581
+  ],
+  [
+   750,
+   4.2277
+  ],
+  [
+   800,
+   4.1742
+  ],
+  [
+   850,
+   4.1439
+  ],
+  [
+   900,
+   4.1325
+  ],
+  [
+   950,
+   4.1093
+  ],
+  [
+   952,
+   4.1116
+  ]
+ ],
+ "train_seconds": 71.61,
+ "wall_seconds": 83.04,
+ "chars_per_sec": 109019,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. Lucy was very upset to her mom and her mommy. Her mommy said, \"That's so brave, Lucy. I'm a good girl. You found an old man.\" But Lucy thought, \"I have to play with this.\"\nLucy was so happy, and her aunt also found a big, red ball on the swings. The man said, \"Thank you, Lucy! I want to share.\" Lucy smiled and hugged her mom. She said, \"You are very happy and you need a new friend.\"\n<|eot|>\nOnce upon a time, there was a big tree. The fire were many big, red ball. It was red and whole. The ball was red. The red ball loved to play with the ball.\nOne day, the cat found a big basket. It was a house. The cat had a big cross. The cat said, \"Don't worry, we'll see!\" The bird said, \"That is a brave cat. It is a big red box!\" The cat said, \"Thank you, dog!\" The cat said, \"Yes, I will let you feel better?\" His friend looked at the cat and said, \"Yes, let's go inside.\"\nAs they shook their tail, the cat said, \"Thank you, little dog!\" The cat said, \"You are not aletats.\" The cat was happy, and the big dog played with the ball all day.\n<|eot|>\nOnce upon",
+ "rule_init": {},
+ "ngram_init": {}
+}

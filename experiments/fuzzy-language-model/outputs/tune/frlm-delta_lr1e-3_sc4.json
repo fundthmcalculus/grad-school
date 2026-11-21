@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.001,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-delta_lr1e-3_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 28392,
+ "params_nonemb": 25256,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.35221,
+ "evals": [
+  [
+   305,
+   3.01566
+  ],
+  [
+   610,
+   2.53501
+  ],
+  [
+   915,
+   2.39228
+  ],
+  [
+   1220,
+   2.35243
+  ],
+  [
+   1221,
+   2.35221
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9086
+  ],
+  [
+   50,
+   6.6301
+  ],
+  [
+   100,
+   5.7357
+  ],
+  [
+   150,
+   4.8237
+  ],
+  [
+   200,
+   4.1002
+  ],
+  [
+   250,
+   3.602
+  ],
+  [
+   300,
+   3.2842
+  ],
+  [
+   350,
+   3.075
+  ],
+  [
+   400,
+   2.9187
+  ],
+  [
+   450,
+   2.8119
+  ],
+  [
+   500,
+   2.7221
+  ],
+  [
+   550,
+   2.6409
+  ],
+  [
+   600,
+   2.5829
+  ],
+  [
+   650,
+   2.5436
+  ],
+  [
+   700,
+   2.5111
+  ],
+  [
+   750,
+   2.4825
+  ],
+  [
+   800,
+   2.453
+  ],
+  [
+   850,
+   2.4367
+  ],
+  [
+   900,
+   2.4201
+  ],
+  [
+   950,
+   2.4044
+  ],
+  [
+   1000,
+   2.3801
+  ],
+  [
+   1050,
+   2.3768
+  ],
+  [
+   1100,
+   2.3659
+  ],
+  [
+   1150,
+   2.3631
+  ],
+  [
+   1200,
+   2.3684
+  ],
+  [
+   1220,
+   2.3672
+  ]
+ ],
+ "train_seconds": 848.05,
+ "wall_seconds": 954.55,
+ "chars_per_sec": 11795,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time the played they very, boxsed to mall and her a sor slo\nOn ad him.\nMal wat fould go and the plarnerfu looked and came toyse liked and care it when ream a, she pey lirm on it the frotter like cow. The leved tire shis a bible.\" Su stall a bocas. Twy. Tom and the toy runce pomends ad the lits, therap s",
+ "rule_init": {}
+}

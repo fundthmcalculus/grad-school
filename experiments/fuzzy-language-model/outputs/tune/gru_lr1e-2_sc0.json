@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "gru",
+  "ffn": "none",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/gru_lr1e-2_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "gru",
+  "ffn": "none",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 15840,
+ "params_nonemb": 12704,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.848,
+ "evals": [
+  [
+   305,
+   2.21399
+  ],
+  [
+   610,
+   1.96433
+  ],
+  [
+   915,
+   1.87768
+  ],
+  [
+   1220,
+   1.84814
+  ],
+  [
+   1221,
+   1.848
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9078
+  ],
+  [
+   50,
+   5.891
+  ],
+  [
+   100,
+   4.5326
+  ],
+  [
+   150,
+   3.586
+  ],
+  [
+   200,
+   3.0044
+  ],
+  [
+   250,
+   2.6376
+  ],
+  [
+   300,
+   2.4101
+  ],
+  [
+   350,
+   2.2746
+  ],
+  [
+   400,
+   2.1723
+  ],
+  [
+   450,
+   2.1116
+  ],
+  [
+   500,
+   2.063
+  ],
+  [
+   550,
+   2.0091
+  ],
+  [
+   600,
+   1.9787
+  ],
+  [
+   650,
+   1.9615
+  ],
+  [
+   700,
+   1.9456
+  ],
+  [
+   750,
+   1.9362
+  ],
+  [
+   800,
+   1.9171
+  ],
+  [
+   850,
+   1.9075
+  ],
+  [
+   900,
+   1.898
+  ],
+  [
+   950,
+   1.8875
+  ],
+  [
+   1000,
+   1.8651
+  ],
+  [
+   1050,
+   1.866
+  ],
+  [
+   1100,
+   1.8591
+  ],
+  [
+   1150,
+   1.8565
+  ],
+  [
+   1200,
+   1.8636
+  ],
+  [
+   1220,
+   1.8624
+  ]
+ ],
+ "train_seconds": 185.29,
+ "wall_seconds": 194.23,
+ "chars_per_sec": 53983,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was not for the store would seared be and a blue came him.\nMax was a big great it. And Bob felt because them stops all got every pricked up the park together.\n<|eot|>\n\n\nMima and Ben and Mia leaw. The learn tigets. Max said, \"You small friends. The ball and their toy. Beere.\n<|eot|>\n\n\nMandy lived something s",
+ "rule_init": {}
+}

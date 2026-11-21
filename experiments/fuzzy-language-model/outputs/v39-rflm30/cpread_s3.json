@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta_cpread",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v39-rflm30\\cpread_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta_cpread",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98464,
+ "params_nonemb": 49312,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10422,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.27134
+  ],
+  [
+   100,
+   1.58004
+  ],
+  [
+   200,
+   1.42508
+  ],
+  [
+   300,
+   1.3593
+  ],
+  [
+   400,
+   1.29856
+  ],
+  [
+   500,
+   1.26259
+  ],
+  [
+   600,
+   1.22473
+  ],
+  [
+   700,
+   1.19415
+  ],
+  [
+   800,
+   1.16451
+  ],
+  [
+   900,
+   1.14261
+  ],
+  [
+   1000,
+   1.12113
+  ],
+  [
+   1100,
+   1.10917
+  ],
+  [
+   1160,
+   1.10422
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3771
+  ],
+  [
+   50,
+   8.0896
+  ],
+  [
+   100,
+   6.2288
+  ],
+  [
+   150,
+   5.3241
+  ],
+  [
+   200,
+   4.8653
+  ],
+  [
+   250,
+   4.6041
+  ],
+  [
+   300,
+   4.4171
+  ],
+  [
+   350,
+   4.3233
+  ],
+  [
+   400,
+   4.2224
+  ],
+  [
+   450,
+   4.1398
+  ],
+  [
+   500,
+   4.0665
+  ],
+  [
+   550,
+   4.0057
+  ],
+  [
+   600,
+   3.9294
+  ],
+  [
+   650,
+   3.8828
+  ],
+  [
+   700,
+   3.8218
+  ],
+  [
+   750,
+   3.7847
+  ],
+  [
+   800,
+   3.7432
+  ],
+  [
+   850,
+   3.709
+  ],
+  [
+   900,
+   3.6657
+  ],
+  [
+   950,
+   3.6374
+  ],
+  [
+   1000,
+   3.585
+  ],
+  [
+   1050,
+   3.5561
+  ],
+  [
+   1100,
+   3.5442
+  ],
+  [
+   1150,
+   3.524
+  ],
+  [
+   1159,
+   3.5151
+  ]
+ ],
+ "train_seconds": 80.37,
+ "wall_seconds": 94.65,
+ "chars_per_sec": 118234,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called See. She had a big voice at her house. \nOne day, See was playing with his toy pize. The berries was beautiful and it was a good surprise. He felt making better, just like the polf. The stone would talk to him, and that the woods was important.\nThen, Seey was sad, but his mom said, \"You are good, a donfe is not like you. You can seth others too. You should not find it.\" See said, \"I am the angry first.\" The bed was not a special snead.\nThe bed space that the bed were important. But the bed were nothing now anymore. They were sad and sorry, but they could not find the queen. They became good friends and played glike. All the little braves can make people happy.\n<|eot|>\nOnce upon a time, there was a little boy named Tim. Tim loved to play with his friends. They played with water every day.\nOne day, Tim met a little bunny named Tim. Tim went to play with his toy. But Tim was too big and sad. He said, \"I am sorry, Tim! That's special thing. We can make we",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v44-fuzzylocal\\noconv_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 97760,
+ "params_nonemb": 46496,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06512,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06345
+  ],
+  [
+   100,
+   1.41375
+  ],
+  [
+   200,
+   1.26991
+  ],
+  [
+   300,
+   1.21562
+  ],
+  [
+   400,
+   1.17842
+  ],
+  [
+   500,
+   1.15026
+  ],
+  [
+   600,
+   1.12008
+  ],
+  [
+   700,
+   1.09962
+  ],
+  [
+   800,
+   1.0806
+  ],
+  [
+   900,
+   1.06844
+  ],
+  [
+   953,
+   1.06512
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7902
+  ],
+  [
+   50,
+   9.0792
+  ],
+  [
+   100,
+   6.8924
+  ],
+  [
+   150,
+   5.84
+  ],
+  [
+   200,
+   5.2903
+  ],
+  [
+   250,
+   4.9884
+  ],
+  [
+   300,
+   4.8181
+  ],
+  [
+   350,
+   4.6821
+  ],
+  [
+   400,
+   4.6438
+  ],
+  [
+   450,
+   4.5616
+  ],
+  [
+   500,
+   4.4995
+  ],
+  [
+   550,
+   4.4245
+  ],
+  [
+   600,
+   4.3515
+  ],
+  [
+   650,
+   4.3034
+  ],
+  [
+   700,
+   4.2805
+  ],
+  [
+   750,
+   4.2635
+  ],
+  [
+   800,
+   4.209
+  ],
+  [
+   850,
+   4.1701
+  ],
+  [
+   900,
+   4.1419
+  ],
+  [
+   950,
+   4.1307
+  ],
+  [
+   952,
+   4.131
+  ]
+ ],
+ "train_seconds": 73.32,
+ "wall_seconds": 85.06,
+ "chars_per_sec": 106477,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl?\" She looked at the thin group and saw the big tree. She was very happy to see the tree. She said, \"You are a good friend. You found other animals in the sky. I'll work!\"\nMia and the girl went to the tree. They saw a big, red ball. She opened the ball and found a big, a big dog. The dog was very happy. The dog gave the ball to Tom and they all played together. They played together and laughed. They laughed and laughed and had fun.\n<|eot|>\nOnce upon a time, there was a little girl named Lucy. She loved to play with her mom in the garden. One day, she found a big, shiny peap on the ground. Lucy and her mom were so happy that the little girl was jealous.\nFinally, her mom saw her and kiss her and said, \"Hello, Lucy! I'm sorry, and don't know like you.\" Lucy felt brave and wanted to swup of the box. She put the mark on her hand and said, \"Tim, for clean and the mome!\"\nThe next day, Lucy's mom and dad were very happy. They played together and had a lot of fun day. And they lived happily ever after.\n<|eot|>\n\n\nTom and Mia were friends. They liked to play with their toys. They had a lot of fun. It was a new friend. They had a big red car and a",
+ "rule_init": {},
+ "ngram_init": {}
+}

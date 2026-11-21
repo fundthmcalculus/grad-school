@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.45,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v44-fuzzylocal\\noconv_t4_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 4,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.45,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 4,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99548,
+ "params_nonemb": 48284,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.05395,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.05544
+  ],
+  [
+   100,
+   1.39219
+  ],
+  [
+   200,
+   1.25413
+  ],
+  [
+   300,
+   1.20726
+  ],
+  [
+   400,
+   1.16638
+  ],
+  [
+   500,
+   1.13876
+  ],
+  [
+   600,
+   1.11145
+  ],
+  [
+   700,
+   1.08849
+  ],
+  [
+   800,
+   1.06891
+  ],
+  [
+   900,
+   1.05674
+  ],
+  [
+   953,
+   1.05395
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7427
+  ],
+  [
+   50,
+   8.9874
+  ],
+  [
+   100,
+   6.8017
+  ],
+  [
+   150,
+   5.7515
+  ],
+  [
+   200,
+   5.2153
+  ],
+  [
+   250,
+   4.9364
+  ],
+  [
+   300,
+   4.7853
+  ],
+  [
+   350,
+   4.6705
+  ],
+  [
+   400,
+   4.5699
+  ],
+  [
+   450,
+   4.5175
+  ],
+  [
+   500,
+   4.4462
+  ],
+  [
+   550,
+   4.4044
+  ],
+  [
+   600,
+   4.3379
+  ],
+  [
+   650,
+   4.2839
+  ],
+  [
+   700,
+   4.2367
+  ],
+  [
+   750,
+   4.2075
+  ],
+  [
+   800,
+   4.1659
+  ],
+  [
+   850,
+   4.1284
+  ],
+  [
+   900,
+   4.1018
+  ],
+  [
+   950,
+   4.0933
+  ],
+  [
+   952,
+   4.092
+  ]
+ ],
+ "train_seconds": 71.46,
+ "wall_seconds": 82.41,
+ "chars_per_sec": 109251,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was busy and had a beautiful thing she was very fun.\nLucy was so excited to see what was outside, but her friend was not brave. So she decided to teach her the other people who liked to play with her friends. But then it started to stay on the stport. Lucy opened a loud noise and a else, a big fan, and put her hole out. Every night she saw her and she knew she had to keep her. She said that she would have something important. Lucy was so excited and she never wanted to know what to do.\nSally went to her mommy, \"I want to wait for you!\" she said. \nThe end. Lucy loved her new friend and gave her the phone. She said she had to be safe and happy. From that day on, Lucy and her mommy learned that even if she???ss playing with her smile.\n<|eot|>\nOne day, a little girl named Sue went to the house. She looked at her and felt a sad hole. The little girl saw a big tree with a nose and a pretty bird.\nSue's friend, Tom, came over to play. But Max said to Tom. Tom told Tom that it was not a new place through the tree. Tom wanted to help Tom, but it was too high in the tree.\nSue asked Tom, \"Can I drive it?\" Tom said, \"Yes, let's go!\" gave Tom a",
+ "rule_init": {},
+ "ngram_init": {}
+}

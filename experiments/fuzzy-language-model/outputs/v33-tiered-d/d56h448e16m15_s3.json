@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 56,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v33-tiered-d\\d56h448e16m15_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 56,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96608,
+ "params_nonemb": 61408,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10748,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.24118
+  ],
+  [
+   100,
+   1.60439
+  ],
+  [
+   200,
+   1.43554
+  ],
+  [
+   300,
+   1.37307
+  ],
+  [
+   400,
+   1.31658
+  ],
+  [
+   500,
+   1.27697
+  ],
+  [
+   600,
+   1.23517
+  ],
+  [
+   700,
+   1.20626
+  ],
+  [
+   800,
+   1.16848
+  ],
+  [
+   900,
+   1.14548
+  ],
+  [
+   1000,
+   1.1255
+  ],
+  [
+   1100,
+   1.11215
+  ],
+  [
+   1160,
+   1.10748
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2388
+  ],
+  [
+   50,
+   8.0774
+  ],
+  [
+   100,
+   6.2749
+  ],
+  [
+   150,
+   5.3766
+  ],
+  [
+   200,
+   4.9269
+  ],
+  [
+   250,
+   4.6599
+  ],
+  [
+   300,
+   4.48
+  ],
+  [
+   350,
+   4.3763
+  ],
+  [
+   400,
+   4.2749
+  ],
+  [
+   450,
+   4.1868
+  ],
+  [
+   500,
+   4.1136
+  ],
+  [
+   550,
+   4.0475
+  ],
+  [
+   600,
+   3.9715
+  ],
+  [
+   650,
+   3.9193
+  ],
+  [
+   700,
+   3.8544
+  ],
+  [
+   750,
+   3.81
+  ],
+  [
+   800,
+   3.7639
+  ],
+  [
+   850,
+   3.7272
+  ],
+  [
+   900,
+   3.6822
+  ],
+  [
+   950,
+   3.6485
+  ],
+  [
+   1000,
+   3.5994
+  ],
+  [
+   1050,
+   3.5656
+  ],
+  [
+   1100,
+   3.5523
+  ],
+  [
+   1150,
+   3.5341
+  ],
+  [
+   1159,
+   3.5243
+  ]
+ ],
+ "train_seconds": 81.4,
+ "wall_seconds": 95.9,
+ "chars_per_sec": 116743,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big warm bird. \nThe meal room asked, \"What is this time, little bird?\" The bird said, \"Yes!\" The dog laughed and said, \"Thank you, please,\" they all said.\nThe bird was very making better, and the bird did not know what. The bird said, \"Thank you, that is that you can organized the escaper and the clear, but they are not good to play together.\" The bird and the bird said, \"Thank you, little bird. If you say your new friend.\"\nThe bird got the sand, a little bird's mom, think of a bit. They tried to snow, but they could not have the bird. The bird was scared and didn't listen to the big tree. It thought it was a big, pope, but it was too nice. \nThe bird and the bird never break. They had so much fun. They were brave and happy. The bird had a new friend, Tim, and that is not a good home.\n<|eot|>\nOne day, a big dog named Max went for a walk. Max was very excited to buy. He saw a big box on the ground. Max wanted to play with the tree, but Sam said, \"Max, Ben! What is my mouth?\" Max showed the makr.",
+ "rule_init": {},
+ "ngram_init": {}
+}

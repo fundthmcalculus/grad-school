@@ -1,0 +1,6 @@
+step 38/155 train 8.7942 val 1.8786 t=143s
+step 76/155 train 6.9882 val 1.6335 t=316s
+step 114/155 train 5.9421 val 1.5373 t=492s
+step 152/155 train 5.2575 val 1.4276 t=667s
+step 155/155 train 5.2140 val 1.4222 t=681s
+base_s2.json: params=96416 val_bpc=1.4222 1865 c/s 957.4s

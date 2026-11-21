@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v49-compose\\c_full_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99005,
+ "params_nonemb": 47741,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.11679,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.04835
+  ],
+  [
+   100,
+   1.47358
+  ],
+  [
+   200,
+   1.34323
+  ],
+  [
+   300,
+   1.28515
+  ],
+  [
+   400,
+   1.23673
+  ],
+  [
+   500,
+   1.20377
+  ],
+  [
+   600,
+   1.17659
+  ],
+  [
+   700,
+   1.15198
+  ],
+  [
+   800,
+   1.13321
+  ],
+  [
+   900,
+   1.11914
+  ],
+  [
+   953,
+   1.11679
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.6957
+  ],
+  [
+   50,
+   9.172
+  ],
+  [
+   100,
+   7.0919
+  ],
+  [
+   150,
+   6.0641
+  ],
+  [
+   200,
+   5.5337
+  ],
+  [
+   250,
+   5.2459
+  ],
+  [
+   300,
+   5.0906
+  ],
+  [
+   350,
+   4.9604
+  ],
+  [
+   400,
+   4.8566
+  ],
+  [
+   450,
+   4.7791
+  ],
+  [
+   500,
+   4.7004
+  ],
+  [
+   550,
+   4.6548
+  ],
+  [
+   600,
+   4.5853
+  ],
+  [
+   650,
+   4.5264
+  ],
+  [
+   700,
+   4.4782
+  ],
+  [
+   750,
+   4.4511
+  ],
+  [
+   800,
+   4.4088
+  ],
+  [
+   850,
+   4.3691
+  ],
+  [
+   900,
+   4.3388
+  ],
+  [
+   950,
+   4.329
+  ],
+  [
+   952,
+   4.3273
+  ]
+ ],
+ "train_seconds": 75.06,
+ "wall_seconds": 85.76,
+ "chars_per_sec": 104004,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl called Sara. She was very excited to play with her mom.\nOne day, they decided to go to the park and show her mom to her family. They found a big, soft boat. They decided to go to the faation.\nLily saw a pretty rock on the ground. She said, \"I want to fly down another else.\" It was a big, shiny boat!\nAnna was very surprised. She said, \"I found the rock! I can't take it to this?\"\nIt was so excited! He finally had a big bite of the shiny tree. He looked for a fit, but he could not find it. He put the flower on the lock and they hit. She didn't know what to do. She wished she had a lot of fun.\nThe next day, the little girl and the little cat went back to help her mom. They played together in the park and had no friends all the park. The sun was going to play with them too.\n<|eot|>\nOnce upon a time, there was a crab named Anna. Ben loved to run and jump and play with her nest. One day, Sam and Lily decided to see a button. It looked at Ben and said, \"I'm sad, Max.\"\nTom said, \"Way, do you want to play.\" Sam barked and gave the jar back to the tree. The tree was happy and asked, \"What is that?\"\nThey walked",
+ "rule_init": {},
+ "ngram_init": {}
+}

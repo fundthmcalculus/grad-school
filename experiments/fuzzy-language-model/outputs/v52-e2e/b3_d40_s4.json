@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 40,
+  "layers": 3,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\b3_d40_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 40,
+  "n_layers": 3,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99002,
+ "params_nonemb": 50906,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.14316,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.03761
+  ],
+  [
+   100,
+   1.54077
+  ],
+  [
+   200,
+   1.36553
+  ],
+  [
+   300,
+   1.30014
+  ],
+  [
+   400,
+   1.25963
+  ],
+  [
+   500,
+   1.22352
+  ],
+  [
+   600,
+   1.20071
+  ],
+  [
+   700,
+   1.1773
+  ],
+  [
+   800,
+   1.15856
+  ],
+  [
+   900,
+   1.14623
+  ],
+  [
+   953,
+   1.14316
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.6706
+  ],
+  [
+   50,
+   9.3016
+  ],
+  [
+   100,
+   7.3882
+  ],
+  [
+   150,
+   6.2526
+  ],
+  [
+   200,
+   5.6584
+  ],
+  [
+   250,
+   5.3629
+  ],
+  [
+   300,
+   5.1746
+  ],
+  [
+   350,
+   5.0361
+  ],
+  [
+   400,
+   4.9299
+  ],
+  [
+   450,
+   4.85
+  ],
+  [
+   500,
+   4.7795
+  ],
+  [
+   550,
+   4.7157
+  ],
+  [
+   600,
+   4.6825
+  ],
+  [
+   650,
+   4.6379
+  ],
+  [
+   700,
+   4.5909
+  ],
+  [
+   750,
+   4.544
+  ],
+  [
+   800,
+   4.4922
+  ],
+  [
+   850,
+   4.4813
+  ],
+  [
+   900,
+   4.4376
+  ],
+  [
+   950,
+   4.4112
+  ],
+  [
+   952,
+   4.4125
+  ]
+ ],
+ "train_seconds": 112.29,
+ "wall_seconds": 128.38,
+ "chars_per_sec": 69528,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She liked to play with her Katy with her. One day, Lucy decided to play with her ball.\nAs her friend walked, Sue found a big, red boat. She decided to go to the fariopers on it. Sue was sad, so she also found a big, red ball on the slide. The task was having very lovely!\nThe ball went back to Tim and Tom and Sue found the ball. They played together together. They became best friends and played together in the park. They had fun. The end of the day of the day of the story would love for the day.\n<|eot|>\n\n\nTom was envan. He loved to play with his turse. He liked to run and run, but he was very happy. He learned that the cread would get to the cravel.\nOne day, Tom saw an old lady and Max's toy no of the toy. Lily asked, \"Wait, Lily?\" Lily said, \"Thank you for go, Lily. You can't clean and be important to sleep.\"\nTom wanted to help the slaxi and take a swing with his mom. But Buddy was happy! He did not like to run away. He knew he could read it with the spunk. He liked Lily and never seen his petrooms. He still liked Sue, and his new friend.\n<|eot|>\nOne day, a boy named Tim went",
+ "rule_init": {},
+ "ngram_init": {}
+}

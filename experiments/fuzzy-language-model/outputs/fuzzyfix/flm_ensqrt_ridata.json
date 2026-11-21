@@ -1,0 +1,186 @@
+{
+ "args": {
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/fuzzyfix/flm_ensqrt_ridata.json",
+  "save_model": false,
+  "exp_norm": "sqrt",
+  "rule_init": "data"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "exp_norm": "sqrt",
+  "max_len": 256
+ },
+ "params_total": 26112,
+ "params_nonemb": 22976,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.92472,
+ "evals": [
+  [
+   305,
+   2.41364
+  ],
+  [
+   610,
+   2.09525
+  ],
+  [
+   915,
+   1.97522
+  ],
+  [
+   1220,
+   1.92523
+  ],
+  [
+   1221,
+   1.92472
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8199
+  ],
+  [
+   50,
+   5.8122
+  ],
+  [
+   100,
+   4.5816
+  ],
+  [
+   150,
+   3.7143
+  ],
+  [
+   200,
+   3.1867
+  ],
+  [
+   250,
+   2.8456
+  ],
+  [
+   300,
+   2.6244
+  ],
+  [
+   350,
+   2.4751
+  ],
+  [
+   400,
+   2.3663
+  ],
+  [
+   450,
+   2.2962
+  ],
+  [
+   500,
+   2.236
+  ],
+  [
+   550,
+   2.1747
+  ],
+  [
+   600,
+   2.1272
+  ],
+  [
+   650,
+   2.1019
+  ],
+  [
+   700,
+   2.083
+  ],
+  [
+   750,
+   2.0645
+  ],
+  [
+   800,
+   2.0385
+  ],
+  [
+   850,
+   2.0234
+  ],
+  [
+   900,
+   2.0061
+  ],
+  [
+   950,
+   1.9924
+  ],
+  [
+   1000,
+   1.9601
+  ],
+  [
+   1050,
+   1.9589
+  ],
+  [
+   1100,
+   1.9471
+  ],
+  [
+   1150,
+   1.9388
+  ],
+  [
+   1200,
+   1.9412
+  ],
+  [
+   1220,
+   1.941
+  ]
+ ],
+ "train_seconds": 432.24,
+ "wall_seconds": 518.61,
+ "chars_per_sec": 23141,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was a smiled at the little smiled her all and said, \"I don't lowle for her back to make a big on the saw and sayss all go all cleasite she reame. The did all and gim and Ben an the flewwhing rinned time, stime the too this neach to callaw a small ball at the scared.\n<|eot|>\n\n\nMax was very day, but s",
+ "rule_init": {
+  "L0.ffn": 64,
+  "L1.ffn": 64
+ }
+}

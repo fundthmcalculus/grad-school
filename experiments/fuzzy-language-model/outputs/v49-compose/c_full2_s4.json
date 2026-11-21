@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v49-compose\\c_full2_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99019,
+ "params_nonemb": 47755,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.10598,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.04491
+  ],
+  [
+   100,
+   1.43832
+  ],
+  [
+   200,
+   1.31902
+  ],
+  [
+   300,
+   1.26196
+  ],
+  [
+   400,
+   1.221
+  ],
+  [
+   500,
+   1.18808
+  ],
+  [
+   600,
+   1.16492
+  ],
+  [
+   700,
+   1.13789
+  ],
+  [
+   800,
+   1.12152
+  ],
+  [
+   900,
+   1.10876
+  ],
+  [
+   953,
+   1.10598
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7089
+  ],
+  [
+   50,
+   9.0313
+  ],
+  [
+   100,
+   6.9493
+  ],
+  [
+   150,
+   5.9301
+  ],
+  [
+   200,
+   5.4209
+  ],
+  [
+   250,
+   5.1671
+  ],
+  [
+   300,
+   4.9995
+  ],
+  [
+   350,
+   4.8771
+  ],
+  [
+   400,
+   4.7813
+  ],
+  [
+   450,
+   4.7028
+  ],
+  [
+   500,
+   4.6363
+  ],
+  [
+   550,
+   4.5718
+  ],
+  [
+   600,
+   4.5404
+  ],
+  [
+   650,
+   4.4949
+  ],
+  [
+   700,
+   4.4497
+  ],
+  [
+   750,
+   4.4037
+  ],
+  [
+   800,
+   4.3498
+  ],
+  [
+   850,
+   4.3333
+  ],
+  [
+   900,
+   4.2949
+  ],
+  [
+   950,
+   4.2683
+  ],
+  [
+   952,
+   4.2687
+  ]
+ ],
+ "train_seconds": 74.89,
+ "wall_seconds": 85.52,
+ "chars_per_sec": 104249,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. Sue was very excited to play with her mom with her. She knew how to get the orsey and the pretty fur.\nOne day, Sue and her mom were sad. Sue decided to help the help. She asked her to help her. The little girl was sad and said, \"What's you can help me now, Sue?\" Sue said, \"I don't know what to be. Let's ask how to get the hose to makes it.\" Tim and her mom said, \"I'm sorry, Sue. Let's be know what to do.\" They flew away to each other, but they could not find it. But the man was ready to get the things. She was so happy to see what the phone was. They opened their hands and nodded.\nThe next day, Sue's mom said, \"I'm sorry, Sue. Is?\" Sue said, \"I don't know like you.\" Her mom smiled and said, \"I love you too. I can't give you a big party, crab. You can't clean and the mill.\"\nSue and her friends looked at the batly and said, \"What happened, girl!\" They all smiled and said, \"I'm sorry, Sue. You are so strong and rude about it. But you can be nice to my story. Let's try the big, yummy cake. Can you help you?\" Sue and Sue said, \"Thank",
+ "rule_init": {},
+ "ngram_init": {}
+}

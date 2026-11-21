@@ -1,0 +1,152 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 4000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 4,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "outputs\\v26-hybrid\\hyb12g1_s1.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "data",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 155,
+ "chars_seen": 4010100,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.4462,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   38,
+   1.98781
+  ],
+  [
+   76,
+   1.67696
+  ],
+  [
+   114,
+   1.56289
+  ],
+  [
+   152,
+   1.4493
+  ],
+  [
+   155,
+   1.4462
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2695
+  ],
+  [
+   50,
+   8.2614
+  ],
+  [
+   100,
+   6.3798
+  ],
+  [
+   150,
+   5.3534
+  ],
+  [
+   154,
+   5.2934
+  ]
+ ],
+ "train_seconds": 382.06,
+ "wall_seconds": 598.47,
+ "chars_per_sec": 3323,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 4,
+ "device": "cpu",
+ "device_name": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big andmorite vequit, a special stori at. The girl was very happy and said that they was scared. The little cat was not good to play with the wind.\n Kitty and her friend, Sue and Ben problech. They moved the polf and said, \"Let's slum, he is that will go home.\"\nLwer was the frog and his mom came to each other. They had a lot of funny. They saw something a big box. They had a great day and had fun.\n<|eot|>\nOnce upon a time, there was a bite flower!\" Tim loved a walk. He had a thrite sunlphed and was even not in the fairch.\nOne day, Tim saw a big hugele in the Pinn. He wanted to fix his perw, but he was very nice. It was store and found a long buckal. The parents decided to make a stucket. The bushty didn't word up, but it was so excited to have to play.\nBut then if they played with water and had a funny day. And they wanted to bed the park. It was happy and had a new friend. She thoughts Sam and Lily was happy.\nAfter the leali and his friends went outside and showed the milray",
+ "rule_init": {
+  "variant": "hyb12g1",
+  "L0.ffn": {
+   "gain": 1.0,
+   "ce_nats": 7.2327
+  },
+  "L1.ffn": {
+   "gain": 1.0,
+   "ce_nats": 7.1201
+  }
+ },
+ "ngram_init": {}
+}

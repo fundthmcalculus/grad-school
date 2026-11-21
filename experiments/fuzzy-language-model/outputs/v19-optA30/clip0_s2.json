@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 0.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-optA30\\clip0_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10798,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.35485
+  ],
+  [
+   580,
+   1.2359
+  ],
+  [
+   870,
+   1.14985
+  ],
+  [
+   1160,
+   1.10798
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2981
+  ],
+  [
+   50,
+   8.0875
+  ],
+  [
+   100,
+   6.2421
+  ],
+  [
+   150,
+   5.3317
+  ],
+  [
+   200,
+   4.8494
+  ],
+  [
+   250,
+   4.6071
+  ],
+  [
+   300,
+   4.4485
+  ],
+  [
+   350,
+   4.3215
+  ],
+  [
+   400,
+   4.2259
+  ],
+  [
+   450,
+   4.1445
+  ],
+  [
+   500,
+   4.0899
+  ],
+  [
+   550,
+   4.0143
+  ],
+  [
+   600,
+   3.966
+  ],
+  [
+   650,
+   3.9092
+  ],
+  [
+   700,
+   3.8377
+  ],
+  [
+   750,
+   3.7924
+  ],
+  [
+   800,
+   3.756
+  ],
+  [
+   850,
+   3.7137
+  ],
+  [
+   900,
+   3.6759
+  ],
+  [
+   950,
+   3.6357
+  ],
+  [
+   1000,
+   3.6081
+  ],
+  [
+   1050,
+   3.5795
+  ],
+  [
+   1100,
+   3.5613
+  ],
+  [
+   1150,
+   3.5251
+  ],
+  [
+   1159,
+   3.5268
+  ]
+ ],
+ "train_seconds": 79.45,
+ "wall_seconds": 85.82,
+ "chars_per_sec": 119610,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Lucy.\nSue saw her room and said, \"Hi. I am heavy!\"\nLucy was sad. She said, \"Hi, I am okay. I will help you go inside.\" Her friend was happy. Lucy and her mom polited. The next day, Lucy's mom said that she would be more careful and not before they had.\nMax and Mia were happy again. They were both very happy and enventual. They all had fun and became best friends.\n<|eot|>\nOnce upon a time, there was a little girl named Lucy. She liked to play with her car through the bag. But Mins are very scared.\nOne day, Pet's walk to the bag of the yard. The bag jumped high, and it was the marry ornoon. They went to the store and found a long bag of hands on the tire. Pet's bottherow and planed to grew a bottic.\nThe next day, Pet met a little boy named Tim. Tim thought for a moment and thought it would barming himself. He gave it a fun picnic. Sam said, \"I can do how to grow the umet, please before you help. It",
+ "rule_init": {},
+ "ngram_init": {}
+}

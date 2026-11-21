@@ -1,0 +1,213 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 128,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v14-rule-seeds\\D-ctx512-r128_30M_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 128,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 114848,
+ "params_nonemb": 65696,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10875,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.35946
+  ],
+  [
+   580,
+   1.23583
+  ],
+  [
+   870,
+   1.15003
+  ],
+  [
+   1160,
+   1.10875
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3075
+  ],
+  [
+   50,
+   8.0904
+  ],
+  [
+   100,
+   6.2525
+  ],
+  [
+   150,
+   5.3483
+  ],
+  [
+   200,
+   4.8537
+  ],
+  [
+   250,
+   4.6041
+  ],
+  [
+   300,
+   4.4283
+  ],
+  [
+   350,
+   4.3132
+  ],
+  [
+   400,
+   4.2047
+  ],
+  [
+   450,
+   4.1437
+  ],
+  [
+   500,
+   4.0755
+  ],
+  [
+   550,
+   4.0222
+  ],
+  [
+   600,
+   3.9469
+  ],
+  [
+   650,
+   3.8902
+  ],
+  [
+   700,
+   3.8471
+  ],
+  [
+   750,
+   3.8013
+  ],
+  [
+   800,
+   3.7504
+  ],
+  [
+   850,
+   3.6938
+  ],
+  [
+   900,
+   3.6546
+  ],
+  [
+   950,
+   3.6312
+  ],
+  [
+   1000,
+   3.5974
+  ],
+  [
+   1050,
+   3.5599
+  ],
+  [
+   1100,
+   3.5445
+  ],
+  [
+   1150,
+   3.5204
+  ],
+  [
+   1159,
+   3.5211
+  ]
+ ],
+ "train_seconds": 90.82,
+ "wall_seconds": 102.65,
+ "chars_per_sec": 104631,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, in a small village, there was a big tree. The village lived in a big forest. The people were best friends. They would play all day long.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She had a problem. She had a purribway. Lily liked to slide with herself. One day, she saw a big cary box with a big, soft. She liked it in her hat.\nLily saw something a big box. She walked and walked and walked. Lily saw a toy countly. She thought it would help the red car. She said, \"Don't worry, you can sing your toy car to make my favorite place to go. You cannot make a big red ball with your toys. We can hop together!\"\nLily and Lily played with their toy toys. They became friends and had fun. They had a great day together. Lily and Lily played with their toys. They had a great time. And they became best friends and had their toys.\n<|eot|>\nOnce upon a time, there was a big, ugly animal named Tom who loved to play with. One day, Tom's mom went for a walk. He wanted to play with his friends.\nTom saw the strangle and looked at the leaves towets the unputhate day. He",
+ "rule_init": {},
+ "ngram_init": {}
+}

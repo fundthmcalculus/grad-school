@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 600,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v23-wu30\\wu600_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10414,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.39909
+  ],
+  [
+   580,
+   1.30323
+  ],
+  [
+   870,
+   1.19849
+  ],
+  [
+   1160,
+   1.10414
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3706
+  ],
+  [
+   50,
+   9.088
+  ],
+  [
+   100,
+   7.0428
+  ],
+  [
+   150,
+   5.7789
+  ],
+  [
+   200,
+   5.1291
+  ],
+  [
+   250,
+   4.7817
+  ],
+  [
+   300,
+   4.5843
+  ],
+  [
+   350,
+   4.466
+  ],
+  [
+   400,
+   4.386
+  ],
+  [
+   450,
+   4.3142
+  ],
+  [
+   500,
+   4.2641
+  ],
+  [
+   550,
+   4.2086
+  ],
+  [
+   600,
+   4.1616
+  ],
+  [
+   650,
+   4.1198
+  ],
+  [
+   700,
+   4.0659
+  ],
+  [
+   750,
+   4.0248
+  ],
+  [
+   800,
+   3.9563
+  ],
+  [
+   850,
+   3.8819
+  ],
+  [
+   900,
+   3.8218
+  ],
+  [
+   950,
+   3.7413
+  ],
+  [
+   1000,
+   3.6689
+  ],
+  [
+   1050,
+   3.6117
+  ],
+  [
+   1100,
+   3.5678
+  ],
+  [
+   1150,
+   3.5491
+  ],
+  [
+   1159,
+   3.5414
+  ]
+ ],
+ "train_seconds": 79.87,
+ "wall_seconds": 86.79,
+ "chars_per_sec": 118984,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Mr. her mom. She loved to play outside and make things. One day, Mr. Sue was playing with her toys. She laughed and played together all day. She was happy and happy and loved to go inside.\nOne day, Mr. Sue saw a big hill. The might slum flew away, but she did not know what it was. She asked Sue, \"Come on the flall, Mr. Do you want to play with a family?\"\nMr. Sue and Sue found a bench in the room. They were very happy. They played with the bowl and played together. They were happy. They learned to play together, even if they have to share with the birds.\n<|eot|>\nOne day, a little girl named Mia went to the park. She saw a big red ball on a tree. The ball was very nice and wanted to stop it.\nA baby came outside to play with the ball. It had an ornal and bors. Lily wanted to play with it. She asked the ball, \"Can I be ready if you go?\"\nMad thought, \"What is my friend?\"\nMum nodded. She wanted to help her. But Max thought his leg, so he said, \"I grow, Spot! I will help you be careful. I am curi",
+ "rule_init": {},
+ "ngram_init": {}
+}

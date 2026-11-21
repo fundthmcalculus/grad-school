@@ -1,0 +1,189 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 1,
+  "threads": 1,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/h9/frlm-acc_mxmean_ffmean_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "max_len": 256
+ },
+ "params_total": 28260,
+ "params_nonemb": 25124,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.76021,
+ "evals": [
+  [
+   305,
+   2.16189
+  ],
+  [
+   610,
+   1.93648
+  ],
+  [
+   915,
+   1.82651
+  ],
+  [
+   1220,
+   1.76119
+  ],
+  [
+   1221,
+   1.76021
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8379
+  ],
+  [
+   50,
+   5.4933
+  ],
+  [
+   100,
+   4.0455
+  ],
+  [
+   150,
+   3.2235
+  ],
+  [
+   200,
+   2.7285
+  ],
+  [
+   250,
+   2.4577
+  ],
+  [
+   300,
+   2.2977
+  ],
+  [
+   350,
+   2.2012
+  ],
+  [
+   400,
+   2.1261
+  ],
+  [
+   450,
+   2.0666
+  ],
+  [
+   500,
+   2.0289
+  ],
+  [
+   550,
+   1.9943
+  ],
+  [
+   600,
+   1.9698
+  ],
+  [
+   650,
+   1.9466
+  ],
+  [
+   700,
+   1.9224
+  ],
+  [
+   750,
+   1.9006
+  ],
+  [
+   800,
+   1.8895
+  ],
+  [
+   850,
+   1.8657
+  ],
+  [
+   900,
+   1.8444
+  ],
+  [
+   950,
+   1.8248
+  ],
+  [
+   1000,
+   1.8086
+  ],
+  [
+   1050,
+   1.7941
+  ],
+  [
+   1100,
+   1.7884
+  ],
+  [
+   1150,
+   1.7793
+  ],
+  [
+   1200,
+   1.7803
+  ],
+  [
+   1220,
+   1.7751
+  ]
+ ],
+ "train_seconds": 833.27,
+ "wall_seconds": 1121.89,
+ "chars_per_sec": 12004,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "device": "cpu",
+ "device_name": "11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz",
+ "host": "localhost.localdomain",
+ "sample": "Once upon a time, there wasn he was too. They would something all and said, do something to play great it. He saw a big friend, them saw say the ball clockine she reamed, she good in house. She say to her floogh.\n\"Can Lily is not sorry. They took with her cat away a nearvy said, \"Yes'toil.\n<|eot|>\n\n\nMayble something and sa",
+ "rule_init": {}
+}

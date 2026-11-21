@@ -1,0 +1,226 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v4096h256e8m20_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe4096",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 4096
+ },
+ "config": {
+  "vocab_size": 4096,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96848,
+ "params_nonemb": 53456,
+ "steps": 927,
+ "chars_seen": 30025470,
+ "chars_per_token": 3.9538496,
+ "val_bpc": 1.06837,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.09294
+  ],
+  [
+   100,
+   1.38036
+  ],
+  [
+   200,
+   1.25752
+  ],
+  [
+   300,
+   1.20766
+  ],
+  [
+   400,
+   1.17527
+  ],
+  [
+   500,
+   1.14957
+  ],
+  [
+   600,
+   1.12038
+  ],
+  [
+   700,
+   1.09748
+  ],
+  [
+   800,
+   1.08104
+  ],
+  [
+   900,
+   1.07125
+  ],
+  [
+   927,
+   1.06837
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   12.2302
+  ],
+  [
+   50,
+   9.3322
+  ],
+  [
+   100,
+   7.0338
+  ],
+  [
+   150,
+   5.9312
+  ],
+  [
+   200,
+   5.3822
+  ],
+  [
+   250,
+   5.0966
+  ],
+  [
+   300,
+   4.9448
+  ],
+  [
+   350,
+   4.8323
+  ],
+  [
+   400,
+   4.7405
+  ],
+  [
+   450,
+   4.6854
+  ],
+  [
+   500,
+   4.6144
+  ],
+  [
+   550,
+   4.5669
+  ],
+  [
+   600,
+   4.5047
+  ],
+  [
+   650,
+   4.4546
+  ],
+  [
+   700,
+   4.4018
+  ],
+  [
+   750,
+   4.3675
+  ],
+  [
+   800,
+   4.34
+  ],
+  [
+   850,
+   4.2974
+  ],
+  [
+   900,
+   4.2621
+  ],
+  [
+   926,
+   4.2524
+  ]
+ ],
+ "train_seconds": 70.36,
+ "wall_seconds": 81.84,
+ "chars_per_sec": 107924,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a girl named Lily. She loved to play and laugh. So she took her friends to her friends and shared it every day.\nOne day, Lily asked her mom to visit her new friend. Lily said, \"Hi, it's our toy.\" They both wanted to sleep. They played together all day, just like Max and Lucy went to play.\nAs they walked, Sue and Lucy started to run away. She said, \"Wow, it's just a fun shop to have fun!\" Lily and Lily were happy. They worked hard to the park and said, \"You are playing with me!\" Lily was happy to have his kiss in her. She sailed it, ducked his new toy again and the sun together had lots of fun. They had a lot, but they knew that the right day and they always bought each other all day together. And they all lived happily ever after.\n<|eot|>\nOnce upon a time, there was a little dog named Max. Max loved to play in the park. One day, Max found a new toy. He thought it would be fun to be friends.\nAfter a okay day, Max saw a new teacher on the street. He wanted to hold the car, but he was too small. Max said, \"That's my car, you are colorful again.\"\nMax took his red toy and started to play. He looked up and saw his ball. He ran and walked to the park. He saw Daisy and",
+ "rule_init": {},
+ "ngram_init": {}
+}

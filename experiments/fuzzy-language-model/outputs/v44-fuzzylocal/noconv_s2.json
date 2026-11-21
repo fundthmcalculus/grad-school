@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v44-fuzzylocal\\noconv_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 97760,
+ "params_nonemb": 46496,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.06819,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.07074
+  ],
+  [
+   100,
+   1.40874
+  ],
+  [
+   200,
+   1.28763
+  ],
+  [
+   300,
+   1.22312
+  ],
+  [
+   400,
+   1.18804
+  ],
+  [
+   500,
+   1.15523
+  ],
+  [
+   600,
+   1.12687
+  ],
+  [
+   700,
+   1.10356
+  ],
+  [
+   800,
+   1.08475
+  ],
+  [
+   900,
+   1.0722
+  ],
+  [
+   953,
+   1.06819
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7937
+  ],
+  [
+   50,
+   9.1457
+  ],
+  [
+   100,
+   6.9481
+  ],
+  [
+   150,
+   5.8537
+  ],
+  [
+   200,
+   5.3227
+  ],
+  [
+   250,
+   5.0416
+  ],
+  [
+   300,
+   4.8724
+  ],
+  [
+   350,
+   4.7716
+  ],
+  [
+   400,
+   4.6725
+  ],
+  [
+   450,
+   4.5778
+  ],
+  [
+   500,
+   4.5106
+  ],
+  [
+   550,
+   4.443
+  ],
+  [
+   600,
+   4.3737
+  ],
+  [
+   650,
+   4.3397
+  ],
+  [
+   700,
+   4.2981
+  ],
+  [
+   750,
+   4.2663
+  ],
+  [
+   800,
+   4.2108
+  ],
+  [
+   850,
+   4.1839
+  ],
+  [
+   900,
+   4.1693
+  ],
+  [
+   950,
+   4.1501
+  ],
+  [
+   952,
+   4.1513
+  ]
+ ],
+ "train_seconds": 70.97,
+ "wall_seconds": 82.11,
+ "chars_per_sec": 110011,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl called Lucy. She was very excited to see the big, friendly bird.\nOne day, Lucy went to the park to show her mom her to a little girl. She was very happy and helped the other people in the tree.\nThe mouse didn't know it was the best friend. She found a big, red ball on the swings. The bird was very happy to have the hole and baking. Lucy had a great idea to be kind and they could not bite the ball.\nLucy and the bird became best friends and played together. They lived happily ever after.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. Lily loved to play outside with her ball. One day, Lily found a big, colorful ball under a big tree. She wanted to help her mom.\nLily put the ball rolling and crossed it. She put the ball on the ball again. She wanted to have a big box too. After this time, Lily swung it. She saw her mom and dad. The box was very nice. Anna was happy. She thought the ball was small and they all played until the ball.\nFrom that day on, Lily and the judge became good friends. They went to the park to help. They both laughed and laughed. They played together in the sun.\n<|eot|>\nOne day, a little girl named Lucy went for a walk. She saw her mom's daughter and dad. They all had",
+ "rule_init": {},
+ "ngram_init": {}
+}

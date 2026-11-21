@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v51-fuzzytokens\\emb_ftail_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98528,
+ "params_nonemb": 47264,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.08997,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.03267
+  ],
+  [
+   100,
+   1.47189
+  ],
+  [
+   200,
+   1.30492
+  ],
+  [
+   300,
+   1.24645
+  ],
+  [
+   400,
+   1.20867
+  ],
+  [
+   500,
+   1.17862
+  ],
+  [
+   600,
+   1.14617
+  ],
+  [
+   700,
+   1.12518
+  ],
+  [
+   800,
+   1.10614
+  ],
+  [
+   900,
+   1.0937
+  ],
+  [
+   953,
+   1.08997
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.6695
+  ],
+  [
+   50,
+   9.1312
+  ],
+  [
+   100,
+   7.1225
+  ],
+  [
+   150,
+   6.0273
+  ],
+  [
+   200,
+   5.4476
+  ],
+  [
+   250,
+   5.1347
+  ],
+  [
+   300,
+   4.955
+  ],
+  [
+   350,
+   4.8132
+  ],
+  [
+   400,
+   4.7665
+  ],
+  [
+   450,
+   4.674
+  ],
+  [
+   500,
+   4.6136
+  ],
+  [
+   550,
+   4.5312
+  ],
+  [
+   600,
+   4.4497
+  ],
+  [
+   650,
+   4.4026
+  ],
+  [
+   700,
+   4.3805
+  ],
+  [
+   750,
+   4.3621
+  ],
+  [
+   800,
+   4.3075
+  ],
+  [
+   850,
+   4.269
+  ],
+  [
+   900,
+   4.2407
+  ],
+  [
+   950,
+   4.2273
+  ],
+  [
+   952,
+   4.2276
+  ]
+ ],
+ "train_seconds": 70.25,
+ "wall_seconds": 81.43,
+ "chars_per_sec": 111132,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She was very excited to play with her mom. One day, a little girl named Amy went for a walk outside her room. She saw some flowers and thought it was a toy.\nSue saw her mom ext the songs. She asked her mom for help, so she also found a gur a special room. She asked her mom, \"Mom, what happened! That's mom would learn she can stay ask her mom and dad. Do you want to take it?\" Her mom smiled and said, \"Yes, Lily! You are a good tonain and make a new mazather. I will have so much fun.\"\nAmy was so happy. She picked up her mom and watched the big mazic. She put on her room and talked to her mom. She put her mom back to her and told her mom for help. She said, \"We'll be careful and have to be careful.\" Her mom smiled and said, \"Thank you for clean and share with my mom for being frightened. Can we be kind with it?\" Lily hoped. She said, \"Yes, Lily, you are so proud of you.\" She put her toys out and hugged her mom and dad shook her voice to help her mom.\nLily's mom smiled and remembered her mom. She knew she could explore up the pazill. She asked her mom about the kowlation. She showed her mom a new Mom and",
+ "rule_init": {},
+ "ngram_init": {}
+}

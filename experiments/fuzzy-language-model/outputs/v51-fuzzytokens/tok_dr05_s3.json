@@ -1,0 +1,238 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v51-fuzzytokens\\tok_dr05_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98528,
+ "params_nonemb": 47264,
+ "steps": 1025,
+ "chars_seen": 30024276,
+ "chars_per_token": 3.5756808,
+ "val_bpc": 1.1217,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.07023
+  ],
+  [
+   100,
+   1.4587
+  ],
+  [
+   200,
+   1.33405
+  ],
+  [
+   300,
+   1.27954
+  ],
+  [
+   400,
+   1.2422
+  ],
+  [
+   500,
+   1.21366
+  ],
+  [
+   600,
+   1.18955
+  ],
+  [
+   700,
+   1.16552
+  ],
+  [
+   800,
+   1.14395
+  ],
+  [
+   900,
+   1.13065
+  ],
+  [
+   1000,
+   1.12194
+  ],
+  [
+   1025,
+   1.1217
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.8026
+  ],
+  [
+   50,
+   9.4249
+  ],
+  [
+   100,
+   7.2942
+  ],
+  [
+   150,
+   6.24
+  ],
+  [
+   200,
+   5.7204
+  ],
+  [
+   250,
+   5.4334
+  ],
+  [
+   300,
+   5.271
+  ],
+  [
+   350,
+   5.1502
+  ],
+  [
+   400,
+   5.0746
+  ],
+  [
+   450,
+   5.0036
+  ],
+  [
+   500,
+   4.949
+  ],
+  [
+   550,
+   4.9003
+  ],
+  [
+   600,
+   4.8725
+  ],
+  [
+   650,
+   4.8125
+  ],
+  [
+   700,
+   4.7732
+  ],
+  [
+   750,
+   4.7165
+  ],
+  [
+   800,
+   4.68
+  ],
+  [
+   850,
+   4.6516
+  ],
+  [
+   900,
+   4.5905
+  ],
+  [
+   950,
+   4.5743
+  ],
+  [
+   1000,
+   4.5413
+  ],
+  [
+   1024,
+   4.5474
+  ]
+ ],
+ "train_seconds": 76.77,
+ "wall_seconds": 89.3,
+ "chars_per_sec": 109374,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lucy. She had a big, red ball and a big popining, and the trainss. Kitty liked to play with it. Lucy loved her mom and dad.\nOne day, Mam went to the park to see it. She was excited to play with her friends, a cat, and a small, a big dog. They all wanted to play. Every night, she saw a big tree with many trees. Rimon and they were still laughing. Lucy said, \"As! Let's go home to the tree and find a tree!\"\nitty was sad and smiled. The whole place was a big red ball. They learned that being nice is fun!\n<|eot|>\nOnce upon a time, there was a little boy named Tim. Tim loved to play with his toy car and make fun go outside. He would put the toy and stretcers all day long. One day, he saw a big red ball in the park. The window was very fast, but it was a small house.\nTim walped to the bag and found the car. But he could not see the button. But Tim was scared. He did not like to run through the bed.\nTim and the car were scared. They were so happy. They had an idea. He asked his mom about the car and asked, \"Can I have your car?\" Tim",
+ "rule_init": {},
+ "ngram_init": {}
+}

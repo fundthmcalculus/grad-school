@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.1,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-optA30\\wd1_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11554,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.39659
+  ],
+  [
+   580,
+   1.2774
+  ],
+  [
+   870,
+   1.17466
+  ],
+  [
+   1160,
+   1.11554
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2386
+  ],
+  [
+   50,
+   8.1878
+  ],
+  [
+   100,
+   6.3286
+  ],
+  [
+   150,
+   5.3985
+  ],
+  [
+   200,
+   4.9466
+  ],
+  [
+   250,
+   4.696
+  ],
+  [
+   300,
+   4.5293
+  ],
+  [
+   350,
+   4.4269
+  ],
+  [
+   400,
+   4.359
+  ],
+  [
+   450,
+   4.2496
+  ],
+  [
+   500,
+   4.2044
+  ],
+  [
+   550,
+   4.1508
+  ],
+  [
+   600,
+   4.0971
+  ],
+  [
+   650,
+   4.0269
+  ],
+  [
+   700,
+   3.977
+  ],
+  [
+   750,
+   3.9259
+  ],
+  [
+   800,
+   3.8667
+  ],
+  [
+   850,
+   3.8113
+  ],
+  [
+   900,
+   3.7676
+  ],
+  [
+   950,
+   3.7085
+  ],
+  [
+   1000,
+   3.6539
+  ],
+  [
+   1050,
+   3.6107
+  ],
+  [
+   1100,
+   3.5855
+  ],
+  [
+   1150,
+   3.5587
+  ],
+  [
+   1159,
+   3.5548
+  ]
+ ],
+ "train_seconds": 85.13,
+ "wall_seconds": 96.39,
+ "chars_per_sec": 111628,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and red bird. The birdquurbs was very surprised and scared.\nThe bird looked at the bird and said, \"Let's play with me!\"\n\"Look, Lily, Kitty! It is a big, fairy mask. It is okay.\"\nThe bird said, \"Yes, but we can't. You can change Marks or spend. We can help each other.\"\nSara and Kitty were happy and enventiting. They had a great day and srapped on the ground.\n<|eot|>\nOnce upon a time, there was a big tother named Tom. He loved to think the sunspute and play with his friends. One day, the bird saw a big hill. The peace was very big, so held it to them.\nTom saw a big, red tree on the tree. It made the rell. The tree bucket flew outside on the ground. Tom tried, but it was too high.\nTom and his friends all felt green. They both felt so happy. They all ran back to the tree. They played with the peaceful until it was time to have fun with. The bird was very surprised.\nThis time, Tom and Max played with the sun on the tree. They were happy, and the bird flew down to the unpute. They all started",
+ "rule_init": {},
+ "ngram_init": {}
+}

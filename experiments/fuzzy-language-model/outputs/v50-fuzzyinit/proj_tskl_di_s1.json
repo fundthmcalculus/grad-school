@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v50-fuzzyinit\\proj_tskl_di_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98720,
+ "params_nonemb": 47456,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.08109,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.04989
+  ],
+  [
+   100,
+   1.45734
+  ],
+  [
+   200,
+   1.31316
+  ],
+  [
+   300,
+   1.25926
+  ],
+  [
+   400,
+   1.20885
+  ],
+  [
+   500,
+   1.17678
+  ],
+  [
+   600,
+   1.14634
+  ],
+  [
+   700,
+   1.12186
+  ],
+  [
+   800,
+   1.10014
+  ],
+  [
+   900,
+   1.08595
+  ],
+  [
+   953,
+   1.08109
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.7049
+  ],
+  [
+   50,
+   9.0085
+  ],
+  [
+   100,
+   6.946
+  ],
+  [
+   150,
+   5.9242
+  ],
+  [
+   200,
+   5.4189
+  ],
+  [
+   250,
+   5.1595
+  ],
+  [
+   300,
+   4.9861
+  ],
+  [
+   350,
+   4.8589
+  ],
+  [
+   400,
+   4.7718
+  ],
+  [
+   450,
+   4.7102
+  ],
+  [
+   500,
+   4.623
+  ],
+  [
+   550,
+   4.5495
+  ],
+  [
+   600,
+   4.4697
+  ],
+  [
+   650,
+   4.4173
+  ],
+  [
+   700,
+   4.3616
+  ],
+  [
+   750,
+   4.3226
+  ],
+  [
+   800,
+   4.2844
+  ],
+  [
+   850,
+   4.2563
+  ],
+  [
+   900,
+   4.208
+  ],
+  [
+   950,
+   4.1865
+  ],
+  [
+   952,
+   4.1872
+  ]
+ ],
+ "train_seconds": 72.81,
+ "wall_seconds": 84.11,
+ "chars_per_sec": 107226,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. She had a big, red ball and a ball. Sue loved a ball with her doll. She would feed the pretty ball, making a ball. Sue loved her ball very much.\nOne day, Sue saw a little boy named Tim. The dog was sad, but Tim wanted to show. Tom felt sad because he wanted to see a big ball.\nSam thought it was tasty. He tried to make the ball feel better. He showed his friends his toy. He thought for a moment and went to find his toy. Tim said, \"Is a nice car!\" His friends were sad, but they could not find it.\nAfter playing, Tim felt better. He learned that even more fun was not now. He always wished he had a new friend.\n<|eot|>\nOne day, a little girl named Lily went for a walk. She saw a small apple on the ground. She was very excited. Her mom said, \"Don't be slow and swacers. You can't get hurt!\"\nLily smiled. They said, \"Yes, let's see the flower!\"\nLily and her mom looked at the fruit and said, \"Look, Mom! I hope your flag! You can follow you anymore.\" They walked to the big snake to have a new spictce.\nLily and Lily walked up to the jar. They looked for a new lesson. They laughed and played with the spider. They gave Mom a",
+ "rule_init": {},
+ "ngram_init": {}
+}

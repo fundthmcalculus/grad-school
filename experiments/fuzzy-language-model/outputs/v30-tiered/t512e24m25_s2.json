@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t512e24m25_s2.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 97664,
+ "params_nonemb": 59648,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10557,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.23747
+  ],
+  [
+   100,
+   1.60056
+  ],
+  [
+   200,
+   1.44755
+  ],
+  [
+   300,
+   1.37339
+  ],
+  [
+   400,
+   1.31511
+  ],
+  [
+   500,
+   1.27194
+  ],
+  [
+   600,
+   1.23225
+  ],
+  [
+   700,
+   1.19916
+  ],
+  [
+   800,
+   1.16828
+  ],
+  [
+   900,
+   1.14428
+  ],
+  [
+   1000,
+   1.12403
+  ],
+  [
+   1100,
+   1.11191
+  ],
+  [
+   1160,
+   1.10557
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.2265
+  ],
+  [
+   50,
+   8.0712
+  ],
+  [
+   100,
+   6.278
+  ],
+  [
+   150,
+   5.3722
+  ],
+  [
+   200,
+   4.8924
+  ],
+  [
+   250,
+   4.6468
+  ],
+  [
+   300,
+   4.4892
+  ],
+  [
+   350,
+   4.3642
+  ],
+  [
+   400,
+   4.2547
+  ],
+  [
+   450,
+   4.1663
+  ],
+  [
+   500,
+   4.104
+  ],
+  [
+   550,
+   4.0232
+  ],
+  [
+   600,
+   3.9757
+  ],
+  [
+   650,
+   3.9169
+  ],
+  [
+   700,
+   3.8476
+  ],
+  [
+   750,
+   3.8023
+  ],
+  [
+   800,
+   3.7597
+  ],
+  [
+   850,
+   3.7131
+  ],
+  [
+   900,
+   3.6741
+  ],
+  [
+   950,
+   3.6285
+  ],
+  [
+   1000,
+   3.603
+  ],
+  [
+   1050,
+   3.5738
+  ],
+  [
+   1100,
+   3.5557
+  ],
+  [
+   1150,
+   3.5184
+  ],
+  [
+   1159,
+   3.5194
+  ]
+ ],
+ "train_seconds": 80.92,
+ "wall_seconds": 95.07,
+ "chars_per_sec": 117434,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and collar. It was not good for other animals when she had never to play.\nOne day, the father was playing with a big soup. It was a small mighty and loved to go inside. The voice said, \"I want to try this aicy tree.\"\nSo held the edge chair. He chacked his bike and said, \"Thank you, mom. I would dance to avocuter and play together.\"\nThe little girl smiled and said, \"That's my friendly boat!\"\nSue and the anxious dog were happy. They played all day, even explored and had fun. They laughed and hit a big hug and became best friends. The moral of the story is to always be mine, orness and help others.\n<|eot|>\n\nMax and Ben were very excited. They had a big hug and pretty park.\nAnna and Ben were sad and wanted to help. They wanted to stumbr named Tom. They ran to the bite and put them in the woods. They had a lot of fun with bed. Everyone became good friends and had a great day for their friends.\n<|eot|>\n \nOnce upon a time, there was a little girl named Sue. Sue had a big corner.",
+ "rule_init": {},
+ "ngram_init": {}
+}

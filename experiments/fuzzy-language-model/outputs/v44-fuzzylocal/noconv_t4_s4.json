@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.45,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v44-fuzzylocal\\noconv_t4_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 4,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.45,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 4,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99548,
+ "params_nonemb": 48284,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.05454,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.06688
+  ],
+  [
+   100,
+   1.40476
+  ],
+  [
+   200,
+   1.2671
+  ],
+  [
+   300,
+   1.21463
+  ],
+  [
+   400,
+   1.173
+  ],
+  [
+   500,
+   1.1439
+  ],
+  [
+   600,
+   1.11535
+  ],
+  [
+   700,
+   1.0887
+  ],
+  [
+   800,
+   1.07039
+  ],
+  [
+   900,
+   1.05769
+  ],
+  [
+   953,
+   1.05454
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.788
+  ],
+  [
+   50,
+   9.0791
+  ],
+  [
+   100,
+   6.9023
+  ],
+  [
+   150,
+   5.8041
+  ],
+  [
+   200,
+   5.2519
+  ],
+  [
+   250,
+   4.9822
+  ],
+  [
+   300,
+   4.8161
+  ],
+  [
+   350,
+   4.6915
+  ],
+  [
+   400,
+   4.594
+  ],
+  [
+   450,
+   4.5208
+  ],
+  [
+   500,
+   4.4571
+  ],
+  [
+   550,
+   4.3917
+  ],
+  [
+   600,
+   4.3603
+  ],
+  [
+   650,
+   4.313
+  ],
+  [
+   700,
+   4.2609
+  ],
+  [
+   750,
+   4.2093
+  ],
+  [
+   800,
+   4.1569
+  ],
+  [
+   850,
+   4.141
+  ],
+  [
+   900,
+   4.1018
+  ],
+  [
+   950,
+   4.0751
+  ],
+  [
+   952,
+   4.0759
+  ]
+ ],
+ "train_seconds": 71.33,
+ "wall_seconds": 82.2,
+ "chars_per_sec": 109449,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. She had many colors that she loved to go on it. One day, Lucy decided to try it to help school, but her friend friend said.\nSue was very sad because she could not find her best friend. She asked her mom if she could help the girl. She also found a big, red ball on the swings. The boy was happy, but she knew her family.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to play in the park in the park. One day, Lily's mom's friend, to a big box. In the box, Lily saw a small box in her house. The box was different and blue.\nLily's mom came to the box. She said, \"Mom, I can't get my book. I want to play with me!\"\nLily and her mom went outside to play. They played with the iceck and had fun all day. On the store, Lily and her mom smiled. They all felt happy. They were always happy. They became good friends with them.\n<|eot|>\n\nOnce upon a time there was a little boy who lived in a big, round gym. One day, he heard a naughty man coming to you to the man.\nThe man asked the lady, \"What's that?\"\n\"I'm sorry, I saw the man. The man was not shy. He asked his bike, but he could not find out",
+ "rule_init": {},
+ "ngram_init": {}
+}

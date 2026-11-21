@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v7-confirm\\b2048-d32-h8_30M_s1.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe2048",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 2048
+ },
+ "config": {
+  "vocab_size": 2048,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 87840,
+ "params_nonemb": 22304,
+ "steps": 1001,
+ "chars_seen": 30011180,
+ "chars_per_token": 3.6598144,
+ "val_bpc": 1.13419,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   250,
+   1.29819
+  ],
+  [
+   500,
+   1.21066
+  ],
+  [
+   750,
+   1.15927
+  ],
+  [
+   1000,
+   1.13411
+  ],
+  [
+   1001,
+   1.13419
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.1877
+  ],
+  [
+   50,
+   9.3067
+  ],
+  [
+   100,
+   7.0407
+  ],
+  [
+   150,
+   5.8677
+  ],
+  [
+   200,
+   5.2908
+  ],
+  [
+   250,
+   4.9818
+  ],
+  [
+   300,
+   4.7975
+  ],
+  [
+   350,
+   4.6728
+  ],
+  [
+   400,
+   4.5977
+  ],
+  [
+   450,
+   4.5721
+  ],
+  [
+   500,
+   4.4961
+  ],
+  [
+   550,
+   4.4432
+  ],
+  [
+   600,
+   4.3965
+  ],
+  [
+   650,
+   4.3508
+  ],
+  [
+   700,
+   4.3152
+  ],
+  [
+   750,
+   4.2756
+  ],
+  [
+   800,
+   4.2475
+  ],
+  [
+   850,
+   4.2265
+  ],
+  [
+   900,
+   4.2001
+  ],
+  [
+   950,
+   4.1827
+  ],
+  [
+   1000,
+   4.1743
+  ]
+ ],
+ "train_seconds": 206.55,
+ "wall_seconds": 220.64,
+ "chars_per_sec": 39700,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Sue. Her mom decided to go to the new room.\nMia climbed up the box and saw her friend. It was a box and a cat. Sue jumped up and saw the meal drinks, but it was too small. She dropped Sue and asked, \"Why are you sad, please?\" Sue said, \"Don't worry, Sue. Let's go in the box.\" Lily was very excited and wanted to try.\nSue listened and said, \"V on, Tom. It can't break yourself.\" Max and Sue played with their toys together all day. They had a fun day at the park.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. Lily loved to play. She had a toy car on her friend, Sam. They had a small toy that had a fun day. They all lived happily ever after. Lily liked to come and play together.\nOne day, Lily saw a boy named Tom. They run to the big ball and barked, and they had a lot of fun.\n\"Look, mom, you, Tom?\" Lily asked. \"Why are you sad, mom?\" Mia asks.\n\"Can we help me find the trutt?\" Tom asks.\n\"No, you can be careful. I can't make a cake.\" Tom says.\n\"I loves my smile!\" Lily says.\n\"OK, no. They can be fun to keep the",
+ "rule_init": {},
+ "ngram_init": {}
+}

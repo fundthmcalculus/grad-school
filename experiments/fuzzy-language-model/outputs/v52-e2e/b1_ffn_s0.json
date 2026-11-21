@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 1,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\b1_ffn_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 1,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99202,
+ "params_nonemb": 47938,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.1441,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.09522
+  ],
+  [
+   100,
+   1.54982
+  ],
+  [
+   200,
+   1.36174
+  ],
+  [
+   300,
+   1.29748
+  ],
+  [
+   400,
+   1.25773
+  ],
+  [
+   500,
+   1.22629
+  ],
+  [
+   600,
+   1.19707
+  ],
+  [
+   700,
+   1.17659
+  ],
+  [
+   800,
+   1.15975
+  ],
+  [
+   900,
+   1.14676
+  ],
+  [
+   953,
+   1.1441
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.8741
+  ],
+  [
+   50,
+   9.6768
+  ],
+  [
+   100,
+   7.5727
+  ],
+  [
+   150,
+   6.3331
+  ],
+  [
+   200,
+   5.6954
+  ],
+  [
+   250,
+   5.3451
+  ],
+  [
+   300,
+   5.152
+  ],
+  [
+   350,
+   5.0001
+  ],
+  [
+   400,
+   4.9505
+  ],
+  [
+   450,
+   4.856
+  ],
+  [
+   500,
+   4.7983
+  ],
+  [
+   550,
+   4.7202
+  ],
+  [
+   600,
+   4.6449
+  ],
+  [
+   650,
+   4.5985
+  ],
+  [
+   700,
+   4.5768
+  ],
+  [
+   750,
+   4.5595
+  ],
+  [
+   800,
+   4.5063
+  ],
+  [
+   850,
+   4.4681
+  ],
+  [
+   900,
+   4.4421
+  ],
+  [
+   950,
+   4.4321
+  ],
+  [
+   952,
+   4.4331
+  ]
+ ],
+ "train_seconds": 44.62,
+ "wall_seconds": 51.47,
+ "chars_per_sec": 174949,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl at. She had a big, shiny toy in her garden. She had a box of toys, and the cookies were wet. She wanted to fix a new song first. She loved her toy, and they would go to the fariopers on it.\nOne day, a little girl found a big, red ball on the table. The toy car was having a fun day with a ball. There were her sun who were so happy to have more fun with kids.\nOne day, Dctnman's sauspt in the air. Its got pink and shove to leave it, but it was too hard. The whole gudoo said, \"It is a pretty place to make the big tree and the tree. But we can have fun. You should stay fit a big hole of rolling and crossing and build a big balloon. You can eat it.\"\nThe funny bird and the cat were very scared. They were hungry when they looked for more time. They looked at the picture for the dog, but the dog was clean and warm.\nThe bird had an idea. They looked at the tall cat, and they saw a small girl named Lily. They said, \"Thank you, Max!\" said Tim. They both laughed and played together every day.\n<|eot|>\n\nOnce upon a time, there was a big cat named Sue. Sue was very sad. \"Mom, can you help others and help",
+ "rule_init": {},
+ "ngram_init": {}
+}

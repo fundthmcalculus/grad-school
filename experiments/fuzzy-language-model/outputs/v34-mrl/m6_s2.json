@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v34-mrl\\m6_s2.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.24116,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.25588
+  ],
+  [
+   100,
+   1.74717
+  ],
+  [
+   200,
+   1.59725
+  ],
+  [
+   300,
+   1.48278
+  ],
+  [
+   400,
+   1.42921
+  ],
+  [
+   500,
+   1.38723
+  ],
+  [
+   600,
+   1.35461
+  ],
+  [
+   700,
+   1.33007
+  ],
+  [
+   800,
+   1.2958
+  ],
+  [
+   900,
+   1.27673
+  ],
+  [
+   1000,
+   1.25941
+  ],
+  [
+   1100,
+   1.24493
+  ],
+  [
+   1160,
+   1.24116
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.258
+  ],
+  [
+   50,
+   8.4944
+  ],
+  [
+   100,
+   6.968
+  ],
+  [
+   150,
+   6.0391
+  ],
+  [
+   200,
+   5.6034
+  ],
+  [
+   250,
+   5.3553
+  ],
+  [
+   300,
+   5.1578
+  ],
+  [
+   350,
+   5.0502
+  ],
+  [
+   400,
+   4.9418
+  ],
+  [
+   450,
+   4.8719
+  ],
+  [
+   500,
+   4.8098
+  ],
+  [
+   550,
+   4.7524
+  ],
+  [
+   600,
+   4.6791
+  ],
+  [
+   650,
+   4.6612
+  ],
+  [
+   700,
+   4.6005
+  ],
+  [
+   750,
+   4.5477
+  ],
+  [
+   800,
+   4.529
+  ],
+  [
+   850,
+   4.5105
+  ],
+  [
+   900,
+   4.4613
+  ],
+  [
+   950,
+   4.3955
+  ],
+  [
+   1000,
+   4.4108
+  ],
+  [
+   1050,
+   4.366
+  ],
+  [
+   1100,
+   4.3421
+  ],
+  [
+   1150,
+   4.3111
+  ],
+  [
+   1159,
+   4.2952
+  ]
+ ],
+ "train_seconds": 82.14,
+ "wall_seconds": 96.24,
+ "chars_per_sec": 115684,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called her friend.\nThe mee took the pian. Then, she was very fast for his cute. The pond was not happy. The moer was very excited. The people and her friends played together all day. The next day, and the puppy lived happily ever after.\n<|eot|>\n\n\nSara and Ben were playing in the garden. They liked to play with them and has a clear, but they are not the day. They saw a big smile and a little bunny. They wanted to make a other apples. Max was a cocret. The boat said, \"I want to make a car thrite. you like to play with.\"\nTom picked up and spot to sporop. He saw a big hug and wanted to play with it. It was now hears. He marws on a black cars. He looked at the exet and he got outside. Tom was sad.\nThe cat and Tom played with the bors. They all had fun. The magic. It was a big tree. They became friends, but they were not sad. They played all day and had fun.\nBut then, the bird was too fast. It was a big cat. But Max thought his cat and Sam pight. The cat having leal and towens the unuit. They were curi",
+ "rule_init": {},
+ "ngram_init": {}
+}

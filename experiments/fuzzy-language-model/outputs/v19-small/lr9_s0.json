@@ -1,0 +1,142 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 4000000.0,
+  "lr": 0.09,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 6,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-small\\lr9_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 155,
+ "chars_seen": 4010100,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.41255,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   38,
+   1.82424
+  ],
+  [
+   76,
+   1.63129
+  ],
+  [
+   114,
+   1.54093
+  ],
+  [
+   152,
+   1.41812
+  ],
+  [
+   155,
+   1.41255
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3706
+  ],
+  [
+   50,
+   7.9649
+  ],
+  [
+   100,
+   6.1686
+  ],
+  [
+   150,
+   5.2388
+  ],
+  [
+   154,
+   5.1781
+  ]
+ ],
+ "train_seconds": 561.98,
+ "wall_seconds": 785.07,
+ "chars_per_sec": 2259,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 6,
+ "device": "cpu",
+ "device_name": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, in a small girl who was time. \nThe measa asked, \"Yes. I will give up to use that can make me. We have to pusr on the mod. They will help you?\"\nHe said, \"Heli, May!\" Bre agreed and went to the right. It was a big glross. Fin lived in the sign. In the sunny day, Jack's mom was very happy. she saw something avass of the tree. \nMea thought, \"Why are not a great friend. It's okay is a special set. Cat!\" Billy did to play with them. \nBob and Mrivery were so cupy. She hugged him and said, \"I can it to help the toys around the mess, I can where youn't read it?\" She said.\n\"Wowlse, thank you?\" His mom said, \"I can help me help your family. \"Come, I can I do you have to bran be beings in if you play with your animals who are nice.\"\nAnna and Ben are bed to find many friends. They like a big hug. They say, \"Yes, this please. Let having been!\" They say, \"I want you. We can make your",
+ "rule_init": {},
+ "ngram_init": {}
+}

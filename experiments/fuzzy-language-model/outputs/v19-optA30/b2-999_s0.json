@@ -1,0 +1,218 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.999,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v19-optA30\\b2-999_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11185,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   290,
+   1.36361
+  ],
+  [
+   580,
+   1.23266
+  ],
+  [
+   870,
+   1.15646
+  ],
+  [
+   1160,
+   1.11185
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3706
+  ],
+  [
+   50,
+   8.124
+  ],
+  [
+   100,
+   6.251
+  ],
+  [
+   150,
+   5.341
+  ],
+  [
+   200,
+   4.8765
+  ],
+  [
+   250,
+   4.6111
+  ],
+  [
+   300,
+   4.4446
+  ],
+  [
+   350,
+   4.3312
+  ],
+  [
+   400,
+   4.2466
+  ],
+  [
+   450,
+   4.1507
+  ],
+  [
+   500,
+   4.0822
+  ],
+  [
+   550,
+   4.0088
+  ],
+  [
+   600,
+   3.9422
+  ],
+  [
+   650,
+   3.8856
+  ],
+  [
+   700,
+   3.8408
+  ],
+  [
+   750,
+   3.8123
+  ],
+  [
+   800,
+   3.7595
+  ],
+  [
+   850,
+   3.7061
+  ],
+  [
+   900,
+   3.674
+  ],
+  [
+   950,
+   3.6289
+  ],
+  [
+   1000,
+   3.59
+  ],
+  [
+   1050,
+   3.5641
+  ],
+  [
+   1100,
+   3.5505
+  ],
+  [
+   1150,
+   3.5532
+  ],
+  [
+   1159,
+   3.5489
+  ]
+ ],
+ "train_seconds": 79.22,
+ "wall_seconds": 86.14,
+ "chars_per_sec": 119959,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Ben. Ben loved to race a special pasta. He would always go to the garden that he was driving up.\nOne day, Ben found a toy sweet called a big tree. He saw a big tree with a small pond. He pointed a bird and wanted to slide. The frog said, \"Let's origer it to the frog.\"\nBen was sad. He did not know what happened. He went to the bird. He said, \"Can I play with you?\"\nBen's friend, Tom, came to see it. But then, a grate bird came down. Ben said, \"Why are you sad, I want to help me?\" Tom said, \"I don't know that you didn't listen.\" Lily said, \"Yes, you can help you find the bird.\"\nBen was very sad. He remembered that the bird could not. The bird cried. Tom had an idea. He thanked the bird to help its friend. They had green bird's home to see the bird. The bird was happy to have fun to play with him.\n<|eot|>\nOne day, a little boy named Tim went to the park. He saw a big, red car. Tim was so happy. Sam said, \"Let's do how to grow, bird!\"\nIn the park, Tim decided to play with",
+ "rule_init": {},
+ "ngram_init": {}
+}

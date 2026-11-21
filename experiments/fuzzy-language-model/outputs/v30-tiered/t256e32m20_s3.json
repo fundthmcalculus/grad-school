@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v30-tiered\\t256e32m20_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 91856,
+ "params_nonemb": 53456,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.12903,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.21517
+  ],
+  [
+   100,
+   1.61668
+  ],
+  [
+   200,
+   1.46183
+  ],
+  [
+   300,
+   1.3955
+  ],
+  [
+   400,
+   1.33766
+  ],
+  [
+   500,
+   1.29726
+  ],
+  [
+   600,
+   1.25679
+  ],
+  [
+   700,
+   1.22135
+  ],
+  [
+   800,
+   1.1891
+  ],
+  [
+   900,
+   1.16731
+  ],
+  [
+   1000,
+   1.14728
+  ],
+  [
+   1100,
+   1.13364
+  ],
+  [
+   1160,
+   1.12903
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.1842
+  ],
+  [
+   50,
+   8.1029
+  ],
+  [
+   100,
+   6.3233
+  ],
+  [
+   150,
+   5.4369
+  ],
+  [
+   200,
+   4.992
+  ],
+  [
+   250,
+   4.7291
+  ],
+  [
+   300,
+   4.5386
+  ],
+  [
+   350,
+   4.4369
+  ],
+  [
+   400,
+   4.3343
+  ],
+  [
+   450,
+   4.2488
+  ],
+  [
+   500,
+   4.1684
+  ],
+  [
+   550,
+   4.1069
+  ],
+  [
+   600,
+   4.0293
+  ],
+  [
+   650,
+   3.9776
+  ],
+  [
+   700,
+   3.912
+  ],
+  [
+   750,
+   3.8668
+  ],
+  [
+   800,
+   3.8235
+  ],
+  [
+   850,
+   3.7854
+  ],
+  [
+   900,
+   3.7441
+  ],
+  [
+   950,
+   3.7113
+  ],
+  [
+   1000,
+   3.6616
+  ],
+  [
+   1050,
+   3.6295
+  ],
+  [
+   1100,
+   3.6159
+  ],
+  [
+   1150,
+   3.5981
+  ],
+  [
+   1159,
+   3.5885
+  ]
+ ],
+ "train_seconds": 80.67,
+ "wall_seconds": 94.95,
+ "chars_per_sec": 117795,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and clear. \nThe mean dog was shiver. He wanted to go to the room that day. He would play outside and pushed on the table. Lily's beautiful sand and loved to go inside.\nOne day, a little boy named Tim polite air. He said, \"Look, Tim!\" he said. Tim thought the train succeaky, so he decided to eat it in the ground. He would see the bird.\nBut the bird got scared. The bird found a big tree. It was shiny and a coar! The sun was so smart and the anxious cat saw a bit. Tim was sad because he could not use good. It thought that it could know that was happy to be very word.\n<|eot|>\nOne day, a little boy named Tim went for a walk. He saw a ball in the store. The expensic was outside that Tom was not a pretty bug.\nAnMandy went to the park with her mom. The bug said to the bugs, \"I am so big! I will go inside and play with your friends.\"\nTim and his friends were surprised. They played with the bugs and had a lot of fun. Tim was safe and sad. But his food is not grow, use his friends. Tim and Sue were not very curi",
+ "rule_init": {},
+ "ngram_init": {}
+}

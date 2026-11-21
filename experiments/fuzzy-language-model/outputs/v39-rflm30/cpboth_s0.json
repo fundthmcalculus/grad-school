@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta_cpboth",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v39-rflm30\\cpboth_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta_cpboth",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 98464,
+ "params_nonemb": 49312,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.10616,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.28517
+  ],
+  [
+   100,
+   1.59549
+  ],
+  [
+   200,
+   1.43122
+  ],
+  [
+   300,
+   1.35779
+  ],
+  [
+   400,
+   1.30709
+  ],
+  [
+   500,
+   1.26128
+  ],
+  [
+   600,
+   1.23
+  ],
+  [
+   700,
+   1.19867
+  ],
+  [
+   800,
+   1.16811
+  ],
+  [
+   900,
+   1.14212
+  ],
+  [
+   1000,
+   1.12515
+  ],
+  [
+   1100,
+   1.11231
+  ],
+  [
+   1160,
+   1.10616
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3706
+  ],
+  [
+   50,
+   8.1366
+  ],
+  [
+   100,
+   6.2525
+  ],
+  [
+   150,
+   5.3414
+  ],
+  [
+   200,
+   4.8814
+  ],
+  [
+   250,
+   4.6167
+  ],
+  [
+   300,
+   4.4547
+  ],
+  [
+   350,
+   4.3348
+  ],
+  [
+   400,
+   4.2431
+  ],
+  [
+   450,
+   4.1509
+  ],
+  [
+   500,
+   4.0869
+  ],
+  [
+   550,
+   4.0135
+  ],
+  [
+   600,
+   3.9521
+  ],
+  [
+   650,
+   3.8948
+  ],
+  [
+   700,
+   3.8418
+  ],
+  [
+   750,
+   3.8126
+  ],
+  [
+   800,
+   3.7533
+  ],
+  [
+   850,
+   3.6974
+  ],
+  [
+   900,
+   3.6642
+  ],
+  [
+   950,
+   3.6159
+  ],
+  [
+   1000,
+   3.5779
+  ],
+  [
+   1050,
+   3.5535
+  ],
+  [
+   1100,
+   3.5358
+  ],
+  [
+   1150,
+   3.5401
+  ],
+  [
+   1159,
+   3.5363
+  ]
+ ],
+ "train_seconds": 85.26,
+ "wall_seconds": 100.16,
+ "chars_per_sec": 111454,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there were playing with her toys. She was a piece of a special shiver. One day, she looked for the crayon. She wanted to pizzy the table. She decided to play with her friend, Sue.\nLucy's mom said, \"Yes, let's go a stut next to slide!\" Sue started to glue. She was happy. They chaucce agreed and show.\n<|eot|>\nOnce upon a time, in a small town, there was a strong orange bug. There was a big, colorful fish. The fish liked to play. The boat liked to play a lot of fun.\nOne day, a little girl named Amy went to the exarraction to the forest. She found a big pant to the kitchen. She put it on a tree. The pants, the pants were fake. She saw a big, red bug and thought. The pare appest and the cat went up to the water. The bird flew down and gave it a gun. It was a big tree to play.\nBut Amy was scared. But one where happened. The little fish came out. The baby was sad. Amy said, \"I saw the big tree, big bird!\" Her pink bird looked at the group and said, \"I saw the big tree. Werow",
+ "rule_init": {},
+ "ngram_init": {}
+}

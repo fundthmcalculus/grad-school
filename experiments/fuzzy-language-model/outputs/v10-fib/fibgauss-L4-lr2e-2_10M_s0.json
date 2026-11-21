@@ -1,0 +1,149 @@
+{
+ "args": {
+  "mixer": "fibgauss",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 4,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "fixed",
+  "ctx": 512,
+  "fib_local": 4,
+  "batch": 16,
+  "chars": 10000000.0,
+  "lr": 0.02,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v10-fib\\fibgauss-L4-lr2e-2_10M_s0.json",
+  "save_model": true,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 4,
+  "mixer": "fibgauss",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 8,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 4
+ },
+ "params_total": 94944,
+ "params_nonemb": 45792,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.33849,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.68041
+  ],
+  [
+   192,
+   1.48048
+  ],
+  [
+   288,
+   1.38731
+  ],
+  [
+   384,
+   1.33934
+  ],
+  [
+   387,
+   1.33849
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3831
+  ],
+  [
+   50,
+   8.8606
+  ],
+  [
+   100,
+   6.8143
+  ],
+  [
+   150,
+   5.6666
+  ],
+  [
+   200,
+   5.083
+  ],
+  [
+   250,
+   4.7567
+  ],
+  [
+   300,
+   4.5453
+  ],
+  [
+   350,
+   4.3996
+  ],
+  [
+   386,
+   4.3321
+  ]
+ ],
+ "train_seconds": 4.92,
+ "wall_seconds": 6.67,
+ "chars_per_sec": 643935,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl calledlf. Tim loved to meet room, he wanted to make a big box. He wanted to climb the fat. He puts on the big birster. Lily was happy and said, \"No, I will problech. We just like you. You are a worm. You are my friend!\"\nLily said, \"Can I do it! I'm me. I will help you. Thank you, you can play your ball.\"\nSue and Mogether, they were not scared and makeful others. They are very happy and happy. They are happy!\"\nThey laughed and ran to their other thanks. They played together all day, even not make them fairs.\n<|eot|>\nOne day, a little girl named Lily found a big tree with his friends. He saw a big pile of marble. He wanted to climb the tree on it and found a long buck that. The parentike was very scared. He opened it and down the bird. He wanted to play with the ball. It was a big tree to play. The bunny was very happy.\nTim walked around, and her mom said, \"I bed to find the sandmner to make a big tree. He wanted to be pight.\nA handpa was towet and braves. He decided toray",
+ "rule_init": {},
+ "ngram_init": {}
+}

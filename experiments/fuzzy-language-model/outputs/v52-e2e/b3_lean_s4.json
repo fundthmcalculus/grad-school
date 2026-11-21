@@ -1,0 +1,230 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 3,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v52-e2e\\b3_lean_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe3072",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 3072
+ },
+ "config": {
+  "vocab_size": 3072,
+  "d_model": 48,
+  "n_layers": 3,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 99439,
+ "params_nonemb": 48175,
+ "steps": 953,
+ "chars_seen": 30027915,
+ "chars_per_token": 3.8462928,
+ "val_bpc": 1.13589,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.07779
+  ],
+  [
+   100,
+   1.52356
+  ],
+  [
+   200,
+   1.36006
+  ],
+  [
+   300,
+   1.29683
+  ],
+  [
+   400,
+   1.25211
+  ],
+  [
+   500,
+   1.21901
+  ],
+  [
+   600,
+   1.1943
+  ],
+  [
+   700,
+   1.16944
+  ],
+  [
+   800,
+   1.15065
+  ],
+  [
+   900,
+   1.13957
+  ],
+  [
+   953,
+   1.13589
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   11.837
+  ],
+  [
+   50,
+   9.2827
+  ],
+  [
+   100,
+   7.3274
+  ],
+  [
+   150,
+   6.2177
+  ],
+  [
+   200,
+   5.6323
+  ],
+  [
+   250,
+   5.3313
+  ],
+  [
+   300,
+   5.1426
+  ],
+  [
+   350,
+   5.0101
+  ],
+  [
+   400,
+   4.9086
+  ],
+  [
+   450,
+   4.8233
+  ],
+  [
+   500,
+   4.7551
+  ],
+  [
+   550,
+   4.6897
+  ],
+  [
+   600,
+   4.6571
+  ],
+  [
+   650,
+   4.6109
+  ],
+  [
+   700,
+   4.5636
+  ],
+  [
+   750,
+   4.5163
+  ],
+  [
+   800,
+   4.4647
+  ],
+  [
+   850,
+   4.4479
+  ],
+  [
+   900,
+   4.4061
+  ],
+  [
+   950,
+   4.381
+  ],
+  [
+   952,
+   4.3815
+  ]
+ ],
+ "train_seconds": 111.78,
+ "wall_seconds": 127.37,
+ "chars_per_sec": 69840,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little girl named Lily. She liked to play with her toys and go for a fun day. Lily was so happy to see what was inside, he saw a big, strong cat.\nLily said, \"Come, I like your extriop.\" Lily said, \"I like to play with the big bippies.\" She worked under her else, a big, red ball and the hole was. Every night, she played with her hands and towers. Lily's mom gave them a big, soft water. Lily and her daddy were best friends.\n<|eot|>\n\nOnce upon a time, there was a hero boy named Tim. He was so happy because he had to give it to his mom. But if he're to the store. His favorite favorite liked to draw so much and wanted to keep his surprise.\nTim's mom said, \"No, Tim, I'm not bad. Let's go to the yard together to play with Tim.\" After a while, Tim swbruged that he felt a sad. Everyone was very excited, but he could not find his lap.\nTim felt sad and he had to talk to Sam. He said, \"Tim, let's go inside!\" So he played with his new hair through the chair and higher. But Tim and Sam remembered they had a fun day. Tim was happy to see his friend.\n<|eot|>\nOnce upon a time, in a big park, there lived a boy named Tim.",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,226 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 4,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v40-tiervocab\\v4096h256e8m20_s4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe4096",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 4096
+ },
+ "config": {
+  "vocab_size": 4096,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96848,
+ "params_nonemb": 53456,
+ "steps": 927,
+ "chars_seen": 30025470,
+ "chars_per_token": 3.9538496,
+ "val_bpc": 1.06218,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.07627
+  ],
+  [
+   100,
+   1.38897
+  ],
+  [
+   200,
+   1.25842
+  ],
+  [
+   300,
+   1.20173
+  ],
+  [
+   400,
+   1.1696
+  ],
+  [
+   500,
+   1.13864
+  ],
+  [
+   600,
+   1.11216
+  ],
+  [
+   700,
+   1.09151
+  ],
+  [
+   800,
+   1.07258
+  ],
+  [
+   900,
+   1.0632
+  ],
+  [
+   927,
+   1.06218
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   12.1288
+  ],
+  [
+   50,
+   9.2636
+  ],
+  [
+   100,
+   7.0016
+  ],
+  [
+   150,
+   5.9143
+  ],
+  [
+   200,
+   5.3638
+  ],
+  [
+   250,
+   5.0809
+  ],
+  [
+   300,
+   4.9079
+  ],
+  [
+   350,
+   4.7688
+  ],
+  [
+   400,
+   4.6931
+  ],
+  [
+   450,
+   4.6342
+  ],
+  [
+   500,
+   4.584
+  ],
+  [
+   550,
+   4.5047
+  ],
+  [
+   600,
+   4.4725
+  ],
+  [
+   650,
+   4.4196
+  ],
+  [
+   700,
+   4.3728
+  ],
+  [
+   750,
+   4.3529
+  ],
+  [
+   800,
+   4.3173
+  ],
+  [
+   850,
+   4.2689
+  ],
+  [
+   900,
+   4.2355
+  ],
+  [
+   926,
+   4.2289
+  ]
+ ],
+ "train_seconds": 70.06,
+ "wall_seconds": 81.1,
+ "chars_per_sec": 108400,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a girl named Lily. She loved to play and had fun.\nOne day, Lily saw a big, clumsy cat in the oven. The cat wanted a big work pretty flower. It was happy that she could jump on the heavy grass. Lily and Lily were all very happy to see the big cat.\n<|eot|>\nOnce upon a time, there was a princess named Spot. Spot liked to play with his best friend, Tim. The town was cool and always play in the side.\nOne day, Spot found a puzzle in the floor. He wanted to play with the journal. The colors laughed and said, \"Let's play together!\" Spot and Tim played together all day. They became best friends and played together every day.\n<|eot|>\nOnce upon a time, there was a bald magic cat named Fin. Bunny was very strong and loved to play with all day. One day, After a while, a big bird came to the forest. The cat said, if there was a rich bird who could not help.\nBob decided to help the bird, but they could not get the bird by the hole. They all lay down on the hill, but they could not find something. They saw the bird and said, \"I could play with your friends.\" The bird came up and down, but the bird could not feel angry too. The bird jumped and started to play too. So, he felt happy and sick. The bird was happy too.\nThe bird felt good",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 40,
+  "layers": 4,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-mix\\acc-L4d40_s0.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 40,
+  "n_layers": 4,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 74688,
+ "params_nonemb": 70768,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.47337,
+ "evals": [
+  [
+   305,
+   1.93634
+  ],
+  [
+   610,
+   1.69139
+  ],
+  [
+   915,
+   1.54467
+  ],
+  [
+   1220,
+   1.47353
+  ],
+  [
+   1221,
+   1.47337
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.7682
+  ],
+  [
+   50,
+   5.0468
+  ],
+  [
+   100,
+   3.6145
+  ],
+  [
+   150,
+   2.8401
+  ],
+  [
+   200,
+   2.4283
+  ],
+  [
+   250,
+   2.1936
+  ],
+  [
+   300,
+   2.0657
+  ],
+  [
+   350,
+   1.9711
+  ],
+  [
+   400,
+   1.895
+  ],
+  [
+   450,
+   1.8462
+  ],
+  [
+   500,
+   1.8032
+  ],
+  [
+   550,
+   1.7502
+  ],
+  [
+   600,
+   1.7177
+  ],
+  [
+   650,
+   1.6932
+  ],
+  [
+   700,
+   1.6678
+  ],
+  [
+   750,
+   1.6492
+  ],
+  [
+   800,
+   1.621
+  ],
+  [
+   850,
+   1.6001
+  ],
+  [
+   900,
+   1.5801
+  ],
+  [
+   950,
+   1.56
+  ],
+  [
+   1000,
+   1.5273
+  ],
+  [
+   1050,
+   1.5185
+  ],
+  [
+   1100,
+   1.5032
+  ],
+  [
+   1150,
+   1.4925
+  ],
+  [
+   1200,
+   1.4926
+  ],
+  [
+   1220,
+   1.4913
+  ]
+ ],
+ "train_seconds": 79.83,
+ "wall_seconds": 90.33,
+ "chars_per_sec": 125292,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Tom. He was singing so made suits. Ben shouted her dad. He wanted to see the gue and did not now to school of home. The bird says deg and saw a soft firent together.\nThey sall on the lackeor with her time to play. They all toll their mom of the dog, and they showed a l",
+ "rule_init": {}
+}

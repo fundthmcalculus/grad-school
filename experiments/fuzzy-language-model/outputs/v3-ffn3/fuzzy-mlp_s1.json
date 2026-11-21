@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "mlp",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn3\\fuzzy-mlp_s1.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 0,
+  "ffn_width": "dim",
+  "ffn_norm": "softmax",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 0,
+  "ffn_width": "dim",
+  "ffn_norm": "softmax",
+  "max_len": 256
+ },
+ "params_total": 76996,
+ "params_nonemb": 70724,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.49197,
+ "evals": [
+  [
+   305,
+   1.89934
+  ],
+  [
+   610,
+   1.70318
+  ],
+  [
+   915,
+   1.56578
+  ],
+  [
+   1220,
+   1.49273
+  ],
+  [
+   1221,
+   1.49197
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9502
+  ],
+  [
+   50,
+   4.8878
+  ],
+  [
+   100,
+   3.4262
+  ],
+  [
+   150,
+   2.6691
+  ],
+  [
+   200,
+   2.3113
+  ],
+  [
+   250,
+   2.1204
+  ],
+  [
+   300,
+   2.0069
+  ],
+  [
+   350,
+   1.9338
+  ],
+  [
+   400,
+   1.8768
+  ],
+  [
+   450,
+   1.8289
+  ],
+  [
+   500,
+   1.7921
+  ],
+  [
+   550,
+   1.7589
+  ],
+  [
+   600,
+   1.7358
+  ],
+  [
+   650,
+   1.7101
+  ],
+  [
+   700,
+   1.6863
+  ],
+  [
+   750,
+   1.663
+  ],
+  [
+   800,
+   1.6483
+  ],
+  [
+   850,
+   1.6178
+  ],
+  [
+   900,
+   1.5952
+  ],
+  [
+   950,
+   1.5735
+  ],
+  [
+   1000,
+   1.5532
+  ],
+  [
+   1050,
+   1.5346
+  ],
+  [
+   1100,
+   1.5257
+  ],
+  [
+   1150,
+   1.5121
+  ],
+  [
+   1200,
+   1.5134
+  ],
+  [
+   1220,
+   1.509
+  ]
+ ],
+ "train_seconds": 52.91,
+ "wall_seconds": 63.91,
+ "chars_per_sec": 189055,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little girl named Sue was not happy. Tim and said, \"Be!\" Tom told his friends and dads. Tim were playing. The needed and said, \"Thank you, Lily, whiey are sad went to the rabbit and saw his friend. They were very happy. He wanted to make eating on a very car!\"\nMom said to the yard call",
+ "rule_init": {}
+}

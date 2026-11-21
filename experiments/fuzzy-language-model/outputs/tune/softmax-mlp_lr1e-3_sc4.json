@@ -1,0 +1,179 @@
+{
+ "args": {
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.001,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/softmax-mlp_lr1e-3_sc4.json",
+  "save_model": false
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 19936,
+ "params_nonemb": 16800,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.31916,
+ "evals": [
+  [
+   305,
+   3.02868
+  ],
+  [
+   610,
+   2.48936
+  ],
+  [
+   915,
+   2.35714
+  ],
+  [
+   1220,
+   2.31926
+  ],
+  [
+   1221,
+   2.31916
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.021
+  ],
+  [
+   50,
+   6.6158
+  ],
+  [
+   100,
+   5.6638
+  ],
+  [
+   150,
+   4.7588
+  ],
+  [
+   200,
+   4.0693
+  ],
+  [
+   250,
+   3.609
+  ],
+  [
+   300,
+   3.2978
+  ],
+  [
+   350,
+   3.0825
+  ],
+  [
+   400,
+   2.9087
+  ],
+  [
+   450,
+   2.7846
+  ],
+  [
+   500,
+   2.6846
+  ],
+  [
+   550,
+   2.5982
+  ],
+  [
+   600,
+   2.5373
+  ],
+  [
+   650,
+   2.4968
+  ],
+  [
+   700,
+   2.4683
+  ],
+  [
+   750,
+   2.4417
+  ],
+  [
+   800,
+   2.4126
+  ],
+  [
+   850,
+   2.3961
+  ],
+  [
+   900,
+   2.381
+  ],
+  [
+   950,
+   2.3658
+  ],
+  [
+   1000,
+   2.3436
+  ],
+  [
+   1050,
+   2.3407
+  ],
+  [
+   1100,
+   2.3311
+  ],
+  [
+   1150,
+   2.329
+  ],
+  [
+   1200,
+   2.3332
+  ],
+  [
+   1220,
+   2.3324
+  ]
+ ],
+ "train_seconds": 339.14,
+ "wall_seconds": 370.45,
+ "chars_per_sec": 29494,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, the the shile for toy.\nThe pun mad the time, the walked Sam him the care fire sgreed it was a liked on the saw and sadys all go ass and sid not was met, freeery lirl ong to have, the had to the pish the leire said a sometherged the cared and away and and the toy runce to sure and just dad. Max a d"
+}

@@ -1,0 +1,254 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 32,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 512,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 16,
+  "chars": 30000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.1,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 3,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 100,
+  "out": "outputs\\v28-emb\\ppmip_s3.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 32,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 512,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 96416,
+ "params_nonemb": 47264,
+ "steps": 1160,
+ "chars_seen": 30011075,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.11359,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   0,
+   3.25923
+  ],
+  [
+   100,
+   1.5448
+  ],
+  [
+   200,
+   1.4154
+  ],
+  [
+   300,
+   1.35452
+  ],
+  [
+   400,
+   1.30539
+  ],
+  [
+   500,
+   1.27162
+  ],
+  [
+   600,
+   1.23139
+  ],
+  [
+   700,
+   1.20196
+  ],
+  [
+   800,
+   1.1712
+  ],
+  [
+   900,
+   1.14871
+  ],
+  [
+   1000,
+   1.12973
+  ],
+  [
+   1100,
+   1.11688
+  ],
+  [
+   1160,
+   1.11359
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3267
+  ],
+  [
+   50,
+   7.7538
+  ],
+  [
+   100,
+   6.0233
+  ],
+  [
+   150,
+   5.1962
+  ],
+  [
+   200,
+   4.7902
+  ],
+  [
+   250,
+   4.5719
+  ],
+  [
+   300,
+   4.4109
+  ],
+  [
+   350,
+   4.3191
+  ],
+  [
+   400,
+   4.2293
+  ],
+  [
+   450,
+   4.159
+  ],
+  [
+   500,
+   4.0905
+  ],
+  [
+   550,
+   4.0288
+  ],
+  [
+   600,
+   3.9569
+  ],
+  [
+   650,
+   3.9102
+  ],
+  [
+   700,
+   3.8474
+  ],
+  [
+   750,
+   3.8063
+  ],
+  [
+   800,
+   3.7603
+  ],
+  [
+   850,
+   3.7249
+  ],
+  [
+   900,
+   3.6872
+  ],
+  [
+   950,
+   3.6543
+  ],
+  [
+   1000,
+   3.6079
+  ],
+  [
+   1050,
+   3.5772
+  ],
+  [
+   1100,
+   3.5663
+  ],
+  [
+   1150,
+   3.549
+  ],
+  [
+   1159,
+   3.539
+  ]
+ ],
+ "train_seconds": 79.42,
+ "wall_seconds": 93.6,
+ "chars_per_sec": 119651,
+ "torch": "2.13.0+cu126",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time there was a little girl who was happy.\nBut then, something unexpected happened. A little girl came to her white hop. It was so bigger. She laughed and jumped around the humb. Kitty and her friend, Sue, came to visit. They saw the pond and came to study.\nSue and Sue became best friends. They had an idea. They put the sharp in the hidder and they found more. The hidden thought they could both play together and play together. The logny loved the hidden roars. The boat said, \"I am the hidden!\" Tim learned that they played all day, even if they started to fly with the spill. The hidden didn't listen to the big bear.\n<|eot|>\nOnce upon a time, in the monste were a very nice girl named Lily. She had a big red bucket. The ball had lots of fun. Lily had an idea.\nSue went to her friend, Tim, saw a little girl. She thought it wanted to play with her. She said, \"Hi, I am another friend to build a tree. It can find my ball. Let's play.\"\nLily's friend, Sam, came to Tom. Her mom said, \"I did it!\" Sue was happy and they both decided to play playing",
+ "rule_init": {},
+ "ngram_init": {}
+}
