@@ -8,10 +8,14 @@ Float64 throughout. Three kinds of check:
      zero beyond lag w-1; bsolve (the banded solve) is expected to move beyond it. That expectation is the test.
 """
 
-import torch
+import pytest
 
-import flm.windowed as W
-from flm import models as M
+# CI collects every experiments/ suite in an environment without torch; skip, don't
+# error (same guard as ../test_models.py).
+torch = pytest.importorskip("torch")
+
+import flm.windowed as W  # noqa: E402
+from flm import models as M  # noqa: E402
 
 torch.set_default_dtype(torch.float64)
 
