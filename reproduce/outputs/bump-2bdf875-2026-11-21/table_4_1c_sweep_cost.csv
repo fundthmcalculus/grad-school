@@ -1,0 +1,31 @@
+Dataset (task),Arm,Runs,Total fit time,Mean / run,Min-max / run,Runs below requested top_n,Failed
+Concrete (regression),wasserstein,70,9.7 s,0.14 s,0.04-0.27 s,0,0
+Concrete (regression),bhattacharyya,70,9.6 s,0.14 s,0.04-0.28 s,0,0
+Concrete (regression),composite,70,10.1 s,0.14 s,0.04-0.34 s,0,0
+Concrete (regression),higher_order,70,9.6 s,0.14 s,0.04-0.28 s,0,0
+Concrete (regression),ALL SCORERS (sweep total),280,38.9 s,0.14 s,0.04-0.34 s,0,0
+Concrete (regression),sweep wall-clock (fit + predict + scoring),,39.5 s,,,,
+Concrete (regression),baseline: MoG shipped default x10 seeds,10,2.3 s,0.23 s,0.22-0.26 s,,0
+Concrete (regression),baseline: ANFIS x10 seeds,10,36.9 s,3.69 s,3.44-4.16 s,,0
+Concrete (regression),baseline: GA-FIS x10 seeds,10,192.1 s,19.21 s,18.25-19.86 s,,0
+Concrete (regression),baseline: RF x10 seeds,10,5.8 s,0.58 s,0.53-0.68 s,,0
+Bike Sharing (regression),wasserstein,90,19.2 s,0.21 s,0.04-0.42 s,10,0
+Bike Sharing (regression),bhattacharyya,90,18.4 s,0.20 s,0.04-0.42 s,10,0
+Bike Sharing (regression),composite,90,19.5 s,0.22 s,0.05-0.45 s,10,0
+Bike Sharing (regression),higher_order,90,22.0 s,0.24 s,0.09-0.47 s,10,0
+Bike Sharing (regression),ALL SCORERS (sweep total),360,79.1 s,0.22 s,0.04-0.47 s,40,0
+Bike Sharing (regression),sweep wall-clock (fit + predict + scoring),,80.6 s,,,,
+Bike Sharing (regression),baseline: MoG shipped default x10 seeds,10,4.4 s,0.44 s,0.42-0.45 s,,0
+Bike Sharing (regression),baseline: ANFIS x10 seeds,10,23.4 s,2.34 s,2.15-2.79 s,,0
+Bike Sharing (regression),baseline: GA-FIS x10 seeds,10,46.2 s,4.62 s,4.34-4.92 s,,0
+Bike Sharing (regression),baseline: RF x10 seeds,10,86.4 s,8.64 s,8.38-8.85 s,,0
+PhiUSIIL (classification),wasserstein,120,51.4 s,0.43 s,0.09-1.71 s,10,0
+PhiUSIIL (classification),bhattacharyya,120,49.9 s,0.42 s,0.07-1.64 s,10,0
+PhiUSIIL (classification),composite,120,55.0 s,0.46 s,0.09-1.68 s,10,0
+PhiUSIIL (classification),higher_order,120,71.1 s,0.59 s,0.22-1.89 s,10,0
+PhiUSIIL (classification),ALL SCORERS (sweep total),480,227.4 s,0.47 s,0.07-1.89 s,40,0
+PhiUSIIL (classification),sweep wall-clock (fit + predict + scoring),,231.1 s,,,,
+PhiUSIIL (classification),baseline: MoG shipped default x10 seeds,10,1.7 s,0.17 s,0.15-0.20 s,,0
+PhiUSIIL (classification),baseline: ANFIS x10 seeds,10,284.1 s,28.41 s,25.37-33.32 s,,0
+PhiUSIIL (classification),baseline: GA-FIS x10 seeds,10,201.2 s,20.12 s,18.81-21.04 s,,0
+PhiUSIIL (classification),baseline: RF x10 seeds,10,20.5 s,2.05 s,1.92-2.13 s,,0

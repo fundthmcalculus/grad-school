@@ -18,6 +18,49 @@ as having no generator yet.
 
 ---
 
+## 2026-11-21 — `tribble-fis` pin `31e8ae9` → `2bdf875` (#243, #244, #245), `outputs/bump-2bdf875-2026-11-21/`
+
+**Status: nothing the proposal quotes moved. Not a whole-document sweep; not itself citable.**
+
+**What the bump brings.** #243: the ranking printout no longer crashes on non-string feature
+names. #244: the Pareto front reuses `optimizers`' `non_dominated_mask` (behaviour unchanged,
+oracle-tested). #245: an opt-in vectorised `engine="gaussian"` for `calculate_interaction_scores`,
+the per-feature scorer `method="interaction"`, `TribbleClassifier(detect_interactions=True)`
+(product "crossover" columns for pairs that beat a label-permutation null) and an opt-in
+`TribbleRegressor(interaction_engine=...)`. **Every new option defaults to off, so no generator in
+`reproduce/` exercises any of it** and none was expected to move.
+
+**The check.** Same generators, same environment, ten seeds, NumPy kernel, one table at a time.
+`preflight --suite fis`: **6 passed, 0 skipped**.
+
+| Table | Baseline | Result |
+|---|---|---|
+| 6.1 (incl. PhiUSIIL row) | `31e8ae9` | **byte-identical** |
+| G.5 | `31e8ae9` | **byte-identical** |
+| A.1 rankings, A.2 accuracies (4 scorers × 9 `top_n`) | `31e8ae9` | identical (0 of 50 cells differ; fit-seconds excluded) |
+| 4.1c, **all 1,120 sweep fits** | `31e8ae9` | **bit-identical**: unrounded scores and features kept, 0 failed |
+| 4.1, MoG / GA-FIS / RF columns, all rows incl. PhiUSIIL | `14b4942` (non-PhiUSIIL), `31e8ae9` (PhiUSIIL) | identical; train-time cells moved (expected) |
+| A.7, non-timing rows | `14b4942` | identical |
+
+*(4.1's non-PhiUSIIL rows and A.7 were last run at `14b4942`; `31e8ae9` changed only the dependency
+locks, so that is the right baseline there.)*
+
+**The ANFIS cells moved, and are noise.** Table 4.1: Bike Sharing ANFIS `0.533 ± 0.088 → 0.538 ± 0.092`,
+PhiUSIIL ANFIS `0.999 → 0.998`. ANFIS is hand-rolled NumPy/scikit-learn, imports nothing from
+`tribblefis`, and is not deterministic run to run (2026-11-20 control: per-seed R² up to 0.049).
+There is now a **within-pin control**: the 4.1c run at *this same pin* reads Bike Sharing ANFIS
+`0.539 ± 0.092` and PhiUSIIL `0.999 ± 0.002`, so two runs at one pin disagree with each other by
+as much as the bump "moved" them. Bike Sharing ANFIS has read `0.533`–`0.539` across five runs.
+
+**Not covered.** A whole-document sweep (preflight passes, so one can be citable; the run of
+record is still `full-2026-08-22` at `tribble-fis` `141596e`). RT-IOT2022 is absent, so its rows
+are `N/A` and unchecked. The compiled kernel was not built here. Timings are from a 4-core Xeon,
+not the run-of-record i9. The new interaction options are **unused** by every table: their own
+measurements (XOR 0.506 → 0.991 accuracy; a null result on PhiUSIIL) live in
+`tribble-fis/docs/interaction-detection.md`, not here.
+
+---
+
 ## 2026-11-21 — Table 4.1c: top_n × scorer sweep (`outputs/topn-sweep-2026-11-21/`)
 
 **New generator, no prose table cites it yet.** `table_4_1c_topn_sweep.py` sweeps the MoG over
