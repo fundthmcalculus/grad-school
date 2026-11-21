@@ -1,0 +1,39 @@
+{
+ "donor": "outputs/tribble50k/donor/frozen_s0.pt",
+ "donor_val_bpc": null,
+ "seed": 0,
+ "build_windows": 2000,
+ "eval_chars": 199946,
+ "bpc_random_blocks": 16.979096861507898,
+ "bpc_constructed_no_training": 4.966272224619994,
+ "bpc_unigram": 4.42202555106818,
+ "bpc_bigram": 3.297770491209604,
+ "gate_beats_random_by_1_bit": true,
+ "gate_beats_unigram_by_0_3": false,
+ "construction": {
+  "block0": {
+   "rules_per_class": [
+    34,
+    1,
+    1,
+    9,
+    2,
+    1
+   ],
+   "ffn_fit_r2": 0.41824430227279663,
+   "firing_active_frac": 1.0
+  },
+  "block1": {
+   "rules_per_class": [
+    49,
+    2,
+    1,
+    13,
+    2,
+    1
+   ],
+   "ffn_fit_r2": 0.4239676594734192,
+   "firing_active_frac": 0.9999998807907104
+  }
+ }
+}

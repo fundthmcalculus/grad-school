@@ -1,0 +1,421 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 2,
+  "rules": 6,
+  "ffn_mult": 1.5,
+  "tsk_dim": 8,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 256,
+  "layer_mixers": "",
+  "attn_heads": 0,
+  "fib_local": 8,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 100,
+  "lr_floor": 0.02,
+  "beta2": 0.98,
+  "clip": 1.0,
+  "seed": 0,
+  "threads": 8,
+  "device": "cpu",
+  "eval_chars": 1000000,
+  "eval_batch": 64,
+  "eval_every": 2000,
+  "out": "outputs/tribble50k/donor/frozen_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "",
+  "emb_dim": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "precision": "fp32",
+  "ckpt_dir": "outputs/tribble50k/donor/frozen_ckpt",
+  "ckpt_every": 2000,
+  "ckpt_keep": 2,
+  "resume": "auto",
+  "resume_ignore": "",
+  "wandb": "",
+  "wandb_name": "",
+  "wandb_artifacts": false
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 8,
+  "n_rules": 6,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "emb_dim": 0,
+  "ante_taps": 1,
+  "max_len": 256,
+  "fib_local": 8,
+  "layer_mixers": "",
+  "attn_heads": 0
+ },
+ "params_total": 49689,
+ "params_nonemb": 44985,
+ "steps": 3663,
+ "chars_seen": 30007296,
+ "chars_per_token": 1.0,
+ "val_bpc": 1.55213,
+ "val_bpc_ema": null,
+ "val_bpc_fp32": null,
+ "evals": [
+  [
+   2000,
+   1.64569
+  ],
+  [
+   3663,
+   1.55213
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   14.4643
+  ],
+  [
+   50,
+   8.9112
+  ],
+  [
+   100,
+   5.0998
+  ],
+  [
+   150,
+   3.4934
+  ],
+  [
+   200,
+   2.7914
+  ],
+  [
+   250,
+   2.4527
+  ],
+  [
+   300,
+   2.2699
+  ],
+  [
+   350,
+   2.1699
+  ],
+  [
+   400,
+   2.0874
+  ],
+  [
+   450,
+   2.0388
+  ],
+  [
+   500,
+   1.9967
+  ],
+  [
+   550,
+   1.9432
+  ],
+  [
+   600,
+   1.9117
+  ],
+  [
+   650,
+   1.893
+  ],
+  [
+   700,
+   1.8746
+  ],
+  [
+   750,
+   1.86
+  ],
+  [
+   800,
+   1.8395
+  ],
+  [
+   850,
+   1.8279
+  ],
+  [
+   900,
+   1.8136
+  ],
+  [
+   950,
+   1.7978
+  ],
+  [
+   1000,
+   1.7751
+  ],
+  [
+   1050,
+   1.775
+  ],
+  [
+   1100,
+   1.7627
+  ],
+  [
+   1150,
+   1.7546
+  ],
+  [
+   1200,
+   1.7555
+  ],
+  [
+   1250,
+   1.74
+  ],
+  [
+   1300,
+   1.7304
+  ],
+  [
+   1350,
+   1.718
+  ],
+  [
+   1400,
+   1.7135
+  ],
+  [
+   1450,
+   1.7068
+  ],
+  [
+   1500,
+   1.7061
+  ],
+  [
+   1550,
+   1.6965
+  ],
+  [
+   1600,
+   1.6877
+  ],
+  [
+   1650,
+   1.6847
+  ],
+  [
+   1700,
+   1.6756
+  ],
+  [
+   1750,
+   1.6748
+  ],
+  [
+   1800,
+   1.6738
+  ],
+  [
+   1850,
+   1.6661
+  ],
+  [
+   1900,
+   1.6584
+  ],
+  [
+   1950,
+   1.6474
+  ],
+  [
+   2000,
+   1.6549
+  ],
+  [
+   2050,
+   1.6436
+  ],
+  [
+   2100,
+   1.6459
+  ],
+  [
+   2150,
+   1.6339
+  ],
+  [
+   2200,
+   1.6331
+  ],
+  [
+   2250,
+   1.6272
+  ],
+  [
+   2300,
+   1.623
+  ],
+  [
+   2350,
+   1.6276
+  ],
+  [
+   2400,
+   1.6176
+  ],
+  [
+   2450,
+   1.6123
+  ],
+  [
+   2500,
+   1.6044
+  ],
+  [
+   2550,
+   1.6078
+  ],
+  [
+   2600,
+   1.606
+  ],
+  [
+   2650,
+   1.6006
+  ],
+  [
+   2700,
+   1.5917
+  ],
+  [
+   2750,
+   1.5924
+  ],
+  [
+   2800,
+   1.5828
+  ],
+  [
+   2850,
+   1.579
+  ],
+  [
+   2900,
+   1.5747
+  ],
+  [
+   2950,
+   1.5739
+  ],
+  [
+   3000,
+   1.5762
+  ],
+  [
+   3050,
+   1.5684
+  ],
+  [
+   3100,
+   1.5623
+  ],
+  [
+   3150,
+   1.5724
+  ],
+  [
+   3200,
+   1.5637
+  ],
+  [
+   3250,
+   1.5657
+  ],
+  [
+   3300,
+   1.5654
+  ],
+  [
+   3350,
+   1.566
+  ],
+  [
+   3400,
+   1.5586
+  ],
+  [
+   3450,
+   1.5594
+  ],
+  [
+   3500,
+   1.5597
+  ],
+  [
+   3550,
+   1.5601
+  ],
+  [
+   3600,
+   1.5557
+  ],
+  [
+   3650,
+   1.5524
+  ],
+  [
+   3662,
+   1.5521
+  ]
+ ],
+ "train_seconds": 1104.19,
+ "peak_mem_mb": null,
+ "wall_seconds": 1135.2,
+ "chars_per_sec": 27176,
+ "torch": "2.14.1+cpu",
+ "diverged_step": null,
+ "threads": 8,
+ "device": "cpu",
+ "device_name": "13th Gen Intel(R) Core(TM) i9-13980HX",
+ "host": "asus-g614jv",
+ "sample": "Once upon a time, the tree had to help be something started to take all day. One day, he was very peace to make a big on the squirrel in string. The bunny is not like was from that ran to the room. The lion cow. The lives and noticed it, the tree. At then, she was a near the park.\nThe end.\n<|eot|>\n\n\nMark you liked to take ",
+ "rule_init": {},
+ "ngram_init": {}
+}
