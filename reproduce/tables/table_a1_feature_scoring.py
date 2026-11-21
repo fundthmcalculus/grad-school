@@ -10,10 +10,10 @@ The point is that these are the same model and the same data; only the feature
 feature first and another leaves it out of the top twenty, and the downstream
 difference is 0.9969 against 0.4251 at one feature.
 
-The four-metric composite that used to be the default was removed upstream
-(tribble-fis #34). If it is ever restored as `method="composite"` this script
-picks it up automatically; until then that column reports N/A with the reason,
-rather than being quietly dropped.
+A scorer the library does not know reports N/A with the reason rather than
+being quietly dropped (the four-metric composite was removed upstream in
+tribble-fis #34 and is accepted again by the pinned build; `higher_order` -- a
+moment distance through skewness and kurtosis -- arrived with tribble-fis #239).
 
 Run (from repo root):
     uv run --project tribble-fis python reproduce/tables/table_a1_feature_scoring.py
@@ -21,7 +21,7 @@ Run (from repo root):
 Knobs:
     REPRO_SEEDS="0,1"          seeds (2 is plenty; the effect is enormous)
     REPRO_PHIUSIIL_N="20000"   sample size
-    REPRO_SCORERS="wasserstein,bhattacharyya,composite"
+    REPRO_SCORERS="wasserstein,bhattacharyya,composite,higher_order"
 """
 
 from __future__ import annotations
@@ -48,7 +48,7 @@ SAMPLE_N = int(os.environ.get("REPRO_PHIUSIIL_N", "20000"))
 SCORERS = [
     s.strip()
     for s in os.environ.get(
-        "REPRO_SCORERS", "wasserstein,bhattacharyya,composite"
+        "REPRO_SCORERS", "wasserstein,bhattacharyya,composite,higher_order"
     ).split(",")
 ]
 K_GRID = [1, 2, 3, 4, 5, 7, 10, 15, 20]
@@ -70,37 +70,30 @@ def _rank(scorer, X, y_series):
 
 
 def _sweep(scorer, X, y):
-    """(accuracy, fit_seconds) per k, with the scorer forced for every fit."""
-    import tribblefis.gauss_math as gm
+    """(accuracy, fit_seconds) per k, with `scoring_method=scorer` for every fit.
+
+    Uses the estimator's own `scoring_method` (tribble-fis #239) instead of the
+    monkeypatch of `calculate_gaussian_correlation` this used to need, which
+    could leak into later tables in the same process if it was not restored.
+    """
     import tribblefis.gaussian_classifier as gc
 
-    original = gm.calculate_gaussian_correlation
-
-    def forced(Xa, ya, method=scorer, **kw):
-        return original(Xa, ya, method=scorer, **kw)
-
-    gm.calculate_gaussian_correlation = forced
-    gc.calculate_gaussian_correlation = forced
-    try:
-        out = {}
-        for k in K_GRID:
-            accs, secs = [], []
-            for seed in C.SEEDS:
-                Xtr, Xte, ytr, yte = train_test_split(
-                    X, y, test_size=0.2, random_state=seed
-                )
-                model = gc.TribbleClassifier(top_n=k, random_state=seed)
-                start = time.perf_counter()
-                model.fit(Xtr, ytr)
-                secs.append(time.perf_counter() - start)
-                accs.append(accuracy_score(yte, np.asarray(model.predict(Xte))))
-            out[k] = (float(np.mean(accs)), float(np.mean(secs)))
-        return out
-    finally:
-        # Restore even on failure; a leaked monkeypatch would silently change
-        # every table run afterwards in the same process.
-        gm.calculate_gaussian_correlation = original
-        gc.calculate_gaussian_correlation = original
+    out = {}
+    for k in K_GRID:
+        accs, secs = [], []
+        for seed in C.SEEDS:
+            Xtr, Xte, ytr, yte = train_test_split(
+                X, y, test_size=0.2, random_state=seed
+            )
+            model = gc.TribbleClassifier(
+                top_n=k, random_state=seed, scoring_method=scorer
+            )
+            start = time.perf_counter()
+            model.fit(Xtr, ytr)
+            secs.append(time.perf_counter() - start)
+            accs.append(accuracy_score(yte, np.asarray(model.predict(Xte))))
+        out[k] = (float(np.mean(accs)), float(np.mean(secs)))
+    return out
 
 
 def main():
@@ -136,10 +129,8 @@ def main():
         header,
         rows,
         note=(
-            "Same data, same model -- only the feature ranking differs. The "
-            "composite column is the four-metric consensus rule removed by "
-            "tribble-fis #34; it reports N/A until that is restored as "
-            "method='composite'."
+            "Same data, same model -- only the feature ranking differs. A "
+            "column reads N/A when the pinned library rejects that scorer name."
         ),
     )
 

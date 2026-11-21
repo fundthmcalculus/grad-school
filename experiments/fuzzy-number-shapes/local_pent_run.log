@@ -1,0 +1,68 @@
+verify gauss_global   analytic vs central FD: max rel. err 6.32e-08
+verify gauss_local    analytic vs central FD: max rel. err 6.32e-08
+verify pent_fou       analytic vs central FD: max rel. err 1.18e-08
+verify pent_collapse  analytic vs central FD: max rel. err 1.18e-08
+verify gauss_collapse analytic vs central FD: max rel. err 6.32e-08
+verify pentagon upper >= lower pointwise: OK
+seed 0 gauss_global   RMSE 0.0577 cov(nf) 0.991 width 1.584 rho +0.10 w 0.200 4.1s
+seed 0 gauss_local    RMSE 0.0640 cov(nf) 1.000 width 1.841 rho +0.17 w 0.445 4.0s
+seed 0 pent_fou       RMSE 0.0498 cov(nf) 0.936 width 0.269 rho +0.29 w 0.100 5.5s
+seed 0 pent_collapse  RMSE 0.0542 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 1.0s
+seed 0 gauss_collapse RMSE 0.0503 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 4.2s
+seed 1 gauss_global   RMSE 0.0703 cov(nf) 0.964 width 0.699 rho +0.12 w 0.087 4.3s
+seed 1 gauss_local    RMSE 0.0660 cov(nf) 0.906 width 0.888 rho -0.05 w 0.118 5.2s
+/home/user/grad-school/experiments/fuzzy-number-shapes/km_study.py:71: RuntimeWarning: invalid value encountered in divide
+  yc = (w * y).sum(0) / w.sum(0)
+seed 1 pent_fou       RMSE 0.0478 cov(nf) 0.921 width 0.351 rho -0.04 w 0.126 2.6s
+seed 1 pent_collapse  RMSE 0.0453 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 3.7s
+seed 1 gauss_collapse RMSE 0.0577 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 4.8s
+seed 2 gauss_global   RMSE 0.0662 cov(nf) 0.979 width 1.778 rho +0.11 w 0.130 4.3s
+seed 2 gauss_local    RMSE 0.0684 cov(nf) 0.989 width 1.669 rho +0.18 w 0.134 4.6s
+seed 2 pent_fou       RMSE 0.0476 cov(nf) 0.866 width 0.229 rho -0.14 w 0.081 4.0s
+seed 2 pent_collapse  RMSE 0.0521 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 0.8s
+seed 2 gauss_collapse RMSE 0.0496 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 5.1s
+seed 3 gauss_global   RMSE 0.0416 cov(nf) 0.998 width 2.080 rho -0.26 w 0.190 4.9s
+seed 3 gauss_local    RMSE 0.0529 cov(nf) 0.993 width 2.754 rho +0.48 w 0.253 5.6s
+seed 3 pent_fou       RMSE 0.0550 cov(nf) 0.754 width 0.185 rho -0.21 w 0.107 2.8s
+seed 3 pent_collapse  RMSE 0.0630 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 1.3s
+seed 3 gauss_collapse RMSE 0.0460 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 4.5s
+seed 4 gauss_global   RMSE 0.0804 cov(nf) 0.917 width 1.022 rho +0.01 w 0.087 4.5s
+seed 4 gauss_local    RMSE 0.0630 cov(nf) 0.944 width 1.090 rho -0.14 w 0.202 4.8s
+seed 4 pent_fou       RMSE 0.0537 cov(nf) 0.849 width 0.276 rho -0.05 w 0.111 1.6s
+seed 4 pent_collapse  RMSE 0.0623 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 2.6s
+seed 4 gauss_collapse RMSE 0.0650 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 4.4s
+seed 5 gauss_global   RMSE 0.0578 cov(nf) 0.983 width 1.855 rho -0.01 w 0.191 3.9s
+seed 5 gauss_local    RMSE 0.0645 cov(nf) 0.998 width 2.515 rho +0.01 w 0.343 4.3s
+seed 5 pent_fou       RMSE 0.0457 cov(nf) 0.866 width 0.228 rho -0.19 w 0.091 1.4s
+seed 5 pent_collapse  RMSE 0.0499 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 0.9s
+seed 5 gauss_collapse RMSE 0.0576 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 4.4s
+seed 6 gauss_global   RMSE 0.0503 cov(nf) 0.998 width 2.256 rho +0.14 w 0.227 4.4s
+seed 6 gauss_local    RMSE 0.0548 cov(nf) 0.992 width 2.492 rho +0.28 w 0.241 4.2s
+seed 6 pent_fou       RMSE 0.0434 cov(nf) 0.860 width 0.221 rho -0.22 w 0.090 5.7s
+seed 6 pent_collapse  RMSE 0.0508 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 1.2s
+seed 6 gauss_collapse RMSE 0.0568 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 1.3s
+seed 7 gauss_global   RMSE 0.0694 cov(nf) 0.992 width 1.085 rho +0.48 w 0.115 4.0s
+seed 7 gauss_local    RMSE 0.0705 cov(nf) 0.949 width 1.554 rho +0.34 w 0.180 4.2s
+seed 7 pent_fou       RMSE 0.0484 cov(nf) 0.878 width 0.241 rho +0.06 w 0.096 1.4s
+seed 7 pent_collapse  RMSE 0.0572 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 1.2s
+seed 7 gauss_collapse RMSE 0.0601 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 3.9s
+seed 8 gauss_global   RMSE 0.0646 cov(nf) 0.994 width 2.537 rho -0.01 w 0.194 3.9s
+seed 8 gauss_local    RMSE 0.0623 cov(nf) 0.976 width 2.234 rho +0.09 w 0.221 3.7s
+seed 8 pent_fou       RMSE 0.0424 cov(nf) 0.890 width 0.244 rho +0.23 w 0.098 5.1s
+seed 8 pent_collapse  RMSE 0.0550 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 1.5s
+seed 8 gauss_collapse RMSE 0.0761 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 4.2s
+seed 9 gauss_global   RMSE 0.0641 cov(nf) 0.976 width 1.148 rho +0.12 w 0.242 4.9s
+seed 9 gauss_local    RMSE 0.0590 cov(nf) 0.988 width 0.858 rho +0.12 w 0.120 5.1s
+seed 9 pent_fou       RMSE 0.0368 cov(nf) 0.944 width 0.257 rho -0.15 w 0.098 1.1s
+seed 9 pent_collapse  RMSE 0.0381 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 7.1s
+seed 9 gauss_collapse RMSE 0.0604 cov(nf) 0.000 width 0.000 rho +0.00 w 0.000 4.0s
+| variant | RMSE median | RMSE mean ± sd | cov. noise-free | cov. noisy | mean width | width low sd | width high sd | Spearman(width, sd) | mean abs(v1) | mean w | undefined grid points |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| gauss_global | 0.0644 | 0.0623 ± 0.0109 | 0.979 | 0.940 | 1.604 | 1.549 | 1.660 | +0.08 | 0.000 | 0.166 | 0.00% |
+| gauss_local | 0.0635 | 0.0625 ± 0.0056 | 0.973 | 0.940 | 1.790 | 1.565 | 2.014 | +0.15 | 1.013 | 0.226 | 0.00% |
+| pent_fou | 0.0477 | 0.0471 ± 0.0054 | 0.877 | 0.711 | 0.250 | 0.253 | 0.247 | -0.04 | 2.361 | 0.100 | 0.08% |
+| pent_collapse | 0.0532 | 0.0528 ± 0.0075 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | +0.00 | 50.000 | 0.000 | 0.00% |
+| gauss_collapse | 0.0576 | 0.0580 ± 0.0086 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | +0.00 | 0.000 | 0.000 | 0.00% |
+
+Seeds 0..9, K=5, N_train=500, heteroscedastic noise sd 0.02 (x1<0.5) / 0.15. Consequent ridge 1e-2. KM output bounds. mean abs(v1) is the fitted local slope for gauss_local and the fitted v for pent variants, averaged over fuzzy numbers.
+

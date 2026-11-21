@@ -18,6 +18,215 @@ as having no generator yet.
 
 ---
 
+## 2026-11-21 — `tribble-fis` pin `31e8ae9` → `2bdf875` (#243, #244, #245), `outputs/bump-2bdf875-2026-11-21/`
+
+**Status: nothing the proposal quotes moved. Not a whole-document sweep; not itself citable.**
+
+**What the bump brings.** #243: the ranking printout no longer crashes on non-string feature
+names. #244: the Pareto front reuses `optimizers`' `non_dominated_mask` (behaviour unchanged,
+oracle-tested). #245: an opt-in vectorised `engine="gaussian"` for `calculate_interaction_scores`,
+the per-feature scorer `method="interaction"`, `TribbleClassifier(detect_interactions=True)`
+(product "crossover" columns for pairs that beat a label-permutation null) and an opt-in
+`TribbleRegressor(interaction_engine=...)`. **Every new option defaults to off, so no generator in
+`reproduce/` exercises any of it** and none was expected to move.
+
+**The check.** Same generators, same environment, ten seeds, NumPy kernel, one table at a time.
+`preflight --suite fis`: **6 passed, 0 skipped**.
+
+| Table | Baseline | Result |
+|---|---|---|
+| 6.1 (incl. PhiUSIIL row) | `31e8ae9` | **byte-identical** |
+| G.5 | `31e8ae9` | **byte-identical** |
+| A.1 rankings, A.2 accuracies (4 scorers × 9 `top_n`) | `31e8ae9` | identical (0 of 50 cells differ; fit-seconds excluded) |
+| 4.1c, **all 1,120 sweep fits** | `31e8ae9` | **bit-identical**: unrounded scores and features kept, 0 failed |
+| 4.1, MoG / GA-FIS / RF columns, all rows incl. PhiUSIIL | `14b4942` (non-PhiUSIIL), `31e8ae9` (PhiUSIIL) | identical; train-time cells moved (expected) |
+| A.7, non-timing rows | `14b4942` | identical |
+
+*(4.1's non-PhiUSIIL rows and A.7 were last run at `14b4942`; `31e8ae9` changed only the dependency
+locks, so that is the right baseline there.)*
+
+**The ANFIS cells moved, and are noise.** Table 4.1: Bike Sharing ANFIS `0.533 ± 0.088 → 0.538 ± 0.092`,
+PhiUSIIL ANFIS `0.999 → 0.998`. ANFIS is hand-rolled NumPy/scikit-learn, imports nothing from
+`tribblefis`, and is not deterministic run to run (2026-11-20 control: per-seed R² up to 0.049).
+There is now a **within-pin control**: the 4.1c run at *this same pin* reads Bike Sharing ANFIS
+`0.539 ± 0.092` and PhiUSIIL `0.999 ± 0.002`, so two runs at one pin disagree with each other by
+as much as the bump "moved" them. Bike Sharing ANFIS has read `0.533`–`0.539` across five runs.
+
+**Not covered.** A whole-document sweep (preflight passes, so one can be citable; the run of
+record is still `full-2026-08-22` at `tribble-fis` `141596e`). RT-IOT2022 is absent, so its rows
+are `N/A` and unchecked. The compiled kernel was not built here. Timings are from a 4-core Xeon,
+not the run-of-record i9. The new interaction options are **unused** by every table: their own
+measurements (XOR 0.506 → 0.991 accuracy; a null result on PhiUSIIL) live in
+`tribble-fis/docs/interaction-detection.md`, not here.
+
+---
+
+## 2026-11-21 — Table 4.1c: top_n × scorer sweep (`outputs/topn-sweep-2026-11-21/`)
+
+**New generator, no prose table cites it yet.** `table_4_1c_topn_sweep.py` sweeps the MoG over
+`top_n` and the four feature scorers beside ANFIS, GA-FIS and RF. Ten seeds, 1,120 sweep fits,
+0 failed, at `tribble-fis` `31e8ae9`, preflight 6/6. A targeted run, **not** a whole-document
+sweep. **Timings are from a 4-core 2.1 GHz Xeon, not the run-of-record i9: ratios transfer,
+seconds do not.** ANFIS is nondeterministic. RT-IOT2022 is excluded (absent; hours).
+
+**Why it exists.** Table 4.1's PhiUSIIL MoG cell (`0.440 ± 0.181`) is
+`TribbleClassifier(top_n=5)` under the default Wasserstein scorer, i.e. a *feature selection*,
+and it sits beside `0.999` for the fuzzy baselines. The sweep separates the two.
+
+**Registered expectations (script docstring) and outcomes.**
+
+| | Expectation | Outcome |
+|---|---|---|
+| E1 | PhiUSIIL, wasserstein, k = 5 reproduces `0.440 ± 0.181` | **held** (`0.440 ± 0.181`; k = 4 `0.438 ± 0.180`) |
+| E2 | scorer moves PhiUSIIL by tens of points at small k, ~1 point at k ≥ 20 | **held** (k = 5: `0.440`–`0.926`; k = 20: `0.970`–`0.983`) |
+| E3 | Concrete and Bike move far less with the scorer than PhiUSIIL | **held for Concrete, refuted for Bike Sharing** (k = 3: `0.130`–`0.632`; Concrete k ≥ 5 spread ≤ 0.07) |
+| E4 | fit time grows with k; scoring dominates small-k fits | **held** (PhiUSIIL per-run `0.07`–`1.85` s; scoring is **71–81 %** of a k = 1 fit — `experiments/measure_scoring_share.py`; an earlier throwaway run read 56–77 %, so treat it as ± a few points) |
+
+**Results (mean ± std over ten seeds).**
+
+| Dataset | MoG shipped | best MoG sweep cell\* | ANFIS | GA-FIS | RF |
+|---|---|---|---|---|---|
+| Concrete R² | 0.799 ± 0.027 | 0.799 ± 0.027 (k = 8, all) | 0.799 ± 0.112 | 0.896 ± 0.038 | 0.909 ± 0.020 |
+| Bike Sharing R² | 0.620 ± 0.014 | 0.655 ± 0.012 (wasserstein, k = 8) | 0.533 ± 0.087 | 0.545 ± 0.047 | 0.944 ± 0.004 |
+| PhiUSIIL acc | **0.440 ± 0.181** | **0.985 ± 0.003** (wasserstein, k = 30) | 0.999 ± 0.001 | 0.998 ± 0.001 | 1.000 ± 0.000 |
+
+\* chosen on the same test splits it is scored on, across 4 scorers × k: **optimistic**, a ceiling.
+
+So the PhiUSIIL gap is mostly selection: the best sweep cell is 1.4 points behind ANFIS, not 56.
+It does **not** close on Concrete (GA-FIS and RF stay ahead) and the MoG already beats ANFIS and
+GA-FIS on Bike Sharing. Quality is non-monotone in k: Bike peaks at k = 8 (`0.655`) and falls to
+`0.641` at k = 12; PhiUSIIL Wasserstein `0.985` at k = 30 → `0.983` at k = 47 (within noise).
+The scorer ordering is dataset-dependent: `higher_order` is best at k = 3–4 on PhiUSIIL (level
+with `composite` at k = 5) and worst, or tied-worst at k = 2, for k = 1–5 on Bike Sharing
+(`0.012`–`0.314`).
+
+**The "all features" row is not all features.** At `top_n = M` the 0.85 redundancy filter keeps
+11 of 12 (Bike) and 43–44 of 47 (PhiUSIIL) — the only grid points where it bites (40 runs each).
+
+**Cost.** Per fit, MoG is 0.07–1.85 s against 24.0 s for one ANFIS fit on PhiUSIIL. The whole
+sweep:
+
+| Dataset | sweep fits | total fit time | wall-clock | ten seeds of ANFIS | ten seeds of GA-FIS |
+|---|---|---|---|---|---|
+| Concrete | 280 | 37.9 s | 38.5 s | 36.7 s | 200.8 s |
+| Bike Sharing | 360 | 83.2 s | 84.7 s | 24.0 s | 48.4 s |
+| PhiUSIIL | 480 | 231.9 s | 235.7 s | 239.6 s | 204.5 s |
+
+One seed's 12-point sweep under one scorer is ~5 s on PhiUSIIL (Wasserstein `5.03` s,
+higher_order `7.38` s) — about a fifth of a single ANFIS fit. Scoring all features once instead
+of once per size would save 13–16 % of that for the first three scorers and 29 % for
+`higher_order` (measured, not modelled). That is the basis for tribble-fis #242. The generator's
+own wall-clock was 1,242 s, 71 % of it the baselines.
+
+**Wired into** `run_all_tables.sh` (`FIS_TABLES`, and the `--fast` reduction list). **Not yet
+in** any chapter; nothing here is quoted in the proposal.
+
+---
+
+## 2026-11-20 — `tribble-fis` pin `d97d6b8` → `14b4942` → `31e8ae9` (tribble-fis #239, #241, #232)
+
+**Status: no archived table moved. Nothing below is itself a citable run** — a
+whole-document sweep was *not* run at the new pin; this section records targeted bump
+checks (AGENTS.md non-negotiable 5) and what they do and do not license. PIN-MATCH is
+**cleared** at `31e8ae9` (see the last paragraphs).
+
+**Correction to the first version of this section.** It said no quoted number moved after
+checking Tables 4.1, 6.1, A.7 and G.5 at `d97d6b8` vs `14b4942`. That check had a hole:
+`data/PhiUSIIL_Phishing_URL_Dataset.csv` was absent, so **Table 4.1's PhiUSIIL
+(classification) row and Table 6.1's PhiUSIIL row were `N/A` on both sides** and were
+never compared — the classification columns are exactly what B14 says an earlier bump
+check missed. RT-IOT2022 (Table 4.1's other `N/A` row) is still absent and **still
+unchecked**. The dataset was then recovered and those rows re-run, below.
+
+**What the bump brings.** #239 adds the `higher_order` feature scorer
+(`method="higher_order"`: moment distance through skewness and kurtosis), an optional
+user feature ranking with Pareto-optimal top-`n` selection (`tribblefis.feature_selection`),
+and `scoring_method` / `user_ranking` / `pareto_choice` on `TribbleClassifier` and
+`TribbleRegressor` (defaults unchanged). #241 builds the optional compiled kernel with
+`-ffp-contract=off`; it was absent (NumPy kernel) in both arms of the check below, so
+it is untested here.
+
+**The check.** Same generators, same environment, same seeds, submodule at `d97d6b8`
+then `14b4942`, outputs redirected with `REPRO_OUTPUT_DIR` (the canonical outputs were not
+touched). Compiled kernel absent in both. Every column of every table diffed:
+
+| Table | Seeds | Result |
+|---|---|---|
+| 4.1 | 0–9 | MoG accuracy/R², GA-FIS and tree/RF columns **identical**, every row. Train-time cells moved (expected). ANFIS / Bike Sharing std `0.087 → 0.088`: see below |
+| 6.1 | 0–9 | **byte-identical** |
+| A.7 | 0–9 | identical except the two `fit (s)` wall-clock rows |
+| G.5 | 0–9 | **byte-identical** |
+| A.1 / A.2 | 0,1 | pin effect **zero**: 27 A.2 accuracy cells and the A.1 rankings identical across `d97d6b8` / `14b4942` with the *old* generator |
+
+*The ANFIS cell.* The ANFIS baseline is hand-rolled NumPy/scikit-learn and imports nothing
+from `tribblefis` (manipulation check: `tribblefis in sys.modules` is `False` after the
+fits), so the bump cannot have moved it — which makes it the thing that "should not have
+moved" and did. Two same-pin, same-seed repeats of ANFIS on Bike Sharing differ by up to
+**0.049 in per-seed R²**: the baseline is **not deterministic run to run**. Its cells
+are therefore not byte-reproducible, independent of any pin.
+
+**Table A.1/A.2 generator change** (same commit, kept separable). The sweep now passes
+`scoring_method=` to the estimator instead of monkeypatching
+`calculate_gaussian_correlation`, and `higher_order` joins the default `REPRO_SCORERS`.
+Attribution: old generator at the new pin vs new generator at the new pin — shared-scorer
+accuracies and rankings **identical**, so the edit changed nothing for the existing
+columns. At ten seeds (`REPRO_PHIUSIIL_N=20000`) the Wasserstein and Bhattacharyya A.2
+accuracy cells at all nine feature counts **equal the archived
+`phiusiil-leakfree-2026-08-30` values**.
+
+**New column, not yet in the proposal:** `higher_order` on PhiUSIIL (ten seeds, leak-free
+set). Accuracy by features kept, with the other scorers for scale:
+
+| k | wasserstein | bhattacharyya | composite | higher_order |
+|---|---|---|---|---|
+| 1 | 0.5733 | 0.7924 | 0.7924 | 0.6364 |
+| 3 | 0.5733 | 0.8106 | 0.7924 | 0.8603 |
+| 5 | 0.4401 | 0.8181 | 0.9186 | 0.9261 |
+| 10 | 0.7204 | 0.9575 | 0.9761 | 0.9373 |
+| 20 | 0.9700 | 0.9799 | 0.9827 | 0.9767 |
+
+It is mixed, not dominant: best at k = 3–5, behind Bhattacharyya at k = 1–2 and
+from k = 10, and behind `composite` from k = 7. One dataset, one split protocol; **not a result**, and the
+appendix (`prose/appendix.md`) is deliberately **not** changed. Fit time is ~2–3× the
+others at k = 1 (0.22 s vs 0.07–0.10 s).
+
+**PhiUSIIL rows, three pins.** Table 4.1's PhiUSIIL row (the generator's own `_bench`, ten
+seeds, 20,000 × 47 leak-free) and the whole of Table 6.1, at `d97d6b8`, `14b4942` and
+`31e8ae9`: every non-timing cell **identical at all three pins** (MoG `0.440 ± 0.181`,
+ANFIS `0.999 ± 0.001`, GA-FIS `0.998 ± 0.001`, RF `1.000 ± 0.000`, per-seed MoG and RF
+accuracies identical; 6.1: 0 differing cells). They also equal the leak-free values
+already recorded above in this file, so the bump check now agrees with the archive on
+the classification rows too.
+
+**What the earlier PIN-MATCH failure was (now cleared).** `preflight.py --suite fis` **fails PIN-MATCH**:
+`optimizers` imports `10d8300` (the `tribble-fis` lock) while the submodule pin is
+`c21d543`. This is **not** caused by the bump — the lock names `10d8300` at both
+`d97d6b8` and `14b4942`. It is the lock-vs-pin gap AGENTS.md rule 5 describes.
+It did not threaten the *comparison* (neither arm exercises `optimizers`; the version was
+identical on both sides) but it stamps archives made in that environment NOT CITABLE.
+
+**PIN-MATCH cleared: `tribble-fis` #232 (dependency-sync) merged, pin now `31e8ae9`.**
+It moves `optimizers` to `c21d543` and `tribble-clustering` to `20264b3` in the
+`tribble-fis` lock — exactly the `tribble-opt` and `tribble-cluster` submodule pins here.
+`preflight.py --suite fis`: **6 passed, 0 skipped** (PIN-MATCH, INSTALL-FRESH, DATASETS,
+W1-SCALE, SCALER-ALIAS, MODEL-NAMES). Because this is a second pin move, the cheap
+generators were re-run at `31e8ae9` against the `14b4942` outputs: Table G.5
+byte-identical; Table A.1/A.2 accuracies and rankings identical (ten seeds, four scorers);
+the PhiUSIIL rows as above. **Not re-run at `31e8ae9`:** Tables 4.1 (non-PhiUSIIL rows)
+and A.7 — they import neither `optimizers` nor `tribbleclustering`, and take ~12 and ~18
+minutes; a whole-document sweep will cover them.
+
+**Dataset note.** `data/PhiUSIIL_Phishing_URL_Dataset.csv` was absent and was recovered
+from `tribble-fis` history with the command in `data/.gitignore` (git-ignored, 56,854,345
+bytes, 235,795 rows). The generator announces the three leak columns it drops.
+
+**Still owed.** A whole-document sweep at `31e8ae9` (preflight now passes, so it can be
+citable); the run of record is still `full-2026-08-22`, at `tribble-fis` `141596e`.
+`check_prose.py` against the new sweep. RT-IOT2022 is absent, so its rows stay `N/A`
+until it is fetched.
+
+---
+
 ## 2026-08-22 — whole-document status against latest `main` + latest submodules
 
 A full ten-seed sweep ran on the current pins (`full-2026-08-22`, 16/16 generators
