@@ -44,6 +44,7 @@ the TSK ↔ ReLU neural-network equivalence line (`papers/nn-fis-equivalence/`,
 | `data/` | Datasets: Concrete, Glass, shuttle, WEC, bikeshare, … (`data/.gitignore` says what is fetched instead) |
 | `AEEM6022/`, `AEEM6097/`, `CS6101/`, `AnalyticalDynamics/` | Coursework (see below) |
 | `papers/`, `presentations/`, `notes/` | Literature notes, slide decks, administrative records |
+| `resume/` | Markdown résumé/CV source and standalone PDF export script |
 
 ## Setup
 
@@ -67,6 +68,22 @@ make format    # black + flake8 + mypy
 ```
 
 See `.github/STYLE_GUIDE.md` for conventions.
+
+## Resume / CV
+
+The starter document is [`resume/resume.md`](resume/resume.md). Replace its
+placeholders with the content you want to publish; no personal résumé content
+has been added. Build a PDF with Pandoc and a TeX engine installed:
+
+```bash
+python resume/build_pdf.py
+```
+
+The PDF is written to `resume/outputs/resume.pdf`, which is ignored by Git.
+Review the Markdown carefully before committing it: this repository may be
+public, and personal contact details should only be included if you intend to
+publish them. See [`resume/README.md`](resume/README.md) for prerequisites and
+details.
 
 ## Reproducing the proposal tables
 
