@@ -40,3 +40,7 @@ on, across (scorers x k): optimistic, a ceiling, not a result.
 run.log: the per-feature ranking printouts that calculate_gaussian_correlation writes to stdout
 (~720 KB, one block per fit) were removed to keep the archive small; every other line is kept.
 table_4_1c_topn_runs.csv is the complete per-fit record (1,120 sweep fits; 0 failed).
+
+Formatting: after this run the generator and measure_scoring_share.py were reformatted with
+black 26.5.1 (the CI pin), because CI gates on it. Formatting only -- black verifies the AST is
+unchanged -- but the committed bytes are not the bytes that ran.

@@ -140,7 +140,9 @@ def _sweep(kind, X, y, score):
         for k in grid:
             for seed in C.SEEDS:
                 Xtr, Xte, ytr, yte = splits[seed]
-                rec = dict(scorer=scorer, k=k, seed=seed, fit_s=None, score=None, kept=None)
+                rec = dict(
+                    scorer=scorer, k=k, seed=seed, fit_s=None, score=None, kept=None
+                )
                 try:
                     model = _model(kind, scorer, k, seed)
                     start = time.perf_counter()
@@ -149,13 +151,19 @@ def _sweep(kind, X, y, score):
                     rec["score"] = float(score(yte, np.asarray(model.predict(Xte))))
                     rec["kept"] = len(model.top_features_)
                 except Exception as exc:  # noqa: BLE001 -- counted, never skipped
-                    print(f"  [fail] {scorer} k={k} seed={seed}: {exc.__class__.__name__}: {exc}")
+                    print(
+                        f"  [fail] {scorer} k={k} seed={seed}: {exc.__class__.__name__}: {exc}"
+                    )
                 runs.append(rec)
     return runs, time.perf_counter() - t_wall
 
 
 def _vals(runs, scorer, k, field):
-    return [r[field] for r in runs if r["scorer"] == scorer and r["k"] == k and r[field] is not None]
+    return [
+        r[field]
+        for r in runs
+        if r["scorer"] == scorer and r["k"] == k and r[field] is not None
+    ]
 
 
 def main():
@@ -191,7 +199,17 @@ def main():
         runs, sweep_wall = _sweep(kind, X, y, score)
         grid = _grid(X.shape[1])
         for r in runs:
-            long_rows.append([label, r["scorer"], r["k"], r["seed"], r["fit_s"], r["score"], r["kept"]])
+            long_rows.append(
+                [
+                    label,
+                    r["scorer"],
+                    r["k"],
+                    r["seed"],
+                    r["fit_s"],
+                    r["score"],
+                    r["kept"],
+                ]
+            )
 
         # ---- 4.1c-b: score / mean fit seconds per (k, scorer) ----
         for k in grid:
@@ -219,47 +237,102 @@ def main():
             return C.cell(s) if s else C.NA
 
         comparison.append(
-            [label, f"{metric}={scell('mog')}", tcell("mog"), scell("anfis"), tcell("anfis"),
-             scell("gafis"), tcell("gafis"), scell("rf"), tcell("rf"), best_txt]
+            [
+                label,
+                f"{metric}={scell('mog')}",
+                tcell("mog"),
+                scell("anfis"),
+                tcell("anfis"),
+                scell("gafis"),
+                tcell("gafis"),
+                scell("rf"),
+                tcell("rf"),
+                best_txt,
+            ]
         )
 
         # ---- 4.1c-c: cost of the whole sweep, and of one run ----
         for sc in SCORERS:
-            t = [r["fit_s"] for r in runs if r["scorer"] == sc and r["fit_s"] is not None]
-            shrunk = sum(1 for r in runs if r["scorer"] == sc and r["kept"] is not None and r["kept"] < r["k"])
+            t = [
+                r["fit_s"] for r in runs if r["scorer"] == sc and r["fit_s"] is not None
+            ]
+            shrunk = sum(
+                1
+                for r in runs
+                if r["scorer"] == sc and r["kept"] is not None and r["kept"] < r["k"]
+            )
             failed = sum(1 for r in runs if r["scorer"] == sc and r["fit_s"] is None)
             cost_rows.append(
-                [label, sc, str(len(t) + failed), f"{sum(t):.1f} s",
-                 f"{np.mean(t):.2f} s" if t else C.NA,
-                 f"{min(t):.2f}-{max(t):.2f} s" if t else C.NA,
-                 str(shrunk), str(failed)]
+                [
+                    label,
+                    sc,
+                    str(len(t) + failed),
+                    f"{sum(t):.1f} s",
+                    f"{np.mean(t):.2f} s" if t else C.NA,
+                    f"{min(t):.2f}-{max(t):.2f} s" if t else C.NA,
+                    str(shrunk),
+                    str(failed),
+                ]
             )
         all_t = [r["fit_s"] for r in runs if r["fit_s"] is not None]
         cost_rows.append(
-            [label, "ALL SCORERS (sweep total)", str(len(runs)), f"{sum(all_t):.1f} s",
-             f"{np.mean(all_t):.2f} s" if all_t else C.NA,
-             f"{min(all_t):.2f}-{max(all_t):.2f} s" if all_t else C.NA,
-             str(sum(1 for r in runs if r["kept"] is not None and r["kept"] < r["k"])),
-             str(len(runs) - len(all_t))]
+            [
+                label,
+                "ALL SCORERS (sweep total)",
+                str(len(runs)),
+                f"{sum(all_t):.1f} s",
+                f"{np.mean(all_t):.2f} s" if all_t else C.NA,
+                f"{min(all_t):.2f}-{max(all_t):.2f} s" if all_t else C.NA,
+                str(
+                    sum(1 for r in runs if r["kept"] is not None and r["kept"] < r["k"])
+                ),
+                str(len(runs) - len(all_t)),
+            ]
         )
         cost_rows.append(
-            [label, "sweep wall-clock (fit + predict + scoring)", "", f"{sweep_wall:.1f} s", "", "", "", ""]
+            [
+                label,
+                "sweep wall-clock (fit + predict + scoring)",
+                "",
+                f"{sweep_wall:.1f} s",
+                "",
+                "",
+                "",
+                "",
+            ]
         )
-        for name, nice in (("mog", "MoG shipped default"), ("anfis", "ANFIS"), ("gafis", "GA-FIS"), ("rf", "RF")):
+        for name, nice in (
+            ("mog", "MoG shipped default"),
+            ("anfis", "ANFIS"),
+            ("gafis", "GA-FIS"),
+            ("rf", "RF"),
+        ):
             t = cols[name]["t"]
             if t:
                 cost_rows.append(
-                    [label, f"baseline: {nice} x{len(t)} seeds", str(len(t)), f"{sum(t):.1f} s",
-                     f"{np.mean(t):.2f} s", f"{min(t):.2f}-{max(t):.2f} s", "", "0"]
+                    [
+                        label,
+                        f"baseline: {nice} x{len(t)} seeds",
+                        str(len(t)),
+                        f"{sum(t):.1f} s",
+                        f"{np.mean(t):.2f} s",
+                        f"{min(t):.2f}-{max(t):.2f} s",
+                        "",
+                        "0",
+                    ]
                 )
-        print(f"  baselines (Table 4.1 harness) {base_wall:.0f}s wall | sweep {sweep_wall:.0f}s wall, "
-              f"{sum(all_t):.0f}s of fits over {len(runs)} runs")
+        print(
+            f"  baselines (Table 4.1 harness) {base_wall:.0f}s wall | sweep {sweep_wall:.0f}s wall, "
+            f"{sum(all_t):.0f}s of fits over {len(runs)} runs"
+        )
 
     total_wall = time.perf_counter() - wall0
     notes.append(f"Whole generator wall-clock: {total_wall:.0f} s.")
 
     base_note = (
-        "Seeds: " + ",".join(map(str, C.SEEDS)) + ". 'Best cell' is the highest mean over "
+        "Seeds: "
+        + ",".join(map(str, C.SEEDS))
+        + ". 'Best cell' is the highest mean over "
         "(scorers x k), chosen on the same test splits it is scored on -- optimistic, a ceiling "
         "not a result. ANFIS is nondeterministic run to run. RT-IOT2022 excluded (cost; dataset "
         "absent). " + " ".join(notes)
@@ -267,8 +340,18 @@ def main():
     C.emit(
         "table_4_1c_comparison",
         "Table 4.1c-a -- MoG default vs ANFIS / GA-FIS / RF, and the best the top_n sweep reaches",
-        ["Dataset (task)", "MoG default (shipped)", "MoG train", "ANFIS", "ANFIS train",
-         "GA-FIS", "GA-FIS train", "RF", "RF train", "MoG best sweep cell"],
+        [
+            "Dataset (task)",
+            "MoG default (shipped)",
+            "MoG train",
+            "ANFIS",
+            "ANFIS train",
+            "GA-FIS",
+            "GA-FIS train",
+            "RF",
+            "RF train",
+            "MoG best sweep cell",
+        ],
         comparison,
         note=base_note,
     )
@@ -277,23 +360,43 @@ def main():
         "Table 4.1c-b -- score / mean fit seconds by top_n and feature scorer (MoG)",
         ["Dataset (task)", "top_n (requested)"] + SCORERS,
         sweep_rows,
-        note=base_note + " Each cell: mean +/- std of the score over seeds / mean fit seconds "
+        note=base_note
+        + " Each cell: mean +/- std of the score over seeds / mean fit seconds "
         "(scoring included -- every fit re-scores all features).",
     )
     C.emit(
         "table_4_1c_sweep_cost",
         "Table 4.1c-c -- cost of the whole top_n sweep and of one run",
-        ["Dataset (task)", "Arm", "Runs", "Total fit time", "Mean / run", "Min-max / run",
-         "Runs below requested top_n", "Failed"],
+        [
+            "Dataset (task)",
+            "Arm",
+            "Runs",
+            "Total fit time",
+            "Mean / run",
+            "Min-max / run",
+            "Runs below requested top_n",
+            "Failed",
+        ],
         cost_rows,
-        note=base_note + " 'Total fit time' sums per-run fit seconds; the wall-clock row adds "
+        note=base_note
+        + " 'Total fit time' sums per-run fit seconds; the wall-clock row adds "
         "prediction and scoring. 'Runs below requested top_n' counts fits where the 0.85 "
         "redundancy filter kept fewer features than asked for.",
     )
     raw = os.path.join(C.OUTPUT_DIR, "table_4_1c_topn_runs.csv")
     with open(raw, "w", newline="") as fh:
         w = csv.writer(fh)
-        w.writerow(["dataset", "scorer", "top_n", "seed", "fit_seconds", "score", "features_kept"])
+        w.writerow(
+            [
+                "dataset",
+                "scorer",
+                "top_n",
+                "seed",
+                "fit_seconds",
+                "score",
+                "features_kept",
+            ]
+        )
         w.writerows(long_rows)
     print(f"  wrote {raw}  ({len(long_rows)} runs)")
     print(f"\nTotal wall-clock: {total_wall:.0f} s")

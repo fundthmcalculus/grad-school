@@ -82,8 +82,12 @@ def _sweep(scorer, X, y):
     for k in K_GRID:
         accs, secs = [], []
         for seed in C.SEEDS:
-            Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed)
-            model = gc.TribbleClassifier(top_n=k, random_state=seed, scoring_method=scorer)
+            Xtr, Xte, ytr, yte = train_test_split(
+                X, y, test_size=0.2, random_state=seed
+            )
+            model = gc.TribbleClassifier(
+                top_n=k, random_state=seed, scoring_method=scorer
+            )
             start = time.perf_counter()
             model.fit(Xtr, ytr)
             secs.append(time.perf_counter() - start)

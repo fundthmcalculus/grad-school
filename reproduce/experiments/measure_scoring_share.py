@@ -44,14 +44,19 @@ def main():
     ap.add_argument(
         "--runs",
         default=os.path.join(
-            os.path.dirname(HERE), "outputs", "topn-sweep-2026-11-21", "table_4_1c_topn_runs.csv"
+            os.path.dirname(HERE),
+            "outputs",
+            "topn-sweep-2026-11-21",
+            "table_4_1c_topn_runs.csv",
         ),
     )
     ap.add_argument("--repeats", type=int, default=3)
     args = ap.parse_args()
 
     data = fm.load_phiusiil()
-    assert data is not None, "PhiUSIIL did not load -- this would silently measure nothing"
+    assert (
+        data is not None
+    ), "PhiUSIIL did not load -- this would silently measure nothing"
     X, y = data
     Xtr, _, ytr, _ = train_test_split(X, y, test_size=0.2, random_state=0)
     ytr = pd.Series(np.asarray(ytr).ravel(), index=Xtr.index)
@@ -66,15 +71,30 @@ def main():
     runs = list(csv.DictReader(open(args.runs)))
     n_k = len({r["top_n"] for r in runs if r["dataset"].startswith("PhiUSIIL")})
     print(f"PhiUSIIL train split {Xtr.shape}; {n_k} top_n values in the sweep")
-    print(f"{'scorer':14s} {'scoring':>9s} {'fit@k=1':>9s} {'share':>6s} {'sweep/seed':>11s} {'saved if scored once':>21s}")
+    print(
+        f"{'scorer':14s} {'scoring':>9s} {'fit@k=1':>9s} {'share':>6s} {'sweep/seed':>11s} {'saved if scored once':>21s}"
+    )
     for sc in SCORERS:
         s = st.mean(score(sc) for _ in range(args.repeats))
-        fit = [float(r["fit_seconds"]) for r in runs
-               if r["dataset"].startswith("PhiUSIIL") and r["scorer"] == sc and r["top_n"] == "1" and r["fit_seconds"]]
-        per_seed = sum(float(r["fit_seconds"]) for r in runs
-                       if r["dataset"].startswith("PhiUSIIL") and r["scorer"] == sc and r["fit_seconds"]) / len({r["seed"] for r in runs})
+        fit = [
+            float(r["fit_seconds"])
+            for r in runs
+            if r["dataset"].startswith("PhiUSIIL")
+            and r["scorer"] == sc
+            and r["top_n"] == "1"
+            and r["fit_seconds"]
+        ]
+        per_seed = sum(
+            float(r["fit_seconds"])
+            for r in runs
+            if r["dataset"].startswith("PhiUSIIL")
+            and r["scorer"] == sc
+            and r["fit_seconds"]
+        ) / len({r["seed"] for r in runs})
         saved = s * (n_k - 1)
-        print(f"{sc:14s} {s:8.3f}s {st.mean(fit):8.3f}s {100*s/st.mean(fit):5.0f}% {per_seed:10.2f}s {saved:8.2f}s ({100*saved/per_seed:.0f}%)")
+        print(
+            f"{sc:14s} {s:8.3f}s {st.mean(fit):8.3f}s {100*s/st.mean(fit):5.0f}% {per_seed:10.2f}s {saved:8.2f}s ({100*saved/per_seed:.0f}%)"
+        )
 
 
 if __name__ == "__main__":
