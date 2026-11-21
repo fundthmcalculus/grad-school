@@ -1,0 +1,8 @@
+# Build products and figures regenerated from reproduce/figures (AGENTS.md: regenerate, do not commit)
+fig/
+main.pdf
+*.aux
+*.log
+*.out
+*.bbl
+*.blg
