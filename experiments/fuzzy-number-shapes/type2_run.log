@@ -1,0 +1,28 @@
+verify it2 analytic vs central FD: max rel. err 7.78e-06
+seed 0 it2_fou       RMSE 0.0308 coverage 0.879 width 1.480 w 0.353 jac 59 1.07s
+seed 0 it2_collapse  RMSE 0.0331 coverage 0.000 width 0.000 w 0.000 jac 172 2.85s
+seed 1 it2_fou       RMSE 0.0348 coverage 0.853 width 0.709 w 0.431 jac 155 2.41s
+seed 1 it2_collapse  RMSE 0.0393 coverage 0.000 width 0.000 w 0.000 jac 165 2.52s
+seed 2 it2_fou       RMSE 0.0444 coverage 0.914 width 3.562 w 0.228 jac 178 2.93s
+seed 2 it2_collapse  RMSE 0.0455 coverage 0.000 width 0.000 w 0.000 jac 57 0.85s
+seed 3 it2_fou       RMSE 0.0326 coverage 0.872 width 2.128 w 4.647 jac 52 0.81s
+seed 3 it2_collapse  RMSE 0.0735 coverage 0.000 width 0.000 w 0.000 jac 172 2.68s
+seed 4 it2_fou       RMSE 0.0335 coverage 0.966 width 2.312 w 0.100 jac 78 1.28s
+seed 4 it2_collapse  RMSE 0.0320 coverage 0.000 width 0.000 w 0.000 jac 85 1.33s
+seed 5 it2_fou       RMSE 0.0365 coverage 0.914 width 0.675 w 0.244 jac 150 2.32s
+seed 5 it2_collapse  RMSE 0.0392 coverage 0.000 width 0.000 w 0.000 jac 167 2.52s
+seed 6 it2_fou       RMSE 0.0427 coverage 0.991 width 5.887 w 0.402 jac 173 2.49s
+seed 6 it2_collapse  RMSE 0.0379 coverage 0.000 width 0.000 w 0.000 jac 185 2.72s
+seed 7 it2_fou       RMSE 0.0406 coverage 0.934 width 1.153 w 0.216 jac 75 1.20s
+seed 7 it2_collapse  RMSE 0.0399 coverage 0.000 width 0.000 w 0.000 jac 106 1.57s
+seed 8 it2_fou       RMSE 0.0388 coverage 0.817 width 0.579 w 0.329 jac 181 2.75s
+seed 8 it2_collapse  RMSE 0.0300 coverage 0.000 width 0.000 w 0.000 jac 108 1.99s
+seed 9 it2_fou       RMSE 0.0475 coverage 0.845 width 0.566 w 0.128 jac 164 2.82s
+seed 9 it2_collapse  RMSE 0.0560 coverage 0.000 width 0.000 w 0.000 jac 172 2.90s
+| arm | test RMSE median | test RMSE mean ± sd | interval coverage (noise-free test) | mean interval width | Jacobians | fitted mean w |
+|---|---:|---:|---:|---:|---:|---:|
+| it2_collapse | 0.0392 | 0.0426 ± 0.0132 | 0.000 | 0.0000 | 139 | 0.000 |
+| it2_fou | 0.0376 | 0.0382 ± 0.0055 | 0.898 | 1.9053 | 126 | 0.708 |
+
+Seeds 0..9, K=5, N_train=500, noise sd=0.05. Gaussian FOU, Nie-Tan point prediction.
+
