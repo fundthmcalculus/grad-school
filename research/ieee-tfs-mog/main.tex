@@ -6,6 +6,8 @@
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{url}
+\usepackage[noend]{algpseudocode}
+\usepackage{algorithm}
 
 % Working-draft marker. Every \todo is an open item for the authors, not for the reader.
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
@@ -16,16 +18,21 @@
 
 \title{Answer-First Fuzzy Inference Systems via Mixtures of Gaussians:\\Fast, Interpretable Classification and Regression with Open-Set Rejection}
 
-\author{Scott~Phillips,~\IEEEmembership{Member,~IEEE}%
-\thanks{S.~Phillips is with \todo{affiliation}. Corresponding author: sphillips@nexigen.com.}%
-\thanks{\todo{Co-author list and roles to be confirmed before submission.}}}
+\author{Scott~Phillips,~\IEEEmembership{Member,~IEEE},
+Kelly~Cohen,~\IEEEmembership{Member,~IEEE},
+Vladik~Kreinovich,~\IEEEmembership{Fellow,~IEEE}, and
+Hugo~Henry%
+\thanks{S.~Phillips and K.~Cohen are with \todo{affiliations for Phillips and Cohen; the NAFIPS 2025 paper lists the University of Cincinnati for Cohen}.}%
+\thanks{V.~Kreinovich is with \todo{affiliation; confirm the spelling and first name of the co-author the request refers to as ``Dr Krienovich''}.}%
+\thanks{H.~Henry is with \todo{affiliation}.}%
+\thanks{Corresponding author: S.~Phillips, sphillips@nexigen.com. \todo{IEEE membership grades to be confirmed by each author.}}}
 
 \markboth{IEEE Transactions on Fuzzy Systems, Draft}{Phillips: Answer-First Fuzzy Inference Systems}
 
 \maketitle
 
 \begin{abstract}
-Fuzzy inference systems (FISs) are interpretable, but the usual way to build one grids the input space, so the rule base grows as the product of the per-input set counts and fitting it is either slow or dependent on an initial guess. We build the rule base in the opposite order. The outputs are partitioned first, into classes or into output buckets, and one rule is made per answer. Each antecedent is then a conjunction over features of per-feature, per-answer Gaussian mixtures, combined with a t-conorm within a feature and a t-norm across features. The rule count is $K$ for a $K$-class problem or $K$ output buckets, and the parameter count grows linearly in the number of features. Regression consequents come from one closed-form least-squares solve. A complement rule, the t-conorm of the known rules negated, gives open-set rejection with no second model. On Concrete, Bike Sharing, PhiUSIIL and RT-IOT2022 we measure training times 14$\times$ to 194$\times$ faster than the slower of two tuned fuzzy baselines (ANFIS and a genetic-algorithm-tuned FIS), with accuracy that matches or trails those baselines in most rows. On the one-class BETH configuration the complement rule reaches Youden's $J$ of +0.843, level with a one-class SVM (+0.841). On the multi-class RT-IOT2022 leave-one-class-out protocol it trails isolation forest by 0.169 in $J$. The speed claim is the defensible result. The open-set claim holds only in the one-class regime.
+Fuzzy inference systems (FISs) are interpretable, but the usual way to build one grids the input space, so the rule base grows as the product of the per-input set counts and fitting it is either slow or dependent on an initial guess. We build the rule base in the opposite order. The outputs are partitioned first, into classes or into output buckets, and one rule is made per answer. Each antecedent is then a conjunction over features of per-feature, per-answer Gaussian mixtures, combined with a t-conorm within a feature and a t-norm across features. The rule count is $K$ for a $K$-class problem or $K$ output buckets, and the parameter count grows linearly in the number of features. Regression consequents come from one closed-form least-squares solve. A complement rule, the t-conorm of the known rules negated, gives open-set rejection with no second model. On Concrete, Bike Sharing, PhiUSIIL and RT-IOT2022 we measure training times 14$\times$ to 194$\times$ faster than the slower of two tuned fuzzy baselines (ANFIS and a genetic-algorithm-tuned FIS), with accuracy that matches or trails those baselines in most rows. On PhiUSIIL the construction fails (accuracy 0.440, below the majority rate), so its 194$\times$ speedup is not a valid comparison and is reported as a defect under investigation. On the one-class BETH configuration the complement rule reaches Youden's $J$ of +0.843, level with a one-class SVM (+0.841). On the multi-class RT-IOT2022 leave-one-class-out protocol it trails isolation forest by 0.169 in $J$. The speed claim is the defensible result. The open-set claim holds only in the one-class regime.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -58,11 +65,39 @@ Rule-learning approaches for fuzzy systems fall into three families. Grid-based 
 \subsection{Open-set recognition and novelty detection}
 Novelty detection is an established field. One-class support-vector machines~\cite{scholkopf2001estimating} and isolation forests~\cite{liu2008isolation} are the standard purpose-built detectors, and open-set recognition is an active subject in its own right. We do not claim to outperform these methods. Our claim concerns where the rejection comes from. In a fuzzy system built as described here, rejection is a consequence of the rules already present and is explained in the same linguistic terms as the classification.
 
+\subsection{Fuzzy decision trees and rule extraction}
+A second family builds fuzzy structure by recursive partitioning. Fuzzy decision trees~\cite{janikow1998fuzzy,yuan1995induction} grow a tree whose branches carry fuzzy tests, and globally optimal variants~\cite{suarez1999globally} and complete induction procedures~\cite{olaru2003complete} address the greedy choices that make fuzzy trees unstable. Such trees are interpretable, but their rules overlap across branches and their size depends on the stopping criterion. Direct extraction from numerical data~\cite{abe1995method} avoids the tree but still searches the input space. The construction here differs in its order of operations. Each rule is anchored to an answer before any antecedent is fitted, so the search is over per-answer density fits rather than over partitions of the input space.
+
+Hierarchical mixtures of experts~\cite{jordan1994hierarchical} share the mixture view of this paper: a gating network softly partitions the input and each expert is fitted locally. The gating in that model is learned jointly with the experts by expectation--maximization, whereas here the gating is implicit in the Gaussian densities and the answers are fixed beforehand. Radial-basis networks and fuzzy inference systems are functionally equivalent under suitable conditions~\cite{jang1993functional}, and TSK systems share functional equivalences with neural networks and ensemble regressors~\cite{wu2020functional}. These results support treating the fuzzy rule base as a model class, but they do not address the construction question this paper answers.
+
+Rule-base reduction is a further line of work~\cite{alcala2007rule}. Deduplication of membership functions in Section~\ref{sec:results} is a reduction of this kind, with the difference that the tolerance is measured against paired accuracy rather than set by a fixed rule-count target.
+
 \section{Method}
 \label{sec:method}
 
 \subsection{Input transform}
 Before either construction, features whose dynamic range spans more than two orders of magnitude are log-scaled automatically, and every feature is then min--max scaled to $[0,1]$. The transform is a monotone map per feature and it matters. On Concrete, the bounded transform raises a first-order model's $R^2$ from 0.695 to 0.796, while CART and random forest are unchanged to within $0.001$. The reason is rank invariance: a monotone map cannot change which side of a threshold a sample falls on, so a tree is unaffected, whereas a Gaussian membership is defined in the feature's own units and does change. A z-score transform reduces the first-order gain to 0.713 and inflates seed variance at second order, so bounded inputs are the default and the paper's comparisons all use them.
+
+\begin{table}[t]
+\centering
+\caption{Input transform, ten seeds, identical splits. Log and min--max scaling to $[0,1]$ is compared with z-scoring. CART and random forest are invariant to monotone transforms and serve as controls.}
+\label{tab:transform}
+\begin{tabular}{llrrr}
+\toprule
+Model & Hyperparameters & Raw & Min--max & z-score \\
+\midrule
+Flat MoG-TSK, 1st order & pipeline default & 0.695 $\pm$ 0.030 & 0.796 $\pm$ 0.018 & 0.713 $\pm$ 0.035 \\
+Flat MoG-TSK, 2nd order & pipeline default & 0.804 $\pm$ 0.030 & 0.841 $\pm$ 0.021 & 0.827 $\pm$ 0.028 \\
+Flat MoG-TSK, full 2nd & pipeline default & 0.830 $\pm$ 0.025 & 0.861 $\pm$ 0.026 & 0.809 $\pm$ 0.115 \\
+Fuzzy tree & demo-tuned & 0.712 $\pm$ 0.030 & 0.740 $\pm$ 0.051 & 0.740 $\pm$ 0.051 \\
+Fuzzy tree & library default & 0.583 $\pm$ 0.067 & 0.689 $\pm$ 0.056 & 0.691 $\pm$ 0.055 \\
+Mixture of experts & demo-tuned & 0.774 $\pm$ 0.025 & 0.834 $\pm$ 0.027 & 0.806 $\pm$ 0.031 \\
+Mixture of experts & library default & 0.648 $\pm$ 0.093 & 0.756 $\pm$ 0.059 & 0.744 $\pm$ 0.066 \\
+CART (reference) & sklearn default & 0.825 $\pm$ 0.047 & 0.826 $\pm$ 0.047 & 0.826 $\pm$ 0.046 \\
+Random forest (reference) & sklearn default & 0.909 $\pm$ 0.018 & 0.909 $\pm$ 0.019 & 0.909 $\pm$ 0.018 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Classification: one rule per class}
 For $N$ samples, $M$ features and $K$ classes, the construction segments the data by class and, for each feature, screens for discriminative signal by comparing the class-conditional distributions pairwise. This screen is the only step whose cost grows quadratically with the class count, at $O(MK^2)$, and it is a screen rather than a fit: it can be subsampled or restricted to one-versus-rest without changing the rule base.
@@ -73,12 +108,12 @@ w_k(x) = T_{j}\Big(S_{\ell}\big(\mu_{jk,\ell}(x_j)\big)\Big),
 \end{equation}
 a conjunction of disjunctions. Classification is the argmax over $K$ rules. Figure~\ref{fig:mog} shows a fit to Glass Type~1.
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\columnwidth]{fig/fig1-mog-classification.pdf}
+\includegraphics[width=0.85\textwidth]{fig/fig1-mog-classification.pdf}
 \caption{Per-feature Gaussian mixtures and the rule they combine into, from a real fit to Glass Type~1 using the three top features. Components are dashed, their t-conorm is solid, and the class's samples form a rug. The lower panel is the rule's firing strength over all samples. A single rule is not a classifier, since prediction is the argmax over all rules. The zero-width component is produced by the automatic component count on a 214-sample dataset and is shown rather than hidden.}
 \label{fig:mog}
-\end{figure}
+\end{figure*}
 
 Because each class rule is estimated only from its own class, new labeled data for one class updates that class's densities without touching the others, and a new class adds one rule. We state this as a property of the construction. A controlled streaming benchmark has not been run.
 
@@ -97,12 +132,12 @@ where $S$ is a t-conorm and $\theta$ is a boost applied to each known-class firi
 
 Two algebraic facts determine what the rule does. First, every t-conorm satisfies $S(1,\cdot)=1$, so one clipped input saturates the aggregate. The complement is then positive only when every class firing is below $1-\theta$. Where some class reaches $1-\theta$, the rule is exactly a rejection threshold on $\max_k \mu_k(x)$, and the choice of conorm has no effect. At the default $\theta = 0.99$ inherited from the BETH script, the rule is therefore a maximum-membership rejector. Second, when there is a single known class the conorm is the identity, and the anomaly label wins exactly when $\mu(x) < (1-\theta)/2$. In that configuration $\theta$ is a threshold parameter, and no norm family can change a prediction. Figure~\ref{fig:anom} shows both cases.
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\columnwidth]{fig/fig4-anomaly-geometry.pdf}
+\includegraphics[width=0.85\textwidth]{fig/fig4-anomaly-geometry.pdf}
 \caption{Geometry of the complement rule with the Hamacher conorm~\cite{hamacher1976}. Panels (a) and (b) show $\mu_{\text{anom}}$ over the unit square of two class firings at $\theta = 0.5$ and $\theta = 0.99$. Dashed lines mark $\mu_k = 1-\theta$, beyond which the rule is identically zero. The orange region is where the anomaly label wins. Panel (c) shows the one-class case, where the decision is a threshold at $(1-\theta)/2$.}
 \label{fig:anom}
-\end{figure}
+\end{figure*}
 
 \subsection{Complexity}
 The rule count is $K$ by construction: the number of classes for classification and the number of buckets for regression. It is never a product over inputs. The number of parameters is at most $2KMp$ for antecedents plus $K(1+q)$ for consequents of basis size $q$. Figure~\ref{fig:rules} places this against the grid. The only quadratic term in the fit is the screen above, at $O(MK^2)$.
@@ -113,6 +148,44 @@ The rule count is $K$ by construction: the number of classes for classification 
 \caption{Rules required by a grid partition (curves, two and three sets per input) against the $K$ rules of the construction (markers), for the datasets used here. The grid curves are arithmetic and are not measured. The construction's rule count is the class or bucket count, so it is independent of $M$.}
 \label{fig:rules}
 \end{figure}
+
+\subsection{Notation}
+Let $\mathcal{D} = \{(x_n, y_n)\}_{n=1}^{N}$ be a dataset with $x_n \in [0,1]^{M}$ after the input transform. Each answer $k \in \{1,\dots,K\}$ is a class for classification or an output bucket for regression. For feature $j$ and answer $k$, $\mu_{jk,\ell}$ denotes the $\ell$-th Gaussian component of a mixture with at most $p$ components. The rule for answer $k$ is $w_k(x)$ in Eq.~(1), and the anomaly firing is $\mu_{\text{anom}}(x)$ in Eq.~\eqref{eq:anom}.
+
+\subsection{Construction procedure}
+Algorithm~\ref{alg:construct} summarizes the classification and regression construction in one pass. The procedure is a sequence of local density fits keyed to the answers, followed by one closed-form solve, so the only iterative component is the Gaussian-mixture fit for each feature and answer.
+
+\begin{algorithm}[t]
+\caption{Answer-first construction of a Mixture-of-Gaussians FIS.}
+\label{alg:construct}
+\begin{algorithmic}[1]
+\Require Data $\{(x_n, y_n)\}$ with $M$ features; components per mixture $p$; for regression, bucket count $K$
+\Ensure Rule base $\{w_k\}_{k=1}^{K}$ with consequents
+\State Log-scale features whose range spans more than two decades; min--max scale each feature to $[0,1]$
+\If{classification}
+  \State Answers $\leftarrow$ the $K$ class labels
+\Else
+  \State Answers $\leftarrow$ $K$ equal-width output buckets over $[\min y, \max y]$; pin the two outer bucket centroids to their bucket means
+\EndIf
+\For{each feature $j$}
+  \State Screen $j$ for discriminative signal across answers (pairwise, $O(K^2)$)
+\EndFor
+\For{each retained feature $j$ and answer $k$}
+  \State Fit a one-dimensional Gaussian mixture with up to $p$ components to the samples in answer $k$
+\EndFor
+\State Form $w_k(x)$ as the t-norm across features of the t-conorm across components (Eq.~1)
+\If{regression}
+  \State Solve one ridge least-squares problem for first-order TSK consequents, holding the outer rules' constant terms fixed
+\EndIf
+\If{classification}
+  \State Optionally add binary correction experts for confused class pairs, gated by anomaly level and margin
+\EndIf
+\State \Return rule base
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Open-set scoring}
+The complement rule of Eq.~\eqref{eq:anom} yields a score for each sample. Detection and false-alarm rates are computed at a threshold, and Youden's $J$ is their difference, the statistic reported throughout. For one-class experiments the threshold is calibrated on benign validation data at a fixed false-alarm budget of 1\%; for leave-one-class-out experiments the held-out class is treated as unseen and each class is withheld in turn. Score quality is also reported as ROC-AUC, so ranking and operating point can be separated.
 
 \section{Experimental Setup}
 \label{sec:setup}
@@ -140,6 +213,27 @@ BETH & binary, one-class & 1{,}141{,}078 & 8 & benign-only training \\
 
 \subsection{Protocol}
 Every reported number is a mean and standard deviation over ten seeds, with identical splits across the methods compared. The construction and the baselines share the same preprocessing. Timings are wall-clock on one workstation, and the first fit of each run is discarded to remove import and warm-up costs. Where a comparison is paired, the table reports the paired difference and its spread.
+
+\subsection{Provenance of the reported numbers}
+Every table in Section~\ref{sec:results} is taken from an archived run under \texttt{reproduce/outputs/}. Table~\ref{tab:provenance} maps each to its archive. The archives were not all produced at the same \texttt{tribble-fis} commit, so the mapping is part of the result and not a footnote. Numbers from the archive marked with a dagger failed their preflight check and are not re-verified here.
+
+\begin{table}[t]
+\centering
+\caption{Where each reported number comes from. $\dagger$: archive whose preflight check failed; its numbers are not re-verified.}
+\label{tab:provenance}
+\begin{tabular}{ll}
+\toprule
+Reported in & Archive \\
+\midrule
+Transform, partitioning, skew, Glass open-set & \texttt{uniform-2026-08-03} \\
+Deduplication, correction pass & \texttt{mf-dedup-2026-08-05} \\
+Speed and baselines (Table~\ref{tab:speed}) & \texttt{phiusiil-leakfree-2026-08-30}$^\dagger$ \\
+RT-IOT2022 open-set and sweep & \texttt{rtiot-deleaked-2026-08-27} \\
+BETH one-class & \texttt{table\_4\_11\_beth\_anomaly} (generator; archive to be confirmed) \\
+PhiUSIIL one-class & \texttt{experiments/phishing-oneclass} at \texttt{tribble-fis} \texttt{ef15d6a} \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Baselines}
 We compare against ANFIS~\cite{jang1993anfis} and a genetic-algorithm-tuned FIS. ANFIS grid-partitions where feasible and scatter-partitions at scale. The GA-tuned FIS evolves the same premises over a population of 20 for 15 generations. We also report CART and random forest~\cite{breiman2001random} as references, not as fuzzy competitors. For one-class detection we compare against a one-class SVM~\cite{scholkopf2001estimating} and an isolation forest~\cite{liu2008isolation}, matched on the complement rule's false-alarm rate.
@@ -204,15 +298,51 @@ Order & Scheme & $R^2$ & Tail RMSE \\
 
 Target skew is the variable that separates the schemes, and Concrete's skew of $+0.42$ is too mild to show it. We isolated skew with a synthetic linear signal passed through $y = \mathrm{expm1}(\lambda z)/\lambda$, which changes the target's shape without changing the information in $X$. Uniform partitioning degrades smoothly, from $R^2 = 0.912$ at skew $0.05$ to $0.084$ at skew $17.7$, and its smallest bucket empties as skew rises. Quantile partitioning does not degrade smoothly. Its standard deviation grows from $\pm 0.010$ to $\pm 24.000$, so on a heavily skewed target it sometimes gives a usable model and sometimes a catastrophic one. Uniform failure is visible at fit time, through bucket occupancy. Quantile failure appears as a bad seed in a run, which an aggregate error does not reveal. We therefore adopt uniform partitioning with a warning when a bucket holds fewer than three samples. On a badly skewed target the recommended fix is a monotone target transform, applied before fitting and inverted for reporting, because monotonicity preserves bucket order.
 
-\begin{figure}[t]
+\begin{table}[t]
 \centering
-\includegraphics[width=\columnwidth]{fig/fig2-output-partitioning.pdf}
+\caption{Output partitioning against target skew, synthetic with skew isolated. Four buckets, second order, ten seeds. Quantile's standard deviation grows with skew while uniform's stays bounded.}
+\label{tab:skew}
+\begin{tabular}{rrrrr}
+\toprule
+Skew & Uniform $R^2$ & Quantile $R^2$ & $Q-U$ & Uniform smallest bucket \\
+\midrule
++0.05 & 0.912 $\pm$ 0.009 & 0.911 $\pm$ 0.010 & $-$0.001 & 11 \\
++1.84 & 0.884 $\pm$ 0.016 & 0.876 $\pm$ 0.035 & $-$0.008 & 1 \\
++5.32 & 0.731 $\pm$ 0.083 & 0.728 $\pm$ 0.169 & $-$0.003 & 1 \\
++10.44 & 0.297 $\pm$ 0.126 & 0.183 $\pm$ 0.813 & $-$0.114 & 1 \\
++14.71 & 0.168 $\pm$ 0.073 & $-$2.106 $\pm$ 4.274 & $-$2.274 & 0 \\
++17.71 & 0.084 $\pm$ 0.016 & $-$12.562 $\pm$ 24.000 & $-$12.646 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.85\textwidth]{fig/fig2-output-partitioning.pdf}
 \caption{Output partitioning. (a) Concrete at three buckets: test $R^2$ by consequent order, with ten-seed error bars. The schemes agree at first and second order and separate at zeroth order, where the pinned-extreme arm goes negative. (b) The synthetic skew sweep on a symmetric-log axis. Quantile's mean reaches $-12.6$ with a spread of $\pm 24$; the error bars, not the means, carry the point, since quantile is unstable rather than uniformly inaccurate.}
 \label{fig:partition}
-\end{figure}
+\end{figure*}
 
 \subsection{Deduplication and the correction pass}
 Membership-function deduplication depends on a numeric tolerance. Across six datasets, the library's shipped tolerance removes between 0.0\% and 13.0\% of membership functions, and the paired accuracy or $R^2$ change has a 95\% interval that includes zero in every case. A lossless tolerance larger than the shipped one exists for every dataset, at a problem-specific multiplier between $2\times$ and $10\times$. Figure~\ref{fig:dedup} shows the sweep. The shipped tolerance is a safe floor, not a ceiling.
+
+\begin{table}[t]
+\centering
+\caption{Membership-function deduplication across six problems, ten paired seeds. $\Delta$ is the dedup arm's accuracy or $R^2$ minus the raw arm's on the same seed and split. The max-lossless multiplier is the largest tolerance multiplier before the paired 95\% interval first excludes zero.}
+\label{tab:dedup}
+\begin{tabular}{llrrrr}
+\toprule
+Dataset & Task & Raw MF & MF at 1$\times$ (red.) & Max-lossless $\times$ & MF at max (red.) \\
+\midrule
+Glass & class. & 81.4 & 71.0 (12.8\%) & 5 & 61.3 (24.7\%) \\
+Wine & class. & 16.6 & 16.6 (0.0\%) & 10 & 14.6 (12.0\%) \\
+Breast Cancer & class. & 11.1 & 11.1 (0.0\%) & 5 & 11.1 (0.0\%) \\
+Digits & class. & 172.2 & 157.5 (8.5\%) & 7 & 96.1 (44.2\%) \\
+Concrete & reg. & 63.2 & 62.6 (0.9\%) & 10 & 58.4 (7.6\%) \\
+Diabetes & reg. & 41.6 & 36.2 (13.0\%) & 2 & 31.4 (24.5\%) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{figure}[t]
 \centering
@@ -221,13 +351,66 @@ Membership-function deduplication depends on a numeric tolerance. Across six dat
 \label{fig:dedup}
 \end{figure}
 
-On Glass the correction pass gives the following, over ten paired seeds. The base model has $81.4 \pm 2.3$ membership functions and accuracy $0.532 \pm 0.041$. The gated cascade reaches $0.563 \pm 0.057$ accuracy at $109.0 \pm 9.5$ raw membership functions, a paired gain of $+0.031 \pm 0.027$. The flattened FIS reaches $0.546 \pm 0.051$ at $83.5 \pm 5.4$ deduplicated functions, a paired gain of $+0.014 \pm 0.061$, whose spread includes zero.
+Table~\ref{tab:correction} reports the correction pass on Glass over ten paired seeds. The flattened arm's gain has a spread that includes zero, so the flat deployment cannot be claimed to keep the cascade's benefit.
+
+\begin{table}[t]
+\centering
+\caption{Correction-rule pass on Glass, ten paired seeds. Paired $\Delta$ is each arm's accuracy minus the base arm's on the same seed and split. The flattened arm deduplicates at exact matches only.}
+\label{tab:correction}
+\begin{tabular}{lrrr}
+\toprule
+Arm & MF count & Accuracy & Paired $\Delta$ \\
+\midrule
+Base (no correction pass) & 81.4 $\pm$ 2.3 & 0.532 $\pm$ 0.041 & -- \\
+Gated cascade & 109.0 $\pm$ 9.5 (raw) & 0.563 $\pm$ 0.057 & +0.031 $\pm$ 0.027 \\
+Cascade flattened to one FIS & 83.5 $\pm$ 5.4 (dedup) & 0.546 $\pm$ 0.051 & +0.014 $\pm$ 0.061 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Open-set rejection}
 Open-set behavior is evaluated under two protocols that answer different questions, and the results disagree.
 
 \paragraph{Operating curve on Glass}
-On Glass under leave-one-class-out, sweeping $\theta$ traces the operating curve. Raising $\theta$ reduces both detection and false alarms monotonically, and past $\theta=1.1$ the rule stops firing. The detection minus false-alarm margin peaks at $+0.154$ at $\theta=0.80$ and at $+0.129$ at the shipped $\theta = 0.99$.
+On Glass under leave-one-class-out, sweeping $\theta$ traces the operating curve. Raising $\theta$ reduces both detection and false alarms monotonically, and past $\theta=1.1$ the rule stops firing. The detection minus false-alarm margin peaks at $+0.154$ at $\theta=0.80$ and at $+0.129$ at the shipped $\theta = 0.99$. Table~\ref{tab:theta} gives the values.
+
+\begin{table}[t]
+\centering
+\caption{Open-set operating curve on Glass: detection and false-alarm rate as the boost $\theta$ varies. Leave-one-class-out, Hamacher conorm, ten seeds.}
+\label{tab:theta}
+\begin{tabular}{rrrr}
+\toprule
+$\theta$ & Detection & False alarm & $J$ \\
+\midrule
+0.50 & 0.838 & 0.719 & +0.119 \\
+0.60 & 0.815 & 0.664 & +0.151 \\
+0.70 & 0.762 & 0.616 & +0.146 \\
+0.80 & 0.700 & 0.546 & \textbf{+0.154} \\
+0.90 & 0.625 & 0.475 & +0.150 \\
+0.99 & 0.491 & 0.362 & +0.129 \\
+1.10 & 0.000 & 0.000 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Open-set operating curve on RT-IOT2022: leave-one-class-out over 12 classes, ten seeds, Hamacher conorm. The $\theta = 0.99$ row matches the complement-rule entry in Table~\ref{tab:openset}.}
+\label{tab:theta_rtiot}
+\begin{tabular}{rrrr}
+\toprule
+$\theta$ & Detection & False alarm & $J$ \\
+\midrule
+0.50 & 0.975 & 0.713 & +0.263 \\
+0.60 & 0.958 & 0.626 & +0.332 \\
+0.70 & 0.934 & 0.592 & +0.342 \\
+0.80 & 0.914 & 0.518 & \textbf{+0.396} \\
+0.90 & 0.842 & 0.485 & +0.358 \\
+0.99 & 0.804 & 0.438 & +0.366 \\
+1.10 & 0.000 & 0.000 & +0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \paragraph{Against purpose-built detectors, multi-class surrogate}
 Table~\ref{tab:openset} compares the methods at matched false-alarm operating points. On Glass the three methods are within their error bars. On RT-IOT2022, at full scale and ten seeds, the picture changes. Isolation forest leads the complement rule by $0.169$ in $J$, a gap approaching two-thirds of the complement rule's own seed spread. Tuning $\theta$ on RT-IOT2022 improves $J$ by $0.030$ and still trails isolation forest by $0.139$.
@@ -281,10 +464,52 @@ BETH has no positive examples in its training and validation splits, so no super
 
 \subsection{Phishing URLs}
 \label{sec:phi}
-On PhiUSIIL the construction trains in $0.13 \pm 0.02$\,s but reaches only $0.440 \pm 0.181$ accuracy on the 47-feature set. That is below the $0.576$ majority-class rate, and individual seeds fall to about $0.23$. Gaussian naive Bayes on the same protocol reaches $0.980 \pm 0.002$, so the dataset is separable under the independence assumption this construction shares. The shortfall is in the construction on this dataset, not the dataset, and we do not yet know which stage causes it. \todo{Locate the PhiUSIIL failure. A leak-free archive (2026-08-30) reports $0.997$, but its own preflight failed and its table reports $0.440$; the $0.997$ is not reproduced.} The fuzzy baselines and random forest reported in Table~\ref{tab:speed} come from an archive whose preflight also failed, and are not re-verified. A one-class detector trained on legitimate URLs only, with no phishing samples, reaches AUROC $0.9992 \pm 0.0001$ and recall $0.9977 \pm 0.0004$ at 1\% false-alarm rate. That number reflects the dataset's separability more than any method, since whitened Mahalanobis distance matches it.
+On PhiUSIIL the construction trains in $0.13 \pm 0.02$\,s but reaches only $0.440 \pm 0.181$ accuracy on the 47-feature set. That is below the $0.576$ majority-class rate, and individual seeds fall to about $0.23$. Gaussian naive Bayes on the same protocol reaches $0.980 \pm 0.002$, so the dataset is separable under the independence assumption this construction shares. The shortfall is in the construction on this dataset, not the dataset, and we do not yet know which stage causes it. \todo{Locate the PhiUSIIL failure. A leak-free archive (2026-08-30) reports $0.997$, but its own preflight failed and its table reports $0.440$; the $0.997$ is not reproduced.} The fuzzy baselines and random forest reported in Table~\ref{tab:speed} come from an archive whose preflight also failed, and are not re-verified. A one-class detector trained on legitimate URLs only, with no phishing samples, is a separate regime. Table~\ref{tab:phi1c} reports it over five seeds, with the threshold calibrated on training normals alone. The surprisal detector reaches AUROC $0.9992 \pm 0.0001$ and recall $0.9977 \pm 0.0004$ at a 1\% false-alarm rate. Whitened Mahalanobis distance matches it, which indicates the dataset's separability rather than the fuzzy method.
+
+\begin{table}[t]
+\centering
+\caption{PhiUSIIL, one-class detectors trained on legitimate URLs only. Five seeds. Recall is at a 1\% (or 5\%) false-alarm budget calibrated on training normals.}
+\label{tab:phi1c}
+\begin{tabular}{lrrrr}
+\toprule
+Method & AUROC & AP & Recall@1\% & Recall@5\% \\
+\midrule
+Complement rule, surprisal score & \textbf{0.9992} & 0.9997 & \textbf{0.9977} & 0.9986 \\
+Mahalanobis (whitened) & 0.9988 & 0.9995 & 0.9974 & 0.9986 \\
+One-class SVM (RBF) & 0.9718 & 0.9872 & 0.6463 & 0.8527 \\
+Isolation forest & 0.9370 & 0.9727 & 0.5023 & 0.7026 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Turbofan remaining useful life}
-As a demonstration on a regression task with a public benchmark, the construction was run once on the N-CMAPSS DS02 split, using 18 physically measured channels. It reaches per-sample RMSE $7.23$, against $7.22$ for a published CNN and $8.34$ for a published MLP on the public 20-channel input set~\cite{ariaschao2021ncmapss,custode2022evolutionary}. This is one fixed split with no variance estimate, and the comparison is across input sets. We report it as a demonstration, not a benchmark result.
+As a demonstration on a regression task with a public benchmark, the construction was run once on the N-CMAPSS DS02 split, using 18 physically measured channels. Table~\ref{tab:cmapss} reports per-sample and per-engine RMSE. The published baselines use the public 20-channel input set and are shown for reference only. This is one fixed split with no variance estimate, so the table is a demonstration, not a benchmark result.
+
+\begin{table}[t]
+\centering
+\caption{Turbofan RUL on N-CMAPSS DS02, one run on the dataset's fixed split. Baselines are published re-runs on a 20-channel input set.}
+\label{tab:cmapss}
+\begin{tabular}{llrr}
+\toprule
+Model & Input & Per-sample RMSE & Per-engine RMSE \\
+\midrule
+Published MLP \cite{custode2022evolutionary} & 20 channels & 8.34 & -- \\
+Published CNN \cite{custode2022evolutionary} & 20 channels & 7.22 & -- \\
+Construction, DS02 & 18 real channels & 7.23 & -- \\
+\midrule
+Construction, pooled 9 files, \texttt{raw\_memory} & 18 real channels & 15.58 & 17.00 \\
+Construction, pooled 9 files, \texttt{whole\_cycle} & 18 real channels & 15.44 & 12.07 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Interpretation and deployment}
+A rule base built this way can be read directly. Each class rule names the features that discriminate its answer, the Gaussian components show the feature ranges, and a correction expert is a small two-class rule for one confused pair. The open-set rejection carries the same structure: a rejected input is explained by the known rules it failed to match and by how close each came. An operator can therefore check whether a rejection is a genuine novelty or a poorly covered region of a known class, without a second model. We have not measured operator performance on this task, so this is a property of the representation rather than a verified human-factors result.
+
+Deployment depends on two choices that the experiments make explicit. The first is the output partition: uniform cuts with an occupancy warning, and a monotone target transform for severely skewed targets. The second is whether to flatten a correction cascade. The flattened FIS is smaller, but Table~\ref{tab:correction} shows it keeps only part of the gain. A deployment that needs the full accuracy should keep the cascade and accept its larger rule count.
+
+\subsection{Threats to validity}
+Several limits bound the claims above. Internal validity is affected by the open items already listed: the PhiUSIIL failure is unlocated, and the isolation-forest comparison on BETH has an unequal threshold protocol. Construct validity is affected by the open-set protocol. Leave-one-class-out on Glass and RT-IOT2022 is a multi-class surrogate for open-set behaviour, and the one-class regime is a single dataset. External validity is limited: all results use public tabular datasets, and none is a control-systems or streaming benchmark. Reproducibility is partly limited by the archive history. Several archives record different \texttt{tribble-fis} commits, and at least one run's preflight failed. Each table in this paper names the archive it comes from, and the figures in Section~\ref{sec:results} are drawn from those archives, not from a single pinned environment.
 
 \section{Discussion}
 \label{sec:discussion}
@@ -302,6 +527,8 @@ Each table and figure is generated from an archived run. Where two runs disagree
 
 \section{Conclusion}
 We have described a fuzzy inference construction that commits to the answers first and fits antecedents per answer. It yields one rule per class or output bucket, a parameter count linear in the feature count, and a closed-form regression consequent. Its complement rule gives open-set rejection that is an algebraic consequence of the rule base. Measured against two tuned fuzzy baselines and two purpose-built detectors, the construction is markedly faster and competitive in accuracy in several settings, and trails the detectors on the multi-class open-set surrogate. The open problems are the naive-Bayes comparison, the unresolved PhiUSIIL numbers, and a hierarchical extension for feature interactions.
+
+Several directions follow directly from the open items. The first is to locate the PhiUSIIL failure, which is the most important open result, since it bears on whether the independence assumption or the loader is responsible. The second is to re-run the BETH one-class comparison with the isolation-forest threshold calibrated on validation data as the fuzzy arm is, which would settle whether the reported detector gap is a threshold artifact. The third is a hierarchical extension for strong feature interactions, which the flat model cannot represent. The fourth is an evaluation under streaming or semi-supervised updates, which the per-class independence of the construction suggests but does not test.
 
 \section*{Acknowledgment}
 \todo{Acknowledgments and funding statement.}
