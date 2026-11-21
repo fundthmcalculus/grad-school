@@ -18,6 +18,68 @@ as having no generator yet.
 
 ---
 
+## 2026-11-21 — Table 4.1c: top_n × scorer sweep (`outputs/topn-sweep-2026-11-21/`)
+
+**New generator, no prose table cites it yet.** `table_4_1c_topn_sweep.py` sweeps the MoG over
+`top_n` and the four feature scorers beside ANFIS, GA-FIS and RF. Ten seeds, 1,120 sweep fits,
+0 failed, at `tribble-fis` `31e8ae9`, preflight 6/6. A targeted run, **not** a whole-document
+sweep. **Timings are from a 4-core 2.1 GHz Xeon, not the run-of-record i9: ratios transfer,
+seconds do not.** ANFIS is nondeterministic. RT-IOT2022 is excluded (absent; hours).
+
+**Why it exists.** Table 4.1's PhiUSIIL MoG cell (`0.440 ± 0.181`) is
+`TribbleClassifier(top_n=5)` under the default Wasserstein scorer, i.e. a *feature selection*,
+and it sits beside `0.999` for the fuzzy baselines. The sweep separates the two.
+
+**Registered expectations (script docstring) and outcomes.**
+
+| | Expectation | Outcome |
+|---|---|---|
+| E1 | PhiUSIIL, wasserstein, k = 5 reproduces `0.440 ± 0.181` | **held** (`0.440 ± 0.181`; k = 4 `0.438 ± 0.180`) |
+| E2 | scorer moves PhiUSIIL by tens of points at small k, ~1 point at k ≥ 20 | **held** (k = 5: `0.440`–`0.926`; k = 20: `0.970`–`0.983`) |
+| E3 | Concrete and Bike move far less with the scorer than PhiUSIIL | **held for Concrete, refuted for Bike Sharing** (k = 3: `0.130`–`0.632`; Concrete k ≥ 5 spread ≤ 0.07) |
+| E4 | fit time grows with k; scoring dominates small-k fits | **held** (PhiUSIIL per-run `0.07`–`1.85` s; scoring is **71–81 %** of a k = 1 fit — `experiments/measure_scoring_share.py`; an earlier throwaway run read 56–77 %, so treat it as ± a few points) |
+
+**Results (mean ± std over ten seeds).**
+
+| Dataset | MoG shipped | best MoG sweep cell\* | ANFIS | GA-FIS | RF |
+|---|---|---|---|---|---|
+| Concrete R² | 0.799 ± 0.027 | 0.799 ± 0.027 (k = 8, all) | 0.799 ± 0.112 | 0.896 ± 0.038 | 0.909 ± 0.020 |
+| Bike Sharing R² | 0.620 ± 0.014 | 0.655 ± 0.012 (wasserstein, k = 8) | 0.533 ± 0.087 | 0.545 ± 0.047 | 0.944 ± 0.004 |
+| PhiUSIIL acc | **0.440 ± 0.181** | **0.985 ± 0.003** (wasserstein, k = 30) | 0.999 ± 0.001 | 0.998 ± 0.001 | 1.000 ± 0.000 |
+
+\* chosen on the same test splits it is scored on, across 4 scorers × k: **optimistic**, a ceiling.
+
+So the PhiUSIIL gap is mostly selection: the best sweep cell is 1.4 points behind ANFIS, not 56.
+It does **not** close on Concrete (GA-FIS and RF stay ahead) and the MoG already beats ANFIS and
+GA-FIS on Bike Sharing. Quality is non-monotone in k: Bike peaks at k = 8 (`0.655`) and falls to
+`0.641` at k = 12; PhiUSIIL Wasserstein `0.985` at k = 30 → `0.983` at k = 47 (within noise).
+The scorer ordering is dataset-dependent: `higher_order` is best at k = 3–4 on PhiUSIIL (level
+with `composite` at k = 5) and worst, or tied-worst at k = 2, for k = 1–5 on Bike Sharing
+(`0.012`–`0.314`).
+
+**The "all features" row is not all features.** At `top_n = M` the 0.85 redundancy filter keeps
+11 of 12 (Bike) and 43–44 of 47 (PhiUSIIL) — the only grid points where it bites (40 runs each).
+
+**Cost.** Per fit, MoG is 0.07–1.85 s against 24.0 s for one ANFIS fit on PhiUSIIL. The whole
+sweep:
+
+| Dataset | sweep fits | total fit time | wall-clock | ten seeds of ANFIS | ten seeds of GA-FIS |
+|---|---|---|---|---|---|
+| Concrete | 280 | 37.9 s | 38.5 s | 36.7 s | 200.8 s |
+| Bike Sharing | 360 | 83.2 s | 84.7 s | 24.0 s | 48.4 s |
+| PhiUSIIL | 480 | 231.9 s | 235.7 s | 239.6 s | 204.5 s |
+
+One seed's 12-point sweep under one scorer is ~5 s on PhiUSIIL (Wasserstein `5.03` s,
+higher_order `7.38` s) — about a fifth of a single ANFIS fit. Scoring all features once instead
+of once per size would save 13–16 % of that for the first three scorers and 29 % for
+`higher_order` (measured, not modelled). That is the basis for tribble-fis #242. The generator's
+own wall-clock was 1,242 s, 71 % of it the baselines.
+
+**Wired into** `run_all_tables.sh` (`FIS_TABLES`, and the `--fast` reduction list). **Not yet
+in** any chapter; nothing here is quoted in the proposal.
+
+---
+
 ## 2026-11-20 — `tribble-fis` pin `d97d6b8` → `14b4942` → `31e8ae9` (tribble-fis #239, #241, #232)
 
 **Status: no archived table moved. Nothing below is itself a citable run** — a

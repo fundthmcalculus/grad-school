@@ -1,0 +1,42 @@
+Table 4.1c (top_n x scorer sweep of the MoG vs ANFIS / GA-FIS / RF), one targeted generator run.
+NOT a whole-document sweep: only reproduce/tables/table_4_1c_topn_sweep.py was run.
+Produced 2026-11-21. Wall-clock for the generator: 1242 s (see run.log).
+
+preflight --suite fis: 6 passed, 0 skipped (preflight.txt) -- captured immediately AFTER the
+run, at the same submodule pins, not during it.
+
+tribble-fis: 31e8ae99be22a5332bf88945ec7e3f1de16434ac
+tribble-cluster: 20264b3b5bf1851285794eb33acfb4506a87ae2e
+tribble-opt: c21d543f1b4458ff59b181365af38c1e17dd716b
+grad-school: HEAD was 1783198 when the run started. The generator file was UNTRACKED at that
+             point (no edits were made to it after launch) and was committed unchanged afterwards
+             at be12e3e6d9aadb9055833aa9995f19174ecb285f.
+imported:
+  tribble-fis          dir file:///home/user/grad-school/tribble-fis  (editable)
+  optimizers           c21d543f1b4458ff59b181365af38c1e17dd716b
+  tribble-clustering   not installed in the tribble-fis environment (the 'clustering' extra is off)
+kernel: NumPy (compiled kernel not built in this environment)
+
+seeds:       0,1,2,3,4,5,6,7,8,9   (all four tables; no narrowed seed set)
+scorers:     wasserstein,bhattacharyya,composite,higher_order
+datasets:    Concrete (1030 x 8), Bike Sharing (17379 x 12), PhiUSIIL leak-free (20000 x 47)
+             RT-IOT2022 EXCLUDED: absent from data/, and a sweep over it costs hours.
+
+machine:
+  os               Linux
+  kernel           Linux 6.18.44-fc-v726
+  cpu              Intel(R) Xeon(R) Processor @ 2.10GHz
+  cores            4 logical
+  ram              15.7 GiB
+
+TIMINGS ARE FROM THIS HOST, NOT THE RUN-OF-RECORD HOST. The harness's run of record is a
+32-thread i9-14900HX; this is a 4-core Xeon. Ratios (sweep vs baseline, scorer vs
+scorer) transfer; absolute seconds do not -- do not quote them next to figures from the
+full sweeps. ANFIS is nondeterministic run to run, so its cells are a sample.
+
+'Best sweep cell' in table_4_1c_comparison is chosen on the same test splits it is scored
+on, across (scorers x k): optimistic, a ceiling, not a result.
+
+run.log: the per-feature ranking printouts that calculate_gaussian_correlation writes to stdout
+(~720 KB, one block per fit) were removed to keep the archive small; every other line is kept.
+table_4_1c_topn_runs.csv is the complete per-fit record (1,120 sweep fits; 0 failed).
