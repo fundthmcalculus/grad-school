@@ -39,11 +39,21 @@ These files are >10 MB and sourced from public repositories that may not be acce
 
 ### RT_IOT2022.csv
 - **Size:** 53 MB
-- **Shape:** 123,117 rows × 81 features + 1 target
-- **Source:** Kaggle — [RT-IOT2022: Real-world IoT intrusion detection dataset](https://www.kaggle.com/datasets/christianamartins/rt-iot2022)
-- **Description:** IoT network traffic with 12 attack types (DoS, DDoS, reconnaissance, MITM, etc.) plus normal traffic. Used for anomaly detection and multi-class classification benchmarks.
-- **Target:** `Attack_type` (12 classes: `MQTT_Pub`, `MQTT_Sub`, `HTTP`, `COAP`, `DNS`, `Reconnaissance`, `Mirai`, `BASHLITE`, `Torii`, `DDoS_HTTP`, `DDoS_TCP`, `DOS_SYN_Hping`)
-- **Preprocessing notes:** The CSV contains an unnamed index column (`Unnamed: 0`) which encodes the attack class and must be dropped before use.
+- **Shape:** 123,117 rows × 85 columns: an unnamed index, `proto` and `service` (strings), 81 numeric features, and the target
+- **Source:** UCI ML Repository (RT-IoT2022); a Kaggle copy also exists ([christianamartins/rt-iot2022](https://www.kaggle.com/datasets/christianamartins/rt-iot2022)). The UCI copy matches the loader's documented fingerprint; the two copies have not been verified identical.
+- **Description:** IoT network traffic: attack patterns (DoS, ARP poisoning, Nmap scans, SSH brute force, Slowloris) plus normal device traffic.
+- **Target:** `Attack_type`, 12 classes (row counts):
+
+| Class | Rows | Class | Rows |
+|---|---|---|---|
+| DOS_SYN_Hping | 94,659 | NMAP_TCP_scan | 1,002 |
+| Thing_Speak | 8,108 | DDOS_Slowloris | 534 |
+| ARP_poisioning (sic) | 7,750 | Wipro_bulb | 253 |
+| MQTT_Publish | 4,146 | Metasploit_Brute_Force_SSH | 37 |
+| NMAP_UDP_SCAN | 2,590 | NMAP_FIN_SCAN | 28 |
+| NMAP_XMAS_TREE_SCAN | 2,010 | NMAP_OS_DETECTION | 2,000 |
+
+- **Preprocessing notes:** The unnamed index column restarts at 0 within each class, so it leaks the label (any value above 8,107 is `DOS_SYN_Hping`). `load_rt_iot2022` in `repro_data/loaders.py` drops it, and `proto`/`service`. Always load through it.
 
 ### WEC_Perth_49.csv
 - **Size:** 33 MB
@@ -75,13 +85,13 @@ These files are >10 MB and sourced from public repositories that may not be acce
 
 These large files are NOT tracked in git but are required to reproduce some experiments. **Note:** Kaggle and UCI ML Repository mirrors may be blocked on some networks (including Claude Cloud runners). For reproducibility, store them locally and pass `GRAD_SCHOOL_DATA=/path/to/data` to the Python environment.
 
-### Via Kaggle API (requires API key)
+### RT-IOT2022
+Download from the UCI ML Repository (preferred; matches the loader fingerprint), or via the Kaggle API (requires API key; copy not verified identical):
 ```bash
-# RT-IOT2022
 kaggle datasets download -d christianamartins/rt-iot2022 -p data/
 unzip data/rt-iot2022.zip -d data/
-mv data/RT_IOT2022.csv data/
 ```
+Either way, check the fingerprint: 123,117 rows, 81 numeric features, 12 classes with the counts above.
 
 ### Via UCI ML / Figshare (if accessible)
 - WEC datasets: https://figshare.com/ (search for "Wave Energy Converter")
