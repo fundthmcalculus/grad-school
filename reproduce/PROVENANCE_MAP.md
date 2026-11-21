@@ -1483,6 +1483,25 @@ which is also why Figure 6.3 is a placeholder.
 
 Table 7.1 is a goals-and-status matrix, not a measurement. No generator applies.
 
+**G9 — IVATMeans against FCM, k-means and E-means** (checklist C11; `reproduce/tables/table_g9_ivatmeans_comparison.py`).
+Outputs: `reproduce/outputs/table_g9_{performance,quality,determinism}.{md,csv}`, `g9_comparison_report.md`,
+`g9_raw.json`, `figures/fig_g9_{runtime,quality,partitions}.{png,eps}`. Status: **new (first run, 2026-11-17), not yet
+archived under `outputs/<label>/`.** Ten seeds, CPU only, `tribble-cluster` 0.3.0 and faiss 1.16.0. Pre-registered
+verdicts, as run (two full runs; timing-based verdicts vary between them):
+
+- **P1 performance — FAIL.** Worst feasible IVATMeans/FCM ratio at N = 16,000: 12.42× (run 1), 10.95× (run 2), against
+  a 10× threshold. The 32,000 and 58,000 IVATMeans rungs are infeasible (predicted peak 17 bytes × N² above 80% of RAM;
+  32,000 was OOM-killed in a dry run at 13.9 GB resident).
+- **P2 predicted loss — not refuted (default medoid refine).** ARI two moons 0.155, circles 0.067, against the predicted
+  k-means row of 0.27 / 0.00. The relational refine reads 0.998 / 1.000, which is a separate finding about §5.2 and not a P2 verdict.
+- **P3 blob set — PASS.** easy_blobs 0.999 against 1.000 for the best baseline.
+- **P4 determinism — PASS.** One distinct IVATMeans labelling across ten seeds on every construction.
+- **P5 manipulation check — PASS.** Baselines vary across seeds on 24 of 24 dataset×arm cells. Those counts include
+  labelings that differ only by a permutation of cluster ids, so they overstate partition-level variation.
+
+Not run: GPU and `on_device` rows (no CUDA host). Clustering timings are wall clock on a 4-core host and are not
+citable as device numbers.
+
 ---
 
 ## Appendix A.4 — feature scoring
