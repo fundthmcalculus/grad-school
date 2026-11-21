@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invertible meaning layer: local demo</title>
+<style>
+  :root { --bg: #f6f7f9; --panel: #ffffff; --fg: #1b2330; --muted: #5d6a7d; --line: #d8dde6; --accent: #1f6fd1; --warm: #d1561f; --good: #1d8a52; --bad: #c23a3a; --soft: #e9eef6; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #11161e; --panel: #181f2a; --fg: #e4e9f1; --muted: #93a0b4; --line: #2b3646; --accent: #5aa2ff; --warm: #ff935c; --good: #4fcf8b; --bad: #ff7a7a; --soft: #222c3a; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.45 system-ui, "Segoe UI", sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 18px 16px 40px; display: grid; gap: 14px; }
+  h1 { font-size: 22px; margin: 0; font-weight: 600; }
+  h2 { font-size: 15px; margin: 0 0 8px; font-weight: 600; }
+  p.sub { margin: 4px 0 0; color: var(--muted); max-width: 70ch; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; min-width: 0; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+  label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
+  textarea, select, input[type=number], input[type=text] { font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+  textarea { width: 100%; min-height: 56px; resize: vertical; font-family: ui-monospace, Consolas, monospace; }
+  button { font: inherit; color: #fff; background: var(--accent); border: 0; border-radius: 6px; padding: 8px 14px; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: wait; }
+  #out { font-family: ui-monospace, Consolas, monospace; font-size: 15px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+  #out span { cursor: pointer; border-radius: 3px; padding: 1px 0; }
+  #out span:hover { outline: 1px solid var(--accent); }
+  #out span.sel { background: var(--accent); color: #fff; }
+  #out span.prompt { color: var(--muted); }
+  .grid2 { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  @media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: 13px; }
+  th, td { text-align: left; padding: 3px 6px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; }
+  .bar { height: 8px; border-radius: 4px; background: var(--accent); display: inline-block; vertical-align: middle; }
+  .bar.neg { background: var(--bad); }
+  .bar.pos { background: var(--good); }
+  .ch { font-family: ui-monospace, Consolas, monospace; background: var(--soft); border-radius: 3px; padding: 0 4px; }
+  .muted { color: var(--muted); }
+  .ok { color: var(--good); font-weight: 600; } .no { color: var(--bad); font-weight: 600; }
+  svg text { fill: var(--fg); font-family: ui-monospace, Consolas, monospace; }
+  #err { color: var(--bad); }
+  .scroll { overflow-x: auto; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Invertible meaning layer: local demo</h1>
+    <p class="sub">Greedy text (always the most likely character) from the 10K-parameter character models. Click any character to see which fuzzy rules fired, how they steered it, and how the output vector is carried back through the invertible layer to a character. Runs on this machine only.</p>
+  </header>
+
+  <section class="card">
+    <div class="row">
+      <label>Model <select id="model"></select></label>
+      <label style="flex:1; min-width:260px">Prompt <textarea id="prompt">Once upon a time, there was a little girl named</textarea></label>
+      <label>Characters <input id="n" type="number" min="1" max="400" value="140" style="width:80px"></label>
+      <button id="go">Generate</button>
+    </div>
+    <p class="muted" id="minfo" style="margin:8px 0 0"></p>
+    <p id="err"></p>
+  </section>
+
+  <section class="card">
+    <h2>Text</h2>
+    <div id="out" class="muted">Press Generate. Grey is the prompt; the generated characters get darker where the model was more sure. Click a character to explain it.</div>
+  </section>
+
+  <div class="grid2">
+    <section class="card" id="pred">
+      <h2>Prediction at the selected character</h2>
+      <div class="muted" id="predhead">Nothing selected.</div>
+      <div id="cands"></div>
+    </section>
+    <section class="card">
+      <h2>Round trip: text in, the same text back</h2>
+      <p class="muted" style="margin:0 0 8px">Each character goes through the embedding layer F, the blocks do nothing, then the same F runs backwards and the nearest codeword is read off. Characters outside the model's 98 symbols come back as one placeholder symbol.</p>
+      <textarea id="rt">The quick brown fox jumps over the lazy dog. "Hello," said Tom's mom: 0123456789!</textarea>
+      <div class="row" style="margin-top:8px"><button id="rtgo">Embed and de-embed</button></div>
+      <div id="rtout" style="margin-top:10px"></div>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Rules that fired</h2>
+    <p class="muted" style="margin:0 0 8px">Per block, the feed-forward rules that add the most to the stream at this position. <b>Strength</b> is firing times slope. <b>Effect</b> is how much the predicted character's log-probability drops if that one rule is removed (green: the rule pushed toward it). <b>Raises / lowers</b> list the characters whose probability that rule moves most, in percentage points.</p>
+    <div id="blocks" class="scroll"><span class="muted">Select a character.</span></div>
+  </section>
+
+  <section class="card">
+    <h2>Embedding space and de-embedding</h2>
+    <div class="muted" id="spnote" style="margin-bottom:6px">Select a character.</div>
+    <div class="scroll"><svg id="space" viewBox="0 0 760 460" width="100%" role="img" aria-label="Embedding space"></svg></div>
+    <div id="near" style="margin-top:8px"></div>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const post = async (url, body) => { const r = await fetch(url, { method: 'POST', body: JSON.stringify(body) }); const j = await r.json(); if (j.error) throw new Error(j.error); return j; };
+let full = '', promptLen = 0, probs = [], sel = -1;
+const f2 = (x) => (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(2);
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const show = (c) => (c === '↵' || c === '␣' ? c : c);
+
+async function init() {
+  const ms = await (await fetch('/api/models')).json();
+  $('model').innerHTML = ms.map((m) => `<option value="${m.id}">${m.name}</option>`).join('');
+  window.MODELS = Object.fromEntries(ms.map((m) => [m.id, m]));
+  const upd = () => { const m = MODELS[$('model').value]; $('minfo').textContent = `${m.params.toLocaleString()} parameters, validation ${m.val ? m.val.toFixed(3) : '?'} bits per character, context ${m.ctx} characters.`; };
+  $('model').onchange = upd; upd();
+}
+
+function renderText() {
+  const o = $('out'); o.textContent = ''; o.classList.remove('muted');
+  [...full].forEach((ch, i) => {
+    const s = document.createElement('span'); s.textContent = ch;
+    if (i < promptLen) s.className = 'prompt'; else { const p = probs[i - promptLen]; s.style.opacity = (0.45 + 0.55 * p).toFixed(2); s.title = `probability ${(100 * p).toFixed(1)}%`; }
+    if (i === sel) s.classList.add('sel');
+    s.onclick = () => explain(i);
+    o.appendChild(s);
+  });
+}
+
+$('go').onclick = async () => {
+  $('go').disabled = true; $('err').textContent = '';
+  try {
+    const prompt = $('prompt').value;
+    const r = await post('/api/generate', { model: $('model').value, prompt, n: +$('n').value });
+    full = prompt + r.text; promptLen = prompt.length; probs = r.probs; sel = -1; renderText();
+  } catch (e) { $('err').textContent = e.message; }
+  $('go').disabled = false;
+};
+
+async function explain(i) {
+  if (i < 1) return;
+  sel = i; renderText(); $('err').textContent = '';
+  try {
+    const r = await post('/api/explain', { model: $('model').value, text: full, pos: i - 1 });
+    drawPred(r, i); drawBlocks(r); drawSpace(r.space);
+  } catch (e) { $('err').textContent = e.message; }
+}
+
+function drawPred(r, i) {
+  const actual = [...full][i];
+  $('predhead').innerHTML = `After <span class="ch">${esc(r.context.slice(-24))}</span> the model picks <span class="ch">${esc(r.chosen)}</span>` + (actual !== r.chosen && actual !== undefined ? ` (the text has <span class="ch">${esc(actual)}</span>)` : '');
+  const mx = r.candidates[0].p;
+  $('cands').innerHTML = '<table>' + r.candidates.map((c) => `<tr><td><span class="ch">${esc(c.ch)}</span></td><td><span class="bar" style="width:${(160 * c.p / mx).toFixed(0)}px"></span></td><td>${(100 * c.p).toFixed(1)}%</td></tr>`).join('') + '</table>';
+}
+
+function chips(list, sign) { return list.map((b) => `<span class="ch">${esc(b.ch)}</span> ${sign}${Math.abs(b.d).toFixed(1)}`).join(' &nbsp;'); }
+function drawBlocks(r) {
+  let h = '';
+  for (const b of r.blocks) {
+    const mx = Math.max(...b.rows.map((x) => Math.abs(x.effect)), 1e-6);
+    h += `<div style="margin:6px 0 4px"><b>Block ${b.block + 1}</b> <span class="muted">${b.rules} rules, ${b.active} firing above 0.05, stream norm ${b.resid.toFixed(2)}</span></div>`;
+    h += '<table><tr><th>Rule</th><th>Strength</th><th>Adds (norm)</th><th>Effect on the chosen character</th><th>Raises</th><th>Lowers</th></tr>';
+    for (const x of b.rows) {
+      const w = (80 * Math.abs(x.effect) / mx).toFixed(0);
+      h += `<tr><td>#${x.rule}</td><td>${f2(x.strength)}</td><td>${x.size.toFixed(2)}</td><td><span class="bar ${x.effect >= 0 ? 'pos' : 'neg'}" style="width:${w}px"></span> ${f2(x.effect)}</td><td>${chips(x.boosts, '+')}</td><td>${chips(x.lowers, '−')}</td></tr>`;
+    }
+    h += '</table>';
+  }
+  $('blocks').innerHTML = h;
+}
+
+function drawSpace(s) {
+  const svg = $('space'); svg.innerHTML = '';
+  $('near').innerHTML = ''; $('spnote').textContent = s.note || '';
+  if (s.kind === 'none') return;
+  const pts = [...s.C, ...s.Z, ...(s.path || [])];
+  const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const W = 760, H = 460, pad = 30, sx = (v) => pad + (W - 2 * pad) * (v - x0) / (x1 - x0 || 1), sy = (v) => H - pad - (H - 2 * pad) * (v - y0) / (y1 - y0 || 1);
+  const ns = 'http://www.w3.org/2000/svg', el = (t, a, txt) => { const e = document.createElementNS(ns, t); for (const k in a) e.setAttribute(k, a[k]); if (txt !== undefined) e.textContent = txt; svg.appendChild(e); return e; };
+  const near = new Set(s.nearest.slice(0, 3).map((n) => n.ch));
+  el('defs', {}); const d = svg.querySelector('defs'); d.innerHTML = '<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>';
+  if (s.kind !== 'ident') s.labels.forEach((ch, i) => { if (s.context.includes(i)) { const l = el('line', { x1: sx(s.C[i][0]), y1: sy(s.C[i][1]), x2: sx(s.Z[i][0]), y2: sy(s.Z[i][1]), stroke: 'var(--accent)', 'stroke-width': 1.5, 'marker-end': 'url(#ah)', style: 'color:var(--accent)' }); } });
+  s.labels.forEach((ch, i) => {
+    el('circle', { cx: sx(s.C[i][0]), cy: sy(s.C[i][1]), r: near.has(ch) ? 9 : 3, fill: near.has(ch) ? 'none' : 'var(--muted)', stroke: near.has(ch) ? 'var(--warm)' : 'none', 'stroke-width': 2, opacity: 0.8 });
+    el('text', { x: sx(s.C[i][0]) + 4, y: sy(s.C[i][1]) - 4, 'font-size': 10, opacity: 0.75 }, ch);
+    if (s.kind !== 'ident') { el('circle', { cx: sx(s.Z[i][0]), cy: sy(s.Z[i][1]), r: 3, fill: 'var(--accent)', opacity: 0.8 }); el('text', { x: sx(s.Z[i][0]) + 4, y: sy(s.Z[i][1]) - 4, 'font-size': 10, fill: 'var(--accent)', style: 'fill:var(--accent)' }, ch); }
+  });
+  const P = s.path;
+  if (P && P.length) {
+    el('polyline', { points: P.map((p) => `${sx(p[0])},${sy(p[1])}`).join(' '), fill: 'none', stroke: 'var(--warm)', 'stroke-width': 2.5 });
+    P.forEach((p, i) => { el('circle', { cx: sx(p[0]), cy: sy(p[1]), r: 6, fill: 'var(--warm)' }); });
+    const lab = (p, t, dy) => el('text', { x: sx(p[0]) + 9, y: sy(p[1]) + dy, 'font-size': 12, style: 'fill:var(--warm);font-weight:700' }, t);
+    lab(P[0], s.kind === 'c' ? 'h (model output, meaning space)' : 'h (model output)', -8);
+    if (s.kind === 'c') { if (P.length > 2) lab(P[1], 'after one inverse step', 16); lab(P[P.length - 1], 'u = F⁻¹(h)', 16); }
+  }
+  const legend = [['var(--muted)', 'codebook C (token space)'], s.kind !== 'ident' ? ['var(--accent)', 'F(C) (meaning space); arrows: the last characters, C → F(C)'] : null, ['var(--warm)', 'model output and its way back']].filter(Boolean);
+  legend.forEach((l, i) => { el('circle', { cx: 16, cy: 14 + 16 * i, r: 5, fill: l[0] }); el('text', { x: 28, y: 18 + 16 * i, 'font-size': 11 }, l[1]); });
+  $('near').innerHTML = `<table><tr><th>Nearest codewords to ${s.kind === 'c' ? 'u' : 'h'}</th><th>squared distance</th><th>logit</th></tr>` + s.nearest.map((n, i) => `<tr><td><span class="ch">${esc(n.ch)}</span>${i === 0 ? ' <span class="ok">output</span>' : ''}</td><td>${n.d2.toFixed(3)}</td><td>${n.logit.toFixed(2)}</td></tr>`).join('') + `</table><div class="muted" style="margin-top:4px">likelihood temperature tau = ${s.tau.toFixed(3)}; logit = −distance² / 2τ². The two plot axes are the top two directions of the codebook and its image together, so distances in the plot are a projection.</div>`;
+}
+
+$('rtgo').onclick = async () => {
+  $('rtgo').disabled = true; $('err').textContent = '';
+  try {
+    const r = await post('/api/roundtrip', { model: $('model').value, text: $('rt').value });
+    if (r.ok === null) { $('rtout').innerHTML = `<span class="muted">${r.note}</span>`; }
+    else {
+      const row = (k) => `<tr><td>${k}</td><td class="${r[k].exact ? 'ok' : 'no'}">${r[k].exact ? 'exact' : 'differs'}</td><td>${r[k].max_err.toExponential(1)}</td><td>${r[k].moved.toFixed(2)}</td></tr>`;
+      $('rtout').innerHTML = `<div>Recovered text (float64): <div class="ch" style="display:block;white-space:pre-wrap;padding:6px;margin-top:4px">${esc(r.float64.text)}</div></div>` +
+        `<table style="margin-top:8px"><tr><th>precision</th><th>symbols recovered</th><th>max |error|</th><th>mean distance moved by F</th></tr>${row('float32')}${row('float64')}</table>` +
+        `<div class="muted" style="margin-top:4px">${r.symbols} characters. ${r.lossy_input ? 'Some characters are outside the vocabulary and map to a placeholder before the embedding: <span class="ch">' + esc(r.via_symbols) + '</span>' : 'Every character is in the vocabulary, so the recovered text equals the input.'}</div>`;
+    }
+  } catch (e) { $('err').textContent = e.message; }
+  $('rtgo').disabled = false;
+};
+init();
+</script>
+</body>
+</html>
