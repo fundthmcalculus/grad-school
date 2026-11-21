@@ -4,7 +4,7 @@ author: "[Author names — IFSA-EUSFLAT template, anonymised for review]"
 bibliography: references.bib
 ---
 
-<!-- DRAFT v0.2. Numbers are tagged in NUMBERS.md. [PROVISIONAL] marks a table whose source archive failed preflight: do not cite until re-run. -->
+<!-- DRAFT v0.3. Numbers are tagged in NUMBERS.md. [PROVISIONAL] marks a value whose current source is not yet re-run. -->
 
 # Abstract
 
@@ -13,10 +13,10 @@ and the usual pipeline leaves that preparation implicit. We treat feature engine
 Inputs are transformed onto a bounded domain, features are scored for class separation, and each class is then described
 by a one-dimensional Gaussian mixture per retained feature. The product over features defines one rule per class, so the
 rule base grows linearly in features and classes rather than exponentially in input sets. On a regression benchmark the
-construction matches ANFIS at first order and trains in a fraction of a second. On a phishing benchmark, the choice of
-feature scorer changes the ranking, and with it whether a readable rule base is possible at all. A leakage audit shows
-that a near-perfect single-clause result was produced by a label-derived feature. We report the transform, the scorer comparison, the timing
-and the failure, with the provenance of each number.
+construction matches ANFIS at first order and trains in a fraction of a second. On a phishing benchmark the shipped
+configuration scores 0.440, and a sweep over feature count and scorer reaches 0.985, a ceiling chosen on the test splits.
+The gap is a feature-selection effect, and the scorer determines which features make a readable rule base possible at
+all. A leakage audit shows that an earlier near-perfect single-clause result came from a label-derived feature.
 
 **Keywords:** fuzzy inference systems, Gaussian mixtures, feature engineering, interpretability, leakage
 
@@ -41,8 +41,8 @@ The contributions are:
    rule per class, so the number of rules equals the number of answers.
 2. A **per-feature, per-class Gaussian-mixture antecedent**, combined within a feature by a t-conorm and across features
    by a t-norm, with parameters growing linearly in the feature count.
-3. An empirical account of the **input transform**, of the **feature scorer**, and of a **leakage failure** that
-   changed the headline result. Readability, not only accuracy, depends on which feature ranking is used.
+3. An empirical account of the **input transform**, of the **feature scorer and feature count**, and of a **leakage
+   failure** that changed an earlier headline result. Readability, not only accuracy, depends on which features are kept.
 
 # 2. Background and related work
 
@@ -73,20 +73,22 @@ then mapped onto $[0,1]$ by min–max scaling. We compare this with z-scoring ($
 ## 3.2 Scoring features for class separation
 
 The screen ranks features by how well their class-conditional distributions separate, keeping the best few. For $N$
-samples, $M$ features and $K$ classes, the data are segmented by class and each feature is scored. We compare three
-scorers:
+samples, $M$ features and $K$ classes, the data are segmented by class and each feature is scored. Four scorers are
+compared:
 
-- **Wasserstein**: the 1-Wasserstein distance between class-conditional samples, in the data's own units.
+- **Wasserstein** (shipped default in `tribble-fis`): the 1-Wasserstein distance between class-conditional samples, in
+  the data's own units.
 - **Bhattacharyya**: the Bhattacharyya measure between class-conditional distributions.
 - **Composite**: a consensus of four measures of separation, namely Bhattacharyya divergence, Jensen–Shannon distance,
   histogram overlap and histogram correlation. The composite is $\tfrac12(\bar a + \bar g)$, the mean of the arithmetic
   and geometric means of the four terms. The geometric term approaches zero if *any* measure is zero, so a feature scores
   well only when all four agree.
+- **Higher-order**: the `higher_order` scorer added to `tribble-fis` in tribble-fis #239. Its definition is in the library
+  documentation and is not restated here; we report only its measured behaviour.
 
-The composite evaluated here is the restored `method="composite"` in `tribble-fis`. It is not verified to be identical
-to the original four-metric blend, whose exact weighting has not been re-measured on leak-free data, and it is reported
-as such (§5.2). The screen costs $\mathcal{O}(M K^2)$ pairwise class comparisons: linear in features, quadratic in
-classes.
+The composite evaluated here is the `method="composite"` in the pinned `tribble-fis` (`2bdf875`). It is not verified to be
+identical to the original four-metric blend, whose exact weighting has not been re-measured, and it is reported as such.
+The screen costs $\mathcal{O}(M K^2)$ pairwise class comparisons: linear in features, quadratic in classes.
 
 **The screen uses labels, so it is a leakage surface.** Any feature that encodes the target will score highly, and §5.3
 shows this happening.
@@ -108,7 +110,7 @@ rules. There is no grid, so there is no exponential rule base.
 
 Feature independence costs accuracy where classes are confused. A small cascade adds a binary expert per confused pair,
 gated by anomaly level and confidence margin. Flattening the cascade recovers only part of the gain, and we do not
-headline it (§5.4).
+headline it (§5.5).
 
 # 4. Why the transform is not optional
 
@@ -117,7 +119,8 @@ a skewed feature's Gaussian fits the skew rather than the structure. Axis-aligne
 map, since they split on rank, which gives a control: if a reference tree moves under the transform, the plumbing is at
 fault.
 
-**Table 1.** [PROVISIONAL] Effect of the input transform on Concrete, R² mean ± s.d. over ten seeds (NUMBERS.md, T1).
+**Table 1.** [PROVISIONAL] Effect of the input transform on Concrete, R² mean ± s.d. over ten seeds. Source is the
+backfilled `pins-synced-2026-08-27` archive, not re-run at `2bdf875` (NUMBERS.md, T1).
 
 | Model                                | raw features  | log + min–max | log + z-score | Δ min–max − raw |
 |--------------------------------------|--------------:|--------------:|--------------:|----------------:|
@@ -134,52 +137,78 @@ main effect is instability at the top of the order ladder (±0.121 against ±0.0
 
 # 5. Experiments
 
-## 5.1 Feature scorers on PhiUSIIL
+## 5.1 Feature scorers and feature count on PhiUSIIL
 
-**Table 2.** [PROVISIONAL] Test accuracy against features kept, PhiUSIIL, 20,000-row sample, ten seeds, leak-free
-(NUMBERS.md, T2). The composite is the restored method, not verified identical to the original.
+**Table 2.** Test accuracy against features kept, PhiUSIIL, ten seeds, leak-free. Verified at `tribble-fis` `2bdf875`
+(`reproduce/outputs/bump-2bdf875-2026-11-21/table_a2_feature_count.md`, appendix A.2). That table uses a 20,000-row sample.
 
-| Features kept | Wasserstein | Bhattacharyya | Composite |
-|--------------:|------------:|--------------:|----------:|
-| 1  | 0.5733 | **0.7924** | **0.7924** |
-| 2  | 0.5733 | 0.7924 | 0.7924 |
-| 3  | 0.5733 | 0.8106 | 0.7924 |
-| 4  | 0.4384 | 0.8175 | 0.7624 |
-| 5  | 0.4401 | 0.8181 | **0.9186** |
-| 7  | 0.6372 | 0.8191 | **0.9496** |
-| 10 | 0.7204 | 0.9575 | **0.9761** |
-| 15 | 0.9571 | 0.9755 | **0.9766** |
-| 20 | 0.9700 | 0.9799 | **0.9827** |
+| Features kept | Wasserstein | Bhattacharyya | Composite | Higher-order |
+|--------------:|------------:|--------------:|----------:|-------------:|
+| 1  | 0.5733 | **0.7924** | **0.7924** | 0.6364 |
+| 2  | 0.5733 | 0.7924 | 0.7924 | 0.7781 |
+| 3  | 0.5733 | 0.8106 | 0.7924 | 0.8603 |
+| 4  | 0.4384 | 0.8175 | 0.7624 | **0.9011** |
+| 5  | 0.4401 | 0.8181 | 0.9186 | **0.9261** |
+| 7  | 0.6372 | 0.8191 | 0.9496 | **0.9361** |
+| 10 | 0.7204 | 0.9575 | 0.9761 | 0.9373 |
+| 15 | 0.9571 | 0.9755 | 0.9766 | 0.9632 |
+| 20 | 0.9700 | 0.9799 | **0.9827** | 0.9767 |
 
-Three findings. First, no single feature is enough under any scorer: the best one-feature accuracy is 0.7924. Second,
-the scorers disagree at rank 1 (Table 3), and the disagreement is not a scale artifact: IsHTTPS is constant across the
-legitimate class, so the scorers that rank it first are ranking a property of collection. Third, Wasserstein is
-non-monotone (0.5733 at three features, 0.4384 at four, 0.6372 at seven). We do not offer a mechanism for this; it is
-unexplained. The composite is best from five features on, and reaches 0.96 at fifteen features under all scorers.
+The one-feature result is the same as before the bump: no single feature is enough under any scorer. The best one-feature
+accuracy is 0.7924. Wasserstein is non-monotone (0.5733 at three features, 0.4384 at four, 0.6372 at seven). We do not offer
+a mechanism for this. Higher-order is best at four and five features, and composite from seven on.
 
-**Table 3.** [PROVISIONAL] Top five features by scorer, PhiUSIIL, normalised scores (NUMBERS.md, T3).
+**Table 3.** Top five features by scorer, PhiUSIIL, normalised scores. Verified at `2bdf875` (`table_a1_feature_ranking.md`).
 
-| Rank | Wasserstein | Bhattacharyya | Composite |
-|-----:|---|---|---|
-| 1 | HasSocialNet (1.000) | IsHTTPS (1.000) | IsHTTPS (1.000) |
-| 2 | HasCopyrightInfo (0.858) | HasSocialNet (0.848) | HasSocialNet (0.975) |
-| 3 | HasDescription (0.726) | NoOfQMarkInURL (0.810) | HasTitle (0.827) |
-| 4 | DomainTitleMatchScore (0.544) | IsDomainIP (0.761) | NoOfCSS (0.800) |
-| 5 | HasSubmitButton (0.539) | NoOfEqualsInURL (0.744) | NoOfSelfRef (0.795) |
+| Rank | Wasserstein | Bhattacharyya | Composite | Higher-order |
+|-----:|---|---|---|---|
+| 1 | HasSocialNet (1.000) | IsHTTPS (1.000) | IsHTTPS (1.000) | NoOfLettersInURL (1.000) |
+| 2 | HasCopyrightInfo (0.858) | HasSocialNet (0.848) | HasSocialNet (0.975) | URLLength (0.852) |
+| 3 | HasDescription (0.726) | NoOfQMarkInURL (0.810) | HasTitle (0.827) | LineOfCode (0.564) |
+| 4 | DomainTitleMatchScore (0.544) | IsDomainIP (0.761) | NoOfCSS (0.800) | NoOfExternalRef (0.500) |
+| 5 | HasSubmitButton (0.539) | NoOfEqualsInURL (0.744) | NoOfSelfRef (0.795) | NoOfPopup (0.417) |
 
-## 5.2 Limits of the scorer comparison
+The scorers disagree at rank 1, and the disagreement is not a scale artifact. IsHTTPS is constant across the legitimate
+class, so the scorers that rank it first are ranking a property of collection rather than of phishing.
 
-The scorer comparison is on one dataset. PhiUSIIL is known to be saturated for most methods, and its signal is unusually
-concentrated, which makes it a clean test of whether a scorer finds the dominant feature. It does not show how often a
-scorer choice matters where signal is spread across features. The broader suite that would test this is not yet run.
+## 5.2 Shipped configuration against the sweep, and against the baselines
 
-An earlier version of this comparison reported Bhattacharyya accuracies that differed by up to 0.043 between two hosts
-running identical code. Those figures came from a leaked archive and are withdrawn. The leak-free figures in Table 2 come
-from the host of record only, so cross-host agreement has not been re-measured. Do not quote the column to four decimals
-across machines.
+The shipped MoG configuration uses the Wasserstein scorer and the top five features. Table 4 reports it beside the best
+cell of a sweep over scorer and feature count (`top_n` from 1 to 47), and beside ANFIS, GA-FIS and a Random Forest.
 
-The shipped scorer default in `tribble-fis` was chosen on a one-feature result that the leak produced. That choice is open
-to re-examination; this paper does not defend it.
+**Table 4.** Scores, mean ± s.d. over ten seeds. Verified at `2bdf875` (`table_4_1.md`, `table_4_1c_topn_sweep.md`), except
+where marked. *Best sweep cell* is chosen on the same test splits it is scored on, so it is a **ceiling, not a result**.
+
+| Dataset (task) | MoG shipped | MoG best sweep cell\* | ANFIS | GA-FIS | RF |
+|---|---|---|---|---|---|
+| Concrete (R²)        | 0.799 ± 0.027 | 0.799 ± 0.027 (k = 8) | 0.799 ± 0.112 | 0.896 ± 0.038 | 0.909 ± 0.020 |
+| Bike Sharing (R²)    | 0.620 ± 0.014 | 0.655 ± 0.012 (Wasserstein, k = 8) | 0.538 ± 0.092 | 0.545 ± 0.047 | 0.944 ± 0.004 |
+| PhiUSIIL (accuracy)  | 0.440 ± 0.181 | 0.985 ± 0.003 (Wasserstein, k = 30) | 0.998 ± 0.001 | 0.998 ± 0.001 | 1.000 ± 0.000 |
+| RT-IOT2022 (12-class) | 0.927 ± 0.002 [PROVISIONAL] | not swept | 0.983 ± 0.003 [PROVISIONAL] | 0.988 ± 0.002 [PROVISIONAL] | 0.998 ± 0.000 [PROVISIONAL] |
+
+\* The RT-IOT2022 row is from the older `phiusiil-leakfree-2026-08-30` archive, which failed preflight. The dataset is
+absent from the `2bdf875` run, so this row has not been re-run at the current pin.
+
+**Table 5.** PhiUSIIL accuracy by feature count and scorer, from the sweep archive `topn-sweep-2026-11-21`. Full-data cells,
+not the 20,000-row sample of Table 2. At k = 20 the values agree with Table 2 to within 0.002.
+
+| k | Wasserstein | Bhattacharyya | Composite | Higher-order |
+|--:|---|---|---|---|
+| 1  | 0.573 ± 0.003 | 0.792 ± 0.004 | 0.792 ± 0.004 | 0.636 ± 0.062 |
+| 3  | 0.573 ± 0.003 | 0.811 ± 0.004 | 0.792 ± 0.004 | 0.860 ± 0.063 |
+| 5  | **0.440 ± 0.181** | 0.818 ± 0.022 | 0.919 ± 0.020 | 0.926 ± 0.019 |
+| 10 | 0.720 ± 0.063 | 0.958 ± 0.010 | 0.976 ± 0.004 | 0.937 ± 0.021 |
+| 20 | 0.970 ± 0.004 | 0.980 ± 0.003 | 0.983 ± 0.004 | 0.977 ± 0.003 |
+| 30 | **0.985 ± 0.003** | 0.982 ± 0.002 | 0.982 ± 0.003 | 0.983 ± 0.003 |
+
+The shipped cell (Wasserstein, k = 5) has a seed spread of ±0.181, which is large against its mean. The MoG does not fail
+on PhiUSIIL as a model. It fails at one scorer and one feature count, and the sweep's ceiling is 1.3 points below ANFIS. Because the
+ceiling is chosen on the test splits, a fair comparison needs a nested selection, which we have not run.
+
+On Concrete the sweep does not improve on the shipped configuration, and GA-FIS is better. On Bike Sharing the shipped
+MoG (0.620) beats both ANFIS (0.538) and GA-FIS (0.545). An earlier archive gave ANFIS 0.577 on the same dataset. The two
+ANFIS figures differ by more than the reported spread, and ANFIS is nondeterministic run to run, so we quote the current
+value and flag the difference.
 
 ## 5.3 A leakage failure in the feature screen
 
@@ -193,22 +222,21 @@ The lesson for feature engineering is general. A screen that uses labels must be
 label in disguise before accuracy is read from it, and a near-perfect separation on a public dataset is a reason to
 audit, not a result. Accuracy-only evaluation did not surface this failure. Readability was the thing it damaged.
 
-## 5.4 Accuracy and cost against fuzzy baselines
+## 5.4 Timing
 
-**Table 4.** [PROVISIONAL] Training time (s) and accuracy or R², mean ± s.d. over ten seeds (NUMBERS.md, T4–T5). The
-source archive failed its preflight check.
+**Table 6.** [PROVISIONAL] Training time in seconds, mean ± s.d. over ten seeds, from the `phiusiil-leakfree-2026-08-30`
+archive. That archive failed preflight, so ANFIS and GA-FIS timings have not been re-run at `2bdf875`. The current
+`2bdf875` run is on a 4-core VM and reports MoG times only (Concrete 0.24 s, Bike Sharing 0.44 s, PhiUSIIL 0.18 s).
 
-| Dataset (task)        | MoG train   | ANFIS train   | GA-FIS train | MoG score     | ANFIS score   | GA-FIS score  | RF score      |
-|-----------------------|------------:|--------------:|-------------:|--------------:|--------------:|--------------:|--------------:|
-| Concrete (regression) | 0.53 ± 0.05 | 7.28 ± 1.12   | 41.11 ± 3.81 | 0.799 ± 0.027 | 0.799 ± 0.112 | 0.896 ± 0.038 | 0.909 ± 0.020 |
-| Bike Sharing (regr.)  | 0.59 ± 0.07 | 4.80 ± 0.68   | 8.30 ± 1.72  | 0.620 ± 0.014 | 0.577 ± 0.075 | 0.545 ± 0.047 | 0.944 ± 0.004 |
-| PhiUSIIL (classif.)   | 0.13 ± 0.02 | 22.53 ± 2.30  | 25.29 ± 1.55 | 0.440 ± 0.181 | 0.999 ± 0.001 | 0.998 ± 0.001 | 1.000 ± 0.000 |
-| RT-IOT2022 (12-class) | 3.64 ± 0.25 | 264.53 ± 25.30 | 51.58 ± 1.25 | 0.927 ± 0.002 | 0.983 ± 0.003 | 0.988 ± 0.002 | 0.998 ± 0.000 |
+| Dataset (task)        | MoG train   | ANFIS train   | GA-FIS train | Speedup vs slowest fuzzy |
+|-----------------------|------------:|--------------:|-------------:|-------------------------:|
+| Concrete (regression) | 0.53 ± 0.05 | 7.28 ± 1.12   | 41.11 ± 3.81 | 78× |
+| Bike Sharing (regr.)  | 0.59 ± 0.07 | 4.80 ± 0.68   | 8.30 ± 1.72  | 14× |
+| PhiUSIIL (classif.)   | 0.13 ± 0.02 | 22.53 ± 2.30  | 25.29 ± 1.55 | 194× |
+| RT-IOT2022 (12-class) | 3.64 ± 0.25 | 264.53 ± 25.30 | 51.58 ± 1.25 | 73× |
 
-On the two regression sets the construction trains one to two orders of magnitude faster than either fuzzy baseline. On
-Concrete it matches ANFIS at first order and GA-FIS is better; on Bike Sharing it is best of the three fuzzy methods. On
-the two classification sets it trails the baselines. The PhiUSIIL row is the leak-free result of §5.3, with a feature
-set that the scorer comparison of Table 2 shows to be unreadable at one clause.
+The construction is one to two orders of magnitude faster than the slowest fuzzy baseline on these four datasets. The
+speedup range is provisional until the timings are re-run on one host.
 
 ## 5.5 The correction pass
 
@@ -218,18 +246,25 @@ later figure and claim no gain. This row is stale and has not been re-derived at
 
 # 6. Limitations
 
-- **Scorer generality.** Table 2 is one dataset; the broader suite that tests scorer choice where signal is spread is not
-  yet run.
+- **Sweep ceiling.** The best sweep cell is chosen on the test splits. A nested selection is needed before any sweep
+  result is compared against a baseline.
+- **Scorer generality.** The scorer and feature-count results are on one dataset, which is unusually concentrated. The
+  broader suite that tests scorer choice where signal is spread is not yet run.
 - **Independence.** Where feature interactions carry the class, the flat model leaves accuracy on the table. The
   hierarchical models of the dissertation's Chapter 6 address this; they are not evaluated here.
 - **Baselines.** Gaussian naive Bayes is the nearest relative and has not been run head-to-head on identical splits.
-- **Provenance.** Tables 1–4 are provisional until a clean re-run (NUMBERS.md, open items).
+- **Pin and run of record.** The current pin is `2bdf875`. No whole-document sweep has been run at that pin, and the run of
+  record is still `full-2026-08-22` at `141596e`. RT-IOT2022 is absent from the current run.
+- **Provenance.** Table 1 (transform), Table 4's RT-IOT2022 row, Table 6 (timing) and the correction-pass figure are
+  provisional until re-run (NUMBERS.md, open items).
 
 # 7. Conclusion
 
-Treating feature engineering as part of fuzzy model construction puts the transform, the scorer and the rule base in one
-audit trail. The construction is fast and yields one rule per class. Its readability depends on the feature ranking, the
-ranking depends on the scorer, and the scorer must be checked for label leakage before any accuracy is believed.
+Treating feature engineering as part of fuzzy model construction puts the transform, the scorer, the feature count and
+the rule base in one audit trail. The construction is fast and yields one rule per class. Its readability depends on
+which features are kept, the scorer and feature count determine that choice, and any sweep over them must be validated
+on held-out data before its ceiling is believed. The scorer must also be checked for label leakage before any accuracy is
+believed.
 
 # Acknowledgements
 

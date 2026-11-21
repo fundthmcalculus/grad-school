@@ -1,41 +1,35 @@
-# Numbers in the draft: provenance and status
+# Numbers in the draft: provenance and status (v0.3)
 
-Status vocabulary follows `reproduce/PROVENANCE_MAP.md`. **Do not cite** a row until its status is *reproduced*.
+Status vocabulary follows `reproduce/PROVENANCE_MAP.md`. **Do not cite** a row marked provisional.
 
 | Row | Paper location | Values | Source | Status and blocker |
 |---|---|---|---|---|
-| T1 | §4 Table 1 | Concrete R² by transform | `reproduce/outputs/pins-synced-2026-08-27/table_hyperparam_normalization.md` | **Provisional.** Backfilled (2026-08-28), not run in that pass. Re-run at the current pin and diff every column. Earlier raw and min–max columns were byte-identical to `full-14900hx-r2`, which predates the B14 fix. |
-| T2 | §5.1 Table 2 — scorer comparison | Accuracy, 1–20 features, three scorers | `reproduce/outputs/phiusiil-leakfree-2026-08-30/table_a2_feature_count.md` (appendix A.2) | **Provisional.** Same archive as T4, which `PREFLIGHT FAILED`. The failed checks are `INSTALL-FRESH` (stale `tribbleclustering/fcm.py`) and `PIN-MATCH`. The scorer path is in `tribble-fis`, not FCM, but nothing here verifies that. Re-run under a passing preflight. |
-| T3 | §5.1 Table 3 — top five by scorer | Feature names and normalised scores | `reproduce/outputs/phiusiil-leakfree-2026-08-30/table_a1_feature_ranking.md` (appendix A.1) | **Provisional.** Same status as T2. The composite column is the restored method, not verified identical to the original four-metric blend. |
-| T4 | §5.4 Table 4 — time and score, MoG vs ANFIS, GA-FIS, RF | Four datasets | `reproduce/outputs/phiusiil-leakfree-2026-08-30/table_4_1.md` and `table_4_1b_baseline_timing.md` | **Provisional, not citable.** `PREFLIGHT FAILED`, and the archive's own banner says every number in it is suspect. Archive pins `1dcf331` and `4d81121` differ from the submodules (`71dbcc3`, `7ba4fc0`). |
-| T5 | §5.4 prose: "matches ANFIS", "best of the three fuzzy methods on Bike Sharing", "14×–194×" | Derived from T4 | — | **Provisional.** Restate only after a clean T4 run. |
-| T6 | §5.5 Glass correction pass +0.008 ± 0.011 | `table_4_9_correction_pass` | `reproduce/outputs/*/table_4_8_mf_dedup*` | **Stale.** Gain fell from +0.031 ± 0.027 under tribble-fis #218. Not re-derived at ten seeds on the current pin. |
-| T7 | §5.3 leak: one-feature 0.997 (retracted), 0.7924 leak-free | Appendix A.4, PROVENANCE_MAP note 31 | `phiusiil-leakfree-2026-08-30` | 0.997 is cited only as the retracted value. 0.7924 is T2. |
+| T1 | §4 Table 1 | Concrete R² by transform | `reproduce/outputs/pins-synced-2026-08-27/table_hyperparam_normalization.md` | **Provisional.** Backfilled, not run in that pass. Not in the `bump-2bdf875` archive. Re-run at `2bdf875` and diff every column. |
+| T2 | §5.1 Table 2 — accuracy by scorer and k | Four scorers, k = 1–20 | `reproduce/outputs/bump-2bdf875-2026-11-21/table_a2_feature_count.md` | **Verified at `2bdf875`.** Passing preflight (6/6) in `bump-2bdf875-2026-11-21/preflight.txt`. The three original scorers are identical to the `phiusiil-leakfree` values. Uses a 20,000-row sample. |
+| T3 | §5.1 Table 3 — top five by scorer | Feature names and scores | `reproduce/outputs/bump-2bdf875-2026-11-21/table_a1_feature_ranking.md` | **Verified at `2bdf875`.** Same archive and preflight as T2. |
+| T4 | §5.2 Table 4 — shipped vs sweep vs baselines | Concrete, Bike, PhiUSIIL | `reproduce/outputs/bump-2bdf875-2026-11-21/table_4_1.md` and `reproduce/outputs/topn-sweep-2026-11-21/table_4_1c_topn_sweep.md` | **Verified at `2bdf875`.** Passing preflight in both archives. Sweep best cells are a **ceiling**: chosen on the test splits. |
+| T4a | §5.2 Table 4 — RT-IOT2022 row | MoG 0.927; ANFIS 0.983; GA-FIS 0.988; RF 0.998 | `reproduce/outputs/phiusiil-leakfree-2026-08-30/table_4_1.md` | **Provisional.** That archive failed preflight. The dataset is absent from the `2bdf875` run (`N/A`). |
+| T4b | §5.2 Bike ANFIS 0.538 ± 0.092 | `bump-2bdf875` table_4_1 | — | **Verified, but run-to-run.** ANFIS is nondeterministic. The earlier 0.577 ± 0.075 is superseded and the paper says so. |
+| T5 | §5.2 Table 5 — PhiUSIIL accuracy by k and scorer | Full-data sweep, k = 1–30 | `reproduce/outputs/topn-sweep-2026-11-21/table_4_1c_topn_sweep.md` | **Verified at `2bdf875`.** The sweep's sample size is not stated in the archive, so Table 5 is not directly comparable to Table 2's 20,000-row sample beyond k = 20. |
+| T6 | §5.4 Table 6 — training time | Four datasets; MoG, ANFIS, GA-FIS | `reproduce/outputs/phiusiil-leakfree-2026-08-30/table_4_1b_baseline_timing.md` | **Provisional.** Same failed archive. The current `2bdf875` run reports MoG times only, on a 4-core VM (Concrete 0.24 s, Bike 0.44 s, PhiUSIIL 0.18 s). Re-run ANFIS and GA-FIS timings on one host. |
+| T7 | §5.5 Glass correction pass +0.008 ± 0.011 | `table_4_9_correction_pass` | `reproduce/outputs/*/table_4_8_mf_dedup*` | **Stale.** Earlier gain was +0.031 ± 0.027 under tribble-fis #218. Not re-derived at ten seeds on the current pin. |
+| T8 | §5.3 leak: 0.997 retracted; 0.7924 leak-free | Appendix A.4; PROVENANCE_MAP note 31 | `bump-2bdf875` table_a2 (one-feature row) | 0.997 is cited only as the retracted value. 0.7924 is T2. |
 
-## Resolved in v0.2
+## Changes from v0.2
 
-- Scorer description corrected. v0.1 said the screen used a Wasserstein distance. The leak-free evidence shows Wasserstein is the weakest scorer at small budgets, and the composite is the best from five features on.
-- Shipped-default claim removed. The appendix says the shipped scorer default was chosen on a leaked result, and the paper does not defend it. The exact current default is not verified here.
-- Composite identity flagged. The restored `method="composite"` is not verified to match the original four-metric blend.
-- Cross-host Bhattacharyya variation (up to 0.043) is withdrawn. It came from the leaked archive and has not been re-measured leak-free.
+- PhiUSIIL shipped 0.440 is now labelled as a feature-count and scorer effect. The abstract and §5.2 say so. The earlier claim that the MoG trails the baselines on PhiUSIIL is removed.
+- Higher-order scorer added as a fourth column (T2, T3, T5). Its definition is not restated.
+- Bike Sharing ANFIS updated from 0.577 to 0.538 (T4b).
+- Timings moved to provisional (T6), since the current run reports MoG times only.
+- Sweep ceiling caveat added (§5.2 and §6).
 
-## References: TODOs closed
+## Still open
 
-| Key | Source | Status |
-|---|---|---|
-| `cordon2001genetic`, `herrera2008genetic` | Copied from `research/proposal-defense/references.bib` (GA-FIS baseline) | Closed |
-| `hastie2009elements` (naive Bayes) | New entry | Closed. **DOI `10.1007/978-0-387-84858-7` to verify.** |
-| `kaufman2012leakage` (leakage) | New entry | Closed. **DOI `10.1145/2382577.2382579` to verify.** |
-| `bhattacharyya1943`, `lin1991divergence`, `villani2008optimal` (scorers) | New entries | `lin1991divergence` DOI `10.1109/18.61115` and `villani2008optimal` DOI `10.1007/978-3-540-71050-9` to verify. `bhattacharyya1943` has no DOI. |
-| Histogram overlap and histogram correlation | Composite terms, no reference | **Open.** Cite the `tribble-fis` implementation, or add a reference if there is a standard one. |
-
-## Open items before submission
-
-1. **Clean re-run** of the scorer tables (T2–T3) and the baseline tables (T4). Requires:
-   - `git submodule update --init` (submodules are uninitialised here: `git submodule status` shows `-`);
-   - `uv lock --upgrade-package tribble-clustering` in `tribble-fis`, reinstall, and `PIN-MATCH` and `INSTALL-FRESH` both green;
-   - PhiUSIIL recovered from `tribble-fis` history (`data/.gitignore`);
-   - roughly 80 minutes on the run-of-record host for T4.
-   Archive under `reproduce/outputs/<label>/` and add a `PROVENANCE_MAP.md` row.
-2. Verify the three DOIs above and the histogram-term reference.
-3. Transfer to the IFSA-EUSFLAT template and check the page limit.
+1. **Composite identity.** `composite` at `2bdf875` matches the leak-free values, but it is not verified identical to the original four-metric blend.
+2. **Nested selection.** Any sweep-vs-baseline comparison needs a held-out selection step before it can be cited.
+3. **Clean timing re-run** (T6): ANFIS and GA-FIS on one host, with the MoG timings from the same run.
+4. **RT-IOT2022 re-run** (T4a): dataset absent from current runs.
+5. **Transform re-run** (T1) at `2bdf875`.
+6. **Whole-document sweep** at `2bdf875` if the paper will cite it; the run of record is still `full-2026-08-22` at `141596e`.
+7. **DOIs** for `hastie2009elements`, `kaufman2012leakage`, `lin1991divergence`, `villani2008optimal` (from memory; `bhattacharyya1943` has no DOI); histogram-term reference.
+8. **Template and page limit** for IFSA-EUSFLAT.
