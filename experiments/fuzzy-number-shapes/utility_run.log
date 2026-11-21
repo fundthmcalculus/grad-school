@@ -1,0 +1,162 @@
+/home/user/grad-school/experiments/fuzzy-number-shapes/km_study.py:71: RuntimeWarning: invalid value encountered in divide
+  yc = (w * y).sum(0) / w.sum(0)
+x_hetero  seed 0 B1    cov 0.887 width 0.401 rho -0.01 wink 0.577 rmse 0.0542
+x_hetero  seed 0 B2    cov 0.859 width 0.310 rho +0.85 wink 0.476 rmse 0.0542
+x_hetero  seed 0 B3    cov 0.898 width 0.415 rho -0.02 wink 0.568 rmse 0.0511
+x_hetero  seed 0 PENT  cov 0.854 width 0.337 rho +0.85 wink 0.470 rmse 0.0511
+x_hetero  seed 0 GAUSS cov 0.833 width 0.356 rho +0.76 wink 0.574 rmse 0.0692
+x_hetero  seed 1 B1    cov 0.881 width 0.363 rho -0.03 wink 0.552 rmse 0.0453
+x_hetero  seed 1 B2    cov 0.883 width 0.296 rho +0.85 wink 0.430 rmse 0.0453
+x_hetero  seed 1 B3    cov 0.872 width 0.346 rho -0.00 wink 0.560 rmse 0.0478
+x_hetero  seed 1 PENT  cov 0.797 width 0.350 rho -0.03 wink 0.727 rmse 0.0478
+x_hetero  seed 1 GAUSS cov 0.801 width 0.316 rho +0.71 wink 0.661 rmse 0.0872
+x_hetero  seed 2 B1    cov 0.870 width 0.363 rho +0.00 wink 0.580 rmse 0.0521
+x_hetero  seed 2 B2    cov 0.879 width 0.286 rho +0.86 wink 0.454 rmse 0.0521
+x_hetero  seed 2 B3    cov 0.870 width 0.368 rho +0.01 wink 0.582 rmse 0.0513
+x_hetero  seed 2 PENT  cov 0.830 width 0.304 rho +0.74 wink 0.506 rmse 0.0513
+x_hetero  seed 2 GAUSS cov 0.781 width 0.300 rho +0.62 wink 0.587 rmse 0.1757
+x_hetero  seed 3 B1    cov 0.840 width 0.327 rho +0.04 wink 0.604 rmse 0.0630
+x_hetero  seed 3 B2    cov 0.855 width 0.293 rho +0.86 wink 0.486 rmse 0.0630
+x_hetero  seed 3 B3    cov 0.859 width 0.347 rho +0.02 wink 0.595 rmse 0.0569
+x_hetero  seed 3 PENT  cov 0.780 width 0.350 rho +0.34 wink 0.707 rmse 0.0569
+x_hetero  seed 3 GAUSS cov 0.811 width 0.272 rho +0.73 wink 0.515 rmse 0.0445
+x_hetero  seed 4 B1    cov 0.846 width 0.346 rho -0.06 wink 0.629 rmse 0.0623
+x_hetero  seed 4 B2    cov 0.834 width 0.284 rho +0.85 wink 0.502 rmse 0.0623
+x_hetero  seed 4 B3    cov 0.860 width 0.366 rho +0.01 wink 0.595 rmse 0.0537
+x_hetero  seed 4 PENT  cov 0.697 width 0.276 rho -0.05 wink 0.899 rmse 0.0537
+x_hetero  seed 4 GAUSS cov 0.830 width 0.379 rho +0.66 wink 0.642 rmse 0.0840
+x_hetero  seed 5 B1    cov 0.814 width 0.325 rho -0.08 wink 0.664 rmse 0.0499
+x_hetero  seed 5 B2    cov 0.826 width 0.271 rho +0.85 wink 0.502 rmse 0.0499
+x_hetero  seed 5 B3    cov 0.838 width 0.351 rho -0.00 wink 0.630 rmse 0.0499
+x_hetero  seed 5 PENT  cov 0.809 width 0.288 rho +0.79 wink 0.552 rmse 0.0499
+x_hetero  seed 5 GAUSS cov 0.802 width 0.373 rho +0.67 wink 0.663 rmse 0.1824
+x_hetero  seed 6 B1    cov 0.881 width 0.378 rho +0.02 wink 0.570 rmse 0.0508
+x_hetero  seed 6 B2    cov 0.864 width 0.303 rho +0.82 wink 0.449 rmse 0.0508
+x_hetero  seed 6 B3    cov 0.887 width 0.398 rho -0.04 wink 0.575 rmse 0.0505
+x_hetero  seed 6 PENT  cov 0.829 width 0.346 rho +0.82 wink 0.531 rmse 0.0505
+x_hetero  seed 6 GAUSS cov 0.815 width 0.412 rho +0.72 wink 0.723 rmse 0.0907
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:98: RuntimeWarning: overflow encountered in exp
+  sig = np.exp(L)
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:99: RuntimeWarning: divide by zero encountered in divide
+  z = dx / sig
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:103: RuntimeWarning: invalid value encountered in multiply
+  dM[k * PG + 0] = z * mu / sig + z * z * mu * dLdc
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:104: RuntimeWarning: invalid value encountered in multiply
+  dM[k * PG + 1] = z * z * mu
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:105: RuntimeWarning: invalid value encountered in multiply
+  dM[k * PG + 2] = z * z * mu * sgn * w
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:106: RuntimeWarning: invalid value encountered in multiply
+  dM[k * PG + 3] = z * z * mu * sgn * w * dx
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:100: RuntimeWarning: overflow encountered in multiply
+  mu = np.exp(-0.5 * z * z)
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:103: RuntimeWarning: overflow encountered in multiply
+  dM[k * PG + 0] = z * mu / sig + z * z * mu * dLdc
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:104: RuntimeWarning: overflow encountered in multiply
+  dM[k * PG + 1] = z * z * mu
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:105: RuntimeWarning: overflow encountered in multiply
+  dM[k * PG + 2] = z * z * mu * sgn * w
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:106: RuntimeWarning: overflow encountered in multiply
+  dM[k * PG + 3] = z * z * mu * sgn * w * dx
+x_hetero  seed 7 B1    cov 0.866 width 0.361 rho +0.07 wink 0.584 rmse 0.0572
+x_hetero  seed 7 B2    cov 0.869 width 0.315 rho +0.86 wink 0.464 rmse 0.0572
+x_hetero  seed 7 B3    cov 0.871 width 0.367 rho -0.04 wink 0.570 rmse 0.0489
+x_hetero  seed 7 PENT  cov 0.798 width 0.290 rho +0.82 wink 0.490 rmse 0.0489
+x_hetero  seed 7 GAUSS cov 0.828 width 0.463 rho +0.68 wink 0.778 rmse 0.1064
+x_hetero  seed 8 B1    cov 0.822 width 0.294 rho -0.00 wink 0.624 rmse 0.0550
+x_hetero  seed 8 B2    cov 0.830 width 0.259 rho +0.86 wink 0.469 rmse 0.0550
+x_hetero  seed 8 B3    cov 0.830 width 0.303 rho +0.04 wink 0.588 rmse 0.0482
+x_hetero  seed 8 PENT  cov 0.816 width 0.330 rho +0.80 wink 0.526 rmse 0.0482
+x_hetero  seed 8 GAUSS cov 0.816 width 0.400 rho +0.80 wink 0.670 rmse 0.0811
+x_hetero  seed 9 B1    cov 0.876 width 0.357 rho +0.01 wink 0.534 rmse 0.0381
+x_hetero  seed 9 B2    cov 0.862 width 0.284 rho +0.86 wink 0.400 rmse 0.0381
+x_hetero  seed 9 B3    cov 0.878 width 0.369 rho -0.06 wink 0.544 rmse 0.0435
+x_hetero  seed 9 PENT  cov 0.822 width 0.287 rho +0.79 wink 0.480 rmse 0.0435
+x_hetero  seed 9 GAUSS cov 0.826 width 0.303 rho +0.65 wink 0.572 rmse 0.0530
+/home/user/grad-school/experiments/fuzzy-number-shapes/km_study.py:62: RuntimeWarning: invalid value encountered in divide
+  yc = (w * y).sum(0) / w.sum(0)
+regime    seed 0 B1    cov 0.852 width 0.348 rho +0.00 wink 0.590 rmse 0.0529
+regime    seed 0 B2    cov 0.852 width 0.349 rho +0.02 wink 0.600 rmse 0.0529
+regime    seed 0 B3    cov 0.861 width 0.362 rho +0.01 wink 0.570 rmse 0.0464
+regime    seed 0 PENT  cov 0.744 width 0.371 rho +0.00 wink 0.837 rmse 0.0464
+regime    seed 0 GAUSS cov 0.789 width 0.345 rho -0.00 wink 0.728 rmse 0.0618
+regime    seed 1 B1    cov 0.887 width 0.383 rho -0.03 wink 0.573 rmse 0.0528
+regime    seed 1 B2    cov 0.886 width 0.391 rho -0.00 wink 0.576 rmse 0.0528
+regime    seed 1 B3    cov 0.898 width 0.397 rho +0.04 wink 0.578 rmse 0.0541
+regime    seed 1 PENT  cov 0.887 width 0.427 rho -0.01 wink 0.635 rmse 0.0541
+regime    seed 1 GAUSS cov 0.850 width 0.433 rho -0.00 wink 0.779 rmse 0.0772
+regime    seed 2 B1    cov 0.852 width 0.339 rho -0.04 wink 0.582 rmse 0.0569
+regime    seed 2 B2    cov 0.845 width 0.336 rho +0.00 wink 0.588 rmse 0.0569
+regime    seed 2 B3    cov 0.861 width 0.355 rho +0.02 wink 0.572 rmse 0.0528
+regime    seed 2 PENT  cov 0.817 width 0.335 rho -0.02 wink 0.652 rmse 0.0528
+regime    seed 2 GAUSS cov 0.787 width 0.476 rho +0.01 wink 0.832 rmse 0.0661
+regime    seed 3 B1    cov 0.843 width 0.359 rho -0.00 wink 0.628 rmse 0.0556
+regime    seed 3 B2    cov 0.836 width 0.350 rho +0.00 wink 0.642 rmse 0.0556
+regime    seed 3 B3    cov 0.873 width 0.387 rho +0.04 wink 0.582 rmse 0.0474
+regime    seed 3 PENT  cov 0.841 width 0.405 rho +0.01 wink 0.676 rmse 0.0474
+regime    seed 3 GAUSS cov 0.829 width 0.381 rho +0.02 wink 0.687 rmse 0.1149
+regime    seed 4 B1    cov 0.846 width 0.340 rho -0.02 wink 0.633 rmse 0.0777
+regime    seed 4 B2    cov 0.848 width 0.342 rho +0.03 wink 0.630 rmse 0.0777
+regime    seed 4 B3    cov 0.841 width 0.339 rho +0.03 wink 0.600 rmse 0.0522
+regime    seed 4 PENT  cov 0.804 width 0.355 rho -0.01 wink 0.692 rmse 0.0522
+regime    seed 4 GAUSS cov 0.754 width 0.541 rho -0.05 wink 0.991 rmse 0.0737
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:80: RuntimeWarning: overflow encountered in square
+  G[rows, j] = np.where(inside, dh * (u - w) / w**2, 0.0)
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:81: RuntimeWarning: overflow encountered in square
+  G[rows, j + 1] = np.where(inside, -dh * u / w**2, 0.0)
+regime    seed 5 B1    cov 0.861 width 0.337 rho -0.01 wink 0.568 rmse 0.0453
+regime    seed 5 B2    cov 0.866 width 0.346 rho -0.03 wink 0.572 rmse 0.0453
+regime    seed 5 B3    cov 0.854 width 0.356 rho -0.00 wink 0.590 rmse 0.0614
+regime    seed 5 PENT  cov 0.831 width 0.356 rho -0.01 wink 0.625 rmse 0.0614
+regime    seed 5 GAUSS cov 0.836 width 0.355 rho +0.00 wink 0.638 rmse 0.0541
+regime    seed 6 B1    cov 0.869 width 0.346 rho +0.01 wink 0.538 rmse 0.0445
+regime    seed 6 B2    cov 0.866 width 0.349 rho +0.01 wink 0.543 rmse 0.0445
+regime    seed 6 B3    cov 0.874 width 0.347 rho -0.06 wink 0.538 rmse 0.0506
+regime    seed 6 PENT  cov 0.846 width 0.355 rho +0.01 wink 0.597 rmse 0.0506
+regime    seed 6 GAUSS cov 0.838 width 0.362 rho -0.01 wink 0.631 rmse 0.0570
+regime    seed 7 B1    cov 0.856 width 0.355 rho -0.02 wink 0.567 rmse 0.0528
+regime    seed 7 B2    cov 0.848 width 0.347 rho -0.03 wink 0.575 rmse 0.0528
+regime    seed 7 B3    cov 0.884 width 0.388 rho +0.04 wink 0.552 rmse 0.0502
+regime    seed 7 PENT  cov 0.876 width 0.421 rho +0.01 wink 0.618 rmse 0.0502
+regime    seed 7 GAUSS cov 0.824 width 0.389 rho -0.04 wink 0.679 rmse 0.0799
+regime    seed 8 B1    cov 0.879 width 0.365 rho +0.01 wink 0.548 rmse 0.0437
+regime    seed 8 B2    cov 0.874 width 0.360 rho +0.06 wink 0.552 rmse 0.0437
+regime    seed 8 B3    cov 0.886 width 0.376 rho -0.01 wink 0.547 rmse 0.0365
+regime    seed 8 PENT  cov 0.868 width 0.379 rho -0.02 wink 0.586 rmse 0.0365
+regime    seed 8 GAUSS cov 0.828 width 0.416 rho +0.01 wink 0.699 rmse 0.0631
+/home/user/grad-school/experiments/fuzzy-number-shapes/local_pent_study.py:99: RuntimeWarning: overflow encountered in divide
+  z = dx / sig
+regime    seed 9 B1    cov 0.870 width 0.335 rho +0.02 wink 0.531 rmse 0.0405
+regime    seed 9 B2    cov 0.874 width 0.340 rho -0.02 wink 0.536 rmse 0.0405
+regime    seed 9 B3    cov 0.891 width 0.354 rho +0.02 wink 0.519 rmse 0.0394
+regime    seed 9 PENT  cov 0.853 width 0.328 rho -0.02 wink 0.575 rmse 0.0394
+regime    seed 9 GAUSS cov 0.877 width 1.295 rho +0.01 wink 1.584 rmse 0.2046
+| noise | method | coverage | cov (low sd) | cov (high sd) | mean width | width ratio hi/lo | Spearman(width, sd) | Winkler | RMSE (noise-free) |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| x_hetero | B1 | 0.858 | 0.999 | 0.718 | 0.352 | 1.00 | -0.00 | 0.592 | 0.0528 |
+| x_hetero | B2 | 0.856 | 0.898 | 0.814 | 0.290 | 3.03 | +0.85 | 0.463 | 0.0528 |
+| x_hetero | B3 | 0.866 | 0.999 | 0.734 | 0.363 | 1.00 | -0.01 | 0.581 | 0.0502 |
+| x_hetero | PENT | 0.803 | 0.870 | 0.736 | 0.316 | 2.71 | +0.59 | 0.589 | 0.0502 |
+| x_hetero | GAUSS | 0.814 | 0.868 | 0.761 | 0.357 | 3.18 | +0.70 | 0.638 | 0.0974 |
+| regime | B1 | 0.861 | 0.994 | 0.728 | 0.351 | 1.00 | -0.01 | 0.576 | 0.0523 |
+| regime | B2 | 0.859 | 0.993 | 0.725 | 0.351 | 1.00 | +0.00 | 0.581 | 0.0523 |
+| regime | B3 | 0.872 | 0.996 | 0.748 | 0.366 | 1.00 | +0.01 | 0.565 | 0.0491 |
+| regime | PENT | 0.836 | 0.972 | 0.701 | 0.373 | 1.00 | -0.01 | 0.649 | 0.0491 |
+| regime | GAUSS | 0.821 | 0.937 | 0.705 | 0.499 | 0.99 | -0.01 | 0.825 | 0.0852 |
+
+Paired per-seed Winkler difference (row minus column; negative favours the row). Mean, sd over seeds, seeds where row < column.
+
+| noise | comparison | mean diff | sd | seeds row better |
+|---|---|---:|---:|---:|
+| x_hetero | PENT vs B2 | +0.126 | 0.133 | 1/10 |
+| x_hetero | PENT vs B1 | -0.003 | 0.136 | 7/10 |
+| x_hetero | PENT vs B3 | +0.008 | 0.138 | 7/10 |
+| x_hetero | PENT vs GAUSS | -0.050 | 0.171 | 7/10 |
+| x_hetero | B3 vs B2 | +0.118 | 0.017 | 0/10 |
+| regime | PENT vs B2 | +0.068 | 0.061 | 0/10 |
+| regime | PENT vs B1 | +0.074 | 0.062 | 0/10 |
+| regime | PENT vs B3 | +0.085 | 0.067 | 0/10 |
+| regime | PENT vs GAUSS | -0.175 | 0.313 | 9/10 |
+| regime | B3 vs B2 | -0.017 | 0.021 | 8/10 |
+
+Seeds 0..9, N_train=500. Test: 40x40 grid (x_hetero) or 1600 random points (regime). Winkler at alpha = 0.1. group = high noise (sd > 0.1). B2 uses k = 100 nearest training residuals.
+

@@ -123,6 +123,9 @@ declare -A SLOW_TABLES=(
   # it exists to bound. Measured on this host: 530 s and 13,084 s.
   [table_4_1_mog_baselines]=1
   [table_4_4_openset]=1
+  # Added 2026-11-21. 1,242 s at ten seeds on the 4-core Xeon host (mostly ten seeds of
+  # ANFIS and GA-FIS inside the comparison); it reads C.SEEDS, so REPRO_SEEDS bounds it.
+  [table_4_1c_topn_sweep]=1
   # Added with the ROOT_TABLES wiring below. 146 s measured on this host at ten
   # seeds -- slower than table_hyperparam_normalization (112 s), the cheapest
   # entry above -- so by this list's own threshold it belongs here. It honours the
@@ -197,6 +200,7 @@ FIS_TABLES=(
   table_g5_output_partitioning
   table_g5b_skew_sweep
   table_4_1_mog_baselines
+  table_4_1c_topn_sweep
   table_6_1_model_family
   table_norm_conorm_matrix
   table_4_4_openset

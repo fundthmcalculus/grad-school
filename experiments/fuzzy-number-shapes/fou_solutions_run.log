@@ -1,0 +1,93 @@
+x_hetero  seed 0 B2    cov 0.889 train_cov nan rho +0.86 wink 0.449 train_wink nan
+x_hetero  seed 0 DEC   cov 0.802 train_cov 0.838 rho +0.84 wink 0.513 train_wink 0.481
+x_hetero  seed 0 LONG  cov 0.797 train_cov 0.834 rho +0.83 wink 0.512 train_wink 0.480
+x_hetero  seed 0 RULE  cov 0.836 train_cov 0.860 rho +0.46 wink 0.609 train_wink 0.536
+x_hetero  seed 1 B2    cov 0.862 train_cov nan rho +0.85 wink 0.458 train_wink nan
+x_hetero  seed 1 DEC   cov 0.816 train_cov 0.838 rho +0.83 wink 0.535 train_wink 0.454
+x_hetero  seed 1 LONG  cov 0.816 train_cov 0.838 rho +0.83 wink 0.535 train_wink 0.454
+x_hetero  seed 1 RULE  cov 0.785 train_cov 0.844 rho +0.78 wink 0.598 train_wink 0.446
+x_hetero  seed 2 B2    cov 0.897 train_cov nan rho +0.84 wink 0.438 train_wink nan
+x_hetero  seed 2 DEC   cov 0.838 train_cov 0.860 rho +0.41 wink 0.612 train_wink 0.527
+x_hetero  seed 2 LONG  cov 0.838 train_cov 0.864 rho +0.39 wink 0.613 train_wink 0.523
+x_hetero  seed 2 RULE  cov 0.858 train_cov 0.898 rho +0.58 wink 0.544 train_wink 0.413
+x_hetero  seed 3 B2    cov 0.845 train_cov nan rho +0.86 wink 0.458 train_wink nan
+x_hetero  seed 3 DEC   cov 0.778 train_cov 0.834 rho +0.46 wink 0.628 train_wink 0.464
+x_hetero  seed 3 LONG  cov 0.781 train_cov 0.840 rho +0.45 wink 0.628 train_wink 0.464
+x_hetero  seed 3 RULE  cov 0.825 train_cov 0.890 rho +0.77 wink 0.501 train_wink 0.344
+x_hetero  seed 4 B2    cov 0.847 train_cov nan rho +0.85 wink 0.495 train_wink nan
+x_hetero  seed 4 DEC   cov 0.784 train_cov 0.832 rho +0.74 wink 0.669 train_wink 0.477
+x_hetero  seed 4 LONG  cov 0.784 train_cov 0.824 rho +0.75 wink 0.666 train_wink 0.476
+x_hetero  seed 4 RULE  cov 0.746 train_cov 0.800 rho +0.46 wink 0.788 train_wink 0.510
+x_hetero  seed 5 B2    cov 0.827 train_cov nan rho +0.85 wink 0.522 train_wink nan
+x_hetero  seed 5 DEC   cov 0.731 train_cov 0.822 rho +0.62 wink 0.769 train_wink 0.457
+x_hetero  seed 5 LONG  cov 0.733 train_cov 0.818 rho +0.62 wink 0.769 train_wink 0.457
+x_hetero  seed 5 RULE  cov 0.794 train_cov 0.862 rho +0.79 wink 0.651 train_wink 0.425
+x_hetero  seed 6 B2    cov 0.835 train_cov nan rho +0.84 wink 0.466 train_wink nan
+x_hetero  seed 6 DEC   cov 0.817 train_cov 0.850 rho +0.69 wink 0.591 train_wink 0.528
+x_hetero  seed 6 LONG  cov 0.823 train_cov 0.858 rho +0.69 wink 0.588 train_wink 0.524
+x_hetero  seed 6 RULE  cov 0.829 train_cov 0.890 rho +0.84 wink 0.485 train_wink 0.386
+x_hetero  seed 7 B2    cov 0.869 train_cov nan rho +0.87 wink 0.448 train_wink nan
+x_hetero  seed 7 DEC   cov 0.772 train_cov 0.832 rho +0.76 wink 0.636 train_wink 0.513
+x_hetero  seed 7 LONG  cov 0.773 train_cov 0.838 rho +0.76 wink 0.636 train_wink 0.513
+x_hetero  seed 7 RULE  cov 0.798 train_cov 0.848 rho +0.42 wink 0.711 train_wink 0.590
+x_hetero  seed 8 B2    cov 0.839 train_cov nan rho +0.86 wink 0.501 train_wink nan
+x_hetero  seed 8 DEC   cov 0.777 train_cov 0.858 rho +0.83 wink 0.573 train_wink 0.376
+x_hetero  seed 8 LONG  cov 0.777 train_cov 0.858 rho +0.83 wink 0.573 train_wink 0.376
+x_hetero  seed 8 RULE  cov 0.776 train_cov 0.878 rho +0.70 wink 0.651 train_wink 0.402
+x_hetero  seed 9 B2    cov 0.858 train_cov nan rho +0.85 wink 0.462 train_wink nan
+x_hetero  seed 9 DEC   cov 0.814 train_cov 0.848 rho +0.73 wink 0.587 train_wink 0.490
+x_hetero  seed 9 LONG  cov 0.810 train_cov 0.844 rho +0.73 wink 0.587 train_wink 0.490
+x_hetero  seed 9 RULE  cov 0.833 train_cov 0.908 rho +0.78 wink 0.537 train_wink 0.359
+regime    seed 0 B2    cov 0.860 train_cov nan rho +0.01 wink 0.600 train_wink nan
+regime    seed 0 DEC   cov 0.822 train_cov 0.850 rho -0.05 wink 0.693 train_wink 0.546
+regime    seed 0 LONG  cov 0.811 train_cov 0.846 rho -0.05 wink 0.699 train_wink 0.543
+regime    seed 0 RULE  cov 0.804 train_cov 0.870 rho -0.03 wink 0.727 train_wink 0.485
+regime    seed 1 B2    cov 0.882 train_cov nan rho +0.01 wink 0.601 train_wink nan
+regime    seed 1 DEC   cov 0.781 train_cov 0.778 rho +0.02 wink 0.737 train_wink 0.757
+regime    seed 1 LONG  cov 0.784 train_cov 0.778 rho +0.02 wink 0.732 train_wink 0.755
+regime    seed 1 RULE  cov 0.784 train_cov 0.798 rho -0.01 wink 0.753 train_wink 0.644
+regime    seed 2 B2    cov 0.836 train_cov nan rho -0.02 wink 0.636 train_wink nan
+regime    seed 2 DEC   cov 0.753 train_cov 0.780 rho +0.05 wink 0.797 train_wink 0.630
+regime    seed 2 LONG  cov 0.756 train_cov 0.792 rho +0.05 wink 0.780 train_wink 0.590
+regime    seed 2 RULE  cov 0.740 train_cov 0.772 rho +0.05 wink 0.802 train_wink 0.599
+regime    seed 3 B2    cov 0.839 train_cov nan rho -0.01 wink 0.642 train_wink nan
+regime    seed 3 DEC   cov 0.823 train_cov 0.856 rho +0.01 wink 0.652 train_wink 0.499
+regime    seed 3 LONG  cov 0.824 train_cov 0.860 rho +0.01 wink 0.653 train_wink 0.498
+regime    seed 3 RULE  cov 0.819 train_cov 0.858 rho -0.01 wink 0.678 train_wink 0.504
+regime    seed 4 B2    cov 0.831 train_cov nan rho +0.02 wink 0.601 train_wink nan
+regime    seed 4 DEC   cov 0.796 train_cov 0.856 rho +0.00 wink 0.702 train_wink 0.511
+regime    seed 4 LONG  cov 0.796 train_cov 0.856 rho +0.00 wink 0.702 train_wink 0.511
+regime    seed 4 RULE  cov 0.791 train_cov 0.868 rho +0.00 wink 0.694 train_wink 0.459
+regime    seed 5 B2    cov 0.861 train_cov nan rho -0.01 wink 0.596 train_wink nan
+regime    seed 5 DEC   cov 0.831 train_cov 0.876 rho +0.03 wink 0.647 train_wink 0.515
+regime    seed 5 LONG  cov 0.833 train_cov 0.874 rho +0.03 wink 0.647 train_wink 0.515
+regime    seed 5 RULE  cov 0.831 train_cov 0.888 rho -0.01 wink 0.633 train_wink 0.470
+regime    seed 6 B2    cov 0.891 train_cov nan rho -0.00 wink 0.532 train_wink nan
+regime    seed 6 DEC   cov 0.871 train_cov 0.888 rho -0.01 wink 0.569 train_wink 0.504
+regime    seed 6 LONG  cov 0.869 train_cov 0.886 rho -0.01 wink 0.571 train_wink 0.502
+regime    seed 6 RULE  cov 0.851 train_cov 0.894 rho -0.03 wink 0.580 train_wink 0.455
+regime    seed 7 B2    cov 0.877 train_cov nan rho -0.04 wink 0.553 train_wink nan
+regime    seed 7 DEC   cov 0.843 train_cov 0.854 rho -0.04 wink 0.627 train_wink 0.559
+regime    seed 7 LONG  cov 0.844 train_cov 0.856 rho -0.05 wink 0.627 train_wink 0.556
+regime    seed 7 RULE  cov 0.871 train_cov 0.868 rho +0.00 wink 0.590 train_wink 0.509
+regime    seed 8 B2    cov 0.854 train_cov nan rho +0.06 wink 0.582 train_wink nan
+regime    seed 8 DEC   cov 0.809 train_cov 0.840 rho +0.02 wink 0.698 train_wink 0.626
+regime    seed 8 LONG  cov 0.805 train_cov 0.836 rho +0.02 wink 0.705 train_wink 0.624
+regime    seed 8 RULE  cov 0.804 train_cov 0.870 rho +0.05 wink 0.694 train_wink 0.534
+regime    seed 9 B2    cov 0.875 train_cov nan rho -0.04 wink 0.537 train_wink nan
+regime    seed 9 DEC   cov 0.858 train_cov 0.878 rho -0.02 wink 0.609 train_wink 0.508
+regime    seed 9 LONG  cov 0.859 train_cov 0.870 rho -0.02 wink 0.607 train_wink 0.508
+regime    seed 9 RULE  cov 0.829 train_cov 0.890 rho +0.03 wink 0.607 train_wink 0.443
+| noise | arm | train coverage | held-out coverage | cov (low sd) | cov (high sd) | mean width | Spearman(width, sd) | Winkler held-out | Winkler train |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| x_hetero | B2 | nan | 0.857 | 0.909 | 0.804 | 0.290 | +0.85 | 0.470 | nan |
+| x_hetero | DEC | 0.841 | 0.793 | 0.885 | 0.701 | 0.285 | +0.69 | 0.611 | 0.477 |
+| x_hetero | LONG | 0.842 | 0.793 | 0.884 | 0.702 | 0.285 | +0.69 | 0.611 | 0.476 |
+| x_hetero | RULE | 0.868 | 0.808 | 0.903 | 0.713 | 0.286 | +0.66 | 0.607 | 0.441 |
+| regime | B2 | nan | 0.861 | 0.988 | 0.734 | 0.356 | -0.00 | 0.588 | nan |
+| regime | DEC | 0.846 | 0.819 | 0.956 | 0.681 | 0.354 | +0.00 | 0.673 | 0.565 |
+| regime | LONG | 0.845 | 0.818 | 0.957 | 0.680 | 0.353 | -0.00 | 0.672 | 0.560 |
+| regime | RULE | 0.858 | 0.813 | 0.946 | 0.678 | 0.346 | +0.00 | 0.676 | 0.510 |
+
+Seeds 0..9, N_train=500. Point is the type-1 Gaussian centre model for every arm. Train columns are n/a (nan, shown as blank in the mean) for B2 because it has no fitted parameters on the training set. Winkler at alpha = 0.1.
+
