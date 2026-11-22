@@ -21,7 +21,7 @@ by [-@wang1998universal; -@wang1999analysis] and [-@joo2002universal]. That theo
 not intrinsically weak, and it is asymptotic in the rule count; every model in this dissertation sits at the other end
 of that axis, on the order of one rule per output class and three output buckets in §4.3. Capability at that rule count
 is settled by measurement, in Chapters 4 and 6: the flat model on Concrete lands level with CART
-($R^2 = 0.861 \pm 0.026$ against $0.826 \pm 0.047$) and behind a random forest ($0.909 \pm 0.019$), and falls
+($R^2 = 0.859 \pm 0.027$ against $0.826 \pm 0.049$) and behind a random forest ($0.909 \pm 0.020$), and falls
 to $0.394 \pm 0.065$ if the consequents are constants.
 
 There are two common flavors. A **Mamdani** system uses fuzzy sets on the output side and requires a defuzzification

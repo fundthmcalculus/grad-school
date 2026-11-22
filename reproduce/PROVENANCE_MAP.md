@@ -18,6 +18,34 @@ as having no generator yet.
 
 ---
 
+## 2026-11-22 — prose re-quoted against `full-03d327a-2026-11-21` (P1 + P2 of the prose recheck)
+
+Per-cell audit: `reviews/2026-11-22-prose-recheck-full-03d327a.md`. `check_prose.py full-03d327a-2026-11-21` went
+from **62 match / 98 drifted / 156 untraceable** to **156 / 55 / 109**. What remains is mostly timing (host scaling,
+accepted as-is), cells deliberately cited from a named older archive, ddof-only spreads, and generators this run does
+not execute.
+
+- **Retracted PhiUSIIL numbers removed (P1).** 04:594–600 named `phiusiil-leakfree-2026-08-30` while quoting
+  `uniform-2026-08-03` cells, including the leaked accuracy 0.997; 06:309 and Table A.6 (HME 1.000) were leak-era too.
+- **Re-quoted to the run of record:** Tables 4.1, 4.3, 4.8, 4.9, the Concrete rows of 4.4, Chapter 6's refinement
+  ladder and Table 6.1, and Table A.6's Concrete columns. The table captions now name `full-03d327a-2026-11-21`.
+- **Claims rewritten because the numbers no longer support them:**
+  - the correction pass (Table 4.9): +0.0077 ± 0.0109, so "the pass helps" becomes open
+  - the skew sweep (4.3): quantile leads at skew 5.3, starvation from 5.3, and the tails rewritten
+  - the dedup ranges (4.8): 3×–50×, 2.4%–66.5%
+  - refined vs full second order (Ch 6): 0.875 vs 0.859, factor of ten
+  - A.11's "factor of twenty-five"
+  - Ch 3 / DATASETS G2 downstream: five of five measured, Crop 0.084
+- **Two moves with no recorded cause, now flagged in the prose rather than explained:**
+  - **Table 4.1, mixture-of-experts and fuzzy-tree rows.** z-score now equals min-max (Δ −0.028/−0.012 → +0.000/+0.003). It landed between `goal-8h-2026-08-11-fullsuite` and `all-restored-2026-08-22`. It is not #95, because it survives the all-restored archive.
+  - **Chapter 6 refined arms.** 0th 0.720 → 0.747, 2nd 0.862 → 0.875, while the closed-form arms held. This is consistent with the `refine.py` changes in the pin window (tribble-fis #134/#136/#178/#209), but untested.
+- **Not touched (deferred or out of scope):**
+  - Table 4.2 and the 0.394 / −0.434 / 0.828 decomposition it feeds (Ch 1, 2, 7, A.6). These are cited from `uniform-2026-08-03`; the run of record moves them by the deferred Concrete host note.
+  - All timing claims.
+  - The Priority 3 arithmetic and label errors listed in the review.
+
+---
+
 ## 2026-11-21 — whole-document sweep at `03d327a`: **run of record for every non-GPU table** (`outputs/full-03d327a-2026-11-21/`)
 
 **Status: the new run of record for all CPU tables, superseding `full-2026-08-22`. Table 3.4 (GPU) is deferred and
@@ -563,8 +591,8 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **re-derived leak-free at 10 seeds** AND **ANFIS/GA-FIS filled** — Goal C1 closed, grad-school #190. §1/§4's "two-rule classifier at 0.997" is re-transcribed to 0.440±0.181. The two MoG rows are still from two different code paths — note 14 |
 | 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **stale** — every cell moved under tribble-fis #72; the band and the operating point are both superseded — note 18 |
 | 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **stale** — three of nine cells moved beyond noise under #72; note 6's instruction not to quote a winner still stands — note 18 |
-| 4.8 MF deduplication | `table_4_8_mf_dedup.py` (+ `_mf_dedup.py`) | `outputs/table_4_8_mf_dedup.{md,csv}` | **stale** — prose is `mf-dedup-2026-08-05` @ tribble-fis `6ddb8028`; the max-lossless column moved from TWO causes — our own CI correction (#143: Digits 44.2%→56.4% with byte-identical means) and tribble-fis #218 (BreastCancer 0.0%→66.5%, Wine 10×→7×) — with Diabetes 2×→3× unattributed; @1× reduction *percentages* unchanged but BreastCancer's raw MF moved 11.1→16.4 — note 29 |
-| 4.9 Correction-rule pass (Glass) | `table_4_8_mf_dedup.py` | `outputs/table_4_9_correction_pass.{md,csv}` | **stale** — same archive; the gated-cascade gain fell +0.031±0.027 → +0.008±0.011 under #218, its 95% CI now spanning zero. The base arm is byte-identical and only the expert arm moved, which is what localises this one to #218 — note 29 |
+| 4.8 MF deduplication | `table_4_8_mf_dedup.py` (+ `_mf_dedup.py`) | `outputs/table_4_8_mf_dedup.{md,csv}` | **reproduced** (re-quoted 2026-11-22 from `full-03d327a-2026-11-21`). Was **stale** — prose was `mf-dedup-2026-08-05` @ tribble-fis `6ddb8028`; the max-lossless column moved from TWO causes — our own CI correction (#143: Digits 44.2%→56.4% with byte-identical means) and tribble-fis #218 (BreastCancer 0.0%→66.5%, Wine 10×→7×) — with Diabetes 2×→3× unattributed; @1× reduction *percentages* unchanged but BreastCancer's raw MF moved 11.1→16.4 — note 29 |
+| 4.9 Correction-rule pass (Glass) | `table_4_8_mf_dedup.py` | `outputs/table_4_9_correction_pass.{md,csv}` | **reproduced** (re-quoted 2026-11-22; claim rewritten). Was **stale** — same archive; the gated-cascade gain fell +0.031±0.027 → +0.008±0.011 under #218, its 95% CI now spanning zero. The base arm is byte-identical and only the expert arm moved, which is what localises this one to #218 — note 29 |
 | 4.11 BETH anomaly detection | `table_4_11_beth_anomaly.py` | `outputs/table_4_11_beth_anomaly.{md,csv}`, `outputs/table_4_11_beth_fa_sweep.{md,csv}` | **reproduced** at 10 seeds (new, grad-school #95); prose slot at §4.4 — note 22 |
 | 4.11(c) BETH feature reduction | `table_4_11c_beth_feature_reduction.py` | `outputs/table_4_11c_beth_feature_reduction.{md,csv}` | **reproduced** at 10 seeds (new, #95); prose slot at §4.4 — note 23 |
 | 4.11(d) BETH matched sample size | `table_4_11d_beth_sample_scaling.py` | `outputs/table_4_11d_beth_sample_scaling.{md,csv}` | **reproduced** at 10 seeds (new, #95); corrects (c)'s timing; prose slot at §4.4 — note 23 |

@@ -314,28 +314,29 @@ objective; the harness now runs it.
 
 | TSK order | closed-form only |           refined |          Δ |
 |-----------|-----------------:|------------------:|-----------:|
-| 0th       |    0.394 ± 0.065 | **0.720 ± 0.037** | **+0.326** |
-| 1st       |    0.796 ± 0.018 | **0.834 ± 0.045** |     +0.038 |
-| 2nd       |    0.841 ± 0.021 | **0.862 ± 0.033** |     +0.021 |
+| 0th       |    0.399 ± 0.063 | **0.747 ± 0.060** | **+0.348** |
+| 1st       |    0.795 ± 0.019 | **0.832 ± 0.041** |     +0.037 |
+| 2nd       |    0.840 ± 0.022 | **0.875 ± 0.029** |     +0.035 |
 
 Refinement helps most where the consequent model has least capacity, and the gradient across the range is the finding:
-+0.326 at zeroth order against +0.038 and +0.021, a factor of nine. A flat consequent can only place a constant per
++0.348 at zeroth order against +0.037 and +0.035, a factor of ten. A flat consequent can only place a constant per
 rule, so moving the membership functions is the only way left to improve the fit; once the consequent carries linear and
 quadratic terms it can absorb most of what better-placed antecedents would have bought. The zeroth-order gain dwarfs its
-spread; the higher-order gains are within a spread of it.
+spread. The first-order gain is within a spread; the second-order gain, +0.035 against spreads of ±0.022 and ±0.029, is
+now just outside one — small, but no longer indistinguishable from zero.
 
 **Figure 6.5 — What refining the antecedents buys, by consequent order.** The table above, plotted from the archive it
-is quoted from (`table_concrete_reconciliation.csv`, `uniform-2026-08-03`): test $R^2$ for the closed-form construction
+is quoted from (`table_concrete_reconciliation.csv`, run of record `full-03d327a-2026-11-21`): test $R^2$ for the closed-form construction
 and the refined arm at each TSK order, ten-seed spreads as error bars, the paired gain printed between them. The
-gradient across the ladder is the finding — a factor of nine from zeroth to second order — and at second order the two
-arms sit inside each other's spread. Refinement is a search over the membership-function centres and widths with the
+gradient across the ladder is the finding — a factor of ten from zeroth to second order — and at second order the two
+arms' error bars overlap, though the gap between their means is wider than either spread. Refinement is a search over the membership-function centres and widths with the
 closed-form solve as its inner objective (§6.3.5); the better the structure-derived model already is, the less that
 search finds.
 `![06-refinement-ladder](fig/06-refinement-ladder.png)`
 
-On the Concrete regression benchmark (Table 6.1), the refined second-order arm's 0.862 ± 0.033 and the full-second-order
-basis's 0.861 ± 0.026 are this chapter's two best fuzzy $R^2$ values and they are the same number to within a
-thousandth, so the chapter has two routes to the same ceiling rather than a best one.
+On the Concrete regression benchmark (Table 6.1), the refined second-order arm's 0.875 ± 0.029 and the full-second-order
+basis's 0.859 ± 0.027 are this chapter's two best fuzzy $R^2$ values. Refinement leads by 0.016, inside both spreads,
+so the chapter has two routes to nearly the same ceiling, with refinement slightly ahead rather than a clear best one.
 
 §6.3.5 reports the same direction for the optimizer arms: they do not order themselves at all, and what that study
 establishes is that a cold search slowly reaches a level the construction supplies at once, then flattens. They are
@@ -353,12 +354,12 @@ the mechanism and the measurement that bounds it inside every seed spread.
 
 | Model                                     |                     default settings |                       demo-tuned |
 |-------------------------------------------|-------------------------------------:|---------------------------------:|
-| Flat MoG-TSK, 2nd order                   | 0.841 ± 0.021 <br> *6.50 ± 0.43 MPa* |                                — |
-| Flat MoG-TSK, full 2nd order              |     0.861 ± 0.026 <br> *6.07 ± 0.51* |                                — |
-| Flat MoG-TSK, 2nd + antecedent refinement | **0.862 ± 0.033** <br> *6.00 ± 0.52* |                                — |
-| Fuzzy tree                                |     0.689 ± 0.056 <br> *9.07 ± 0.57* | 0.740 ± 0.051 <br> *8.29 ± 0.63* |
-| CART (reference)                          |     0.826 ± 0.047 <br> *6.73 ± 0.74* |                                — |
-| Random Forest (reference)                 | **0.909 ± 0.019** <br> *4.90 ± 0.31* |                                — |
+| Flat MoG-TSK, 2nd order                   | 0.840 ± 0.022 <br> *6.53 ± 0.47 MPa* |                                — |
+| Flat MoG-TSK, full 2nd order              |     0.859 ± 0.027 <br> *6.12 ± 0.53* |                                — |
+| Flat MoG-TSK, 2nd + antecedent refinement | **0.875 ± 0.029** <br> *5.76 ± 0.55* |                                — |
+| Fuzzy tree                                |     0.689 ± 0.059 <br> *9.07 ± 0.61* | 0.740 ± 0.054 <br> *8.29 ± 0.66* |
+| CART (reference)                          |     0.826 ± 0.049 <br> *6.73 ± 0.78* |                                — |
+| Random Forest (reference)                 | **0.909 ± 0.020** <br> *4.90 ± 0.33* |                                — |
 
 The table is deliberately a grid rather than a ranking, because the answer to "does the hierarchy beat the flat
 model?" turns entirely on what one holds fixed.

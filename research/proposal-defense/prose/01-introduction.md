@@ -19,8 +19,8 @@ intrinsically weak. That position is commonly asymptotic in the rule count, and 
 rule-base count axis — on the order of one rule per output class.
 
 Whether capability survives at a readable rule count is a question for measurement, not theory. On Concrete, ten seeds
-under one protocol, the flat model reaches $R^2 = 0.861 \pm 0.026$ with a full second-order consequent, against
-CART's $0.826 \pm 0.047$ and a random forest's $0.909 \pm 0.019$: level with the tree, behind the forest. At zeroth
+under one protocol, the flat model reaches $R^2 = 0.859 \pm 0.027$ with a full second-order consequent, against
+CART's $0.826 \pm 0.049$ and a random forest's $0.909 \pm 0.020$: level with the tree, behind the forest. At zeroth
 order, with constant consequents, it scores $0.394 \pm 0.065$ — usable, and less than half as good. Capability at a
 readable rule count is real, and it is not free. With regulators and safety engineers increasingly unwilling to accept a
 black box model — and with the aviation authorities now writing guidance that treats the explainability of a
