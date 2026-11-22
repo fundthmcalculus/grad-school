@@ -1,0 +1,51 @@
+dataset,metric,k,seed,acc,score_s,fit_s,kept,features
+Breast Cancer,higher_order,2,0,0.6140350877192983,0.02243657600001825,0.07585879099997328,2,concavity error|fractal dimension error
+Breast Cancer,higher_order,4,0,0.8771929824561403,0.02243657600001825,0.07389327999999296,4,mean concavity|area error|concavity error|fractal dimension error
+Breast Cancer,higher_order,5,0,0.8859649122807017,0.02243657600001825,0.13414926299998342,5,mean concavity|worst concavity|area error|concavity error|fractal dimension error
+Breast Cancer,higher_order,8,0,0.8859649122807017,0.02243657600001825,0.15150479099997938,8,mean concavity|worst concavity|perimeter error|area error|concave points error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,10,0,0.9122807017543859,0.02243657600001825,0.197737170000039,10,worst area|mean concavity|worst concavity|radius error|perimeter error|area error|concave points error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,2,1,0.7017543859649122,0.015887792999990324,0.04518056299997397,2,concavity error|smoothness error
+Breast Cancer,higher_order,4,1,0.7894736842105263,0.015887792999990324,0.09870895399996016,4,mean concavity|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,5,1,0.8596491228070176,0.015887792999990324,0.13330440599997928,5,mean concavity|area error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,8,1,0.8421052631578947,0.015887792999990324,0.1683794740000053,8,mean concavity|radius error|perimeter error|area error|concave points error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,10,1,0.8596491228070176,0.015887792999990324,0.22140624700000444,10,mean concavity|radius error|perimeter error|area error|concave points error|concavity error|fractal dimension error|symmetry error|smoothness error|mean fractal dimension
+Breast Cancer,higher_order,2,2,0.6929824561403509,0.01910373300000856,0.04808810499997662,2,concavity error|smoothness error
+Breast Cancer,higher_order,4,2,0.7894736842105263,0.01910373300000856,0.09346585800000184,4,area error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,5,2,0.8333333333333334,0.01910373300000856,0.1140590890000226,5,perimeter error|area error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,8,2,0.8859649122807017,0.01910373300000856,0.1797052499999836,8,mean concavity|worst concavity|radius error|perimeter error|area error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,10,2,0.9035087719298246,0.01910373300000856,0.20407508900001403,10,worst area|mean concavity|worst concavity|radius error|perimeter error|area error|concavity error|fractal dimension error|symmetry error|smoothness error
+Breast Cancer,higher_order,2,3,0.7105263157894737,0.017691041000034602,0.0470615309999971,2,concavity error|smoothness error
+Breast Cancer,higher_order,4,3,0.8333333333333334,0.017691041000034602,0.08234711000000061,4,mean concavity|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,5,3,0.9122807017543859,0.017691041000034602,0.11026959499997702,5,mean concavity|area error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,8,3,0.9210526315789473,0.017691041000034602,0.1830306470000096,8,mean concavity|worst concavity|radius error|perimeter error|area error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,10,3,0.9122807017543859,0.017691041000034602,0.22970479299999624,10,worst area|mean concavity|worst concavity|radius error|perimeter error|area error|concave points error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,2,4,0.6491228070175439,0.01802410099998042,0.048052470000016,2,concavity error|fractal dimension error
+Breast Cancer,higher_order,4,4,0.8947368421052632,0.01802410099998042,0.0869556970000076,4,mean concavity|area error|concavity error|fractal dimension error
+Breast Cancer,higher_order,5,4,0.9035087719298246,0.01802410099998042,0.1142920199999935,5,mean concavity|area error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,8,4,0.9122807017543859,0.01802410099998042,0.18571413099999745,8,mean concavity|radius error|perimeter error|area error|concave points error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,10,4,0.8421052631578947,0.01802410099998042,0.24234298200002513,10,worst area|mean area|mean concavity|radius error|perimeter error|area error|concave points error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,2,5,0.9122807017543859,0.017145101999972212,0.06416533999998819,2,area error|concavity error
+Breast Cancer,higher_order,4,5,0.868421052631579,0.017145101999972212,0.07661802399996986,4,area error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,5,5,0.9035087719298246,0.017145101999972212,0.10019007199997532,5,mean concavity|area error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,8,5,0.8859649122807017,0.017145101999972212,0.15324673600002825,8,mean concavity|radius error|area error|perimeter error|concave points error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,10,5,0.8771929824561403,0.017145101999972212,0.19765985500004035,10,mean concavity|radius error|area error|perimeter error|concave points error|concavity error|fractal dimension error|symmetry error|mean fractal dimension|smoothness error
+Breast Cancer,higher_order,2,6,0.6929824561403509,0.03552911399998493,0.0530015069999763,2,concavity error|smoothness error
+Breast Cancer,higher_order,4,6,0.7719298245614035,0.03552911399998493,0.08530808099999376,4,mean concavity|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,5,6,0.7631578947368421,0.03552911399998493,0.11482888900002308,5,mean concavity|worst concavity|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,8,6,0.8771929824561403,0.03552911399998493,0.16753158900002063,8,mean concavity|worst concavity|area error|concave points error|concavity error|symmetry error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,10,6,0.868421052631579,0.03552911399998493,0.24045590700001185,10,mean concavity|worst concavity|area error|radius error|concave points error|concavity error|symmetry error|fractal dimension error|smoothness error|texture error
+Breast Cancer,higher_order,2,7,0.8245614035087719,0.027243811999994705,0.04874687099999164,2,area error|concavity error
+Breast Cancer,higher_order,4,7,0.868421052631579,0.027243811999994705,0.11453602699998555,4,mean concavity|area error|concavity error|fractal dimension error
+Breast Cancer,higher_order,5,7,0.8596491228070176,0.027243811999994705,0.12205252199998995,5,mean concavity|perimeter error|area error|concavity error|fractal dimension error
+Breast Cancer,higher_order,8,7,0.8947368421052632,0.027243811999994705,0.25275471199995536,8,mean concavity|worst concavity|radius error|perimeter error|area error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,10,7,0.9298245614035088,0.027243811999994705,0.20751165599995147,10,worst area|mean concavity|worst concavity|radius error|perimeter error|area error|concave points error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,2,8,0.631578947368421,0.02470135900000514,0.05512994900004742,2,concavity error|smoothness error
+Breast Cancer,higher_order,4,8,0.8508771929824561,0.02470135900000514,0.08247642899999619,4,area error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,5,8,0.9035087719298246,0.02470135900000514,0.10971359800004166,5,mean concavity|area error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,8,8,0.9035087719298246,0.02470135900000514,0.16104292500000383,8,mean concavity|worst concavity|radius error|perimeter error|area error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,10,8,0.9298245614035088,0.02470135900000514,0.2029785009999614,10,worst area|mean concavity|worst concavity|radius error|perimeter error|area error|concave points error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,2,9,0.6052631578947368,0.017128141000000596,0.043813188000001446,2,concavity error|smoothness error
+Breast Cancer,higher_order,4,9,0.8421052631578947,0.017128141000000596,0.09565442600001006,4,area error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,5,9,0.9035087719298246,0.017128141000000596,0.10213256899999124,5,mean concavity|area error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,8,9,0.9122807017543859,0.017128141000000596,0.1588419710000153,8,mean concavity|worst concavity|radius error|perimeter error|area error|concavity error|fractal dimension error|smoothness error
+Breast Cancer,higher_order,10,9,0.9035087719298246,0.017128141000000596,0.22997278200000437,10,worst area|mean concavity|worst concavity|radius error|perimeter error|area error|concave points error|concavity error|fractal dimension error|smoothness error
