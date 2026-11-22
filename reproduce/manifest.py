@@ -620,6 +620,58 @@ EXPERIMENTS = [
         "skipped if absent. results.json carries its own provenance block "
         "(pin SHAs, versions, host, UTC timestamp).",
     ),
+    Experiment(
+        id="uniformity-scaling-sweep",
+        title="Uniformity-preserving scalers (quantile / piecewise / ECDF) vs. "
+        "log+min-max, regression at tsk_order 1st and auto, plus classification",
+        chapter="Ch4",
+        produces="reproduce/experiments/UNIFORMITY_SCALING_RESULTS.md (no numbered table)",
+        repo="tribble-fis",
+        command=_uv("../reproduce/experiments/uniformity_scaling_sweep.py"),
+        hardware="any",
+        datasets=[
+            "Concrete",
+            "Body Fat",
+            "Bike Sharing (n=5000)",
+            "Glass",
+            "Shuttle (n=10000)",
+            "PhiUSIIL (n=10000, gitignored -- N/A if absent)",
+        ],
+        outputs=[
+            "reproduce/outputs/uniformity_scaling_sweep.md",
+            "reproduce/outputs/uniformity_scaling_sweep_classification.md",
+            "reproduce/outputs/uniformity_scaling_sweep_perseed.csv",
+        ],
+        notes="grad-school #249. Every scaler is tribblefis.scaling's (tribble-fis "
+        "#225, in the 03d327a pin); the experiment-local uniformity_transforms.py "
+        "that #246 shipped is deleted so there is one implementation. Regression "
+        "runs at BOTH tsk_order='1st' and 'auto' so a gain that only exists against "
+        "an under-powered consequent is visible, reports the PAIRED delta vs "
+        "log+minmax, and carries an OLS reference row: on Body Fat log+minmax is "
+        "far below OLS (degenerate baseline), so the headline +0.47 there is the "
+        "baseline's defect, not a transform effect. ~3 min on 4 cores. NOT in "
+        "run_all_tables.sh -- no numbered table.",
+    ),
+    Experiment(
+        id="feature-range-sweep",
+        title="MinMaxScaler feature_range [0,1] vs [-1,1] vs [-0.5,1.5], flat "
+        "MoG-TSK 1st order, four regression datasets",
+        chapter="Ch4",
+        produces="reproduce/experiments/UNIFORMITY_SCALING_RESULTS.md (no numbered table)",
+        repo="tribble-fis",
+        command=_uv("../reproduce/experiments/feature_range_sweep.py"),
+        hardware="any",
+        datasets=["Concrete", "Body Fat", "Bike Sharing (n=5000)", "WEC Sydney"],
+        outputs=[
+            "reproduce/outputs/feature_range_sweep.md",
+            "reproduce/outputs/feature_range_sweep.csv",
+        ],
+        notes="grad-school #249. Negative result: feature_range makes no systematic "
+        "difference. WEC Sydney reads R2 ~ -39 in every arm -- the cell is broken, "
+        "not informative. The script fits the scaler on ALL rows before the split "
+        "(transductive), unlike uniformity_scaling_sweep. ~3.5 min. NOT in "
+        "run_all_tables.sh -- no numbered table.",
+    ),
     # ---- Ch3 pVAT / clustering experiments ----
     Experiment(
         id="ch3-adversarial-eval",
