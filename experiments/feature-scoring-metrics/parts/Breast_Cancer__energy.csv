@@ -1,0 +1,51 @@
+dataset,metric,k,seed,acc,score_s,fit_s,kept,features
+Breast Cancer,energy,2,0,0.8859649122807017,0.00401801800001067,0.07666605600002185,2,worst area|mean area
+Breast Cancer,energy,4,0,0.8947368421052632,0.00401801800001067,0.07924033300002975,4,worst perimeter|worst area|mean area|area error
+Breast Cancer,energy,5,0,0.9035087719298246,0.00401801800001067,0.10427137499999617,5,worst perimeter|mean perimeter|worst area|mean area|area error
+Breast Cancer,energy,8,0,0.9035087719298246,0.00401801800001067,0.15967294099999663,8,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|area error|worst texture
+Breast Cancer,energy,10,0,0.8947368421052632,0.00401801800001067,0.1913861860000452,10,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|perimeter error|area error|worst texture|mean texture
+Breast Cancer,energy,2,1,0.8245614035087719,0.003839986000002682,0.03915513800001236,2,worst area|mean area
+Breast Cancer,energy,4,1,0.8421052631578947,0.003839986000002682,0.07843189999999822,4,worst perimeter|worst area|mean area|area error
+Breast Cancer,energy,5,1,0.8421052631578947,0.003839986000002682,0.11109563000002254,5,worst perimeter|mean perimeter|worst area|mean area|area error
+Breast Cancer,energy,8,1,0.8508771929824561,0.003839986000002682,0.16795589899999186,8,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|area error|worst texture
+Breast Cancer,energy,10,1,0.868421052631579,0.003839986000002682,0.20097630200001504,10,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|perimeter error|area error|worst texture|mean texture
+Breast Cancer,energy,2,2,0.868421052631579,0.0032385279999971317,0.04333567399999083,2,worst area|mean area
+Breast Cancer,energy,4,2,0.868421052631579,0.0032385279999971317,0.08451900200003593,4,worst perimeter|worst area|mean area|area error
+Breast Cancer,energy,5,2,0.8596491228070176,0.0032385279999971317,0.1030188539999699,5,worst perimeter|mean perimeter|worst area|mean area|area error
+Breast Cancer,energy,8,2,0.868421052631579,0.0032385279999971317,0.18238063900003,8,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|area error|worst texture
+Breast Cancer,energy,10,2,0.8859649122807017,0.0032385279999971317,0.20181681200000412,10,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|perimeter error|area error|worst texture|mean texture
+Breast Cancer,energy,2,3,0.8771929824561403,0.003882053999973323,0.0415645779999636,2,worst area|mean area
+Breast Cancer,energy,4,3,0.8859649122807017,0.003882053999973323,0.08293849900002215,4,worst perimeter|worst area|mean area|area error
+Breast Cancer,energy,5,3,0.8859649122807017,0.003882053999973323,0.11157903100001931,5,worst perimeter|mean perimeter|worst area|mean area|area error
+Breast Cancer,energy,8,3,0.8859649122807017,0.003882053999973323,0.1657086920000097,8,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|area error|worst texture
+Breast Cancer,energy,10,3,0.8947368421052632,0.003882053999973323,0.22107564300000604,10,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|perimeter error|area error|worst texture|mean texture
+Breast Cancer,energy,2,4,0.7807017543859649,0.003952652999998918,0.044405769999968925,2,worst area|mean area
+Breast Cancer,energy,4,4,0.8157894736842105,0.003952652999998918,0.10553524300001982,4,worst perimeter|worst area|mean area|area error
+Breast Cancer,energy,5,4,0.8070175438596491,0.003952652999998918,0.1030403510000042,5,worst perimeter|mean perimeter|worst area|mean area|area error
+Breast Cancer,energy,8,4,0.8157894736842105,0.003952652999998918,0.17517904200002477,8,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|worst texture|area error
+Breast Cancer,energy,10,4,0.8157894736842105,0.003952652999998918,0.2347125109999979,10,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|perimeter error|worst texture|area error|mean texture
+Breast Cancer,energy,2,5,0.8947368421052632,0.0038505929999814725,0.04392991199995322,2,worst area|mean area
+Breast Cancer,energy,4,5,0.8859649122807017,0.0038505929999814725,0.08296639099995673,4,worst perimeter|worst area|mean area|area error
+Breast Cancer,energy,5,5,0.8859649122807017,0.0038505929999814725,0.09441796300001215,5,worst perimeter|mean perimeter|worst area|mean area|area error
+Breast Cancer,energy,8,5,0.9122807017543859,0.0038505929999814725,0.1640626559999987,8,worst perimeter|worst radius|mean perimeter|worst area|mean radius|mean area|area error|worst texture
+Breast Cancer,energy,10,5,0.9210526315789473,0.0038505929999814725,0.20400596199999654,10,worst perimeter|worst radius|mean perimeter|worst area|mean radius|mean area|area error|perimeter error|worst texture|mean texture
+Breast Cancer,energy,2,6,0.868421052631579,0.004508742999973947,0.04162564000000657,2,worst area|mean area
+Breast Cancer,energy,4,6,0.868421052631579,0.004508742999973947,0.0837750570000253,4,worst perimeter|worst area|mean area|area error
+Breast Cancer,energy,5,6,0.868421052631579,0.004508742999973947,0.11026141199999984,5,worst perimeter|mean perimeter|worst area|mean area|area error
+Breast Cancer,energy,8,6,0.868421052631579,0.004508742999973947,0.16985617099999217,8,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|area error|worst texture
+Breast Cancer,energy,10,6,0.8771929824561403,0.004508742999973947,0.2165641749999736,10,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|area error|perimeter error|worst texture|mean texture
+Breast Cancer,energy,2,7,0.9035087719298246,0.003952853999976469,0.05386394000004202,2,worst area|mean area
+Breast Cancer,energy,4,7,0.9122807017543859,0.003952853999976469,0.09398573400000032,4,worst perimeter|worst area|mean area|area error
+Breast Cancer,energy,5,7,0.9122807017543859,0.003952853999976469,0.10603819599998587,5,worst perimeter|mean perimeter|worst area|mean area|area error
+Breast Cancer,energy,8,7,0.9298245614035088,0.003952853999976469,0.16760983100004978,8,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|area error|worst texture
+Breast Cancer,energy,10,7,0.9298245614035088,0.003952853999976469,0.2124443109999561,10,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|perimeter error|area error|worst texture|mean texture
+Breast Cancer,energy,2,8,0.868421052631579,0.003864727000006951,0.04550260899998193,2,worst area|mean area
+Breast Cancer,energy,4,8,0.8771929824561403,0.003864727000006951,0.08602931100000433,4,worst perimeter|worst area|mean area|area error
+Breast Cancer,energy,5,8,0.8771929824561403,0.003864727000006951,0.10522350700000516,5,worst perimeter|mean perimeter|worst area|mean area|area error
+Breast Cancer,energy,8,8,0.8859649122807017,0.003864727000006951,0.17874672800002145,8,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|area error|worst texture
+Breast Cancer,energy,10,8,0.9035087719298246,0.003864727000006951,0.20298806400001013,10,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|perimeter error|area error|worst texture|mean texture
+Breast Cancer,energy,2,9,0.8771929824561403,0.0030347460000257342,0.04448826100002634,2,worst area|mean area
+Breast Cancer,energy,4,9,0.8859649122807017,0.0030347460000257342,0.08230770699998402,4,worst perimeter|worst area|mean area|area error
+Breast Cancer,energy,5,9,0.8771929824561403,0.0030347460000257342,0.11889451399997597,5,worst perimeter|mean perimeter|worst area|mean area|area error
+Breast Cancer,energy,8,9,0.8771929824561403,0.0030347460000257342,0.18039612499995883,8,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|area error|worst texture
+Breast Cancer,energy,10,9,0.8859649122807017,0.0030347460000257342,0.21913421299996116,10,worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area|perimeter error|area error|worst texture|mean texture
