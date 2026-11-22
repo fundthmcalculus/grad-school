@@ -305,9 +305,9 @@ experiment.
 > the fixed reproducibility protocol and the full baseline suite before citation (see Ch 7 Goal G4/G3).
 
 **What is measured today.** Table 6.1 compares the flat model and the fuzzy tree on Concrete, on shared splits and seeds
-but *not* under a single protocol, and the table takes up what that licenses. On PhiUSIIL classification the flat model
-reaches 0.997 ± 0.001 and the tree 0.970 on interpretable splits, though as Table 6.2 notes the gaps there carry no
-weight. And the memory result above.
+but *not* under a single protocol, and the table takes up what that licenses. On leak-free PhiUSIIL classification the flat
+model reaches only 0.440 ± 0.181 and the tree 0.958 ± 0.003 on interpretable splits, against CART's 0.997 (Table 6.2
+and the note under it). And the memory result above.
 
 **Antecedent refinement, measured.** §6.3.5 described refining the membership-function parameters against a held-out
 objective; the harness now runs it.

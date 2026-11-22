@@ -592,13 +592,13 @@ Applying the transform uniformly costs the baselines nothing, for the rank-invar
 +0.001 and +0.000, so the CART and Random Forest column reads the same either way.
 
 The MoG appears on two rows because only the first is fully instrumented. Every cell in row 1 comes from one file,
-`reproduce/outputs/phiusiil-leakfree-2026-08-30/table_4_1.csv`: Concrete `R² = 0.795 ± 0.025` at **0.43 ± 0.02 s**,
-PhiUSIIL `acc = 0.997 ± 0.001` at **0.28 ± 0.02 s**.
+`reproduce/outputs/phiusiil-leakfree-2026-08-30/table_4_1.csv`: Concrete `R² = 0.799 ± 0.027` at **0.53 ± 0.05 s**,
+PhiUSIIL `acc = 0.440 ± 0.181` at **0.13 ± 0.02 s**.
 
-The 2% spread on the Concrete clock is worth explaining, since a naive first pass through the ten seeds reads far
+The spread on the Concrete clock is worth explaining, since a naive first pass through the ten seeds reads far
 noisier. Concrete is the first arm fit, so seed 0 absorbs import, JIT, thread-pool spin-up and first-touch allocation at
-3.7× the other nine; the generator discards that one warm-up fit, leaving the cell at 0.43 ± 0.02 s, in line with the
-PhiUSIIL row (fitted second, so never affected by the warm-up cost). Accuracy is unaffected by the warm-up fit either
+3.7× the other nine; the generator discards that one warm-up fit, leaving the cell at 0.53 ± 0.05 s (the PhiUSIIL row is
+fitted second, so never affected by the warm-up cost). Accuracy is unaffected by the warm-up fit either
 way, so the effect is confined to the clock (`PROVENANCE_MAP.md`, note 14).
 
 One missing row. §4.2 names Gaussian naive Bayes as this construction's nearest acknowledged relative, and it does not
@@ -658,10 +658,10 @@ and Bike Sharing, so the argument is against fuzzy-system induction and not agai
 *The full-second-order row's missing time.* Its two halves come from different code paths: the **R² of 0.861 ± 0.026
 comes from Table 4.1's study** (`table_hyperparam_normalization.py`, driving `solve_tsk_consequents` / `predict_tsk`
 directly), while row 1's numbers come from the `MixtureOfGaussiansFuzzyRegressor` estimator. That estimator now carries
-a timed full-second-order arm, measuring **R² = 0.852 ± 0.030 in 0.44 ± 0.04 s** at ten seeds — a 0.009 gap from the
+a timed full-second-order arm, measuring **R² = 0.852 ± 0.030 in 0.53 ± 0.04 s** at ten seeds — a 0.009 gap from the
 0.861 figure, inside both spreads. The two agree, but the cell stays empty rather than splice a time from one
 implementation onto an accuracy from another. The reading today: on the estimator path full second order buys about
-+0.06 R² over first order for one hundredth of a second, with the exact pairing still owed.
++0.05 R² over first order at no measurable extra training time (0.53 s either way), with the exact pairing still owed.
 
 *Reading the empty cells.* `N/A (C1)` is not a number withheld; it is a measurement that cannot be taken with what is in
 the repository. `table_4_1_mog_baselines.py` looks for `reproduce/tables/_baseline_anfis.py` and `_baseline_gafis.py`

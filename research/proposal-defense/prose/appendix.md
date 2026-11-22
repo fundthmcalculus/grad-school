@@ -1599,7 +1599,7 @@ Jacobs [@jordan1994hierarchical] is the standard reference for the hierarchical 
 | Model                        | Concrete, default settings | Concrete, demo-tuned | PhiUSIIL accuracy |
 |------------------------------|---------------------------:|---------------------:|------------------:|
 | Flat MoG-TSK, full 2nd order |              0.861 ± 0.026 |                    — |     0.440 ± 0.181 |
-| Mixture of experts (HME)     |              0.756 ± 0.059 |        0.834 ± 0.027 |     1.000 ± 0.001 |
+| Mixture of experts (HME)     |              0.756 ± 0.059 |        0.834 ± 0.027 |     0.914 ± 0.039 |
 | Fuzzy tree                   |              0.689 ± 0.056 |        0.740 ± 0.051 |     0.958 ± 0.003 |
 | CART (reference)             |              0.826 ± 0.047 |                    — |     0.997 ± 0.001 |
 | Random Forest (reference)    |              0.909 ± 0.019 |                    — |     1.000 ± 0.000 |
@@ -1607,9 +1607,9 @@ Jacobs [@jordan1994hierarchical] is the standard reference for the hierarchical 
 Tuned, the mixture reaches $R^2 = 0.834 \pm 0.027$ against the flat model's matched-architecture $0.841 \pm 0.021$:
 indistinguishable within spread. Tuning cuts the mixture's standard deviation from 0.060 to 0.022, nearly a factor of
 three, while raising the mean from 0.760 to 0.829, so what the tuned settings mostly buy is reliability rather than a
-level shift — at library defaults the mixture is an erratic model, not a slightly worse one. On PhiUSIIL the mixture
-reaches parity with CART and the random forest, though the dataset is saturated for every method tested and the
-comparison carries no weight.
+level shift — at library defaults the mixture is an erratic model, not a slightly worse one. On leak-free PhiUSIIL the mixture
+reaches 0.914 ± 0.039: well above the flat model's 0.440 but short of the fuzzy tree (0.958), CART (0.997) and the
+random forest (1.000), so it does not reach parity (`phiusiil-leakfree-2026-08-30` and the run of record agree).
 
 **A rare catastrophic failure, and why it motivates the dissertation's ten-seed floor (Goal G4a).** At library defaults,
 one of ten seeds (seed 9, normalized features) produced predictions running to 10,536 MPa on a target that never exceeds
