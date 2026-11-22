@@ -211,7 +211,7 @@ Table knobs are documented in `reproduce/tables/README.md` (`REPRO_SEEDS`,
 Running everything:
 
 ```bash
-reproduce/run_all_tables.sh my-label            # all tables; ~30–40 min on the run-of-record host (i9-14900HX), slower elsewhere
+reproduce/run_all_tables.sh my-label            # all tables; ~70 min on the run-of-record host (i9-13980HX, CPU tables) without RT-IOT2022 — Table 4.4 on RT-IOT2022 adds ~3.5 h
 reproduce/run_all_tables.sh --fast smoke-check  # minutes; stamped NOT CITABLE
 reproduce/run_all_tables.sh --archive-only my-label   # snapshot current outputs, run nothing
 ```
@@ -259,14 +259,16 @@ that is what `--archive-only` recovers).
 ## Submodule conventions
 
 Pins move over time — check `git submodule status` for the current ones (the
-2026-08-28 state: `tribble-fis` `353162c`, `tribble-cluster` `1dcf331`,
-`tribble-opt` `4d81121`, advanced 2026-08-25). The pins below are a
-*snapshot*, not a guarantee, and so is everything that cites them:
-`WORKINGDOC.md`'s state table is the 2026-08-01/02 state, and the run of
-record cited by PROVENANCE_MAP's latest whole-document section
-(`full-2026-08-22`) ran at the *previous* `tribble-fis` pin (`141596e`) — its
-numbers are comparable only to that pin (CHECKLIST B14/D8 record what moved
-since, and that both named causes are now inside the current pin).
+2026-11-21 state: `tribble-fis` `03d327a`, `tribble-cluster` `20264b3`,
+`tribble-opt` `c21d543`). The pins below are a *snapshot*, not a guarantee,
+and so is everything that cites them: `WORKINGDOC.md`'s state table is the
+2026-08-01/02 state. The run of record for every **non-GPU** table is
+`full-03d327a-2026-11-21` (i9-13980HX, those pins; PROVENANCE_MAP's
+2026-11-21 whole-document section says what it does and does not cover —
+notably RT-IOT2022 rows and Table 4.4 on RT-IOT2022). Table 3.4's GPU rows
+are deferred and still rest on earlier archives. The previous run of record,
+`full-2026-08-22`, ran at `tribble-fis` `141596e` and carries the B14 defect;
+do not quote Chapter 4/6 accuracy cells from it.
 
 - **`tribble-fis`** (import `tribblefis`): optional Cython forward-pass kernel
   and optional GPU backend are *not built by default* and fall back silently

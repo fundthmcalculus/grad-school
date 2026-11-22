@@ -238,7 +238,7 @@ The broader conclusion concerns *interpretability*, this dissertation's central 
 establish. Chapter 4 argues the construction yields a readable rule base, a handful of clauses over named features.
 Table A.2 still shows that claim is no property of the model architecture — but what it now shows is stronger and less
 comfortable: on this dataset, **with the leak removed, no ranking delivers a readable *and* accurate rule base at all.**
-Reaching 0.96 takes fifteen features under every scorer.
+Reaching 0.96 takes ten features at best (composite) and fifteen to twenty under the others.
 
 The evidence is still the **one-feature row**, and it now says the opposite of what it used to. It used to read 0.9967
 against 0.4267 — a gap of 0.57 — and support the claim that *with a ranking that works, the model is readable and
@@ -564,8 +564,8 @@ labels against true Gaussian posteriors.
 
 G3's prediction is registered in advance because the document had already absorbed every outcome. A.11.2 notes that a
 single-layer TSK system is functionally equivalent to a mixture of experts; §6.3.5 and §6.4 both measure additional
-search buying less as consequent capacity grows, refinement worth 0.914 at zeroth order, 0.072 at first and 0.037 at
-second, a factor of twenty-five; and A.11.1 says that if the EM slips, the one-shot mixture stands as a completed
+search buying less as consequent capacity grows, refinement worth 0.348 at zeroth order, 0.037 at first and 0.035 at
+second, a factor of ten (Chapter 6); and A.11.1 says that if the EM slips, the one-shot mixture stands as a completed
 prototype. Left alone, EM ≈ one-shot reads as confirmation, EM > one-shot as the deliverable, EM-never-runs as a
 de-scope: three doors and no experiment.
 
@@ -1598,18 +1598,18 @@ Jacobs [@jordan1994hierarchical] is the standard reference for the hierarchical 
 
 | Model                        | Concrete, default settings | Concrete, demo-tuned | PhiUSIIL accuracy |
 |------------------------------|---------------------------:|---------------------:|------------------:|
-| Flat MoG-TSK, full 2nd order |              0.861 ± 0.026 |                    — |     0.440 ± 0.181 |
-| Mixture of experts (HME)     |              0.756 ± 0.059 |        0.834 ± 0.027 |     1.000 ± 0.001 |
-| Fuzzy tree                   |              0.689 ± 0.056 |        0.740 ± 0.051 |     0.958 ± 0.003 |
-| CART (reference)             |              0.826 ± 0.047 |                    — |     0.997 ± 0.001 |
-| Random Forest (reference)    |              0.909 ± 0.019 |                    — |     1.000 ± 0.000 |
+| Flat MoG-TSK, full 2nd order |              0.859 ± 0.027 |                    — |     0.440 ± 0.181 |
+| Mixture of experts (HME)     |              0.758 ± 0.062 |        0.836 ± 0.028 |     0.914 ± 0.039 |
+| Fuzzy tree                   |              0.689 ± 0.059 |        0.740 ± 0.054 |     0.958 ± 0.003 |
+| CART (reference)             |              0.826 ± 0.049 |                    — |     0.997 ± 0.001 |
+| Random Forest (reference)    |              0.909 ± 0.020 |                    — |     1.000 ± 0.000 |
 
-Tuned, the mixture reaches $R^2 = 0.834 \pm 0.027$ against the flat model's matched-architecture $0.841 \pm 0.021$:
-indistinguishable within spread. Tuning cuts the mixture's standard deviation from 0.060 to 0.022, nearly a factor of
-three, while raising the mean from 0.760 to 0.829, so what the tuned settings mostly buy is reliability rather than a
-level shift — at library defaults the mixture is an erratic model, not a slightly worse one. On PhiUSIIL the mixture
-reaches parity with CART and the random forest, though the dataset is saturated for every method tested and the
-comparison carries no weight.
+Tuned, the mixture reaches $R^2 = 0.836 \pm 0.028$ against the flat model's matched-architecture $0.840 \pm 0.022$:
+indistinguishable within spread. Tuning cuts the mixture's standard deviation from 0.062 to 0.028, about a factor of
+two, while raising the mean from 0.758 to 0.836, so what the tuned settings mostly buy is reliability rather than a
+level shift — at library defaults the mixture is an erratic model, not a slightly worse one. On leak-free PhiUSIIL the mixture
+reaches 0.914 ± 0.039: well above the flat model's 0.440 but short of the fuzzy tree (0.958), CART (0.997) and the
+random forest (1.000), so it does not reach parity (`phiusiil-leakfree-2026-08-30` and the run of record agree).
 
 **A rare catastrophic failure, and why it motivates the dissertation's ten-seed floor (Goal G4a).** At library defaults,
 one of ten seeds (seed 9, normalized features) produced predictions running to 10,536 MPa on a target that never exceeds

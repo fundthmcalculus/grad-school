@@ -30,14 +30,14 @@ loaders under `reproduce/tables/_fuzzy_models.py`.
 - **Status:** Loads from the local CSV; the earlier path through `tribble-fis/gaussian_mixture/` no longer resolves
   upstream
 
-#### RT-IOT2022 (Table 4.4, §4.4, pending)
+#### RT-IOT2022 (Tables 4.4, 4.7b, 4.7c, §4.4)
 
 - **File:** `data/RT_IOT2022.csv`
 - **Size:** 123,117 rows × 81 features, 12 classes
 - **Role:** Open-set detection testbed (planned); intended to replace Glass (214 samples) as the large-scale
   anomaly/open-set partner
 - **Source:** [UC Irvine Machine Learning Repository](https://archive.ics.uci.edu/datasets), dataset ID 952
-- **Loading:** `reproduce/tables/_fuzzy_models.py::load_rt_iot2022()` (not yet wired)
+- **Loading:** `reproduce/tables/_fuzzy_models.py::load_rt_iot2022()`
 - **Status:** In the repository and wired (2026-08-12), both roles measured. Open-set claim at ten seeds (Table 4.7b,
   re-measured 2026-08-27 on the de-leaked loader): complement rule loses to Isolation Forest at this scale (+0.366 vs
   +0.535 Youden's $J$). Plain classification/timing at ten seeds (Table 4.4, `table_4_1_mog_baselines.py`): MoG trains
@@ -160,11 +160,11 @@ edit distance, graphs under a kernel dissimilarity. Three of the UCR/UEA time-se
     - **FordA:** 4,921 × 500 — exactness 1.000, violations 0.4% (below the synthetic proxy), downstream: every method
       scores ≈0 ARI (degenerate)
     - **Crop:** 24,000 × 46, 24 classes (the large-scale target, ≈4.6 GB as float64 dissimilarity matrix) — exactness
-      1.000, violations 23.6%, matrix build 1,597 s + reorder **4.7 s**, downstream both methods weak (NERFCM 0.029,
-      set-cover 0.064 ARI)
-- **Verified loadable, not yet attempted:**
-    - **ElectricDevices:** 16,637 × 96
-    - **StarLightCurves:** 9,236 × 1,024
+      1.000, violations 23.6%, matrix build 1,597 s + reorder **4.7 s**, downstream both methods weak (NERFCM 0.030 ± 0.012,
+      set-cover 0.114 ARI on the corrected transform, `g2-downstream-2026-08-25`; 0.029 / 0.064 before it)
+- **Downstream only (2026-08-25, full N):**
+    - **ElectricDevices:** 16,637 × 96 — NERFCM 0.175, set-cover 0.147 ARI
+    - **StarLightCurves:** 9,236 × 1,024 — NERFCM 0.482 ± 0.060, set-cover 0.664 ARI
 - **Distance metric:** Dynamic Time Warping (DTW)
 - **Status:** Three of five wired and measured; two verified loadable, unattempted
 - **Role:** Core to Goal G2 — demonstrates coordinate-free regime on real non-metric data; exactness (decision-rule item
@@ -274,11 +274,11 @@ demonstrate scaling past Concrete's ~1K rows, it's a strong practical benchmark.
 |-------------------------------|----------------------|-----------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Regression**                | Concrete (1,030)     | Bike Sharing (17,379); California Housing (20,640); Superconductivity (21,263); N-CMAPSS DS02 turbofan RUL (6.5M raw) | **Yes** (10 seeds) + **demonstrated** (N-CMAPSS, single-run) | Bike Sharing in Table 4.1; California Housing/Superconductivity in Appendix A.7.1 — RF wins both, flat MoG/HME unstable on Superconductivity; N-CMAPSS a physics/prognostics case study (Table 4.10, §4.4.1) beating public-file CNN/MLP baselines                                             |
 | **Classification**            | Glass (214)          | PhiUSIIL (236K)                                                                                                       | Yes                                                          | Fixed; was broken, now working                                                                                                                                                                                                                                                                 |
-| **Classification (open-set)** | Glass (214)          | RT-IOT2022 (123K)                                                                                                     | **Yes** (2026-08-12, both roles)                             | Open-set (10 seeds, Table 4.7b): complement rule loses to Isolation Forest (+0.366 vs +0.535). Classification/timing (10 seeds, Table 4.4, de-leaked loader): MoG 92.7% / 4.2s vs. RF 99.8%                                                                                                    |
+| **Classification (open-set)** | Glass (214)          | RT-IOT2022 (123K)                                                                                                     | **Yes** (2026-08-12, both roles)                             | Open-set (10 seeds, Table 4.7b): complement rule loses to Isolation Forest (+0.366 vs +0.535). Classification/timing (10 seeds, Table 4.4, de-leaked loader): MoG 92.7% / 3.64 s vs. RF 99.8%                                                                                                    |
 | **Anomaly**                   | Glass (214)          | BETH (1.14M)                                                                                                          | **Yes** (10 seeds, Table 4.11)                               | Measured via the one-class protocol (`TribbleOneClassDetector`), not leave-one-class-out — that needs ≥3 classes and BETH is binary. Complement rule reaches parity with a one-class SVM ($J$ +0.843 vs +0.841); Isolation Forest overtakes both once its default is corrected (Table 4.11(d)) |
 | **Clustering**                | Synthetic (120–1.5k) | Shuttle (58K)                                                                                                         | Demonstrated                                                 | Shuttle in place; demo not repeatable                                                                                                                                                                                                                                                          |
 | **Membership Gen**            | Synthetic (120–160)  | Scalable batteries (100–5,000)                                                                                        | **Yes** (2026-08-12, 10 seeds)                               | `many_scale` solid, `single_scale` less stable than believed, `log_separated` gradual — see Ch5 §5.4, Goal G1                                                                                                                                                                                  |
-| **Non-coordinate (G2)**       | *[unwired]*          | ECG5000, FordA, Crop (up to 24k, DTW)                                                                                 | **Partially** (2026-08-12, exactness only)                   | Exactness = 1.000 on 3 of 5 named datasets; downstream-usefulness threshold not yet met (2 of 3 tested, both low-information)                                                                                                                                                                  |
+| **Non-coordinate (G2)**       | *[unwired]*          | ECG5000, FordA, Crop (up to 24k, DTW)                                                                                 | **Partially** (2026-08-12, exactness only)                   | Exactness = 1.000 on 3 of 5 named datasets; downstream measured on all 5 (2026-08-25); parity threshold not met (2 of 5, both low-information; the other 3 favor the set-cover)                                                                                                                                                                  |
 
 ---
 

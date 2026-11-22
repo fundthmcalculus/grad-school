@@ -44,9 +44,10 @@ features are wider, by exactly that sum (Appendix A.10.8). What I claim is not a
 construction produces an *interpretable fuzzy inference system* (real membership functions, real linguistic rules,
 editable by hand) extremely fast, and that the naive-Bayes-like factorization is what keeps it so. Where the
 independence assumption costs accuracy, I recover it with a few correction rules rather than abandoning the
-factorization. That pass is now measured on Glass (§4.3.1, Table 4.9): +0.031 ± 0.027 accuracy for the gated cascade
-over the flat base, of which +0.014 ± 0.061 survives collapsing the cascade into one deployable FIS. The mechanism
-claim — that the pass helps, and that deploying it costs something identifiable — holds. The *scale* claim, that it
+factorization. That pass is now measured on Glass (§4.3.1, Table 4.9): +0.0077 ± 0.0109 accuracy for the gated cascade
+over the flat base, a 95% interval that just reaches zero, and +0.0046 ± 0.0384 after collapsing the cascade into one
+deployable FIS. The mechanism claim — that the pass helps — is therefore not yet supported: on Glass at ten seeds it
+neither costs nor gains anything measurable. The *scale* claim, that it
 earns its keep at RT-IOT2022's twelve classes and eighty-three features, remains a design intention: the correction pass
 has not yet been run on that dataset (the open-set complement rule has, Table 4.7b, but that is a different mechanism).
 
@@ -71,48 +72,50 @@ than the fact that there is one. Measured across ten seeds on identical splits:
 
 **Table 4.1 — What the transform is worth, by model, and what a centred transform costs.** All nine rows the generator
 emits; the pattern is the point, not any single row. Provenance:
-`reproduce/outputs/uniform-2026-08-03/table_hyperparam_normalization.csv`, the run of record. The z-score column was
+`reproduce/outputs/full-03d327a-2026-11-21/table_hyperparam_normalization.csv`, the run of record. The z-score column was
 first measured by the three-arm side study (`outputs/norm-three-arm-a385a1a/`); every figure in it has since moved, for
 the reason given below.
 
 | Model                     | Hyperparameters  |  raw features | log + min-max to $[0,1]$ | log + z-score | Δ min-max − raw | Δ z-score − min-max |
 |---------------------------|------------------|--------------:|-------------------------:|--------------:|----------------:|--------------------:|
-| flat MoG-TSK, 1st order   | pipeline default | 0.695 ± 0.030 |            0.796 ± 0.018 | 0.713 ± 0.035 |      **+0.101** |              −0.083 |
-| flat MoG-TSK, 2nd order   | pipeline default | 0.804 ± 0.030 |            0.841 ± 0.021 | 0.827 ± 0.028 |          +0.037 |              −0.015 |
-| flat MoG-TSK, full 2nd    | pipeline default | 0.830 ± 0.025 |            0.861 ± 0.026 | 0.809 ± 0.115 |          +0.030 |              −0.051 |
-| fuzzy tree                | demo-tuned       | 0.712 ± 0.030 |            0.740 ± 0.051 | 0.740 ± 0.051 |          +0.028 |              −0.000 |
-| fuzzy tree                | library default  | 0.583 ± 0.067 |            0.689 ± 0.056 | 0.691 ± 0.055 |          +0.106 |              +0.002 |
-| mixture of experts        | demo-tuned       | 0.774 ± 0.025 |            0.834 ± 0.027 | 0.806 ± 0.031 |          +0.060 |              −0.028 |
-| mixture of experts        | library default  | 0.648 ± 0.093 |            0.756 ± 0.059 | 0.744 ± 0.066 |          +0.108 |              −0.012 |
-| CART (reference)          | sklearn default  | 0.825 ± 0.047 |            0.826 ± 0.047 | 0.826 ± 0.046 |          +0.001 |              −0.000 |
-| Random Forest (reference) | sklearn default  | 0.909 ± 0.018 |            0.909 ± 0.019 | 0.909 ± 0.018 |          +0.000 |              −0.000 |
+| flat MoG-TSK, 1st order   | pipeline default | 0.695 ± 0.031 |            0.795 ± 0.019 | 0.710 ± 0.033 |      **+0.100** |              −0.085 |
+| flat MoG-TSK, 2nd order   | pipeline default | 0.804 ± 0.032 |            0.840 ± 0.022 | 0.825 ± 0.028 |          +0.036 |              −0.015 |
+| flat MoG-TSK, full 2nd    | pipeline default | 0.830 ± 0.027 |            0.859 ± 0.027 | 0.807 ± 0.120 |          +0.028 |              −0.052 |
+| fuzzy tree                | demo-tuned       | 0.713 ± 0.032 |            0.740 ± 0.054 | 0.740 ± 0.054 |          +0.027 |              +0.000 |
+| fuzzy tree                | library default  | 0.586 ± 0.075 |            0.689 ± 0.059 | 0.689 ± 0.059 |          +0.103 |              +0.000 |
+| mixture of experts        | demo-tuned       | 0.775 ± 0.024 |            0.836 ± 0.028 | 0.837 ± 0.028 |          +0.062 |              +0.000 |
+| mixture of experts        | library default  | 0.631 ± 0.121 |            0.758 ± 0.062 | 0.761 ± 0.063 |          +0.127 |              +0.003 |
+| CART (reference)          | sklearn default  | 0.825 ± 0.049 |            0.826 ± 0.049 | 0.826 ± 0.049 |          +0.001 |              −0.000 |
+| Random Forest (reference) | sklearn default  | 0.909 ± 0.019 |            0.909 ± 0.020 | 0.909 ± 0.019 |          +0.000 |              −0.000 |
 
 Three things fall out.
 
 A **bounded** transform is worth ten points of $R^2$ to the Gaussian models. A first-order model goes from 0.695 to
-0.796 on nothing but a log and a rescale onto $[0,1]$, and the library-default fuzzy tree and mixture gain 0.106 and
-0.108. Any comparison that omits it is not measuring the method.
+0.795 on nothing but a log and a rescale onto $[0,1]$, and the library-default fuzzy tree and mixture gain 0.103 and
+0.127. Any comparison that omits it is not measuring the method.
 
 **The transform is worth essentially nothing to CART and Random Forest**: +0.001 and +0.000. That is not a rounding
 artifact; it is the control that licenses reading anything else in the table. An axis-aligned decision tree splits on
 rank, so a monotone transform cannot change whether a feature exceeds a threshold and the induced tree is identical
 (Appendix A.10.12 gives the two-line proof, and shows why a Gaussian membership has no such invariance: only an *affine*
 map can be absorbed into a re-fitted centre and width). Min-max and z-score are both strictly monotone per feature, and
-across CART, Random Forest and both fuzzy-tree rows the largest movement between the two normalized arms is **0.002**,
-against their own seed spreads of ±0.018 to ±0.056. Column-wise Spearman correlation between the two scalers' outputs is
+across CART, Random Forest and both fuzzy-tree rows the two normalized arms agree to the third decimal (largest
+movement **0.000**), against their own seed spreads of ±0.019 to ±0.059. The mixture of experts now sits with them
+(+0.000 and +0.003); an earlier run had it 0.028 and 0.012 *worse* under z-scoring, and the change landed between
+2026-08-11 and 2026-08-22 without an attributed cause (`PROVENANCE_MAP.md`). Column-wise Spearman correlation between the two scalers' outputs is
 1.000000000000 on every feature. So when a fuzzy row moves between those columns, it is the model responding, not the
 plumbing. A Gaussian membership function has no such immunity: defined by a location and a width in the feature's own
 units, it fits a skewed feature's skew instead of its structure.
 
 **Boundedness is a preference, not a cliff, and the size of it is worth being precise about.** Under real z-scoring
-to $\mu = 0$, $\sigma = 1$, the first-order flat MoG-TSK reaches 0.713 ± 0.035 against min-max's 0.796 ± 0.018, a cost
-of 0.083, roughly two of its own seed spreads and still 0.018 *above* its raw-feature score. At second order the cost
+to $\mu = 0$, $\sigma = 1$, the first-order flat MoG-TSK reaches 0.710 ± 0.033 against min-max's 0.795 ± 0.019, a cost
+of 0.085, more than two of its own seed spreads and still 0.015 *above* its raw-feature score. At second order the cost
 falls to 0.015, inside the spread. So bounding the inputs buys real ground at first order and almost nothing once the
 consequent can bend.
 
 Where z-scoring does hurt unambiguously is in *stability*, and only at the top of the order ladder. The
-full-second-order arm reaches 0.809 with a spread of **±0.115**, against ±0.026 under min-max: the same mean to within
-0.05, with four times the seed-to-seed variance, and an RMSE spread of ±1.718 MPa against ±0.512. That is the same shape
+full-second-order arm reaches 0.807 with a spread of **±0.120**, against ±0.027 under min-max: a mean 0.052 lower, with
+four times the seed-to-seed variance, and an RMSE spread of ±1.799 MPa against ±0.529. That is the same shape
 of failure the output partition turns out to have (§4.3.2) and it is worth naming as such: an unbounded input domain
 does not make this construction worse on average so much as it makes it *less predictable*, which for a component inside
 a larger pipeline is the more expensive property.
@@ -160,15 +163,17 @@ they keep the rule base readable. What that pass buys is now measured — on Gla
 correction-rule cascade has not yet been run on RT-IOT2022, which is now loadable but was not the dataset this
 particular measurement targeted (Table 4.9, Figure 4.8). `MixtureOfGaussiansFuzzySequenceClassifier` implements the pass
 as a cascade: the flat base plus a small binary "expert" classifier for each confused pair, gated by anomaly level and
-confidence margin. Over ten paired seeds on Glass, the gated cascade gains +0.031 ± 0.027 accuracy over the base at the
-cost of raising the raw membership-function count from 81.4 to 109.0. Collapsing the cascade into one deployable FIS —
-union every layer's model, deduplicate at exact numeric tolerance, predict by a single argmax instead of routing through
-gates — keeps +0.014 ± 0.061 of that gain at 83.5 membership functions: under half the accuracy benefit survives, for
-almost none of the size penalty. This does not give the per-class confusion detail the original ask specified; that
-finer-grained comparison, and RT-IOT2022 at its intended scale, are still owed. What it does settle is the coarser
-question: the pass helps, and the gating logic a flattened deployment
-discards is doing real work, not decoration, so a deployment that wants the full gain needs the cascade rather than just
-the rules it leaves behind.
+confidence margin. Over ten paired seeds on Glass, the gated cascade gains +0.0077 ± 0.0109 accuracy over the base — a 95%
+interval that just reaches zero — at the cost of raising the raw membership-function count from 81.4 to 107.4.
+Collapsing the cascade into one deployable FIS — union every layer's model, deduplicate at exact numeric tolerance,
+predict by a single argmax instead of routing through gates — gives +0.0046 ± 0.0384 at 80.9 membership functions, the
+base's size, with an interval spanning zero. An earlier measurement (`mf-dedup-2026-08-05`) put the cascade's gain at
++0.031 ± 0.027; it fell under `tribble-fis` #218, which changed feature selection inside the expert classifiers while
+leaving the base arm byte-identical (`PROVENANCE_MAP.md` note 29). This does not give the per-class confusion detail
+the original ask specified; that finer-grained comparison, and RT-IOT2022 at its intended scale, are still owed. What the
+table settles is narrower than the earlier reading: neither the cascade nor its flattening costs accuracy, and
+flattening removes the size penalty entirely, but whether the pass *helps* is open — a gain of this size is not
+resolvable on Glass at ten seeds.
 
 Deduplication turns out to be a more general question than this one flattening, and worth separating from it.
 `simple_gaussian_predict`'s tolerance for treating two Gaussian membership functions as the same one is a hardcoded
@@ -178,9 +183,9 @@ and Diabetes for regression, ten paired seeds each. Two things hold across every
 shipped tolerance is free money everywhere it was tested: at that tolerance, membership-function reduction ranges from
 0.0% (Wine, Breast Cancer) to 13.0% (Diabetes), and on none of the six does the paired accuracy-or-R² delta's 95%
 confidence interval exclude zero. Second, a *lossless* tolerance past the shipped one exists for every problem, at a
-boundary that is a property of the problem rather than a universal constant: from 2× (Diabetes) to 10× (Wine, Concrete),
-with the reduction available at that boundary ranging from 0.0% (Breast Cancer, which has almost no redundancy left to
-remove) to 44.2% (Digits). The shipped default is a safe floor, not a ceiling — a deployment willing to search the
+boundary that is a property of the problem rather than a universal constant: from 3× (Diabetes) to 50× (Breast Cancer),
+with the reduction available at that boundary ranging from 2.4% (Wine) to 66.5% (Breast Cancer, though its boundary
+sits at a paired delta of −0.055 ± 0.079 — lossless only in the interval-contains-zero sense). The shipped default is a safe floor, not a ceiling — a deployment willing to search the
 multiplier, the max-lossless preset `tribble-fis` issue #85 asks the library to expose, can do substantially better on a
 problem whose membership functions turn out to be more redundant than the shipped tolerance assumes.
 
@@ -230,8 +235,8 @@ blocks discussed below.
 
 **At first and second order this is a null result; at zeroth order it is decisive.** The three arms span 0.009 and 0.009
 in the lower two blocks, against seed spreads of ±0.018 to ±0.027; no configuration clears its own noise floor, and the
-ordering is not stable enough to read. The same three arms span **0.828** at zeroth order, twelve times the widest
-spread involved. The ordering holds at every bucket count: uniform 0.394 / 0.416 / 0.541 against pinned quantile's
+ordering is not stable enough to read. The same three arms span **0.828** at zeroth order, more than three times the widest
+spread involved (±0.241) and over twelve times uniform's own. The ordering holds at every bucket count: uniform 0.394 / 0.416 / 0.541 against pinned quantile's
 −0.434 / 0.048 / 0.326 at three, four and six buckets, each separation clearing both arms' error bars. Worst-case error
 tells the same story, 56.3 MPa against 38.2 on a target spanning about 80.
 
@@ -242,7 +247,7 @@ available to offset it: the bottom rule emits the target's global minimum for a 
 0.195, and the top rule emits the global maximum for 343 points whose mean is 0.653. Extrema standing in for
 representative values. At first and second order the same two ends stay pinned, but the free interior constants run
 to $-0.38$ and $-1.19$ — outside the target's own $[0,1]$ range, because the solve is spending intercepts as free
-parameters and paying the bias back through the linear terms. That compensation is why the penalty there is 0.005
+parameters and paying the bias back through the linear terms. That compensation is why the pinning penalty there is 0.002 and 0.004
 instead of 0.676. Appendix A.10.11 writes the mechanism down: at zeroth order the squared error of bucket $r$ decomposes
 as its within-bucket variance plus $n_r (m_r - \bar y_r)^2$, a bias the pinned constant fixes
 at $(\bar y_r - y_{\min})^2$ per sample with nothing to offset it, while at first order the free coefficients can
@@ -274,42 +279,45 @@ target while leaving the information in $X$ untouched. A perfect learner would s
 whatever degrades is what the partitioning fails to absorb.
 
 **Table 4.3 — Partitioning against target skew** (synthetic, skew isolated; 4 buckets, 2nd order, 10 seeds;
-`uniform-2026-08-03/table_g5b_skew_sweep.csv`).
+run of record, `full-03d327a-2026-11-21/table_g5b_skew_sweep.csv`. The quantile arm differs from the earlier
+`uniform-2026-08-03` reading only by the #143 sample-std correction; the uniform arm has read these values in every
+archive since 2026-08-11).
 
 | target skew |        uniform R² |      quantile R² |   Q − U | uniform tail RMSE | quantile tail RMSE | uniform min bucket |
 |------------:|------------------:|-----------------:|--------:|------------------:|-------------------:|-------------------:|
-|       +0.05 |     0.912 ± 0.009 |    0.911 ± 0.010 |  −0.001 |             0.052 |          **0.051** |                 11 |
-|       +1.84 | **0.884 ± 0.016** |    0.876 ± 0.035 |  −0.008 |             0.066 |          **0.062** |                  1 |
-|       +5.32 | **0.731 ± 0.083** |    0.728 ± 0.169 |  −0.003 |             0.092 |          **0.066** |                  1 |
-|      +10.44 | **0.297 ± 0.126** |    0.183 ± 0.813 |  −0.114 |             0.118 |          **0.064** |                  1 |
-|      +14.71 | **0.168 ± 0.073** |   −2.106 ± 4.274 |  −2.274 |             0.111 |          **0.062** |                  0 |
-|      +17.71 | **0.084 ± 0.016** | −12.562 ± 24.000 | −12.646 |             0.132 |          **0.060** |                  0 |
+|       +0.05 |     0.912 ± 0.009 |    0.911 ± 0.011 |  −0.001 |             0.052 |          **0.051** |                 11 |
+|       +1.84 | **0.884 ± 0.017** |    0.876 ± 0.037 |  −0.008 |             0.066 |          **0.062** |                  1 |
+|       +5.32 |     0.708 ± 0.092 | **0.728 ± 0.178** |  +0.020 |             0.084 |          **0.066** |                  0 |
+|      +10.44 | **0.337 ± 0.128** |    0.183 ± 0.857 |  −0.154 |             0.097 |          **0.064** |                  0 |
+|      +14.71 | **0.184 ± 0.100** |   −2.106 ± 4.505 |  −2.290 |             0.078 |          **0.062** |                  0 |
+|      +17.71 | **0.025 ± 0.225** | −12.562 ± 25.298 | −12.587 |             0.066 |          **0.060** |                  0 |
 
-Quantile's mean $R^2$ trails uniform's in every row, and past skew 5 the gap opens hard against it: −0.008, −0.003,
-−0.114, −2.274, −12.646. That is not a case for "uniform wins" either, and reading the means is the wrong way to read
+Quantile's mean $R^2$ trails uniform's in every row but one — at skew 5.3 it leads by +0.020 — and past skew 5 the
+gap opens hard against it: −0.154, −2.290, −12.587. That is not a case for "uniform wins" either, and reading the means is the wrong way to read
 this table.
 
 The finding is that quantile becomes unstable, not inaccurate. Read the standard deviations instead. Quantile's spread
-explodes: ±0.169 at skew 5, ±0.813 at skew 10, ±4.274 and ±24.000 beyond, while uniform's stays bounded and its mean
-degrades smoothly toward zero. A mean of −12.6 with a deviation of ±24.0 is not typical behaviour. It is a small number
+explodes: ±0.178 at skew 5, ±0.857 at skew 10, ±4.505 and ±25.298 beyond, while uniform's stays two orders of
+magnitude smaller (at most ±0.225, at skew 17.7) and its mean degrades smoothly toward zero. A mean of −12.6 with a
+deviation of ±25.3 is not typical behaviour. It is a small number
 of catastrophic splits dragging an otherwise reasonable distribution. Quantile on a heavily skewed target sometimes
 produces a usable model and sometimes a disaster, and the three-seed run missed the disasters. Uniform fails, but
 *predictably*, which for a component inside a larger pipeline is often the more valuable property.
 
 The starvation mechanism survives, and it is still the reason uniform degrades. The last column collapses exactly as
-predicted: 11 samples at symmetry, *one* by skew 1.8, *zero* past skew 14. Equal-width buckets on a skewed target put
+predicted: 11 samples at symmetry, *one* by skew 1.8, *zero* from skew 5.3 on. Equal-width buckets on a skewed target put
 nearly every point in the first bucket and leave the rest to estimate rules from almost nothing, which is why
-uniform's $R^2$ falls from 0.912 to 0.084 across the sweep. What that mechanism does *not* license is the inference that
+uniform's $R^2$ falls from 0.912 to 0.025 across the sweep. What that mechanism does *not* license is the inference that
 quantile's guaranteed occupancy therefore makes it the better choice: it removes one failure mode and introduces
 another.
 
-The tails go the other way from the geometry. Even coverage of the output range should hold the *tails* better, and
-consistently, with small spreads, it does not: uniform's tail error grows from 0.052 to 0.132 while quantile's actually
-*falls*, 0.051 to 0.060. Coverage of the range is worthless without coverage of the *samples*.
+The tails go the other way from the geometry. Even coverage of the output range should hold the *tails* better, and it
+does not: quantile's tail error is at or below uniform's in every row, staying between 0.051 and 0.066, while uniform's
+rises from 0.052 to 0.097 at skew 10 (with spreads up to ±0.064) before falling back to 0.066 as its $R^2$ collapses. Coverage of the range is worthless without coverage of the *samples*.
 
-Past skew 14 both schemes fail, quantile's $R^2$ going sharply negative with standard deviations of ±4.3 and ±24.0, so
+Past skew 14 both schemes fail, quantile's $R^2$ going sharply negative with standard deviations of ±4.5 and ±25.3, so
 the apparent uniform "win" there is noise between two broken models. At that point the target is so compressed that
-uniform's smallest bucket is empty outright and the problem needs a target transform, not a better partition.
+uniform's smallest bucket has been empty since skew 5.3 and the problem needs a target transform, not a better partition.
 
 **The recommendation is uniform, with a monotone target transform when the target is badly skewed.** Three experiments
 converge on it. Uniform is the only arm that leaves a zeroth-order model usable at all, which matters because the flat
@@ -545,9 +553,10 @@ path; its own docstring names the gap it fills. `load_beth()` loads {{dataset.be
 train/validation/test splits.
 
 On the **UCI Concrete Compressive Strength** regression set (Table 4.1, full 2nd order), the flat model's test $R^2$ is
-0.394, 0.796, and 0.841 at TSK orders zero, one, and two, rising to 0.861 ± 0.026 with the full second-order basis. That
+0.399, 0.795, and 0.840 at TSK orders zero, one, and two, rising to 0.859 ± 0.027 with the full second-order basis
+(run of record). That
 is a capacity ladder rather than a threshold: constant consequents give a usable if unimpressive model, the first-order
-affine term buys most of the remaining ground, and the two second-order variants add 0.045 and 0.065 more. Where the
+affine term buys most of the remaining ground, and the two second-order variants add 0.045 and 0.064 more. Where the
 returns fall off is between first and second order, not between zeroth and first.
 
 The zeroth-order figure carries a caveat: it is measured under equal-width output cuts, and is unusually sensitive to
@@ -558,7 +567,7 @@ here, not a requirement.
 
 The reconciliation with Chapter 6 is done. A flat-model $R^2$ in the mid-0.60s from the tree-and-mixture experiment
 reads as a contradiction of the figures above; under one protocol, with identical splits, seeds, and preprocessing, the
-flat model scores 0.862 ± 0.033 with refinement (`uniform-2026-08-03/table_concrete_reconciliation.csv`), and the
+flat model scores 0.875 ± 0.029 with refinement (`full-03d327a-2026-11-21/table_concrete_reconciliation.csv`), and the
 discrepancy was configuration and not disagreement. Chapter 6 Table 6.1 and the table above are the same measurement
 from two chapters. The remaining trap is Chapter 6's Table 6.2, which deliberately runs everything untuned at raw
 features and reports the flat model at 0.687 ± 0.049 (`table_6_1.csv`): a different question, not a different answer.
@@ -571,9 +580,9 @@ as the row with no timing is labelled.
 |------------------------------------|------------------------------|------------------:|-----------------------------------------------:|-----------------------------|
 | PhiUSIIL (binary classification)   | 235,795 × 47                 |     0.13 ± 0.02 s |                         **0.440 ± 0.181 acc.** | 2 rules (K = 2)             |
 | RT-IOT2022 (12-class)              | {{dataset.rt_iot2022.shape}} | **3.64 ± 0.25 s** | **0.927 ± 0.002 acc.** (RF ref. 0.998 ± 0.000) | 12 by construction (K = 12) |
-| Concrete (regression, TSK order 1) | {{dataset.concrete.shape}}   |           seconds |                             R² = 0.787 ± 0.026 | 3 output buckets            |
-| Concrete (regression, TSK order 2) | {{dataset.concrete.shape}}   |           seconds |                             R² = 0.832 ± 0.027 | 3 output buckets            |
-| Concrete (regression, full 2nd)    | {{dataset.concrete.shape}}   |           seconds |                         **R² = 0.861 ± 0.026** | 3 output buckets            |
+| Concrete (regression, TSK order 1) | {{dataset.concrete.shape}}   |           seconds |                             R² = 0.795 ± 0.019 | 3 output buckets            |
+| Concrete (regression, TSK order 2) | {{dataset.concrete.shape}}   |           seconds |                             R² = 0.840 ± 0.022 | 3 output buckets            |
+| Concrete (regression, full 2nd)    | {{dataset.concrete.shape}}   |           seconds |                         **R² = 0.859 ± 0.027** | 3 output buckets            |
 
 That RT-IOT2022 row is now measured at this table's own ten-seed protocol, and labels its rule count a structural
 consequence because it is one: for classification the count is the number of classes, for regression the number of
@@ -592,13 +601,13 @@ Applying the transform uniformly costs the baselines nothing, for the rank-invar
 +0.001 and +0.000, so the CART and Random Forest column reads the same either way.
 
 The MoG appears on two rows because only the first is fully instrumented. Every cell in row 1 comes from one file,
-`reproduce/outputs/phiusiil-leakfree-2026-08-30/table_4_1.csv`: Concrete `R² = 0.795 ± 0.025` at **0.43 ± 0.02 s**,
-PhiUSIIL `acc = 0.997 ± 0.001` at **0.28 ± 0.02 s**.
+`reproduce/outputs/phiusiil-leakfree-2026-08-30/table_4_1.csv`: Concrete `R² = 0.799 ± 0.027` at **0.53 ± 0.05 s**,
+PhiUSIIL `acc = 0.440 ± 0.181` at **0.13 ± 0.02 s**.
 
-The 2% spread on the Concrete clock is worth explaining, since a naive first pass through the ten seeds reads far
+The spread on the Concrete clock is worth explaining, since a naive first pass through the ten seeds reads far
 noisier. Concrete is the first arm fit, so seed 0 absorbs import, JIT, thread-pool spin-up and first-touch allocation at
-3.7× the other nine; the generator discards that one warm-up fit, leaving the cell at 0.43 ± 0.02 s, in line with the
-PhiUSIIL row (fitted second, so never affected by the warm-up cost). Accuracy is unaffected by the warm-up fit either
+3.7× the other nine; the generator discards that one warm-up fit, leaving the cell at 0.53 ± 0.05 s (the PhiUSIIL row is
+fitted second, so never affected by the warm-up cost). Accuracy is unaffected by the warm-up fit either
 way, so the effect is confined to the clock (`PROVENANCE_MAP.md`, note 14).
 
 One missing row. §4.2 names Gaussian naive Bayes as this construction's nearest acknowledged relative, and it does not
@@ -641,8 +650,8 @@ splits as Table 4.5. "Speedup" is the ratio of means, slowest of {ANFIS, GA-FIS}
 **Read the range, not the headline.** The accurate statement is **14× to 194×**, one to two orders of magnitude, not a
 flat "two orders". Bike Sharing at 14× is the weakest and belongs in the claim: it is the case where the fuzzy baselines
 are cheapest, because ANFIS scatter-partitions to twelve rules there rather than grid-partitioning to 256 as it does on
-Concrete. Two further caveats. The random forest is *not* slower than the construction on Concrete or Bike Sharing —
-the speed argument is against fuzzy-system induction, not against trees. And Concrete's ratio is 78×, at ten seeds and
+Concrete. Two further caveats. The random forest is level with the construction on Concrete (0.63 s against 0.53 s), though far slower on Bike
+Sharing — the speed argument is against fuzzy-system induction, not against trees. And Concrete's ratio is 78×, at ten seeds and
 against a GA-FIS baseline that itself runs the dual-form consequent solve of grad-school #237 (a 3.4× speedup over an
 unoptimised GA-FIS).
 
@@ -651,24 +660,22 @@ per dataset, four arms: the construction, ANFIS, the GA-tuned FIS and the random
 ten-seed spread as error bars, and the table's own speedup column — the construction against the slower of the two fuzzy
 baselines — printed above each group. Drawn from `phiusiil-leakfree-2026-08-30`, the archive Table 4.1b is quoted from,
 so the two cannot disagree. The picture makes the two caveats of the paragraph above visible at once: the ratio is a
-range spanning an order of magnitude, and the random forest bars are level with or below the construction's on Concrete
-and Bike Sharing, so the argument is against fuzzy-system induction and not against trees.
+range spanning an order of magnitude, and the random forest bars are level with the construction's on Concrete, so the argument is against fuzzy-system induction and not against trees.
 `![04-speedup](fig/04-speedup.png)`
 
-*The full-second-order row's missing time.* Its two halves come from different code paths: the **R² of 0.861 ± 0.026
+*The full-second-order row's missing time.* Its two halves come from different code paths: the **R² of 0.859 ± 0.027
 comes from Table 4.1's study** (`table_hyperparam_normalization.py`, driving `solve_tsk_consequents` / `predict_tsk`
 directly), while row 1's numbers come from the `MixtureOfGaussiansFuzzyRegressor` estimator. That estimator now carries
-a timed full-second-order arm, measuring **R² = 0.852 ± 0.030 in 0.44 ± 0.04 s** at ten seeds — a 0.009 gap from the
-0.861 figure, inside both spreads. The two agree, but the cell stays empty rather than splice a time from one
+a timed full-second-order arm, measuring **R² = 0.852 ± 0.030 in 0.53 ± 0.04 s** at ten seeds — a 0.007 gap from the
+0.859 figure, inside both spreads. The two agree, but the cell stays empty rather than splice a time from one
 implementation onto an accuracy from another. The reading today: on the estimator path full second order buys about
-+0.06 R² over first order for one hundredth of a second, with the exact pairing still owed.
++0.05 R² over first order at no measurable extra training time (0.53 s either way), with the exact pairing still owed.
 
-*Reading the empty cells.* `N/A (C1)` is not a number withheld; it is a measurement that cannot be taken with what is in
-the repository. `table_4_1_mog_baselines.py` looks for `reproduce/tables/_baseline_anfis.py` and `_baseline_gafis.py`
-and emits `N/A` when they are absent, which they are. Writing those two adapters is checklist item **C1**, the single
-most important experiment still owed, because the *orders of magnitude faster* claim in the title and in Chapters 1, 7
-and 8 has no fuzzy baseline to be faster **than** until they exist. The eight cells are the shape of that hole, marked
-rather than filled with a plausible figure.
+*Reading the empty cells.* The ANFIS and GA-tuned FIS rows were once `N/A (C1)`: `table_4_1_mog_baselines.py` looks
+for `reproduce/tables/_baseline_anfis.py` and `_baseline_gafis.py` and emits `N/A` when they are absent. Both adapters
+now exist (checklist item **C1**) and fill their rows in Table 4.5, so the *orders of magnitude faster* claim in the
+title and in Chapters 1, 7 and 8 has fuzzy baselines to be faster **than**. The cells still empty are Gaussian naive
+Bayes, which no generator instantiates — marked rather than filled with a plausible figure.
 
 **The mechanism, measured.** Two protocols now run, and they answer different questions. Tables 4.6 and 4.7 use
 leave-one-class-out on public multi-class data — each class withheld from training in turn and treated as unseen,
@@ -945,7 +952,7 @@ default, worth carrying upstream.
 > θ *list*, and `run_all_tables.sh` now defaults it to `0.5,0.6,0.7,0.8,0.9,0.99,1.1`. Note that `=1` is a valid list of
 > *one* and emits a single saturated row of zeros, which reads exactly like a null result. Table 4.7b's run set
 > `REPRO_THETA_SWEEP=""` deliberately, to keep the RT-IOT2022 run inside its time budget, which is why Table 4.6 and
-> Figure 4.6 still show only Glass — the sweep at RT-IOT2022 scale is real future work, not an oversight. No cell here is
+> Figure 4.6 show only Glass; the sweep at RT-IOT2022 scale was run separately and is Table 4.7c. No cell here is
 > left a bare *pending*: every unfilled cell names what blocks it, and any checklist item tracking it. The harness prints
 > exactly what it could not run rather than substituting a guess. But the guesses this pass removed from Table 4.4 were
 > *hand-authored into the prose*, so the guarantee held for the harness and not the transcription: that is the failure
@@ -964,47 +971,47 @@ default, worth carrying upstream.
 **Table 4.8 — Membership-function deduplication, across six problems.** Ten paired seeds each; `Δ` is the dedup arm's
 accuracy or R² minus the raw arm's, same seed and split. "Max-lossless ×" is the largest tolerance multiplier reachable
 by an unbroken run of "the paired delta's 95% CI contains zero," starting from the tightest multiplier tested (0.1×) —
-the *first* break, not a later point that happens to look safe in a tail that is not monotone. From
-`reproduce/outputs/mf-dedup-2026-08-05/table_4_8_mf_dedup.csv`; the full per-multiplier sweep (14 multipliers × 6
+the *first* break, not a later point that happens to look safe in a tail that is not monotone. From the run of record,
+`reproduce/outputs/full-03d327a-2026-11-21/table_4_8_mf_dedup.csv`; the full per-multiplier sweep (14 multipliers × 6
 problems) is in the sibling `_sweep.csv`.
 
 | Dataset       | Task           | Raw MF |                  MF @ 1× (Δ) | Reduction @ 1× | Max-lossless × |       MF @ max-lossless (Δ) | Reduction @ max-lossless |
 |---------------|----------------|-------:|-----------------------------:|---------------:|---------------:|----------------------------:|-------------------------:|
-| Glass         | classification |   81.4 |  71.0 (+0.0015 ± 0.0046 acc) |          12.8% |             5× | 61.3 (+0.0000 ± 0.0069 acc) |                    24.7% |
-| Wine          | classification |   16.6 |  16.6 (+0.0000 ± 0.0000 acc) |           0.0% |            10× | 14.6 (−0.0037 ± 0.0161 acc) |                    12.0% |
-| Breast Cancer | classification |   11.1 |  11.1 (+0.0000 ± 0.0000 acc) |           0.0% |             5× | 11.1 (+0.0000 ± 0.0000 acc) |                     0.0% |
-| Digits        | classification |  172.2 | 157.5 (+0.0009 ± 0.0028 acc) |           8.5% |             7× | 96.1 (−0.0117 ± 0.0211 acc) |                    44.2% |
-| Concrete      | regression     |   63.2 |   62.6 (+0.0000 ± 0.0000 R²) |           0.9% |            10× |  58.4 (−0.0118 ± 0.0305 R²) |                     7.6% |
-| Diabetes      | regression     |   41.6 |   36.2 (+0.0059 ± 0.0167 R²) |          13.0% |             2× |  31.4 (+0.0011 ± 0.0168 R²) |                    24.5% |
+| Glass         | classification |   81.4 |  71.0 (+0.0015 ± 0.0049 acc) |          12.8% |             5× | 61.3 (+0.0000 ± 0.0073 acc) |                    24.7% |
+| Wine          | classification |   16.6 |  16.6 (+0.0000 ± 0.0000 acc) |           0.0% |             7× | 16.2 (−0.0074 ± 0.0234 acc) |                     2.4% |
+| Breast Cancer | classification |   16.4 |  16.4 (+0.0000 ± 0.0000 acc) |           0.0% |            50× |  5.5 (−0.0550 ± 0.0788 acc) |                    66.5% |
+| Digits        | classification |  172.2 | 157.5 (+0.0009 ± 0.0029 acc) |           8.5% |            10× | 75.0 (−0.0189 ± 0.0285 acc) |                    56.4% |
+| Concrete      | regression     |   63.2 |   62.6 (+0.0000 ± 0.0000 R²) |           0.9% |            10× |  58.4 (−0.0122 ± 0.0332 R²) |                     7.6% |
+| Diabetes      | regression     |   41.6 |   36.2 (+0.0057 ± 0.0178 R²) |          13.0% |             3× |  26.8 (−0.0057 ± 0.0244 R²) |                    35.6% |
 
 Three things the six rows agree on, and one they do not. They agree the shipped tolerance never costs anything
 measurable: every "Reduction @ 1×" cell pairs with a delta whose 95% CI contains zero. They agree a lossless tolerance
 strictly past 1× exists for all six, so 1× is a floor nobody needs to treat as a ceiling. And they agree the tails are
-genuinely non-monotone, not just noisy in one direction — Breast Cancer's and Digits's sweeps both dip back inside the
-CI band after their first break (at 15×–20× and 50×–70× respectively), which is exactly the shape "first break, not a
+genuinely non-monotone, not just noisy in one direction — Glass's and Digits's sweeps both dip back inside the
+CI band after their first break (at 15× and 50×–70× respectively), which is exactly the shape "first break, not a
 later lucky point" is written to survive. What they do not agree on is *where* the boundary sits or how much it is
-worth: 2×–10× and 0.0%–44.2% is not a number this method can report as a single constant, and reporting one would
+worth: 3×–50× and 2.4%–66.5% is not a number this method can report as a single constant, and reporting one would
 misrepresent every problem except whichever one happened to be measured last.
 
 **Figure 4.7 — The deduplication sweep behind Table 4.8, per problem.** Fourteen tolerance multipliers on six problems,
 from the archive's own `table_4_8_mf_dedup_sweep.csv`: the paired delta (deduplicated minus raw, same seed and split) as
 a line with the ten-seed spread as a band, the shipped $1\times$ dotted, and the first multiplier at which the table's
 own *CI excludes zero* column reads yes drawn as the orange rule. Everything left of the rule is the lossless region
-Table 4.8's *max-lossless* column names, and it sits at a different multiplier on every panel — $3\times$ on
-Diabetes, $15\times$ on Wine and Concrete — which is the table's point that the boundary is a property of the problem.
+Table 4.8's *max-lossless* column names, and it sits at a different multiplier on every panel — $5\times$ on
+Diabetes, $10\times$ on Wine, $15\times$ on Concrete, $70\times$ on Breast Cancer — which is the table's point that the boundary is a property of the problem.
 Where a tail dips back inside the band after the first break the panel shows it; the table's rule of taking the *first*
 break rather than a later lucky point is written to survive exactly that.
 `![04-mf-dedup-sweep](fig/04-mf-dedup-sweep.png)`
 
 **Table 4.9 — The correction-rule pass, quantified on Glass.** Same protocol as Table 4.8, ten paired seeds; "Paired Δ
-vs. base" is each arm's accuracy minus the base arm's on the same seed and split. From
-`reproduce/outputs/mf-dedup-2026-08-05/table_4_9_correction_pass.csv`.
+vs. base" is each arm's accuracy minus the base arm's on the same seed and split. From the run of record,
+`reproduce/outputs/full-03d327a-2026-11-21/table_4_9_correction_pass.csv`.
 
 | Arm                                                        |           MF count |        Accuracy | Paired Δ vs. base |
 |------------------------------------------------------------|-------------------:|----------------:|------------------:|
-| Base (no correction pass)                                  |         81.4 ± 2.3 | 0.5323 ± 0.0408 |                 — |
-| Gated cascade (base + experts, routed)                     |    109.0 ± 9.5 raw | 0.5631 ± 0.0568 |  +0.0308 ± 0.0266 |
-| Cascade → one flat FIS (union, dedup @ exact tol., argmax) | 83.5 ± 5.4 deduped | 0.5462 ± 0.0511 |  +0.0138 ± 0.0609 |
+| Base (no correction pass)                                  |         81.4 ± 2.5 | 0.5323 ± 0.0430 |                 — |
+| Gated cascade (base + experts, routed)                     |    107.4 ± 9.9 raw | 0.5400 ± 0.0413 |  +0.0077 ± 0.0109 |
+| Cascade → one flat FIS (union, dedup @ exact tol., argmax) | 80.9 ± 7.2 deduped | 0.5369 ± 0.0380 |  +0.0046 ± 0.0384 |
 
 The flattened arm dedups at `rtol = atol = 0` — exact matches only, no numeric tolerance — deliberately, so the table
 separates two costs that a single "cascade vs. flat" number would conflate: the *mechanism* cost of removing the gates
@@ -1017,7 +1024,11 @@ table isolates.
 > this repository pins (`6ddb8028`), after catching and resolving a mismatch against a later commit the first pass of this
 > measurement had run against by mistake — the exact failure mode CHECKLIST B4 flags as open elsewhere in this document,
 > caught here by hand; the full account, including the byte-identical re-verification, is in
-> `reproduce/outputs/mf-dedup-2026-08-05/PROVENANCE.txt`. Filed upstream as [
+> `reproduce/outputs/mf-dedup-2026-08-05/PROVENANCE.txt`. The tables above are the re-measurement in the run of record
+> (`full-03d327a-2026-11-21`, `tribble-fis` `03d327a`). Its drift from the 2026-08-05 figures has two identified causes —
+> the #143 interval correction (ddof 1 and Student's t, which moves Digits' boundary from 7× to 10× with identical means)
+> and `tribble-fis` #218 (Breast Cancer, Wine, and Table 4.9's expert arm) — plus a Diabetes move whose cause is not
+> identified (`PROVENANCE_MAP.md` note 29). Filed upstream as [
 `tribble-fis` #85](https://github.com/fundthmcalculus/tribble-fis/issues/85), which asks the library to expose the dedup
 > tolerance as a parameter rather than a hardcoded constant, extend deduplication to the cascade classifier and the
 > regressor, and add a unit test pinning the exact-tolerance behaviour Table 4.9's flattened arm depends on.
@@ -1027,8 +1038,8 @@ boost $\theta$, with $J$, their difference, as the shaded band between them, and
 and the saturation past $\theta = 1.1$ marked. Drawn from the table's own CSV, not a second run of the sweep, so the two
 cannot disagree; regenerate the table with a θ list (`REPRO_THETA_SWEEP=0.5,0.6,0.7,0.8,0.9,0.99,1.1`) and the figure
 follows. Still on Glass, not RT-IOT2022: Table 4.7b measured one operating point (θ = 0.99) at scale and found the
-complement rule behind both baselines there, which makes the sweep more urgent, not less, since Glass's sweep found a
-materially better θ than the shipped default and RT-IOT2022 has not been given the chance to. The BETH version of this
+complement rule behind both baselines there, and Table 4.7c has since swept θ at that scale too: a different θ narrows the gap there but does not close it. The
+figure stays on Glass. The BETH version of this
 curve is emitted as Table 4.11 (b) with the θ sweep as 4.11 (e). It is not plotted as a second figure because §4.3 shows
 θ to be a threshold parameterisation on a one-class fit, so the BETH curve carries the same information as the budget
 sweep already tabulated; the Glass figure stays because there the conorm is doing work the threshold reading cannot
@@ -1098,10 +1109,11 @@ Two findings are worth carrying forward. First, **the virtual channels are not f
 Re-running the design-of-experiments' original config with the two virtual channels `T40`/`P30` reaches ~6.5 versus 7.23
 without them (`CHECKLIST` **C18**), so dropping them costs about 0.7 RMSE, measured rather than assumed. Every row of
 Table 4.10, DS02 and pooled alike, still uses real sensors only, as a deliberate simplicity-over-the-last-0.7-RMSE
-choice, not a free one. Second, **the scoring convention decides the winner.** On the canonical per-engine metric (one
+choice, not a free one. Second, **the scoring convention decides the margin.** On the canonical per-engine metric (one
 prediction per test engine at its last cycle, the standard C-MAPSS protocol) the simplest real-sensor model —
 whole-cycle aggregation in Table 4.10 — is best of the two pooled models at per-engine RMSE 12.07 and a NASA score of
-320; the raw-memory model leads only on the per-sample density metric. Reporting both, rather than the flattering one,
+320, against 17.00 for the raw-memory model; on the per-sample density metric the two are nearly level (15.44 against
+15.58). Reporting both, rather than the flattering one,
 is the point.
 
 **Table 4.10 — Turbofan RUL, N-CMAPSS DS02 and pooled** *(demonstrated; one run on the dataset's own fixed train/test
@@ -1117,8 +1129,8 @@ conventions; "real only" = the 18 physically measurable channels, virtual `T40`/
 | Published CNN (Custode re-run)            | 20 ch   |            7.22 |               — | public DS02 file                                                    |
 | **This work — DS02**                      | 18 real |        **7.23** |               — | ~1 s fit; real sensors only; ~6.5 with T40/P30 added back (**C18**) |
 | — pooled, all 9 files (18 real sensors) — |         |                 |                 |                                                                     |
-| `raw_memory`                              | 18 real |       **15.58** |           17.00 | memory features; best per-sample                                    |
-| `whole_cycle`                             | 18 real |           15.44 |       **12.07** | one summary row per cycle; best per-engine                          |
+| `raw_memory`                              | 18 real |           15.58 |           17.00 | memory features                                                     |
+| `whole_cycle`                             | 18 real |       **15.44** |       **12.07** | one summary row per cycle; best on both                             |
 
 **Figure 4.9 — Predicted versus true RUL, per engine, DS02.** The `honest` real-sensor model's one-prediction-per-cycle
 RUL (blue for training engines, orange for the held-out test engines) overlaid on each engine's true run-to-failure
@@ -1144,9 +1156,9 @@ case where you least want an unexplainable answer.
 
 What is and is not established. The construction is real and the timings are measured, not estimated, and the run of
 record supplies the headline row's clock and its accuracy from one file. The speed claim is only fully persuasive
-against the right baselines, and I have not run the head-to-head against ANFIS and a genetic-algorithm-tuned FIS on
-identical splits, nor against Gaussian naive Bayes, the cheapest of the three and the one §4.2 names as its nearest
-relative. That table is the first thing I owe this chapter, a goal for completion. These numbers are also subject to
+against the right baselines. The head-to-head against ANFIS and a genetic-algorithm-tuned FIS on identical splits is
+now Table 4.5; Gaussian naive Bayes, the cheapest of the three and the one §4.2 names as its nearest relative, is still
+not run. That row is the first thing I owe this chapter, a goal for completion. These numbers are also subject to
 the board-wide repeatability standard, with fixed hardware, multiple seeds and error bars. And the accuracy claim's
 scope is bounded by the naive-Bayes-like factorization: where feature interactions matter a great deal, the flat model
 will leave accuracy on the table, precisely the gap the hierarchical models of Chapter 6 exist to close. The bridge in

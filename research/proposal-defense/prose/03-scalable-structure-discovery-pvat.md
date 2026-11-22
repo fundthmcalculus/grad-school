@@ -700,13 +700,13 @@ inequality somewhere, and the engine's ordering is exact on every one regardless
 What remains open from Goal G2's full decision rule is downstream usefulness, not exactness. Whether the topological
 set-cover selectors of Chapter 5 (`select_coverage_cover`, `select_multiscale` — themselves run on a real dissimilarity
 matrix for the first time in this pass, not merely a code capability) land within 0.05 adjusted Rand index of
-NERFCM-given-$k$ on at least three of the five named DTW sets is **not yet settled**: on ECG5000, the one dataset with
-real recoverable cluster structure, the set-cover *beats* NERFCM by 0.122 ARI, which fails the criterion in the
-favorable direction; on Crop and FordA both methods score far lower in absolute terms and happen to land within 0.05 of
-each other, a pass that reflects two struggling (Crop) or degenerate (FordA, ARI ≈ 0 for every method tested) results
-rather than two good ones. ElectricDevices and StarLightCurves were not attempted. Summary: the set-cover
-never loses meaningfully to NERFCM on real non-coordinate data, and does better where there is anything to find, but the
-specific ARI-parity threshold as written is not yet met on the evidence in hand. This detail belongs to Chapter 5 as
+NERFCM-given-$k$ on at least three of the five named DTW sets is **measured on all five and not met as written**
+(`g2-downstream-2026-08-25`, on the corrected minimax transform). Two land within 0.05: FordA (0.002 vs 0.000, a
+degenerate tie with ARI ≈ 0 for every method tested) and ElectricDevices (0.147 vs 0.175, both weak on seven classes).
+The other three fail the band in the favorable direction — the set-cover *beats* NERFCM on ECG5000 by 0.122, on
+StarLightCurves by 0.182, and on Crop by 0.084 (0.114 vs 0.030; the earlier 0.064 came from a transform that dropped
+duplicate points). Summary: the set-cover never loses meaningfully to NERFCM on real non-coordinate data, and does
+better wherever there is anything to find, but the specific ARI-parity threshold as written is not met. This detail belongs to Chapter 5 as
 much as here; see §7.2's Goal G2 entry for the full accounting.
 
 ## 3.5 Discussion and Contributions

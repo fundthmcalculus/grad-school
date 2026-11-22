@@ -1,0 +1,16 @@
+Table 3.7 (Goal G2) companion -- decision-rule item 3: downstream usefulness
+
+== ECG5000 ==
+  loaded: N=5000 length=140 k_true=5
+  DTW matrix (5000, 5000): 560.0s
+  [minimax] lowmem path verified equal to the O(n^3) reference on a 300-point subsample (max |diff| = 0.00e+00; 0 zero off-diagonal pairs present)
+  minimax transform (lowmem, split-phase, verified): 0.81s
+  NERFCM given k=5: ARI=0.593 ± 0.047 (10 seeds, 20.42s total)
+  select_coverage_cover: 0.22s -> k=25 coverage=0.943 ARI=0.715
+  select_multiscale: 0.19s -> 1 band(s), granularities=[25], per-band ARI=[0.7148683815145677], best=0.715
+  single-linkage given k: ARI=0.000  |  beta-plateau: 0.70s -> k=23 coverage=0.948 ARI=0.716
+  decision-rule check: |cover_ARI - NERFCM_ARI| = 0.122 -> within 0.05? no
+  wrote /home/scott/grad-school/reproduce/outputs/table_3_7_g2_downstream.md
+  wrote /home/scott/grad-school/reproduce/outputs/table_3_7_g2_downstream.csv
+  wrote /home/scott/grad-school/reproduce/outputs/table_3_7_g2_downstream.md
+  wrote /home/scott/grad-school/reproduce/outputs/table_3_7_g2_downstream.csv

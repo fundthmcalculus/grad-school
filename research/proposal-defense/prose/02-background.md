@@ -21,7 +21,7 @@ by [-@wang1998universal; -@wang1999analysis] and [-@joo2002universal]. That theo
 not intrinsically weak, and it is asymptotic in the rule count; every model in this dissertation sits at the other end
 of that axis, on the order of one rule per output class and three output buckets in §4.3. Capability at that rule count
 is settled by measurement, in Chapters 4 and 6: the flat model on Concrete lands level with CART
-($R^2 = 0.861 \pm 0.026$ against $0.826 \pm 0.047$) and behind a random forest ($0.909 \pm 0.019$), and falls
+($R^2 = 0.859 \pm 0.027$ against $0.826 \pm 0.049$) and behind a random forest ($0.909 \pm 0.020$), and falls
 to $0.394 \pm 0.065$ if the consequents are constants.
 
 There are two common flavors. A **Mamdani** system uses fuzzy sets on the output side and requires a defuzzification
@@ -256,7 +256,7 @@ This is the foil for the entire dissertation, which I summarize as *structure be
 the data first and the model synthesis becomes largely closed-form or one-pass; whatever optimization remains is a cheap
 local polish on an already-good solution, not the engine that has to find the solution from nothing. The refinement
 study behind §6.3.5 speaks to the size of that polish, not to conventional training: on Concrete at two thousand
-objective evaluations every optimizer arm ends between +0.017 and +0.025 in $R^2$ above the construction, most of it
+objective evaluations every optimizer arm ends between +0.016 and +0.025 in $R^2$ above the construction, most of it
 banked in the first few hundred evaluations. The optimization library that provides the optional polish —
 metaheuristics, a candidate-restricted local search, a quality-diversity layer, and the high-performance kernels behind
 them — is real and I use it, but it is supporting infrastructure, not a contribution; its details live in Appendix A.

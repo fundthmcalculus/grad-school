@@ -351,10 +351,10 @@ property of the feature transform, which removes a claim this document made abou
 has both investigations.
 
 The residual risk is uniform's own failure mode, and it is bounded rather than eliminated: on a heavily skewed target
-equal-width bins starve, the smallest falling to one sample by skew 1.8 and to zero past skew 14. That is why the
+equal-width bins starve, the smallest falling to one sample by skew 1.8 and to zero from skew 5.3 on (Table 4.3). That is why the
 recommendation carries the transform clause, and why the warning exists: a starved bucket barely moves an aggregate
 error, so it is precisely the failure an accuracy check cannot see. Quantile's failure at the same skews is worse for
-being quieter: deviations of ±0.99, ±4.45 and ±21.2 where uniform degrades smoothly toward zero.
+being quieter: deviations of ±0.86, ±4.51 and ±25.3 where uniform degrades smoothly toward zero.
 
 **Effort spent: about a day, against an estimate of three weeks.** The estimate assumed the answer needed a new guard
 mechanism on the quantile path and a confirming sweep. It needed neither: the missing measurement was an axis the
