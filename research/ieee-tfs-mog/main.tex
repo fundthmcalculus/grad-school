@@ -464,21 +464,20 @@ BETH has no positive examples in its training and validation splits, so no super
 
 \subsection{Phishing URLs}
 \label{sec:phi}
-On PhiUSIIL the construction trains in $0.13 \pm 0.02$\,s but reaches only $0.440 \pm 0.181$ accuracy on the 47-feature set, below the $0.576$ majority-class rate. Gaussian naive Bayes on the same protocol reaches $0.980 \pm 0.002$, so the dataset is separable under the independence assumption this construction shares. The shortfall is tied to feature selection. Figure~\ref{fig:topn} and Table~\ref{tab:topn} sweep the feature budget $k$ (\texttt{top\_n}) for four scorers, on the same ten seeds. With four or five features the Wasserstein scorer falls to $0.44$, while the other three stay between $0.76$ and $0.93$. From about $k = 15$ every scorer reaches $0.96$--$0.98$. The sweep is reported on the test split, so it shows sensitivity to the scorer and budget, and the choice of scorer should be re-made on validation data.
+On PhiUSIIL the construction trains in $0.13 \pm 0.02$\,s but reaches only $0.440 \pm 0.181$ accuracy on the 47-feature set, below the $0.576$ majority-class rate. Gaussian naive Bayes on the same protocol reaches $0.980 \pm 0.002$, so the dataset is separable under the independence assumption this construction shares. The shortfall is tied to feature selection. Table~\ref{tab:topn} gives the feature budget $k$ (\texttt{top\_n}) for four scorers, from the filter-off study on the same ten seeds. With four or five features the Wasserstein scorer falls to $0.44$, while the other three stay between $0.76$ and $0.92$. From $k = 8$ composite is the most accurate of the four, and higher-order is no longer ahead of it. The results are on the test split, so they show sensitivity to the scorer and budget, and the choice of scorer should be re-made on validation data.
 
 \begin{table}[t]
 \centering
-\caption{PhiUSIIL, MoG test accuracy and mean fit time by feature scorer and feature budget $k$. Ten seeds. Each cell is accuracy (fit seconds). Times are from the same archived runs; the test split was used for both columns, so this is a sensitivity table, not a selection.}
+\caption{PhiUSIIL, MoG test accuracy by feature scorer and feature budget $k$, from the filter-off study (ten seeds, mean). Each cell is accuracy (mean fit seconds). Test split, so this is a sensitivity table, not a selection.}
 \label{tab:topn}
 \begin{tabular}{rrrrr}
 \toprule
 $k$ & Wasserstein & Bhattacharyya & Composite & Higher-order \\
 \midrule
-4 & 0.438 (0.15) & 0.818 (0.12) & 0.762 (0.16) & 0.901 (0.36) \\
-5 & 0.440 (0.17) & 0.818 (0.15) & 0.919 (0.21) & 0.926 (0.37) \\
-8 & 0.667 (0.21) & 0.876 (0.22) & 0.962 (0.31) & 0.936 (0.46) \\
-10 & 0.720 (0.27) & 0.958 (0.29) & 0.976 (0.38) & 0.937 (0.57) \\
-20 & 0.970 (0.60) & 0.980 (0.67) & 0.983 (0.71) & 0.977 (0.84) \\
+4 & 0.438 (0.10) & 0.818 (0.08) & 0.762 (0.10) & 0.843 (0.15) \\
+5 & 0.440 (0.11) & 0.818 (0.10) & 0.919 (0.13) & 0.848 (0.20) \\
+8 & 0.810 (0.17) & 0.876 (0.16) & 0.962 (0.22) & 0.929 (0.26) \\
+10 & 0.726 (0.22) & 0.958 (0.24) & 0.976 (0.30) & 0.937 (0.32) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -486,7 +485,7 @@ $k$ & Wasserstein & Bhattacharyya & Composite & Higher-order \\
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{fig/fig8-phiusiil-topn.pdf}
-\caption{PhiUSIIL test accuracy against feature budget $k$, by scorer (mean and s.d. over ten seeds). Shaded: the $k = 4$--$5$ region where the Wasserstein result of $0.44$ is measured. Dashed: majority rate. Data from the \texttt{topn-sweep-2026-11-21} archive.}
+\caption{PhiUSIIL test accuracy against feature budget $k$, by scorer (mean and s.d. over ten seeds). Shaded: the $k = 4$--$5$ region where the Wasserstein result of $0.44$ is measured. Dashed: majority rate. Data from the \texttt{topn-sweep-2026-11-21} archive (filter on, $k$ up to 47). Table~\ref{tab:topn} uses the filter-off study instead.}
 \label{fig:topn}
 \end{figure}
 
