@@ -11,6 +11,7 @@ Writes results.csv and results.md next to this file.
 from __future__ import annotations
 
 import csv
+import re
 import os
 import sys
 import time
@@ -177,8 +178,10 @@ def run():
                         list(clf.top_features_) if clf.top_features_ is not None else []
                     )
                     kept = len(kept_list)
+                    # The classifier names its inputs by position within the subset it was
+                    # given (feature_j is column sel[j]), so map back to the original column.
                     kept_names = "|".join(
-                        names[sel[int(f)]] if not isinstance(f, str) else f
+                        str(names[sel[int(re.sub(r"\D", "", str(f)))]])
                         for f in kept_list
                     )
                     rows.append(
