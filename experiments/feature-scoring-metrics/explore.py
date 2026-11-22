@@ -162,14 +162,24 @@ def run():
                         continue
                     sel = order[:k]
                     t1 = time.perf_counter()
+                    # correlation_threshold=1.0 disables the redundancy filter
+                    # (gauss_math._finalise_ranking filters only for 0 < t < 1).
                     clf = TribbleClassifier(
-                        top_n=k, scoring_method="wasserstein", random_state=seed
+                        top_n=k,
+                        scoring_method="wasserstein",
+                        random_state=seed,
+                        correlation_threshold=1.0,
                     )
                     clf.fit(Xtr[:, sel], ytr)
                     fit_s = time.perf_counter() - t1
                     acc = accuracy_score(yte, np.asarray(clf.predict(Xte[:, sel])))
-                    kept = (
-                        len(clf.top_features_) if clf.top_features_ is not None else k
+                    kept_list = (
+                        list(clf.top_features_) if clf.top_features_ is not None else []
+                    )
+                    kept = len(kept_list)
+                    kept_names = "|".join(
+                        names[sel[int(f)]] if not isinstance(f, str) else f
+                        for f in kept_list
                     )
                     rows.append(
                         dict(
@@ -181,6 +191,7 @@ def run():
                             score_s=score_s,
                             fit_s=fit_s,
                             kept=kept,
+                            features=kept_names,
                         )
                     )
                 print(f"{ds_name} seed={seed} {metric}: done", flush=True)
