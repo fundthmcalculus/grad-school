@@ -1,0 +1,51 @@
+dataset,metric,k,seed,acc,score_s,fit_s,kept,features
+Breast Cancer,hellinger,2,0,0.9035087719298246,0.01718571300000349,0.08091275399999631,2,worst perimeter|worst area
+Breast Cancer,hellinger,4,0,0.9298245614035088,0.01718571300000349,0.0944352829999957,4,worst concave points|worst perimeter|worst radius|worst area
+Breast Cancer,hellinger,5,0,0.9385964912280702,0.01718571300000349,0.10227594200000567,5,worst concave points|mean concave points|worst perimeter|worst radius|worst area
+Breast Cancer,hellinger,8,0,0.9298245614035088,0.01718571300000349,0.1680699760000266,8,worst concave points|mean concave points|worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean area
+Breast Cancer,hellinger,10,0,0.9473684210526315,0.01718571300000349,0.24218238500003508,10,worst concave points|mean concave points|worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean concavity|mean area|area error
+Breast Cancer,hellinger,2,1,0.8596491228070176,0.007296700000040346,0.05945073800000955,2,worst perimeter|worst area
+Breast Cancer,hellinger,4,1,0.9385964912280702,0.007296700000040346,0.1055595440000161,4,worst concave points|worst perimeter|worst radius|worst area
+Breast Cancer,hellinger,5,1,0.9385964912280702,0.007296700000040346,0.12265032199996995,5,worst concave points|worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,hellinger,8,1,0.9122807017543859,0.007296700000040346,0.18224020100001326,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area
+Breast Cancer,hellinger,10,1,0.9385964912280702,0.007296700000040346,0.21166300800001636,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean concavity|mean area|area error
+Breast Cancer,hellinger,2,2,0.8596491228070176,0.007083754999996472,0.04788490800001455,2,worst perimeter|worst area
+Breast Cancer,hellinger,4,2,0.9035087719298246,0.007083754999996472,0.08463836800001445,4,worst concave points|worst perimeter|worst radius|worst area
+Breast Cancer,hellinger,5,2,0.8947368421052632,0.007083754999996472,0.10423589799995625,5,worst concave points|worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,hellinger,8,2,0.868421052631579,0.007083754999996472,0.1735305500000095,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area
+Breast Cancer,hellinger,10,2,0.8947368421052632,0.007083754999996472,0.1985767790000068,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean concavity|mean area|area error
+Breast Cancer,hellinger,2,3,0.9122807017543859,0.010075608000022385,0.05450679700004457,2,worst perimeter|worst area
+Breast Cancer,hellinger,4,3,0.9298245614035088,0.010075608000022385,0.09357679400000052,4,worst concave points|worst perimeter|worst radius|worst area
+Breast Cancer,hellinger,5,3,0.9385964912280702,0.010075608000022385,0.1245480910000083,5,worst concave points|worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,hellinger,8,3,0.9035087719298246,0.010075608000022385,0.16305294000000004,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area
+Breast Cancer,hellinger,10,3,0.9298245614035088,0.010075608000022385,0.21221736100000044,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area|mean concavity|area error
+Breast Cancer,hellinger,2,4,0.8333333333333334,0.007027175000018815,0.05344731600001751,2,worst perimeter|worst area
+Breast Cancer,hellinger,4,4,0.8771929824561403,0.007027175000018815,0.10551975699996774,4,worst concave points|worst perimeter|worst radius|worst area
+Breast Cancer,hellinger,5,4,0.8859649122807017,0.007027175000018815,0.13209338100000423,5,worst concave points|worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,hellinger,8,4,0.8859649122807017,0.007027175000018815,0.17378035699999828,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area
+Breast Cancer,hellinger,10,4,0.8771929824561403,0.007027175000018815,0.22635773900003642,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area|mean concavity|area error
+Breast Cancer,hellinger,2,5,0.9210526315789473,0.005435979999958818,0.05379117400002542,2,worst perimeter|worst radius
+Breast Cancer,hellinger,4,5,0.9649122807017544,0.005435979999958818,0.08396305200000143,4,worst concave points|worst perimeter|worst radius|worst area
+Breast Cancer,hellinger,5,5,0.956140350877193,0.005435979999958818,0.09794859300001235,5,worst concave points|worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,hellinger,8,5,0.9385964912280702,0.005435979999958818,0.16927670400002626,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|worst area|mean radius|mean area
+Breast Cancer,hellinger,10,5,0.9385964912280702,0.005435979999958818,0.19441133700001956,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|worst area|mean radius|mean concavity|mean area|worst concavity
+Breast Cancer,hellinger,2,6,0.8771929824561403,0.010735612000019046,0.049068783999985044,2,worst perimeter|worst area
+Breast Cancer,hellinger,4,6,0.9122807017543859,0.010735612000019046,0.0775763660000166,4,worst concave points|worst perimeter|worst radius|worst area
+Breast Cancer,hellinger,5,6,0.9298245614035088,0.010735612000019046,0.1069828130000019,5,worst concave points|worst perimeter|mean concave points|worst radius|worst area
+Breast Cancer,hellinger,8,6,0.8947368421052632,0.010735612000019046,0.174027897999963,8,worst concave points|worst perimeter|mean concave points|worst radius|mean perimeter|mean radius|worst area|mean area
+Breast Cancer,hellinger,10,6,0.9298245614035088,0.010735612000019046,0.19799554599995872,10,worst concave points|worst perimeter|mean concave points|worst radius|mean perimeter|mean radius|worst area|mean area|mean concavity|area error
+Breast Cancer,hellinger,2,7,0.9736842105263158,0.006788948000007622,0.0435540240000023,2,worst concave points|worst perimeter
+Breast Cancer,hellinger,4,7,0.9473684210526315,0.006788948000007622,0.08316910900003904,4,worst concave points|worst perimeter|worst radius|worst area
+Breast Cancer,hellinger,5,7,0.9649122807017544,0.006788948000007622,0.11124154899999894,5,worst concave points|worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,hellinger,8,7,0.9473684210526315,0.006788948000007622,0.1729802330000325,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area
+Breast Cancer,hellinger,10,7,0.956140350877193,0.006788948000007622,0.2152775459999816,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area|mean concavity|area error
+Breast Cancer,hellinger,2,8,0.9035087719298246,0.007088342000031389,0.044434487000046374,2,worst perimeter|worst radius
+Breast Cancer,hellinger,4,8,0.9298245614035088,0.007088342000031389,0.07969942500000116,4,worst concave points|worst perimeter|worst radius|worst area
+Breast Cancer,hellinger,5,8,0.9385964912280702,0.007088342000031389,0.12220978400000604,5,worst concave points|mean concave points|worst perimeter|worst radius|worst area
+Breast Cancer,hellinger,8,8,0.9385964912280702,0.007088342000031389,0.1691391239999689,8,worst concave points|mean concave points|worst perimeter|worst radius|mean perimeter|worst area|mean concavity|mean area
+Breast Cancer,hellinger,10,8,0.9210526315789473,0.007088342000031389,0.2331896160000042,10,worst concave points|mean concave points|worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean concavity|mean area|area error
+Breast Cancer,hellinger,2,9,0.8859649122807017,0.007109313000000839,0.04054584300001807,2,worst perimeter|worst area
+Breast Cancer,hellinger,4,9,0.9210526315789473,0.007109313000000839,0.08443641499997057,4,worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,hellinger,5,9,0.9473684210526315,0.007109313000000839,0.0984787819999724,5,worst concave points|worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,hellinger,8,9,0.9298245614035088,0.007109313000000839,0.16153035199999977,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|worst area|mean area|area error
+Breast Cancer,hellinger,10,9,0.9385964912280702,0.007109313000000839,0.2014095159999556,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area|mean concavity|area error
