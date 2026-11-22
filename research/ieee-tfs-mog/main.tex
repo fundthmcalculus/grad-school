@@ -464,7 +464,7 @@ BETH has no positive examples in its training and validation splits, so no super
 
 \subsection{Phishing URLs}
 \label{sec:phi}
-On PhiUSIIL the construction trains in $0.13 \pm 0.02$\,s but reaches only $0.440 \pm 0.181$ accuracy on the 47-feature set, below the $0.576$ majority-class rate. Gaussian naive Bayes on the same protocol reaches $0.980 \pm 0.002$, so the dataset is separable under the independence assumption this construction shares. The shortfall is tied to feature selection. Table~\ref{tab:topn} gives the feature budget $k$ (\texttt{top\_n}) for four scorers, from the filter-off study on the same ten seeds. With four or five features the Wasserstein scorer falls to $0.44$, while the other three stay between $0.76$ and $0.92$. From $k = 8$ composite is the most accurate of the four, and higher-order is no longer ahead of it. The results are on the test split, so they show sensitivity to the scorer and budget, and the choice of scorer should be re-made on validation data.
+On PhiUSIIL the construction trains in $0.13 \pm 0.02$\,s but reaches only $0.440 \pm 0.181$ accuracy on the 47-feature set, below the $0.576$ majority-class rate. Gaussian naive Bayes on the same protocol reaches $0.980 \pm 0.002$, so the dataset is separable under the independence assumption this construction shares. The shortfall is tied to feature selection. Table~\ref{tab:topn} gives the feature budget $k$ (\texttt{top\_n}) for four scorers, from the filter-off study on the same ten seeds. With four or five features the Wasserstein scorer falls to $0.44$, while the other three stay between $0.76$ and $0.92$. From $k = 8$ composite is the most accurate of the four, and higher-order is no longer ahead of it. By $k = 15$ all four reach $0.95$--$0.98$. The results are on the test split, so they show sensitivity to the scorer and budget, and the choice of scorer should be re-made on validation data.
 
 \begin{table}[t]
 \centering
@@ -478,6 +478,8 @@ $k$ & Wasserstein & Bhattacharyya & Composite & Higher-order \\
 5 & 0.440 (0.11) & 0.818 (0.10) & 0.919 (0.13) & 0.848 (0.20) \\
 8 & 0.810 (0.17) & 0.876 (0.16) & 0.962 (0.22) & 0.929 (0.26) \\
 10 & 0.726 (0.22) & 0.958 (0.24) & 0.976 (0.30) & 0.937 (0.32) \\
+15 & 0.949 (0.44) & 0.976 (0.42) & 0.977 (0.42) & 0.947 (0.54) \\
+20 & 0.970 (0.58) & 0.978 (0.57) & 0.983 (0.55) & 0.973 (0.65) \\
 \bottomrule
 \end{tabular}
 \end{table}
