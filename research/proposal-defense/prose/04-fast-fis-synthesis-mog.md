@@ -235,8 +235,8 @@ blocks discussed below.
 
 **At first and second order this is a null result; at zeroth order it is decisive.** The three arms span 0.009 and 0.009
 in the lower two blocks, against seed spreads of ±0.018 to ±0.027; no configuration clears its own noise floor, and the
-ordering is not stable enough to read. The same three arms span **0.828** at zeroth order, twelve times the widest
-spread involved. The ordering holds at every bucket count: uniform 0.394 / 0.416 / 0.541 against pinned quantile's
+ordering is not stable enough to read. The same three arms span **0.828** at zeroth order, more than three times the widest
+spread involved (±0.241) and over twelve times uniform's own. The ordering holds at every bucket count: uniform 0.394 / 0.416 / 0.541 against pinned quantile's
 −0.434 / 0.048 / 0.326 at three, four and six buckets, each separation clearing both arms' error bars. Worst-case error
 tells the same story, 56.3 MPa against 38.2 on a target spanning about 80.
 
@@ -247,7 +247,7 @@ available to offset it: the bottom rule emits the target's global minimum for a 
 0.195, and the top rule emits the global maximum for 343 points whose mean is 0.653. Extrema standing in for
 representative values. At first and second order the same two ends stay pinned, but the free interior constants run
 to $-0.38$ and $-1.19$ — outside the target's own $[0,1]$ range, because the solve is spending intercepts as free
-parameters and paying the bias back through the linear terms. That compensation is why the penalty there is 0.005
+parameters and paying the bias back through the linear terms. That compensation is why the pinning penalty there is 0.002 and 0.004
 instead of 0.676. Appendix A.10.11 writes the mechanism down: at zeroth order the squared error of bucket $r$ decomposes
 as its within-bucket variance plus $n_r (m_r - \bar y_r)^2$, a bias the pinned constant fixes
 at $(\bar y_r - y_{\min})^2$ per sample with nothing to offset it, while at first order the free coefficients can
@@ -650,8 +650,8 @@ splits as Table 4.5. "Speedup" is the ratio of means, slowest of {ANFIS, GA-FIS}
 **Read the range, not the headline.** The accurate statement is **14× to 194×**, one to two orders of magnitude, not a
 flat "two orders". Bike Sharing at 14× is the weakest and belongs in the claim: it is the case where the fuzzy baselines
 are cheapest, because ANFIS scatter-partitions to twelve rules there rather than grid-partitioning to 256 as it does on
-Concrete. Two further caveats. The random forest is *not* slower than the construction on Concrete or Bike Sharing —
-the speed argument is against fuzzy-system induction, not against trees. And Concrete's ratio is 78×, at ten seeds and
+Concrete. Two further caveats. The random forest is level with the construction on Concrete (0.63 s against 0.53 s), though far slower on Bike
+Sharing — the speed argument is against fuzzy-system induction, not against trees. And Concrete's ratio is 78×, at ten seeds and
 against a GA-FIS baseline that itself runs the dual-form consequent solve of grad-school #237 (a 3.4× speedup over an
 unoptimised GA-FIS).
 
@@ -660,8 +660,7 @@ per dataset, four arms: the construction, ANFIS, the GA-tuned FIS and the random
 ten-seed spread as error bars, and the table's own speedup column — the construction against the slower of the two fuzzy
 baselines — printed above each group. Drawn from `phiusiil-leakfree-2026-08-30`, the archive Table 4.1b is quoted from,
 so the two cannot disagree. The picture makes the two caveats of the paragraph above visible at once: the ratio is a
-range spanning an order of magnitude, and the random forest bars are level with or below the construction's on Concrete
-and Bike Sharing, so the argument is against fuzzy-system induction and not against trees.
+range spanning an order of magnitude, and the random forest bars are level with the construction's on Concrete, so the argument is against fuzzy-system induction and not against trees.
 `![04-speedup](fig/04-speedup.png)`
 
 *The full-second-order row's missing time.* Its two halves come from different code paths: the **R² of 0.859 ± 0.027
@@ -672,12 +671,11 @@ a timed full-second-order arm, measuring **R² = 0.852 ± 0.030 in 0.53 ± 0.04 
 implementation onto an accuracy from another. The reading today: on the estimator path full second order buys about
 +0.05 R² over first order at no measurable extra training time (0.53 s either way), with the exact pairing still owed.
 
-*Reading the empty cells.* `N/A (C1)` is not a number withheld; it is a measurement that cannot be taken with what is in
-the repository. `table_4_1_mog_baselines.py` looks for `reproduce/tables/_baseline_anfis.py` and `_baseline_gafis.py`
-and emits `N/A` when they are absent, which they are. Writing those two adapters is checklist item **C1**, the single
-most important experiment still owed, because the *orders of magnitude faster* claim in the title and in Chapters 1, 7
-and 8 has no fuzzy baseline to be faster **than** until they exist. The eight cells are the shape of that hole, marked
-rather than filled with a plausible figure.
+*Reading the empty cells.* The ANFIS and GA-tuned FIS rows were once `N/A (C1)`: `table_4_1_mog_baselines.py` looks
+for `reproduce/tables/_baseline_anfis.py` and `_baseline_gafis.py` and emits `N/A` when they are absent. Both adapters
+now exist (checklist item **C1**) and fill their rows in Table 4.5, so the *orders of magnitude faster* claim in the
+title and in Chapters 1, 7 and 8 has fuzzy baselines to be faster **than**. The cells still empty are Gaussian naive
+Bayes, which no generator instantiates — marked rather than filled with a plausible figure.
 
 **The mechanism, measured.** Two protocols now run, and they answer different questions. Tables 4.6 and 4.7 use
 leave-one-class-out on public multi-class data — each class withheld from training in turn and treated as unseen,
@@ -954,7 +952,7 @@ default, worth carrying upstream.
 > θ *list*, and `run_all_tables.sh` now defaults it to `0.5,0.6,0.7,0.8,0.9,0.99,1.1`. Note that `=1` is a valid list of
 > *one* and emits a single saturated row of zeros, which reads exactly like a null result. Table 4.7b's run set
 > `REPRO_THETA_SWEEP=""` deliberately, to keep the RT-IOT2022 run inside its time budget, which is why Table 4.6 and
-> Figure 4.6 still show only Glass — the sweep at RT-IOT2022 scale is real future work, not an oversight. No cell here is
+> Figure 4.6 show only Glass; the sweep at RT-IOT2022 scale was run separately and is Table 4.7c. No cell here is
 > left a bare *pending*: every unfilled cell names what blocks it, and any checklist item tracking it. The harness prints
 > exactly what it could not run rather than substituting a guess. But the guesses this pass removed from Table 4.4 were
 > *hand-authored into the prose*, so the guarantee held for the harness and not the transcription: that is the failure
@@ -1040,8 +1038,8 @@ boost $\theta$, with $J$, their difference, as the shaded band between them, and
 and the saturation past $\theta = 1.1$ marked. Drawn from the table's own CSV, not a second run of the sweep, so the two
 cannot disagree; regenerate the table with a θ list (`REPRO_THETA_SWEEP=0.5,0.6,0.7,0.8,0.9,0.99,1.1`) and the figure
 follows. Still on Glass, not RT-IOT2022: Table 4.7b measured one operating point (θ = 0.99) at scale and found the
-complement rule behind both baselines there, which makes the sweep more urgent, not less, since Glass's sweep found a
-materially better θ than the shipped default and RT-IOT2022 has not been given the chance to. The BETH version of this
+complement rule behind both baselines there, and Table 4.7c has since swept θ at that scale too: a different θ narrows the gap there but does not close it. The
+figure stays on Glass. The BETH version of this
 curve is emitted as Table 4.11 (b) with the θ sweep as 4.11 (e). It is not plotted as a second figure because §4.3 shows
 θ to be a threshold parameterisation on a one-class fit, so the BETH curve carries the same information as the budget
 sweep already tabulated; the Glass figure stays because there the conorm is doing work the threshold reading cannot
@@ -1111,10 +1109,11 @@ Two findings are worth carrying forward. First, **the virtual channels are not f
 Re-running the design-of-experiments' original config with the two virtual channels `T40`/`P30` reaches ~6.5 versus 7.23
 without them (`CHECKLIST` **C18**), so dropping them costs about 0.7 RMSE, measured rather than assumed. Every row of
 Table 4.10, DS02 and pooled alike, still uses real sensors only, as a deliberate simplicity-over-the-last-0.7-RMSE
-choice, not a free one. Second, **the scoring convention decides the winner.** On the canonical per-engine metric (one
+choice, not a free one. Second, **the scoring convention decides the margin.** On the canonical per-engine metric (one
 prediction per test engine at its last cycle, the standard C-MAPSS protocol) the simplest real-sensor model —
 whole-cycle aggregation in Table 4.10 — is best of the two pooled models at per-engine RMSE 12.07 and a NASA score of
-320; the raw-memory model leads only on the per-sample density metric. Reporting both, rather than the flattering one,
+320, against 17.00 for the raw-memory model; on the per-sample density metric the two are nearly level (15.44 against
+15.58). Reporting both, rather than the flattering one,
 is the point.
 
 **Table 4.10 — Turbofan RUL, N-CMAPSS DS02 and pooled** *(demonstrated; one run on the dataset's own fixed train/test
@@ -1130,8 +1129,8 @@ conventions; "real only" = the 18 physically measurable channels, virtual `T40`/
 | Published CNN (Custode re-run)            | 20 ch   |            7.22 |               — | public DS02 file                                                    |
 | **This work — DS02**                      | 18 real |        **7.23** |               — | ~1 s fit; real sensors only; ~6.5 with T40/P30 added back (**C18**) |
 | — pooled, all 9 files (18 real sensors) — |         |                 |                 |                                                                     |
-| `raw_memory`                              | 18 real |       **15.58** |           17.00 | memory features; best per-sample                                    |
-| `whole_cycle`                             | 18 real |           15.44 |       **12.07** | one summary row per cycle; best per-engine                          |
+| `raw_memory`                              | 18 real |           15.58 |           17.00 | memory features                                                     |
+| `whole_cycle`                             | 18 real |       **15.44** |       **12.07** | one summary row per cycle; best on both                             |
 
 **Figure 4.9 — Predicted versus true RUL, per engine, DS02.** The `honest` real-sensor model's one-prediction-per-cycle
 RUL (blue for training engines, orange for the held-out test engines) overlaid on each engine's true run-to-failure
@@ -1157,9 +1156,9 @@ case where you least want an unexplainable answer.
 
 What is and is not established. The construction is real and the timings are measured, not estimated, and the run of
 record supplies the headline row's clock and its accuracy from one file. The speed claim is only fully persuasive
-against the right baselines, and I have not run the head-to-head against ANFIS and a genetic-algorithm-tuned FIS on
-identical splits, nor against Gaussian naive Bayes, the cheapest of the three and the one §4.2 names as its nearest
-relative. That table is the first thing I owe this chapter, a goal for completion. These numbers are also subject to
+against the right baselines. The head-to-head against ANFIS and a genetic-algorithm-tuned FIS on identical splits is
+now Table 4.5; Gaussian naive Bayes, the cheapest of the three and the one §4.2 names as its nearest relative, is still
+not run. That row is the first thing I owe this chapter, a goal for completion. These numbers are also subject to
 the board-wide repeatability standard, with fixed hardware, multiple seeds and error bars. And the accuracy claim's
 scope is bounded by the naive-Bayes-like factorization: where feature interactions matter a great deal, the flat model
 will leave accuracy on the table, precisely the gap the hierarchical models of Chapter 6 exist to close. The bridge in

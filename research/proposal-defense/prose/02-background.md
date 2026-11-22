@@ -256,7 +256,7 @@ This is the foil for the entire dissertation, which I summarize as *structure be
 the data first and the model synthesis becomes largely closed-form or one-pass; whatever optimization remains is a cheap
 local polish on an already-good solution, not the engine that has to find the solution from nothing. The refinement
 study behind §6.3.5 speaks to the size of that polish, not to conventional training: on Concrete at two thousand
-objective evaluations every optimizer arm ends between +0.017 and +0.025 in $R^2$ above the construction, most of it
+objective evaluations every optimizer arm ends between +0.016 and +0.025 in $R^2$ above the construction, most of it
 banked in the first few hundred evaluations. The optimization library that provides the optional polish —
 metaheuristics, a candidate-restricted local search, a quality-diversity layer, and the high-performance kernels behind
 them — is real and I use it, but it is supporting infrastructure, not a contribution; its details live in Appendix A.

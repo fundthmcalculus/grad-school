@@ -238,7 +238,7 @@ The broader conclusion concerns *interpretability*, this dissertation's central 
 establish. Chapter 4 argues the construction yields a readable rule base, a handful of clauses over named features.
 Table A.2 still shows that claim is no property of the model architecture — but what it now shows is stronger and less
 comfortable: on this dataset, **with the leak removed, no ranking delivers a readable *and* accurate rule base at all.**
-Reaching 0.96 takes fifteen features under every scorer.
+Reaching 0.96 takes ten features at best (composite) and fifteen to twenty under the others.
 
 The evidence is still the **one-feature row**, and it now says the opposite of what it used to. It used to read 0.9967
 against 0.4267 — a gap of 0.57 — and support the claim that *with a ranking that works, the model is readable and
@@ -1605,8 +1605,8 @@ Jacobs [@jordan1994hierarchical] is the standard reference for the hierarchical 
 | Random Forest (reference)    |              0.909 ± 0.020 |                    — |     1.000 ± 0.000 |
 
 Tuned, the mixture reaches $R^2 = 0.836 \pm 0.028$ against the flat model's matched-architecture $0.840 \pm 0.022$:
-indistinguishable within spread. Tuning cuts the mixture's standard deviation from 0.060 to 0.022, nearly a factor of
-three, while raising the mean from 0.760 to 0.829, so what the tuned settings mostly buy is reliability rather than a
+indistinguishable within spread. Tuning cuts the mixture's standard deviation from 0.062 to 0.028, about a factor of
+two, while raising the mean from 0.758 to 0.836, so what the tuned settings mostly buy is reliability rather than a
 level shift — at library defaults the mixture is an erratic model, not a slightly worse one. On leak-free PhiUSIIL the mixture
 reaches 0.914 ± 0.039: well above the flat model's 0.440 but short of the fuzzy tree (0.958), CART (0.997) and the
 random forest (1.000), so it does not reach parity (`phiusiil-leakfree-2026-08-30` and the run of record agree).
