@@ -155,3 +155,37 @@ clean test of the score alone. A clean test needs the filter off.
 filter disabled, and log the selected feature names per metric, seed and `k`.
 Then the explanation for each metric can rest on which features it picks, not
 only on accuracy.
+
+## Filter-off rerun (2026-11-22): correction
+
+The rerun with `correlation_threshold=1.0` (filter off) and per-run feature
+logging is committed in `results.csv` / `results.md`. The filter-on results are in
+commit `26b68b9`.
+
+Correction to the confound note above. Removing the filter **raised** the
+higher-order result at k = 4 on PhiUSIIL from 0.869 (3.0 features kept) to 0.843
+(4.0 kept). So the filter was helping higher-order on that dataset, not hurting it.
+Every other metric kept the requested number of features on PhiUSIIL under both
+settings, and their accuracies did not change.
+
+| PhiUSIIL, k = 4 | filter on | filter off |
+|---|---|---|
+| mutual_info, ks, hellinger, jensen_shannon | 0.955 | 0.955 |
+| energy | 0.924 | 0.924 |
+| higher_order | 0.869 (3.0 kept) | 0.843 (4.0 kept) |
+| composite | 0.762 | 0.762 |
+| wasserstein | 0.438 | 0.438 |
+
+On Breast Cancer and Wine the filter changes a few values, several within the
+seed spread. Composite on Wine drops from 0.950 to 0.931 with the filter off, and
+energy on Breast Cancer drops from 0.900 to 0.874.
+
+The conclusion holds. Higher-order is not the best candidate on PhiUSIIL, and the
+filter does not explain its gap. The redundancy filter is still a real problem:
+it changes which features the classifier uses, silently. The `tribble-fis` issue
+should be read in that light. Its "accuracy comparisons mix score and filter
+effects" point is true, but the example it gives runs the other way here.
+
+Still open: the feature-level logging in `results.csv` (the `features` column) has
+not yet been checked against the hypotheses about binary features. That is the next
+analysis step.
