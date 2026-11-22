@@ -79,3 +79,79 @@ it is a finding to explain, not a result to hide.
 - `results.csv` — the same, machine-readable.
 - An explanation section, added after the run, that covers each metric's result
   and whether the prediction above held.
+
+## Results (run 2026-11-22, 10 seeds; full tables in `results.md`, raw in `results.csv`)
+
+At `k` = 4 (mean accuracy):
+
+| metric | PhiUSIIL | Breast Cancer | Wine |
+|---|---|---|---|
+| mutual_info | 0.955 | 0.922 | 0.947 |
+| ks | 0.955 | 0.919 | 0.942 |
+| hellinger | 0.955 | 0.925 | 0.950 |
+| jensen_shannon | 0.955 | 0.925 | 0.950 |
+| anova_f | 0.792 | 0.928 | 0.950 |
+| energy | 0.924 | 0.900 | 0.897 |
+| bhattacharyya | 0.818 | 0.931 | 0.914 |
+| composite | 0.762 | 0.928 | 0.950 |
+| higher_order | 0.869 | 0.839 | 0.919 |
+| wasserstein | 0.438 | 0.928 | 0.922 |
+
+Mean fit time per scorer is not reported separately: the classifier fit is
+dominated by the classifier and is similar across metrics. Scoring time per
+dataset (all features, one seed) varies by orders of magnitude: KS took 22 s on
+PhiUSIIL, mutual information 1.7 s, Hellinger and Jensen–Shannon about 0.2 s, and
+the built-in scores 0.04–0.12 s.
+
+## Against the predictions
+
+| # | Prediction | Outcome | Verdict |
+|---|---|---|---|
+| 1 | Higher-order ahead of composite at k = 4, matches it at k = 5 | At k = 4 higher-order (0.869) is ahead of composite (0.762), but behind hellinger, JS, KS and MI (0.955). At k = 5 composite (0.919) is ahead of higher-order (0.893). | **Partly wrong.** Higher-order is not the best on PhiUSIIL. |
+| 2 | Energy near higher-order on PhiUSIIL | Energy 0.924 at k = 4, above higher-order. Energy is also below the best on Breast Cancer and Wine. | **Wrong on accuracy**, right that it favours tails. |
+| 3 | KS behaves like Wasserstein on binary features | KS 0.955 at k = 4, Wasserstein 0.438. | **Wrong.** |
+| 4 | MI strongest on Breast Cancer and Wine | Bhattacharyya is best on Breast Cancer (0.931), and MI is not first on Wine (JS, Hellinger and composite tie at 0.950). | **Wrong.** |
+| 5 | ANOVA F weakest on PhiUSIIL | ANOVA F 0.792 at k = 4 and 0.626 at k = 5, above Wasserstein and Bhattacharyya-free candidates but below the binned and MI metrics. | **Partly right.** Weak, not the weakest. |
+| 6 | Scoring-time order, with KS cheap | KS took 22 s on PhiUSIIL, far above the others. | **Wrong on KS.** Mutual information was the second-slowest, as predicted. |
+
+## Protocol confound found while reading the results
+
+The classifier applies its own redundancy filter (`correlation_threshold` 0.85)
+after the external selection. Higher-order keeps fewer features than requested
+on PhiUSIIL (3.0–3.3 of 4–5 at `k` = 4–5, against 4.0–5.0 for the other
+metrics). Its top features are correlated count features, so the filter removes
+them. The accuracy reported here for higher-order therefore includes a loss from
+that filter, not only from the score. The sweep in the paper used the classifier's
+own selection, which can differ. Both protocols are reported; neither is the
+clean test of the score alone. A clean test needs the filter off.
+
+## What is established, and what is not
+
+**Established by these runs**
+
+- On PhiUSIIL at `k` = 4, four metrics (MI, KS, Hellinger, Jensen–Shannon) reach
+  0.955, and higher-order reaches 0.869. Higher-order is not the best candidate here.
+- Wasserstein is the only metric that fails badly at small `k` on PhiUSIIL
+  (0.438 at `k` = 4), and it recovers by `k` = 15–20.
+- On Breast Cancer, the spread among the top metrics is 0.92–0.93, inside the seed
+  spread (about ±0.03). No ranking among them is supported there.
+- The scoring-cost ordering is set by the implementation, not the metric: KS
+  calls `ks_2samp` once per feature and class (which computes p-values), and the
+  binned metrics do a single histogram per feature.
+
+**Hypotheses, not yet tested**
+
+- *Binned metrics avoid binary features.* With quantile edges, a binary feature
+  collapses to one or two bins. This should make Hellinger and Jensen–Shannon
+  prefer continuous features. The runs did not record which features each metric
+  kept, so this is untested.
+- *Why Wasserstein and KS disagree.* For a binary feature, the one-vs-rest
+  Wasserstein distance and the KS statistic are the same quantity (the difference
+  in class proportions). Their large disagreement on PhiUSIIL must therefore come
+  from non-binary features. Which features each metric selects at `k` = 4 would
+  show this. Not recorded.
+
+**Next step, to settle the hypotheses:** rerun with the classifier's redundancy
+filter disabled, and log the selected feature names per metric, seed and `k`.
+Then the explanation for each metric can rest on which features it picks, not
+only on accuracy.
