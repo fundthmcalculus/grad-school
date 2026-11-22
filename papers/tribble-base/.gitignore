@@ -1,0 +1,9 @@
+# Regenerated artifacts -- same convention as AnalyticalDynamics/chaos/.gitignore:
+# anything a script rebuilds on every run is not tracked. paper.md is the draft
+# (tracked); a PDF rendered from it is a throwaway preview.
+build/
+*.aux
+*.log
+*.blg
+*.out
+*.bbl
