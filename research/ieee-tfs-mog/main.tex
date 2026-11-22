@@ -244,7 +244,7 @@ Gaussian naive Bayes is the nearest acknowledged relative of the factorization. 
 \label{sec:results}
 
 \subsection{Accuracy and training time}
-Table~\ref{tab:speed} reports training time for the construction and the two fuzzy baselines. Across the datasets the construction trains 14$\times$ to 194$\times$ faster than the slower of ANFIS and the GA-tuned FIS. The lower end is Bike Sharing, where ANFIS partitions coarsely. The upper end is PhiUSIIL. Random forests are not slower than the construction on Concrete or Bike Sharing, so the speed claim is against fuzzy-system induction, not against trees.
+Table~\ref{tab:speed} and Figure~\ref{fig:speed} report training time for the construction and the two fuzzy baselines. Across the datasets the construction trains 14$\times$ to 194$\times$ faster than the slower of ANFIS and the GA-tuned FIS. The lower end is Bike Sharing, where ANFIS partitions coarsely. The upper end is PhiUSIIL. Random forests are not slower than the construction on Concrete or Bike Sharing, so the speed claim is against fuzzy-system induction, not against trees.
 
 \begin{table}[t]
 \centering
@@ -275,7 +275,7 @@ Accuracy is not bought with speed. On Concrete the construction reaches $R^2 = 0
 
 \subsection{Output partitioning}
 \label{sec:partition}
-Table~\ref{tab:partition} compares the three partition schemes on Concrete at three buckets. At first and second order the schemes are indistinguishable. At zeroth order the pinned-extreme variant fails. Its outer rules emit the target's global minimum and maximum for buckets whose means are far from those extremes, and nothing offsets the error. Uniform partitioning gives $0.394 \pm 0.065$ at zeroth order against $-0.434 \pm 0.241$ for pinned quantile. Decomposing the gap, the boundary scheme accounts for $0.152$ and the pinning for $0.676$. Pinning the extreme consequents inside the data range is worth doing, because it prevents impossible outputs. Pinning them to the most extreme observation is not.
+Table~\ref{tab:partition} and Figure~\ref{fig:partition} compare the three partition schemes on Concrete at three buckets. At first and second order the schemes are indistinguishable. At zeroth order the pinned-extreme variant fails. Its outer rules emit the target's global minimum and maximum for buckets whose means are far from those extremes, and nothing offsets the error. Uniform partitioning gives $0.394 \pm 0.065$ at zeroth order against $-0.434 \pm 0.241$ for pinned quantile. Decomposing the gap, the boundary scheme accounts for $0.152$ and the pinning for $0.676$. Pinning the extreme consequents inside the data range is worth doing, because it prevents impossible outputs. Pinning them to the most extreme observation is not.
 
 \begin{table}[t]
 \centering
@@ -372,7 +372,7 @@ Cascade flattened to one FIS & 83.5 $\pm$ 5.4 (dedup) & 0.546 $\pm$ 0.051 & +0.0
 Open-set behavior is evaluated under two protocols that answer different questions, and the results disagree.
 
 \paragraph{Operating curve on Glass}
-On Glass under leave-one-class-out, sweeping $\theta$ traces the operating curve. Raising $\theta$ reduces both detection and false alarms monotonically, and past $\theta=1.1$ the rule stops firing. The detection minus false-alarm margin peaks at $+0.154$ at $\theta=0.80$ and at $+0.129$ at the shipped $\theta = 0.99$. Table~\ref{tab:theta} gives the values.
+On Glass under leave-one-class-out, sweeping $\theta$ traces the operating curve. Raising $\theta$ reduces both detection and false alarms monotonically, and past $\theta=1.1$ the rule stops firing. The detection minus false-alarm margin peaks at $+0.154$ at $\theta=0.80$ and at $+0.129$ at the shipped $\theta = 0.99$. Table~\ref{tab:theta} gives the values and Figure~\ref{fig:sweep} plots them.
 
 \begin{table}[t]
 \centering
@@ -464,7 +464,34 @@ BETH has no positive examples in its training and validation splits, so no super
 
 \subsection{Phishing URLs}
 \label{sec:phi}
-On PhiUSIIL the construction trains in $0.13 \pm 0.02$\,s but reaches only $0.440 \pm 0.181$ accuracy on the 47-feature set. That is below the $0.576$ majority-class rate, and individual seeds fall to about $0.23$. Gaussian naive Bayes on the same protocol reaches $0.980 \pm 0.002$, so the dataset is separable under the independence assumption this construction shares. The shortfall is in the construction on this dataset, not the dataset, and we do not yet know which stage causes it. \todo{Locate the PhiUSIIL failure. A leak-free archive (2026-08-30) reports $0.997$, but its own preflight failed and its table reports $0.440$; the $0.997$ is not reproduced.} The fuzzy baselines and random forest reported in Table~\ref{tab:speed} come from an archive whose preflight also failed, and are not re-verified. A one-class detector trained on legitimate URLs only, with no phishing samples, is a separate regime. Table~\ref{tab:phi1c} reports it over five seeds, with the threshold calibrated on training normals alone. The surprisal detector reaches AUROC $0.9992 \pm 0.0001$ and recall $0.9977 \pm 0.0004$ at a 1\% false-alarm rate. Whitened Mahalanobis distance matches it, which indicates the dataset's separability rather than the fuzzy method.
+On PhiUSIIL the construction trains in $0.13 \pm 0.02$\,s but reaches only $0.440 \pm 0.181$ accuracy on the 47-feature set, below the $0.576$ majority-class rate. Gaussian naive Bayes on the same protocol reaches $0.980 \pm 0.002$, so the dataset is separable under the independence assumption this construction shares. The shortfall is tied to feature selection. Table~\ref{tab:topn} gives the feature budget $k$ (\texttt{top\_n}) for four scorers, from the filter-off study on the same ten seeds. With four or five features the Wasserstein scorer falls to $0.44$, while the other three stay between $0.76$ and $0.92$. From $k = 8$ composite is the most accurate of the four, and higher-order is no longer ahead of it. By $k = 15$ all four reach $0.95$--$0.98$. The results are on the test split, so they show sensitivity to the scorer and budget, and the choice of scorer should be re-made on validation data.
+
+\begin{table}[t]
+\centering
+\caption{PhiUSIIL, MoG test accuracy by feature scorer and feature budget $k$, from the filter-off study (ten seeds, mean). Each cell is accuracy (mean fit seconds). Test split, so this is a sensitivity table, not a selection.}
+\label{tab:topn}
+\begin{tabular}{rrrrr}
+\toprule
+$k$ & Wasserstein & Bhattacharyya & Composite & Higher-order \\
+\midrule
+4 & 0.438 (0.10) & 0.818 (0.08) & 0.762 (0.10) & 0.843 (0.15) \\
+5 & 0.440 (0.11) & 0.818 (0.10) & 0.919 (0.13) & 0.848 (0.20) \\
+8 & 0.810 (0.17) & 0.876 (0.16) & 0.962 (0.22) & 0.929 (0.26) \\
+10 & 0.726 (0.22) & 0.958 (0.24) & 0.976 (0.30) & 0.937 (0.32) \\
+15 & 0.949 (0.44) & 0.976 (0.42) & 0.977 (0.42) & 0.947 (0.54) \\
+20 & 0.970 (0.58) & 0.978 (0.57) & 0.983 (0.55) & 0.973 (0.65) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig/fig8-phiusiil-topn.pdf}
+\caption{PhiUSIIL test accuracy against feature budget $k$, by scorer (mean and s.d. over ten seeds). Shaded: the $k = 4$--$5$ region where the Wasserstein result of $0.44$ is measured. Dashed: majority rate. Data from the \texttt{topn-sweep-2026-11-21} archive (filter on, $k$ up to 47). Table~\ref{tab:topn} uses the filter-off study instead.}
+\label{fig:topn}
+\end{figure}
+
+A seed-0 inspection shows what differs. Wasserstein keeps near-binary flags (skewness near 0, excess kurtosis near $-2$), which is a poor and unstable model for a Gaussian mixture, as Chapter 4 notes. Higher-order keeps heavy-tailed count features (skewness 24--85), which it scores highly because it compares fourth moments. Composite keeps a mixture that includes the strongest single feature, \texttt{IsHTTPS}. This is one seed and one feature set, so it is a hypothesis about mechanism, not a result. \todo{Confirm the mechanism across all ten seeds, with features recorded per run, and confirm the setting Table~4.1 uses.} A one-class detector trained on legitimate URLs only, with no phishing samples, is a separate regime. Table~\ref{tab:phi1c} reports it over five seeds, with the threshold calibrated on training normals alone. The surprisal detector reaches AUROC $0.9992 \pm 0.0001$ and recall $0.9977 \pm 0.0004$ at a 1\% false-alarm rate. Whitened Mahalanobis distance matches it, which indicates the dataset's separability rather than the fuzzy method.
 
 \begin{table}[t]
 \centering

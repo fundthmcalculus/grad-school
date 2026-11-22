@@ -1,0 +1,51 @@
+dataset,metric,k,seed,acc,score_s,fit_s,kept,features
+Breast Cancer,wasserstein,2,0,0.9122807017543859,0.020255091999985098,0.07085345199999438,2,worst concave points|mean concave points
+Breast Cancer,wasserstein,4,0,0.9210526315789473,0.020255091999985098,0.08713672799999017,4,worst concave points|mean concave points|worst perimeter|worst radius
+Breast Cancer,wasserstein,5,0,0.9210526315789473,0.020255091999985098,0.1449212620000253,5,worst concave points|mean concave points|worst perimeter|worst radius|mean perimeter
+Breast Cancer,wasserstein,8,0,0.9298245614035088,0.020255091999985098,0.17839297399999055,8,worst concave points|mean concave points|worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean concavity
+Breast Cancer,wasserstein,10,0,0.9473684210526315,0.020255091999985098,0.2236768799999993,10,worst concave points|mean concave points|worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean concavity|mean area|worst concavity
+Breast Cancer,wasserstein,2,1,0.9298245614035088,0.021059076999989657,0.05122736900000291,2,worst concave points|worst perimeter
+Breast Cancer,wasserstein,4,1,0.9385964912280702,0.021059076999989657,0.08965972199999328,4,worst concave points|worst perimeter|worst radius|mean concave points
+Breast Cancer,wasserstein,5,1,0.9385964912280702,0.021059076999989657,0.10476327499998206,5,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter
+Breast Cancer,wasserstein,8,1,0.9473684210526315,0.021059076999989657,0.17807083899998588,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean concavity
+Breast Cancer,wasserstein,10,1,0.9210526315789473,0.021059076999989657,0.21020162100001016,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean concavity|mean area|worst concavity
+Breast Cancer,wasserstein,2,2,0.9035087719298246,0.029167160999975295,0.04753280899998913,2,worst concave points|worst perimeter
+Breast Cancer,wasserstein,4,2,0.8859649122807017,0.029167160999975295,0.09247978499999476,4,worst concave points|worst perimeter|worst radius|mean concave points
+Breast Cancer,wasserstein,5,2,0.8859649122807017,0.029167160999975295,0.10607043299998509,5,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter
+Breast Cancer,wasserstein,8,2,0.8947368421052632,0.029167160999975295,0.16777572399999485,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean concavity
+Breast Cancer,wasserstein,10,2,0.8947368421052632,0.029167160999975295,0.22191682000001833,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean concavity|mean area|worst concavity
+Breast Cancer,wasserstein,2,3,0.9473684210526315,0.025176752999982455,0.046792581000005384,2,worst concave points|worst perimeter
+Breast Cancer,wasserstein,4,3,0.9473684210526315,0.025176752999982455,0.08091642099998353,4,worst concave points|worst perimeter|worst radius|mean concave points
+Breast Cancer,wasserstein,5,3,0.9385964912280702,0.025176752999982455,0.10318246099998873,5,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter
+Breast Cancer,wasserstein,8,3,0.9035087719298246,0.025176752999982455,0.1638180729999874,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area
+Breast Cancer,wasserstein,10,3,0.9298245614035088,0.025176752999982455,0.21121609399997965,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area|mean concavity|worst concavity
+Breast Cancer,wasserstein,2,4,0.8596491228070176,0.024153179999984786,0.05247234699999126,2,worst concave points|worst perimeter
+Breast Cancer,wasserstein,4,4,0.8859649122807017,0.024153179999984786,0.09462179400000537,4,worst concave points|worst perimeter|worst radius|mean concave points
+Breast Cancer,wasserstein,5,4,0.8859649122807017,0.024153179999984786,0.12168352300000151,5,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter
+Breast Cancer,wasserstein,8,4,0.8859649122807017,0.024153179999984786,0.16925133200001596,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area
+Breast Cancer,wasserstein,10,4,0.8859649122807017,0.024153179999984786,0.21936805000001414,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area|mean concavity|worst concavity
+Breast Cancer,wasserstein,2,5,0.9473684210526315,0.026715624999980037,0.04474594600000614,2,worst concave points|worst perimeter
+Breast Cancer,wasserstein,4,5,0.956140350877193,0.026715624999980037,0.08232418399998664,4,worst concave points|worst perimeter|worst radius|mean concave points
+Breast Cancer,wasserstein,5,5,0.956140350877193,0.026715624999980037,0.1021968359999903,5,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter
+Breast Cancer,wasserstein,8,5,0.9649122807017544,0.026715624999980037,0.15708682799998996,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|worst area|mean radius|mean concavity
+Breast Cancer,wasserstein,10,5,0.9385964912280702,0.026715624999980037,0.20783846899999503,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|worst area|mean radius|mean concavity|mean area|worst concavity
+Breast Cancer,wasserstein,2,6,0.9210526315789473,0.02174715000001015,0.044473980000020674,2,worst concave points|worst perimeter
+Breast Cancer,wasserstein,4,6,0.9210526315789473,0.02174715000001015,0.08005589199999008,4,worst concave points|worst perimeter|mean concave points|worst radius
+Breast Cancer,wasserstein,5,6,0.9298245614035088,0.02174715000001015,0.12274198299999739,5,worst concave points|worst perimeter|mean concave points|worst radius|mean perimeter
+Breast Cancer,wasserstein,8,6,0.8947368421052632,0.02174715000001015,0.17724800999999957,8,worst concave points|worst perimeter|mean concave points|worst radius|mean perimeter|mean radius|worst area|mean area
+Breast Cancer,wasserstein,10,6,0.9298245614035088,0.02174715000001015,0.19953431199999727,10,worst concave points|worst perimeter|mean concave points|worst radius|mean perimeter|mean radius|worst area|mean area|mean concavity|worst concavity
+Breast Cancer,wasserstein,2,7,0.9736842105263158,0.02108083900000679,0.03595333099997333,2,worst concave points|worst perimeter
+Breast Cancer,wasserstein,4,7,0.9736842105263158,0.02108083900000679,0.08495110500001601,4,worst concave points|worst perimeter|worst radius|mean concave points
+Breast Cancer,wasserstein,5,7,0.9649122807017544,0.02108083900000679,0.11815055900001425,5,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter
+Breast Cancer,wasserstein,8,7,0.9473684210526315,0.02108083900000679,0.18895648200000892,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area
+Breast Cancer,wasserstein,10,7,0.956140350877193,0.02108083900000679,0.21176109700002144,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area|mean concavity|worst concavity
+Breast Cancer,wasserstein,2,8,0.9210526315789473,0.017907694000001584,0.05720214399997303,2,worst concave points|mean concave points
+Breast Cancer,wasserstein,4,8,0.9473684210526315,0.017907694000001584,0.09838824300001647,4,worst concave points|mean concave points|worst perimeter|worst radius
+Breast Cancer,wasserstein,5,8,0.9385964912280702,0.017907694000001584,0.11526440899999102,5,worst concave points|mean concave points|worst perimeter|worst radius|mean perimeter
+Breast Cancer,wasserstein,8,8,0.9385964912280702,0.017907694000001584,0.18223985899999207,8,worst concave points|mean concave points|worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean concavity
+Breast Cancer,wasserstein,10,8,0.9298245614035088,0.017907694000001584,0.23674671299997385,10,worst concave points|mean concave points|worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean concavity|mean area|worst concavity
+Breast Cancer,wasserstein,2,9,0.9385964912280702,0.024185018999986596,0.053817984999994906,2,worst concave points|worst perimeter
+Breast Cancer,wasserstein,4,9,0.9473684210526315,0.024185018999986596,0.0985505959999955,4,worst concave points|worst perimeter|worst radius|mean concave points
+Breast Cancer,wasserstein,5,9,0.9385964912280702,0.024185018999986596,0.09621535499999823,5,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter
+Breast Cancer,wasserstein,8,9,0.9210526315789473,0.024185018999986596,0.16670576900000356,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area
+Breast Cancer,wasserstein,10,9,0.9385964912280702,0.024185018999986596,0.22660779200001002,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area|mean concavity|worst concavity
