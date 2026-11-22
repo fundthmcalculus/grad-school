@@ -464,7 +464,26 @@ BETH has no positive examples in its training and validation splits, so no super
 
 \subsection{Phishing URLs}
 \label{sec:phi}
-On PhiUSIIL the construction trains in $0.13 \pm 0.02$\,s but reaches only $0.440 \pm 0.181$ accuracy on the 47-feature set. That is below the $0.576$ majority-class rate, and individual seeds fall to about $0.23$. Gaussian naive Bayes on the same protocol reaches $0.980 \pm 0.002$, so the dataset is separable under the independence assumption this construction shares. The shortfall is in the construction on this dataset, not the dataset, and we do not yet know which stage causes it. \todo{Locate the PhiUSIIL failure. A leak-free archive (2026-08-30) reports $0.997$, but its own preflight failed and its table reports $0.440$; the $0.997$ is not reproduced.} The fuzzy baselines and random forest reported in Table~\ref{tab:speed} come from an archive whose preflight also failed, and are not re-verified. A one-class detector trained on legitimate URLs only, with no phishing samples, is a separate regime. Table~\ref{tab:phi1c} reports it over five seeds, with the threshold calibrated on training normals alone. The surprisal detector reaches AUROC $0.9992 \pm 0.0001$ and recall $0.9977 \pm 0.0004$ at a 1\% false-alarm rate. Whitened Mahalanobis distance matches it, which indicates the dataset's separability rather than the fuzzy method.
+On PhiUSIIL the construction trains in $0.13 \pm 0.02$\,s but reaches only $0.440 \pm 0.181$ accuracy on the 47-feature set, below the $0.576$ majority-class rate. Gaussian naive Bayes on the same protocol reaches $0.980 \pm 0.002$, so the dataset is separable under the independence assumption this construction shares. The shortfall is tied to feature selection. Table~\ref{tab:topn} sweeps the feature budget $k$ (\texttt{top\_n}) for four scorers, on the same ten seeds. With four or five features the Wasserstein scorer falls to $0.44$, while the other three stay between $0.76$ and $0.93$. From about $k = 15$ every scorer reaches $0.96$--$0.98$. The sweep is reported on the test split, so it shows sensitivity to the scorer and budget, and the choice of scorer should be re-made on validation data.
+
+\begin{table}[t]
+\centering
+\caption{PhiUSIIL, MoG test accuracy and mean fit time by feature scorer and feature budget $k$. Ten seeds. Each cell is accuracy (fit seconds). Times are from the same archived runs; the test split was used for both columns, so this is a sensitivity table, not a selection.}
+\label{tab:topn}
+\begin{tabular}{rrrrr}
+\toprule
+$k$ & Wasserstein & Bhattacharyya & Composite & Higher-order \\
+\midrule
+4 & 0.438 (0.15) & 0.818 (0.12) & 0.762 (0.16) & 0.901 (0.36) \\
+5 & 0.440 (0.17) & 0.818 (0.15) & 0.919 (0.21) & 0.926 (0.37) \\
+8 & 0.667 (0.21) & 0.876 (0.22) & 0.962 (0.31) & 0.936 (0.46) \\
+10 & 0.720 (0.27) & 0.958 (0.29) & 0.976 (0.38) & 0.937 (0.57) \\
+20 & 0.970 (0.60) & 0.980 (0.67) & 0.983 (0.71) & 0.977 (0.84) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A seed-0 inspection shows what differs. Wasserstein keeps near-binary flags (skewness near 0, excess kurtosis near $-2$), which is a poor and unstable model for a Gaussian mixture, as Chapter 4 notes. Higher-order keeps heavy-tailed count features (skewness 24--85), which it scores highly because it compares fourth moments. Composite keeps a mixture that includes the strongest single feature, \texttt{IsHTTPS}. This is one seed and one feature set, so it is a hypothesis about mechanism, not a result. \todo{Confirm the mechanism across all ten seeds, with features recorded per run, and confirm the setting Table~4.1 uses.} A one-class detector trained on legitimate URLs only, with no phishing samples, is a separate regime. Table~\ref{tab:phi1c} reports it over five seeds, with the threshold calibrated on training normals alone. The surprisal detector reaches AUROC $0.9992 \pm 0.0001$ and recall $0.9977 \pm 0.0004$ at a 1\% false-alarm rate. Whitened Mahalanobis distance matches it, which indicates the dataset's separability rather than the fuzzy method.
 
 \begin{table}[t]
 \centering
