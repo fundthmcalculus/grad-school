@@ -13,7 +13,9 @@ difference is 0.9969 against 0.4251 at one feature.
 A scorer the library does not know reports N/A with the reason rather than
 being quietly dropped (the four-metric composite was removed upstream in
 tribble-fis #34 and is accepted again by the pinned build; `higher_order` -- a
-moment distance through skewness and kurtosis -- arrived with tribble-fis #239).
+moment distance through skewness and kurtosis -- arrived with tribble-fis #239;
+the rank/bin scorers `hellinger`, `jensen_shannon`, `ks` and the kNN
+`mutual_info` arrived with tribble-fis #253).
 
 Run (from repo root):
     uv run --project tribble-fis python reproduce/tables/table_a1_feature_scoring.py
@@ -21,7 +23,8 @@ Run (from repo root):
 Knobs:
     REPRO_SEEDS="0,1"          seeds (2 is plenty; the effect is enormous)
     REPRO_PHIUSIIL_N="20000"   sample size
-    REPRO_SCORERS="wasserstein,bhattacharyya,composite,higher_order"
+    REPRO_SCORERS="wasserstein,bhattacharyya,composite,higher_order,
+                   hellinger,jensen_shannon,ks,mutual_info"
 """
 
 from __future__ import annotations
@@ -48,7 +51,9 @@ SAMPLE_N = int(os.environ.get("REPRO_PHIUSIIL_N", "20000"))
 SCORERS = [
     s.strip()
     for s in os.environ.get(
-        "REPRO_SCORERS", "wasserstein,bhattacharyya,composite,higher_order"
+        "REPRO_SCORERS",
+        "wasserstein,bhattacharyya,composite,higher_order,"
+        "hellinger,jensen_shannon,ks,mutual_info",
     ).split(",")
 ]
 K_GRID = [1, 2, 3, 4, 5, 7, 10, 15, 20]

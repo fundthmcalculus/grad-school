@@ -6,6 +6,13 @@ classifier is fit on the selected columns. Predictions are registered in README.
 
 Run (from repo root):  uv run --project tribble-fis python experiments/feature-scoring-metrics/explore.py
 Writes results.csv and results.md next to this file.
+
+Knobs (unset, the run is the 2026-11-22 one: ten metrics, results.csv):
+    FSM_METRICS   e.g. "lib:ks,lib:hellinger,lib:jensen_shannon,lib:mutual_info"
+        A `lib:` prefix ranks with the library's own scorer
+        (`calculate_gaussian_correlation(method=...)`, tribble-fis #253) instead of
+        this file's reference implementation of the same metric.
+    FSM_OUT       output stem, e.g. "results_library" (writes <stem>.csv, <stem>.md)
 """
 
 from __future__ import annotations
@@ -41,7 +48,12 @@ SEEDS = range(10)
 KS = (2, 4, 5, 8, 10)
 BUILTIN = ("wasserstein", "bhattacharyya", "composite", "higher_order")
 NEW = ("anova_f", "mutual_info", "ks", "energy", "hellinger", "jensen_shannon")
-METRICS = BUILTIN + NEW
+METRICS = tuple(
+    m.strip()
+    for m in os.environ.get("FSM_METRICS", ",".join(BUILTIN + NEW)).split(",")
+    if m.strip()
+)
+OUT_STEM = os.environ.get("FSM_OUT", "results")
 BINS = 20
 EPS = 1e-12
 
@@ -148,8 +160,8 @@ def run():
             Xte = np.asarray(Xte_df, dtype=float)
             for metric in METRICS:
                 t0 = time.perf_counter()
-                if metric in BUILTIN:
-                    sc = builtin_scores(metric, Xtr_df, ytr)
+                if metric in BUILTIN or metric.startswith("lib:"):
+                    sc = builtin_scores(metric.removeprefix("lib:"), Xtr_df, ytr)
                     order = [
                         names.index(n)
                         for n, _ in sorted(sc.items(), key=lambda kv: -kv[1])
@@ -202,7 +214,7 @@ def run():
 
 
 def write(rows):
-    csv_path = os.path.join(HERE, "results.csv")
+    csv_path = os.path.join(HERE, OUT_STEM + ".csv")
     with open(csv_path, "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
         w.writeheader()
@@ -244,7 +256,7 @@ def write(rows):
                 f"{r['score_s']:.3f} | {r['fit_s']:.3f} | {r['kept']:.1f} |"
             )
         lines.append("")
-    with open(os.path.join(HERE, "results.md"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(HERE, OUT_STEM + ".md"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(lines))
     print("wrote", csv_path)
 

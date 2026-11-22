@@ -1,0 +1,4 @@
+Dataset (task),MoG default (shipped),MoG train,ANFIS,ANFIS train,GA-FIS,GA-FIS train,RF,RF train,MoG best sweep cell
+Concrete (regression),R2=0.797 ± 0.028,0.29 ± 0.02 s,0.799 ± 0.112,2.08 ± 0.02 s,0.896 ± 0.038,12.51 ± 0.28 s,0.909 ± 0.020,0.30 ± 0.00 s,"0.797 ± 0.028 (wasserstein, k=8)"
+Bike Sharing (regression),R2=0.620 ± 0.014,0.65 ± 0.01 s,0.569 ± 0.075,1.35 ± 0.05 s,0.545 ± 0.047,2.57 ± 0.10 s,0.944 ± 0.004,4.25 ± 0.01 s,"0.655 ± 0.012 (wasserstein, k=8)"
+PhiUSIIL (classification),acc=0.440 ± 0.181,0.16 ± 0.02 s,0.998 ± 0.002,11.76 ± 0.57 s,0.998 ± 0.001,12.10 ± 0.17 s,1.000 ± 0.000,1.01 ± 0.01 s,"0.985 ± 0.003 (wasserstein, k=30)"

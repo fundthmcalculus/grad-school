@@ -1,0 +1,4 @@
+Arm,MF count,Accuracy,Paired Δ vs. base
+Base (no correction pass),81.4 ± 2.5,0.5323 ± 0.0430,—
+"Gated cascade (base + experts, routed)",107.4 ± 9.9 raw,0.5400 ± 0.0413,+0.0077 ± 0.0109
+"Cascade → one flat FIS (union, dedup @ exact tol., argmax)",80.9 ± 7.2 deduped,0.5369 ± 0.0380,+0.0046 ± 0.0384

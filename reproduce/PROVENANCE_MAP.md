@@ -18,6 +18,62 @@ as having no generator yet.
 
 ---
 
+## 2026-11-22 — `tribble-fis` pin `03d327a` → `dd72d5e` (#253 scorers, #252 kept count), `outputs/bump-dd72d5e-2026-11-22/`
+
+**Status: nothing the proposal quotes moved. Table A.1/A.2 gains four scorer columns. Not itself the run of record.**
+
+**What the bump brings.**
+- **#253 (tribble-fis #261):** four new `scoring_method`s.
+  - `hellinger` and `jensen_shannon` compare quantile-binned histograms, 20 bins, class vs rest.
+  - `ks` is the two-sample KS statistic.
+  - `mutual_info` is sklearn's kNN MI, seeded at 0.
+  - The existing scorers' code paths are unchanged.
+- **#252 (tribble-fis #260):** `take_top_features` now reports the number of features kept, not `top_n`, when the
+  redundancy filter runs short. The feature list it returns is unchanged. Fitted estimators also expose
+  `redundant_features_`.
+- **Not used by any generator:** `projected_lbfgs_solve` and `temporal_aggregation` (#127).
+- **Lock:** certifi and pillow only.
+
+**The check.** Every generator in `run_all_tables.sh`, ten seeds, on the run-of-record host (i9-13980HX), diffed with
+`compare_runs.py` against `full-03d327a-2026-11-21`. Preflight passed 6/6 (fis), and all 18 generators were ok.
+
+| Table | Result vs `full-03d327a-2026-11-21` |
+|---|---|
+| Concrete reconciliation, hyperparameter normalization, G.5, G.5b, norm/conorm, 4.4, 4.4b, 4.8 (+ sweep), 4.9, 6.1, 3.2, 3.7 ×2, Chapter 5 (5.1–5.4, incl. 1,800 raw cells) | **identical** |
+| 4.1c, all 1,120 sweep fits | identical except `fit_seconds` |
+| 4.1, 4.1b, 4.1c comparison | MoG, GA-FIS and RF identical; **ANFIS moved** (below); train times moved |
+| 3.1, 3.1 complexity fit, 3.1 three-arm | timing columns only |
+| A.1 rankings, A.2 accuracies, original four scorers | identical (fit seconds excluded) |
+
+**ANFIS moved again; this is noise, not the bump.**
+- Bike Sharing went `0.561 ± 0.086 → 0.574 ± 0.080` (Table 4.1) and `0.556 → 0.569` (4.1c). PhiUSIIL's spread went
+  `0.002 → 0.003`.
+- The adapter imports nothing from `tribblefis`.
+- The old run already disagreed with itself: 0.561 in 4.1 against 0.556 in 4.1c.
+- Archived readings at the last two pins span 0.534–0.577. See the `03d327a` bump note below.
+
+**New in Table A.2 (PhiUSIIL, 20,000 rows, ten seeds):**
+- At four features, `hellinger`, `jensen_shannon`, `ks` and `mutual_info` all reach **0.9555**, and **0.9642** at five.
+- The original four reach 0.438, 0.818, 0.762 and 0.901 at four features, and need about ten features to pass 0.96.
+- At twenty features every scorer is at 0.970–0.983.
+- In A.1, all four new scorers rank page-content counts first (`LineOfCode`, `NoOfExternalRef`, `NoOfSelfRef`,
+  `NoOfImage`, `NoOfJS`).
+- `mutual_info` costs about 1 s more per fit (its scoring step).
+
+The A.4 prose has **not** been revised against this yet; that waits on the author (grad-school#304).
+
+**The library scorers agree with the exploratory ones.**
+- `experiments/feature-scoring-metrics/results_library.csv` reran the #302 experiment with the library implementations.
+  The setup is 3 datasets × 10 seeds × 5 `k`, with the filter off.
+- On PhiUSIIL all four select the same features as the experiment's reference implementations in every run.
+  `higher_order`, the control, and `ks` are bit-identical on all three datasets.
+- On Breast Cancer and Wine, `hellinger`, `jensen_shannon` and `mutual_info` select the same features in 86–98% of
+  runs. Mean accuracy moves by at most 0.009, inside the seed spread. The causes are known:
+  - the library bins on pooled class-vs-rest quantiles, not whole-feature quantiles
+  - its MI is seeded at 0 rather than at the split seed
+
+---
+
 ## 2026-11-22 — prose re-quoted against `full-03d327a-2026-11-21` (P1 + P2 of the prose recheck)
 
 Per-cell audit: `reviews/2026-11-22-prose-recheck-full-03d327a.md`. `check_prose.py full-03d327a-2026-11-21` went

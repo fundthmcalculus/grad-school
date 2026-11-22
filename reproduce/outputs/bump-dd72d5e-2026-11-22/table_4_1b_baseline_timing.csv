@@ -1,0 +1,5 @@
+Dataset (task),MoG train,ANFIS train,GA-FIS train,RF train,MoG speedup vs slowest fuzzy
+Concrete (regression),0.29 ± 0.03 s,2.04 ± 0.04 s,12.23 ± 0.41 s,0.30 ± 0.00 s,42×
+"Concrete (regression, full 2nd order)",0.29 ± 0.01 s,2.05 ± 0.03 s,12.48 ± 0.06 s,0.29 ± 0.00 s,43×
+Bike Sharing (regression),0.64 ± 0.02 s,1.29 ± 0.07 s,2.53 ± 0.07 s,4.25 ± 0.01 s,4×
+PhiUSIIL (classification),0.16 ± 0.02 s,11.70 ± 0.38 s,12.24 ± 0.17 s,1.01 ± 0.01 s,76×
