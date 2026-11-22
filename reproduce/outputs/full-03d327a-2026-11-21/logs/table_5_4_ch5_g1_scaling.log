@@ -1,0 +1,22 @@
+Table 5.4 -- G1 scaling decision rule (two-stage vs flat), seeds=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  single_scale   n=  100  flat_k= 2.7 ± 1.1  ms_gran=[5, 2] (6/10)  ms_ari=[0.98 ± 0.07]
+  single_scale   n=  250  flat_k= 2.7 ± 0.5  ms_gran=[5, 2] (6/10)  ms_ari=[1.00]
+  single_scale   n=  500  flat_k= 2.9 ± 0.9  ms_gran=[5, 2] (6/10)  ms_ari=[1.00]
+  single_scale   n= 1000  flat_k= 2.6 ± 0.5  ms_gran=[5, 2] (5/10)  ms_ari=[1.00]
+  single_scale   n= 2000  flat_k= 2.6 ± 0.5  ms_gran=[5, 2] (7/10)  ms_ari=[1.00]
+  single_scale   n= 5000  flat_k= 2.6 ± 0.5  ms_gran=[5, 2] (6/10)  ms_ari=[1.00]
+  many_scale     n=  100  flat_k=       2.0  ms_gran=[8, 4, 2] (10/10)  ms_ari=[1.00, 1.00, 1.00]
+  many_scale     n=  250  flat_k=       2.0  ms_gran=[8, 4, 2] (10/10)  ms_ari=[1.00, 1.00, 1.00]
+  many_scale     n=  500  flat_k=       2.0  ms_gran=[8, 4, 2] (10/10)  ms_ari=[1.00, 1.00, 1.00]
+  many_scale     n= 1000  flat_k=       2.0  ms_gran=[8, 4, 2] (10/10)  ms_ari=[1.00, 1.00, 1.00]
+  many_scale     n= 2000  flat_k=       2.0  ms_gran=[8, 4, 2] (10/10)  ms_ari=[1.00, 1.00, 1.00]
+  many_scale     n= 5000  flat_k=       2.0  ms_gran=[8, 4, 2] (10/10)  ms_ari=[1.00, 1.00, 1.00]
+  log_separated  n=  100  flat_k= 2.7 ± 0.5  ms_gran=[3] (4/10)  ms_ari=[0.73 ± 0.21]
+  log_separated  n=  250  flat_k=       3.0  ms_gran=[2, 2] (3/10)  ms_ari=[0.72 ± 0.20]
+  log_separated  n=  500  flat_k=       3.0  ms_gran=[3] (2/10)  ms_ari=[0.73 ± 0.21]
+  log_separated  n= 1000  flat_k= 3.1 ± 0.3  ms_gran=[3] (8/10)  ms_ari=[0.94 ± 0.13]
+  log_separated  n= 2000  flat_k=       3.0  ms_gran=[3] (10/10)  ms_ari=[0.99 ± 0.01]
+  log_separated  n= 5000  flat_k= 4.0 ± 0.8  ms_gran=[4] (4/10)  ms_ari=[0.99 ± 0.00]
+  wrote /home/scott/grad-school/reproduce/outputs/table_5_4_ch5_g1_scaling_raw.csv
+  wrote /home/scott/grad-school/reproduce/outputs/table_5_4_ch5_g1_scaling.md
+  wrote /home/scott/grad-school/reproduce/outputs/table_5_4_ch5_g1_scaling.csv

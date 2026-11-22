@@ -18,6 +18,57 @@ as having no generator yet.
 
 ---
 
+## 2026-11-21 — whole-document sweep at `03d327a`: **run of record for every non-GPU table** (`outputs/full-03d327a-2026-11-21/`)
+
+**Status: the new run of record for all CPU tables, superseding `full-2026-08-22`. Table 3.4 (GPU) is deferred and
+stays on its earlier archive. Closes grad-school#298.** Host: i9-13980HX (`asus-g614jv`), designated run-of-record host
+for CPU tables from this run on. Pins: `tribble-fis` `03d327a`, `tribble-cluster` `20264b3`, `tribble-opt` `c21d543`.
+Ten seeds everywhere except Chapter 5's documented `0..4`. Preflight: fis **6/6**, cluster **3 passed, 1 skipped**.
+18/18 generators produced output. The archive's `PROVENANCE.txt` opens with a READ FIRST note covering all of this.
+
+**It took three passes, and two of the failures reported green.**
+
+1. **Table 4.4's complement-rule row has been unproducible since #197** (`c71ae4b`, 2026-08-27). That PR split
+   `complement_rule` into `_fit_complement` + `_score_complement` and moved the θ-sweep onto them, but missed the
+   main-table call site. Every fold raised `NameError`, the generator's `except Exception` swallowed it, the row
+   archived as `N/A`, and the runner reported **ok**. `phiusiil-leakfree-2026-08-30` carries the same broken row. The
+   One-class SVM / Isolation Forest rows were wrong too: their contamination is matched to the complement rule's
+   false-alarm rate, and fell back to 0.1. **Fixed** (one call site). Manipulation check: the fixed generator on Glass
+   gives `0.491 ± 0.362 / 0.362 ± 0.264 / J = +0.129`, against the last pre-#197 Glass run (`full-2026-08-03`)
+   `0.491 ± 0.359 / 0.362 ± 0.262 / +0.129` (same means; spread is the ddof change below at n = 60).
+2. **The tribble-cluster Cython extensions were 0-byte files** left by an interrupted build, so the first pass ran
+   every Chapter 3 table on the numba/pure fallback, and the three-arm table produced nothing. Preflight's
+   `INSTALL-FRESH` passed regardless: it compares source revisions, not whether the extensions load. Rebuilt and
+   re-run; the N/A layout of 3.1 / three-arm / complexity-fit / 5.1–5.3 now matches `full-2026-08-22` cell for cell.
+
+(Chapter 5's `results.json` had also never been generated on this host; the driver was run before rendering.)
+
+**Same pin, other host — against `bump-03d327a-2026-11-21` (4-core Xeon).** Every tribble-fis table agrees within
+noise, with one exception, recorded and **deferred by decision**: Concrete. MoG R² `0.797` vs `0.799`, full 2nd order
+`0.848` vs `0.852`; in 4.1c, Concrete per-fit scores differ by up to 0.011, Bike Sharing by ≤ 6e-16, PhiUSIIL not at
+all, and **all 1,120 fits keep identical features**. Likely BLAS kernel / summation order (this host: OpenBLAS
+Haswell kernel, no AVX-512); untested. Archives should start recording the BLAS build so this can be traced.
+
+**Against the old run of record (`full-2026-08-22`, pin `141596e`).** Most Chapter 4/6 accuracy cells moved, as
+expected: that archive carries the B14 Wasserstein defect (see its section below), and two bumps have landed since.
+`check_prose.py full-03d327a-2026-11-21 --against full-2026-08-22`: **62 match, 96 drifted, 156 untraceable**. Of
+the 93 DRIFTED ± pairs it parses, **40 have the same mean and a spread that is exactly ×√(10/9)** — population →
+sample std, **#143 (`32218a5`, 2026-08-23)**, one day after the old run of record, so the prose still quotes ddof 0.
+**19** are rounding only. Most of the remaining 34 are the same ddof change at other n (open-set: 6 classes × 10
+seeds), or coincidental same-mean hits in an unrelated table. None so far is a result moving that should not have, but
+they need a per-cell pass before anything is re-quoted.
+
+**Not covered by this record.** RT-IOT2022 and BETH are absent (Kaggle), so the RT-IOT2022 rows of 4.1 are `N/A`
+and **Table 4.4 ran on Glass (the Tables 4.6/4.7 data), not RT-IOT2022 (Table 4.7b)**. Table 3.4 (GPU; the driver
+was not loaded). `table_a7_regression_scale` is not wired into `run_all_tables.sh`. M5Prime (6.1) is `N/A`, as in
+every archive (`m5py` optional).
+
+**Owed next.** A per-cell prose pass against this archive (start with the 34 unexplained DRIFTED pairs). Fetch
+RT-IOT2022 and backfill 4.1 + 4.4 (`REPRO_OPENSET_DATASET=rt-iot2022`, about 3.6 h). Make the open-set generator
+fail when the method row is all `N/A`, and make preflight import the compiled extensions. Wire A.7 into the runner.
+
+---
+
 ## 2026-11-21 — `tribble-fis` pin `2bdf875` → `03d327a` (#246, #249, #250), `outputs/bump-03d327a-2026-11-21/`
 
 **Status: nothing the proposal quotes moved. Not a whole-document sweep; not itself citable.**

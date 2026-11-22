@@ -102,7 +102,7 @@ Run everything, archived under a label with the submodule SHAs and per-table
 seed sets recorded alongside it:
 
 ```bash
-reproduce/run_all_tables.sh my-label            # all tables, ~30–40 min
+reproduce/run_all_tables.sh my-label            # all tables, ~70 min on the run-of-record host (+~3.5 h with RT-IOT2022)
 reproduce/run_all_tables.sh --fast smoke-check  # minutes; reduced seeds, stamped NOT CITABLE
 ```
 

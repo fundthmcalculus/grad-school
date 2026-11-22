@@ -1,0 +1,4 @@
+Table 3.1 -- pVAT vs. classical VAT reorder time
+  using pVAT: tribbleclustering.pvat.vat_prim_mst
+  wrote /home/scott/grad-school/reproduce/outputs/table_3_1.md
+  wrote /home/scott/grad-school/reproduce/outputs/table_3_1.csv

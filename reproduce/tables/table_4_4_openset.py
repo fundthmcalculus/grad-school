@@ -357,7 +357,10 @@ def main():
             is_unknown = np.r_[np.zeros(len(Xte_k), bool), np.ones(len(Xte_u), bool)]
 
             try:
-                flg = complement_rule(Xtr, ytr, Xte)
+                # #197 split the old `complement_rule` into fit + score and missed
+                # this call site: every fold raised NameError, the except below
+                # swallowed it, and the main row archived as N/A (exit 0, status ok).
+                flg = _score_complement(_fit_complement(Xtr, ytr), Xte, THRESHOLD)
                 d, f = rates(flg, is_unknown)
                 add("**Complement rule (this work)**", d, f)
                 target_fa = f  # match the baselines to this
