@@ -1,0 +1,51 @@
+dataset,metric,k,seed,acc,score_s,fit_s,kept,features
+Breast Cancer,mutual_info,2,0,0.9035087719298246,0.059240708999993785,0.08121733500001938,2,worst perimeter|worst area
+Breast Cancer,mutual_info,4,0,0.9210526315789473,0.059240708999993785,0.0965408359999742,4,worst concave points|mean concave points|worst perimeter|worst area
+Breast Cancer,mutual_info,5,0,0.9385964912280702,0.059240708999993785,0.11170050499998752,5,worst concave points|mean concave points|worst perimeter|worst radius|worst area
+Breast Cancer,mutual_info,8,0,0.9298245614035088,0.059240708999993785,0.15495223400000668,8,worst concave points|mean concave points|worst perimeter|worst radius|mean perimeter|worst area|mean concavity|mean area
+Breast Cancer,mutual_info,10,0,0.9473684210526315,0.059240708999993785,0.22160853899998756,10,worst concave points|mean concave points|worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean concavity|mean area|area error
+Breast Cancer,mutual_info,2,1,0.8596491228070176,0.05803266399999529,0.047698614000012185,2,worst perimeter|worst area
+Breast Cancer,mutual_info,4,1,0.9385964912280702,0.05803266399999529,0.08296985900000209,4,worst concave points|worst perimeter|worst radius|worst area
+Breast Cancer,mutual_info,5,1,0.9385964912280702,0.05803266399999529,0.10770586999996112,5,worst concave points|worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,mutual_info,8,1,0.9473684210526315,0.05803266399999529,0.16907256899997947,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean concavity
+Breast Cancer,mutual_info,10,1,0.9385964912280702,0.05803266399999529,0.2148681649999844,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean concavity|mean area|area error
+Breast Cancer,mutual_info,2,2,0.8596491228070176,0.08061538300000848,0.045608643999969445,2,worst perimeter|worst area
+Breast Cancer,mutual_info,4,2,0.8771929824561403,0.08061538300000848,0.11391137999999046,4,worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,mutual_info,5,2,0.8947368421052632,0.08061538300000848,0.0975849710000034,5,worst concave points|worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,mutual_info,8,2,0.868421052631579,0.08061538300000848,0.16507179800004224,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area
+Breast Cancer,mutual_info,10,2,0.8947368421052632,0.08061538300000848,0.21318242600000303,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean concavity|mean area|area error
+Breast Cancer,mutual_info,2,3,0.9122807017543859,0.0885309129999996,0.059401959000012994,2,worst perimeter|worst area
+Breast Cancer,mutual_info,4,3,0.9298245614035088,0.0885309129999996,0.1141101499999877,4,worst concave points|worst perimeter|worst radius|worst area
+Breast Cancer,mutual_info,5,3,0.9385964912280702,0.0885309129999996,0.1062603240000044,5,worst concave points|worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,mutual_info,8,3,0.9035087719298246,0.0885309129999996,0.1791373789999966,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area
+Breast Cancer,mutual_info,10,3,0.9298245614035088,0.0885309129999996,0.2534476050000194,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area|mean concavity|area error
+Breast Cancer,mutual_info,2,4,0.8333333333333334,0.08046427599998651,0.04845420099997,2,worst perimeter|worst area
+Breast Cancer,mutual_info,4,4,0.8771929824561403,0.08046427599998651,0.0873099629999956,4,worst concave points|worst perimeter|worst radius|worst area
+Breast Cancer,mutual_info,5,4,0.8859649122807017,0.08046427599998651,0.08966851700000689,5,worst concave points|worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,mutual_info,8,4,0.8859649122807017,0.08046427599998651,0.17170718500000248,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area
+Breast Cancer,mutual_info,10,4,0.8771929824561403,0.08046427599998651,0.22659346599999708,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area|mean concavity|area error
+Breast Cancer,mutual_info,2,5,0.9210526315789473,0.06404580800000303,0.0492608640000185,2,worst perimeter|worst area
+Breast Cancer,mutual_info,4,5,0.9649122807017544,0.06404580800000303,0.08540657100002136,4,worst concave points|worst perimeter|worst radius|worst area
+Breast Cancer,mutual_info,5,5,0.956140350877193,0.06404580800000303,0.10828248600000734,5,worst concave points|worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,mutual_info,8,5,0.9649122807017544,0.06404580800000303,0.1775190999999836,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|worst area|mean radius|mean concavity
+Breast Cancer,mutual_info,10,5,0.9473684210526315,0.06404580800000303,0.20324579700002232,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|worst area|mean radius|mean concavity|mean area|area error
+Breast Cancer,mutual_info,2,6,0.8771929824561403,0.0712456629999565,0.04913060600000563,2,worst perimeter|worst area
+Breast Cancer,mutual_info,4,6,0.8771929824561403,0.0712456629999565,0.0828036279999651,4,worst perimeter|mean concave points|worst radius|worst area
+Breast Cancer,mutual_info,5,6,0.9298245614035088,0.0712456629999565,0.10362683700003572,5,worst concave points|worst perimeter|mean concave points|worst radius|worst area
+Breast Cancer,mutual_info,8,6,0.8947368421052632,0.0712456629999565,0.18029905499997767,8,worst concave points|worst perimeter|mean concave points|worst radius|mean perimeter|mean radius|worst area|mean area
+Breast Cancer,mutual_info,10,6,0.9298245614035088,0.0712456629999565,0.2203100890000087,10,worst concave points|worst perimeter|mean concave points|worst radius|mean perimeter|mean radius|worst area|mean area|mean concavity|area error
+Breast Cancer,mutual_info,2,7,0.9122807017543859,0.09931317199999512,0.0429338449999932,2,worst perimeter|worst area
+Breast Cancer,mutual_info,4,7,0.9473684210526315,0.09931317199999512,0.08250227900003893,4,worst concave points|worst perimeter|worst radius|worst area
+Breast Cancer,mutual_info,5,7,0.9649122807017544,0.09931317199999512,0.11794162700005018,5,worst concave points|worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,mutual_info,8,7,0.956140350877193,0.09931317199999512,0.23833963799995672,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|worst area|mean area|mean concavity
+Breast Cancer,mutual_info,10,7,0.956140350877193,0.09931317199999512,0.23193916600001785,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area|mean concavity|area error
+Breast Cancer,mutual_info,2,8,0.8947368421052632,0.06593196900001885,0.04456775299996707,2,worst perimeter|worst area
+Breast Cancer,mutual_info,4,8,0.9298245614035088,0.06593196900001885,0.0788856199999941,4,worst concave points|worst perimeter|worst radius|worst area
+Breast Cancer,mutual_info,5,8,0.9385964912280702,0.06593196900001885,0.11357232099999237,5,worst concave points|mean concave points|worst perimeter|worst radius|worst area
+Breast Cancer,mutual_info,8,8,0.9385964912280702,0.06593196900001885,0.17478528300000562,8,worst concave points|mean concave points|worst perimeter|worst radius|mean perimeter|worst area|mean concavity|mean area
+Breast Cancer,mutual_info,10,8,0.9210526315789473,0.06593196900001885,0.1945244660000185,10,worst concave points|mean concave points|worst perimeter|worst radius|mean perimeter|mean radius|worst area|mean concavity|mean area|area error
+Breast Cancer,mutual_info,2,9,0.8859649122807017,0.05266126300000451,0.043872959999987415,2,worst perimeter|worst area
+Breast Cancer,mutual_info,4,9,0.9210526315789473,0.05266126300000451,0.09170958599997903,4,worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,mutual_info,5,9,0.9473684210526315,0.05266126300000451,0.10547571699999025,5,worst concave points|worst perimeter|worst radius|mean concave points|worst area
+Breast Cancer,mutual_info,8,9,0.9385964912280702,0.05266126300000451,0.17492647600005284,8,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|area error
+Breast Cancer,mutual_info,10,9,0.9385964912280702,0.05266126300000451,0.23167787699998144,10,worst concave points|worst perimeter|worst radius|mean concave points|mean perimeter|mean radius|worst area|mean area|mean concavity|area error
