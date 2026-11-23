@@ -60,7 +60,21 @@ as having no generator yet.
   `NoOfImage`, `NoOfJS`).
 - `mutual_info` costs about 1 s more per fit (its scoring step).
 
-The A.4 prose has **not** been revised against this yet; that waits on the author (grad-school#304).
+**2026-11-23: Appendix A.4 rewritten against this archive.**
+- Tables A.1 and A.2 are now eight scorers wide.
+- New Table A.2b counts, per budget, the features every seed's fitted model keeps against the features any seed keeps.
+  It is generated from the new per-fit file `table_a2_feature_runs.csv`.
+- New Figure A.4 (`fig_a4_scorer_consistency.py`, prose name `a4-scorer-consistency`) plots accuracy and the share of
+  kept features that all ten seeds agree on.
+- All of these come from a recorded backfill pass of the A.1 generator into this archive. A.1 is byte-identical and the
+  A.2 accuracies are identical (see the archive's `PROVENANCE.txt`).
+- Headline: KS's selection never depends on the split, at any budget. Higher-order keeps no feature common to all ten
+  seeds through five features: its redundant URL-length counts swap under the redundancy filter.
+- The section's claims changed:
+  - "no ranking delivers a readable *and* accurate rule base" now reads that the rank/bin scorers reach 0.96 at four to
+    five features
+  - the withdrawn mechanism is replaced by the per-scorer explanation from tribble-fis #253
+  - the consensus argument is restated
 
 **The library scorers agree with the exploratory ones.**
 - `experiments/feature-scoring-metrics/results_library.csv` reran the #302 experiment with the library implementations.

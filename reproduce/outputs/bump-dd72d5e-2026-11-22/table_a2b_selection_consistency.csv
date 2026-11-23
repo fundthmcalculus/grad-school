@@ -1,0 +1,10 @@
+Features kept,wasserstein (all seeds / any seed),bhattacharyya (all seeds / any seed),composite (all seeds / any seed),higher_order (all seeds / any seed),hellinger (all seeds / any seed),jensen_shannon (all seeds / any seed),ks (all seeds / any seed),mutual_info (all seeds / any seed)
+1,1 / 1,1 / 1,1 / 1,0 / 2,1 / 1,1 / 1,1 / 1,1 / 1
+2,2 / 2,2 / 2,2 / 2,0 / 4,2 / 2,2 / 2,2 / 2,2 / 2
+3,3 / 3,3 / 3,3 / 3,0 / 5,2 / 4,3 / 3,3 / 3,3 / 3
+4,3 / 5,3 / 5,3 / 6,0 / 6,4 / 4,4 / 4,4 / 4,4 / 4
+5,5 / 5,4 / 8,4 / 6,0 / 8,5 / 5,5 / 5,5 / 5,5 / 5
+7,6 / 8,6 / 8,6 / 9,2 / 9,7 / 7,7 / 7,7 / 7,7 / 7
+10,9 / 11,9 / 11,9 / 12,5 / 12,8 / 12,10 / 10,10 / 10,10 / 10
+15,13 / 16,13 / 18,14 / 18,9 / 18,13 / 17,14 / 16,15 / 15,14 / 16
+20,19 / 21,18 / 23,18 / 24,19 / 21,18 / 22,19 / 21,20 / 20,18 / 22

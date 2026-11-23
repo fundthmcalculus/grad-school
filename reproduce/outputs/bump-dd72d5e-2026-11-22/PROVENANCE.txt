@@ -17,6 +17,13 @@ scorers (hellinger, jensen_shannon, ks, mutual_info) to Table A.1/A.2's
 default. The four original A.1/A.2 columns are identical to the run of record
 (accuracy and rankings; fit seconds excluded); the four new columns are new.
 
+Backfill 2026-11-23 (same pins, same host, grad-school 0b087f7 + the
+table_a1_feature_scoring.py change that records per-fit selections):
+Table A.1/A.2 re-run into this archive. A.1 byte-identical, A.2 accuracies
+identical; adds table_a2_feature_runs.csv (one line per fit) and
+table_a2b_selection_consistency. Log: logs/table_a1_feature_scoring.backfill.log.
+Appendix A.4 (Tables A.1, A.2, A.2b, Figure A.4) quotes this archive.
+
 Removed from this archive, as in full-03d327a: 19 files the archiver sweeps
 from outputs/ that this run did not produce (ch5_end_to_end*,
 diagnose_bounded_normalization*, FIX_IMPACT.md, dated notes).

@@ -359,6 +359,14 @@ FIGURES = [
         extras=("matplotlib",),
     ),
     Figure(
+        "a4-scorer-consistency",
+        "A.4",
+        "Feature scorers on PhiUSIIL: accuracy and cross-seed selection consistency",
+        module="fig_a4_scorer_consistency",
+        extras=("matplotlib",),
+        archive="bump-dd72d5e-2026-11-22",
+    ),
+    Figure(
         "06-ruspini-export",
         "6.5",
         "The Ruspini export: triangular partition of unity, and apex-only refinement",

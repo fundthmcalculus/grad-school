@@ -129,10 +129,11 @@ It is also distinct from the mergeVAT methods paper's complexity audit — the s
 heap-versus-dense measurement — while a systems paper would cover the parallel and GPU engineering envelope. Neither
 should absorb the other's claim.
 
-## A.4 Feature scoring: why the composite metric earned its keep
+## A.4 Feature scoring: the ranking is the lever
 
-A refactor deleted something whose value nobody had measured. Measuring it afterwards produced the proposal's clearest
-single argument for consensus over a single statistic.
+A refactor deleted something whose value nobody had measured. Measuring it afterwards showed that the feature *ranking*,
+not the model, decides whether this construction yields a readable rule base. Eight scorers were then put through the same
+model, and the one that wins does so because it can tell a count from a flag.
 
 The Mixture-of-Gaussians construction of Chapter 4 begins by scoring each feature for how well it separates the output
 classes, keeping the best few and building membership functions only over those. Everything downstream (rule count,
@@ -141,136 +142,175 @@ it turns out, the one with the most leverage.
 
 The scorer originally combined four measures of distributional separation: Bhattacharyya divergence, Jensen–Shannon
 distance, histogram overlap, and histogram correlation. It reduced them not by averaging but by taking the mean of their
-**arithmetic and geometric** means. That detail is the whole design. A geometric mean collapses toward zero if *any*
-term is near zero, so a feature scores well only when **every** measure agrees it separates the classes. The composite
-is a consensus rule, and consensus insures against any one metric's assumptions failing.
+**arithmetic and geometric** means. A geometric mean collapses toward zero if *any* term is near zero, so a feature scored
+well only when **every** measure agreed it separated the classes: a consensus rule. An upstream refactor replaced it with a
+choice of one metric, defaulting to Bhattacharyya and later to Wasserstein. The library now offers eight:
 
-An upstream refactor replaced it with a choice of one metric, defaulting to Bhattacharyya. On the PhiUSIIL phishing set
-the effect was severe, and instructive precisely because the accuracy number understates it.
+- **Gaussian and moment scorers:** `wasserstein`, `bhattacharyya`, `composite` (the restored blend) and `higher_order` (a
+  moment distance through skewness and kurtosis, tribble-fis #239).
+- **Rank and bin scorers** (tribble-fis #253, pinned at `dd72d5e`):
+  - `hellinger` and `jensen_shannon` compare class-vs-rest histograms over 20 quantile bins of the pooled values;
+  - `ks` is the two-sample Kolmogorov–Smirnov statistic;
+  - `mutual_info` is the k-nearest-neighbour estimator, seeded.
 
-**Table A.1 — Feature ranking depends on the scorer.** Top five features on PhiUSIIL under each rule, with normalized
-scores.
+  The first three look only at the ordering of a feature's values, so they are unchanged by any increasing transform of
+  that feature. Mutual information is invariant to such a transform in principle; its kNN estimate is approximately so.
 
-| Rank | Wasserstein                   | Bhattacharyya           | Composite            |
-|------|-------------------------------|-------------------------|----------------------|
-| 1    | HasSocialNet (1.000)          | IsHTTPS (1.000)         | IsHTTPS (1.000)      |
-| 2    | HasCopyrightInfo (0.858)      | HasSocialNet (0.848)    | HasSocialNet (0.975) |
-| 3    | HasDescription (0.726)        | NoOfQMarkInURL (0.810)  | HasTitle (0.827)     |
-| 4    | DomainTitleMatchScore (0.544) | IsDomainIP (0.761)      | NoOfCSS (0.800)      |
-| 5    | HasSubmitButton (0.539)       | NoOfEqualsInURL (0.744) | NoOfSelfRef (0.795)  |
+**Table A.1 — Feature ranking depends on the scorer.** Top five features on leak-free PhiUSIIL under each rule, 20,000-row
+sample; normalized scores are in the archive (`bump-dd72d5e-2026-11-22`).
 
-**These tables were re-derived leak-free on 2026-08-30 and both of them moved.** Until then the ranked set included
-`URLSimilarityIndex` — a URL's similarity to a whitelist of *known-legitimate* URLs, the label in disguise, and the
-single most separating feature in the file at AUC 0.996 — together with `TLDLegitimateProb` and `URLCharProb`, two
-further probabilities fitted on this corpus's own labels. `repro_data.load_phiusiil` now drops all three on load
-(grad-school #215; `PROVENANCE_MAP.md` note 31), so nothing below trains on them. The previous version of this section
-rested on that feature almost entirely, and what replaced it is a different and more sober result; the argument is
-rewritten rather than re-quoted.
+| Rank | Wasserstein           | Bhattacharyya   | Composite    | Higher-order     | Hellinger       | Jensen–Shannon  | KS              | Mutual info.    |
+|------|-----------------------|-----------------|--------------|------------------|-----------------|-----------------|-----------------|-----------------|
+| 1    | HasSocialNet          | IsHTTPS         | IsHTTPS      | NoOfLettersInURL | LineOfCode      | LineOfCode      | NoOfExternalRef | LineOfCode      |
+| 2    | HasCopyrightInfo      | HasSocialNet    | HasSocialNet | URLLength        | NoOfExternalRef | NoOfExternalRef | LineOfCode      | NoOfExternalRef |
+| 3    | HasDescription        | NoOfQMarkInURL  | HasTitle     | LineOfCode       | NoOfSelfRef     | NoOfImage       | NoOfSelfRef     | NoOfImage       |
+| 4    | DomainTitleMatchScore | IsDomainIP      | NoOfCSS      | NoOfExternalRef  | NoOfImage       | NoOfSelfRef     | NoOfImage       | NoOfSelfRef     |
+| 5    | HasSubmitButton       | NoOfEqualsInURL | NoOfSelfRef  | NoOfPopup        | NoOfJS          | NoOfJS          | NoOfJS          | NoOfJS          |
 
-No single feature carries the signal any more. The three scorers now disagree at rank 1 — Wasserstein takes
-`HasSocialNet` (does the page link to a social network), the other two take `IsHTTPS` — and the disagreement is real
-rather than a scale artifact: `IsHTTPS` is one of nine features that are *exactly constant* across the legitimate class
-of this corpus, so a scorer that ranks it first is ranking a property of how PhiUSIIL was collected, not of phishing.
+**These tables are leak-free, and the earlier version of this section was not.** Until 2026-08-30 the ranked set included
+`URLSimilarityIndex`, a URL's similarity to a whitelist of *known-legitimate* URLs. It is the label in disguise, and at
+AUC 0.996 the single most separating feature in the file. Two further probabilities fitted on this corpus's own labels,
+`TLDLegitimateProb` and `URLCharProb`, were in it too. `repro_data.load_phiusiil` now drops all three on load (grad-school
+#215; `PROVENANCE_MAP.md` note 31), so nothing below trains on them.
 
-**Table A.2 — What the ranking costs.** Test accuracy and fit time against the number of features retained; 20,000-row
-sample, ten seeds.
+The four rank/bin scorers agree on the same five features, in two orders. Every one of those features is a many-valued
+page-content count (lines of code, external and self references, images, scripts). The first three columns are dominated
+by binary flags instead. `IsHTTPS`, which two of them rank first, is one of nine features that are *exactly constant*
+across the legitimate class of this corpus. A scorer that ranks it first is ranking a property of how PhiUSIIL was
+collected, not of phishing.
 
-| Features kept |     Wasserstein |       Bhattacharyya |           Composite |
-|--------------:|----------------:|--------------------:|--------------------:|
-|             1 | 0.5733 (0.26 s) | **0.7924** (0.09 s) | **0.7924** (0.10 s) |
-|             2 |          0.5733 |              0.7924 |              0.7924 |
-|             3 |          0.5733 |              0.8106 |              0.7924 |
-|             4 |          0.4384 |              0.8175 |              0.7624 |
-|             5 |          0.4401 |              0.8181 |              0.9186 |
-|             7 |          0.6372 |              0.8191 |              0.9496 |
-|            10 |          0.7204 |              0.9575 |              0.9761 |
-|            15 |          0.9571 |              0.9755 |              0.9766 |
-|            20 | 0.9700 (0.71 s) |     0.9799 (0.76 s) | **0.9827** (0.77 s) |
+**Table A.2 — What the ranking costs.** Test accuracy against the number of features retained, mean of ten seeds; same
+model (`TribbleClassifier`, default 0.85 redundancy filter), same data, only `scoring_method` differs. Bold marks each
+row's best.
 
-**Nothing here is readable at a single clause.** The best one-feature cell is 0.7924, and the column that used to reach
-0.9967 there now reaches 0.5733. The 0.9967 *was* `URLSimilarityIndex`: one clause, thresholded on a number computed
-from the answer. Removing it does not degrade the result so much as reveal that there was never a one-clause result on
-this dataset.
+| Features kept | Wasserstein | Bhattacharyya | Composite  | Higher-order | Hellinger  | Jensen–Shannon |         KS | Mutual info. |
+|--------------:|------------:|--------------:|-----------:|-------------:|-----------:|---------------:|-----------:|-------------:|
+|             1 |      0.5733 |        0.7924 |     0.7924 |       0.6364 |     0.7901 |         0.7901 | **0.7992** |       0.7901 |
+|             2 |      0.5733 |        0.7924 |     0.7924 |       0.7781 | **0.8819** |     **0.8819** | **0.8819** |   **0.8819** |
+|             3 |      0.5733 |        0.8106 |     0.7924 |       0.8603 |     0.9425 |         0.9296 | **0.9450** |       0.9296 |
+|             4 |      0.4384 |        0.8175 |     0.7624 |       0.9011 | **0.9555** |     **0.9555** | **0.9555** |   **0.9555** |
+|             5 |      0.4401 |        0.8181 |     0.9186 |       0.9261 | **0.9642** |     **0.9642** | **0.9642** |   **0.9642** |
+|             7 |      0.6372 |        0.8191 |     0.9496 |       0.9361 | **0.9649** |     **0.9649** |     0.9647 |   **0.9649** |
+|            10 |      0.7204 |        0.9575 |     0.9761 |       0.9373 | **0.9787** |         0.9743 |     0.9647 |       0.9726 |
+|            15 |      0.9571 |        0.9755 |     0.9766 |       0.9632 |     0.9806 |         0.9810 |     0.9780 |   **0.9815** |
+|            20 |      0.9700 |        0.9799 |     0.9827 |       0.9767 |     0.9798 |         0.9803 |     0.9787 |   **0.9834** |
 
-**The ordering of the scorers inverts.** Wasserstein was the strongest at one feature (0.9967) and is now the weakest
-(0.5733), behind both others at *every* budget below fifteen; Bhattacharyya was the weakest (0.4267) and is now the
-strongest of the three up to four features. Wasserstein is also non-monotone leak-free — 0.5733 at three features,
-0.4384 at four, 0.6372 at seven — which is what a ranking that has run out of dominant signal looks like: adding a
-mediocre feature can cost more than it brings. The composite is the best of the three from five features on and takes
-the table's highest score at twenty (0.9827).
+Fit time is not what separates them. At twenty features a fit takes 0.9–1.0 s under the Gaussian and moment scorers,
+1.0–1.3 s under the rank/bin scorers, and 2.2 s under mutual information. Mutual information's extra second is its kNN
+estimator, paid once per fit and visible from the one-feature row (1.14 s against 0.05–0.14 s). The per-fit seconds are
+in the archive.
 
-**A portability caveat, now attached to numbers that no longer exist.** The bhattacharyya accuracies this paragraph was
-written about came from `reproduce/outputs/main-d0efefc/` and were shown not to be host-portable — the difference was
-chased, not assumed (`PROVENANCE_MAP.md` note 12; write-up `reproduce/outputs/NOTE12_THREADING.md`). Within one
-environment the column was bit-identical across two full sweeps, four thread counts and four BLAS kernel families;
-between hosts, at identical code, identical seeds and a byte-identical Table A.1 ranking, it moved up to 0.043, and only
-from four features on, so the cause acts on the fit rather than on the ranking or the data. Neither half of the
-threading-or-BLAS explanation stood: thread count was refuted outright, and the kernel-family sweep was inconclusive
-because its manipulation check failed. A.6 carries both sweeps, and library versions remain the leading untested
-candidate — numpy, scipy and scikit-learn are recorded on this host and unrecorded in the disagreeing archive. **All of
-that concerns the leak-era column.** The tables above are leak-free and were taken on the host of record only, so the
-cross-host comparison has not been repeated and the specific deltas are withdrawn. The instruction stands and is if
-anything more binding: **do not quote this column to four decimals across machines.**
+**The rank/bin scorers reach a readable, accurate rule base, and nothing else in the table does.** All four reach
+**0.9555 at four features and 0.9642 at five**. The best of the original four reaches 0.9011 at four (higher-order) and
+0.9261 at five, and none passes 0.96 until ten features (composite, 0.9761). By twenty features the scorers have converged
+(0.970–0.983) and the ranking no longer matters. The table is about the small budgets, where a rule base is short enough
+to read.
 
-**Which composite this is.** The scorer measured here is the restored `method="composite"`, not identical to the
-four-metric blend that was the original default. The distinction used to be described in terms of where each ranked
-`URLSimilarityIndex`; with that feature dropped, the two blends have not been compared leak-free and this row is
-**unmeasured**, not merely re-quoted. Nothing below depends on it.
+**Nothing is readable at a single clause.** The best one-feature cell is 0.7992. The column that reached 0.9967 there
+before the leak was removed now reaches 0.5733. The 0.9967 *was* `URLSimilarityIndex`: one clause, thresholded on a number
+computed from the answer. There was never a one-clause result on this dataset. What the rank/bin scorers deliver is a
+**four- or five-clause** result at 0.96, which is the scale Chapter 4's readability argument actually needs.
 
-**The mechanism that was on offer here has been withdrawn.** This paragraph used to explain Bhattacharyya's failure by
-its distributional assumption: it fits a Gaussian to each class and integrates the overlap, and `URLSimilarityIndex` is
-a bounded, spiky similarity score that a Gaussian-fit divergence mismeasures, while Wasserstein assumes nothing and
-finds it at once. That explanation was correct about the mechanism and wrong about which way it points, because the
-feature it explained was the leak. Leak-free, Bhattacharyya is the *better* scorer at small budgets and Wasserstein the
-worse, so a parametric assumption is not the liability this section claimed. **No mechanism is offered in its place.**
-Why Wasserstein's leak-free ranking underperforms is unexplained and worth measuring; asserting a story for it now would
-repeat the mistake this rewrite is correcting.
+**Table A.2b — How consistently each scorer selects.** Of the features each of the ten seeds' fitted models keeps
+(`top_features_`, after the redundancy filter), how many are kept by *all ten*, against how many are kept by *any*. A
+selection that does not depend on which 80% split the scorer saw reads *k* / *k*. Six of the nine budgets are shown; all
+nine are in the archive.
 
-**The narrow conclusion is withdrawn, and it reached the library.** This section previously concluded that Wasserstein
-is the better default *"and is now the shipped one: the only rule reaching full accuracy on a single feature."* That
-recommendation was made on the strength of the one-feature row, and the one-feature row was the leak. Leak-free,
-Wasserstein is behind both other scorers at every budget below fifteen. **A library default was chosen on a leaked
-result** — the shipped `tribble-fis` scorer default is the concrete artifact of it — and re-examining that choice
-against this table is owed work, not a formality. The composite, not Wasserstein, is the best of the three here from
-five features on.
+| Features kept | Wasserstein | Bhattacharyya | Composite | Higher-order | Hellinger | Jensen–Shannon |      KS | Mutual info. |
+|--------------:|------------:|--------------:|----------:|-------------:|----------:|---------------:|--------:|-------------:|
+|             1 |       1 / 1 |         1 / 1 |     1 / 1 |        0 / 2 |     1 / 1 |          1 / 1 |   1 / 1 |        1 / 1 |
+|             3 |       3 / 3 |         3 / 3 |     3 / 3 |        0 / 5 |     2 / 4 |          3 / 3 |   3 / 3 |        3 / 3 |
+|             4 |       3 / 5 |         3 / 5 |     3 / 6 |        0 / 6 |     4 / 4 |          4 / 4 |   4 / 4 |        4 / 4 |
+|             5 |       5 / 5 |         4 / 8 |     4 / 6 |        0 / 8 |     5 / 5 |          5 / 5 |   5 / 5 |        5 / 5 |
+|            10 |      9 / 11 |        9 / 11 |    9 / 12 |       5 / 12 |    8 / 12 |        10 / 10 | 10 / 10 |      10 / 10 |
+|            20 |     19 / 21 |       18 / 23 |   18 / 24 |      19 / 21 |   18 / 22 |        19 / 21 | 20 / 20 |      18 / 22 |
 
-The broader conclusion concerns *interpretability*, this dissertation's central claim, which accuracy alone does not
-establish. Chapter 4 argues the construction yields a readable rule base, a handful of clauses over named features.
-Table A.2 still shows that claim is no property of the model architecture — but what it now shows is stronger and less
-comfortable: on this dataset, **with the leak removed, no ranking delivers a readable *and* accurate rule base at all.**
-Reaching 0.96 takes ten features at best (composite) and fifteen to twenty under the others.
+**Figure A.4 — Accuracy and selection consistency, by scorer.** (a) Table A.2's accuracies. (b) The share of the kept
+features that all ten seeds agree on, Table A.2b's first number divided by *k*; 1.0 means the selection does not depend
+on the split. Circles are the Gaussian and moment scorers, squares the rank/bin scorers.
+`![a4-scorer-consistency](fig/a4-scorer-consistency.png)`
 
-The evidence is still the **one-feature row**, and it now says the opposite of what it used to. It used to read 0.9967
-against 0.4267 — a gap of 0.57 — and support the claim that *with a ranking that works, the model is readable and
-accurate at a single clause*. Leak-free it reads **0.7924 against 0.5733**, a gap of 0.22, and the columns have swapped
-places. What survives is that the ranking matters at a fixed budget, which is a real and useful finding. What does not
-survive is the single clause: there is no scorer under which one feature is enough here, so the readability this section
-claimed for the good ranking was, in fact, the leak's. That is the sharper version of the same warning — a change to a
-step the pipeline treats as preprocessing damaged interpretability more than accuracy, and an accuracy-only evaluation
-never surfaced it. It was the *dataset*, not a scorer, that was doing the damage, and it took two years of green sweeps
-to see it.
+**Consistency and accuracy point the same way, with one exception.** At four and five features, where the rank/bin
+scorers lead on accuracy, all four select the identical set on every split. KS, Jensen–Shannon and mutual information stay
+fully consistent through ten features. **KS is the only scorer whose selection never depends on the split**, at any
+budget up to twenty. Hellinger slips at three features (2 / 4) and at ten (8 / 12). Its quantile bins are recomputed per
+split, and a feature near a bin edge can change rank. The Gaussian scorers are stable through three features. From four
+on they mostly trade one or two features between splits.
 
-**Note 12's portability caveat has to be re-established, not carried over.** The bhattacharyya-column figures it was
-written about (0.4267 at one feature, 0.4527 at two, agreeing to the digit across two hosts) no longer exist. The
-leak-free numbers above were taken on the host of record only, so the cross-host comparison behind note 12 is void until
-it is repeated. Treat the instruction as still standing and the specific figures as withdrawn.
+**Higher-order is the outlier on both axes.** Through five features *no single feature* is kept by all ten seeds. The
+measure is strict: at one feature nine seeds keep `NoOfLettersInURL` and one keeps `LineOfCode`. But the instability is
+real. Higher-order's top candidates are URL-length counts that carry nearly the same information (`NoOfLettersInURL`,
+`URLLength`). The redundancy filter removes whichever one it meets second. Which one that is changes with the split, so
+the kept set changes with it. The scorer that looked best of the original four at four features (0.9011) is also the one
+whose selection could not be written down as a fixed rule base.
 
-**One dataset carries all of this, and it is not a neutral one.** Both tables above are PhiUSIIL and nothing else.
-Chapter 6 says twice that PhiUSIIL is saturated, every method it tests landing within a fraction of a perfect score, and
-that it should therefore carry no weight in a comparison between methods. That verdict does not void the argument here,
-because this section compares no methods: it holds the model fixed and varies the *ranking*, and PhiUSIIL's
-concentration is what makes the mechanism visible, a dataset with one dominant feature being the cleanest test of
-whether a scorer finds it. But the mechanism is demonstrated on one unusually concentrated dataset and its generality is
-not. Whether a scorer choice costs this much where the signal is spread across many features is unmeasured; A.2.3's
-broadened suite is where it would be measured. Until then this shows the failure mode exists and does not characterize
-how often it bites.
+**Why each scorer picks what it picks.** The mechanism earlier versions of this section offered was withdrawn with the
+leak. Eight scorers on one model now support a better-founded one. The per-scorer evidence is in tribble-fis #253 and
+`experiments/feature-scoring-metrics/`.
 
-So the composite stays available even though a single well-chosen metric beats it here. Its value is not the ranking it
-produces on one dataset but that it cannot be silently wrong the way a single metric can, because it requires agreement.
-On a new dataset, where nobody yet knows which assumption fails, that is worth having.
+- **Wasserstein** ranks class-imbalanced *flags* first (`HasSocialNet`, `HasCopyrightInfo`, `HasDescription`). For a
+  0/1 feature, the class-vs-class Wasserstein distance is simply the difference in class proportions. On unscaled
+  features that number is large beside the per-unit CDF gaps of a count. A per-feature Gaussian mixture over a two-point
+  support is then a poor membership model, and accuracy at four and five features is 0.44.
+- **Bhattacharyya** fits one Gaussian per class. It rewards features with *zero within-class variance* (`IsHTTPS`,
+  `IsDomainIP`, constant on the legitimate class), because the fitted overlap vanishes. That measures how the corpus was
+  collected.
+- **Composite** blends the two above and inherits both preferences.
+- **Higher-order** does find counts, because moment gaps are largest on heavy tails. It finds mutually redundant ones,
+  though, and moment estimates are noisy under heavy tails: hence the instability above.
+- **The rank/bin scorers** cannot be inflated by a long tail. A separation in the *bulk* of a count distribution scores
+  fully, and on Hellinger and Jensen–Shannon a binary feature collapses to a single quantile bin and scores 0. Because
+  all four are (approximately, for mutual information) invariant to increasing transforms of the feature, they agree with
+  each other on the same top-five set. That agreement is the result, not a coincidence of four metrics.
 
-*Reproduced by `reproduce/tables/table_a1_feature_scoring.py`. Upstream:
-tribble-fis issues #49 (the regression) and #50 (`top_p` semantics).*
+**The consensus argument survives in a different form.** The original composite's case was that requiring agreement
+insures against any one metric's assumptions failing. On this dataset the restored composite does not deliver that,
+because two of its ingredients share the same failure (both reward flags). Four rank/bin metrics with different
+definitions pick the same top-five set and reach the same accuracy at two, four and five features, and the agreement is
+the useful signal. A consensus of
+metrics that share an invariance is worth more than a consensus of metrics that share a blind spot.
+
+**Which composite this is.** The `composite` measured here is the restored `method="composite"`, not identical to the
+four-metric blend that was the original default. The two blends have not been compared leak-free. That row is
+**unmeasured**, not merely re-quoted, and nothing in this section depends on it.
+
+**The library default is still the leak-era choice.** This section once concluded that Wasserstein was the better default
+*"and is now the shipped one: the only rule reaching full accuracy on a single feature."* That one-feature row was the
+leak. Leak-free, Wasserstein is last at every budget in Table A.2, and the shipped `tribble-fis`
+default is still `wasserstein`. These tables are test-split accuracies on a fixed grid. They support "the rank/bin scorers
+are much better here at small budgets", not "KS is the best scorer". Changing the default should rest on a
+validation-split selection and on more than one dataset. tribble-fis #253 deliberately leaves the default unchanged for
+that reason. Re-examining it is owed work, and KS is the obvious first candidate: it ties for the best accuracy at four
+and five features, holds a fully stable selection at every budget, and is now as cheap as the Gaussian scorers.
+
+**One dataset carries the tables, and it is not a neutral one.** Tables A.1–A.2b are PhiUSIIL only. Chapter 6 says twice
+that PhiUSIIL is saturated, every method landing within a fraction of a perfect score, and that it should carry no weight
+in a comparison between methods. That verdict does not void this section, because the section compares no methods: it
+holds the model fixed and varies the ranking. PhiUSIIL's mix of binary flags and heavy-tailed counts is exactly what makes
+scorers disagree.
+
+The exploratory study (`experiments/feature-scoring-metrics/`, filter off, the same ten splits) adds Breast Cancer and Wine,
+whose features are continuous and roughly unimodal. At four features the library's eight scorers land at 0.92–0.93 on Breast Cancer, with
+`higher_order` the exception at 0.84, and at 0.91–0.95 on Wine, all inside seed spreads of ±0.02–0.07. No ranking among
+them is supported. So the scorer choice
+matters when a dataset mixes flags with many-valued counts, which describes much tabular security data. Where the signal
+sits in the bulk of continuous features, it matters little. How often the first case occurs is what A.2.3's broadened suite
+would measure.
+
+**A portability caveat, and it has not been re-established.** The bhattacharyya accuracies of an earlier, leak-era
+version of Table A.2 moved by up to 0.043 between two hosts at identical code, identical seeds and a byte-identical Table
+A.1 ranking, from four features on (`PROVENANCE_MAP.md` note 12; `reproduce/outputs/NOTE12_THREADING.md`). Thread count
+was refuted outright as the cause, and the BLAS kernel-family sweep was inconclusive because its manipulation check failed
+(A.6 carries both).
+
+The tables above were taken on the host of record only, so that cross-host comparison has not been repeated. Their four original columns
+are identical to the run of record's at a different `tribble-fis` pin, so they are repeatable
+within this host. The instruction stands: **do not quote these columns to four decimals across machines.**
+
+*Reproduced by `reproduce/tables/table_a1_feature_scoring.py` (Tables A.1, A.2, A.2b and the per-fit file
+`table_a2_feature_runs.csv`) and `reproduce/figures/fig_a4_scorer_consistency.py` (Figure A.4), archive
+`reproduce/outputs/bump-dd72d5e-2026-11-22/`. Upstream: tribble-fis issues #49 (the regression), #50 (`top_p`
+semantics) and #253 (the rank/bin scorers).*
 
 ---
 
