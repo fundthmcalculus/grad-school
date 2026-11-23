@@ -189,3 +189,35 @@ effects" point is true, but the example it gives runs the other way here.
 Still open: the feature-level logging in `results.csv` (the `features` column) has
 not yet been checked against the hypotheses about binary features. That is the next
 analysis step.
+
+## Library scorers (2026-11-22, tribble-fis `dd72d5e`)
+
+tribble-fis #253 added `hellinger`, `jensen_shannon`, `ks` and `mutual_info` as built-in `scoring_method`s. To
+rerun this experiment through the library instead of this file's reference implementations:
+
+```bash
+FSM_METRICS="lib:ks,lib:hellinger,lib:jensen_shannon,lib:mutual_info,lib:higher_order" \
+FSM_OUT=results_library uv run --project tribble-fis python experiments/feature-scoring-metrics/explore.py
+```
+
+The output is in `results_library.csv` / `results_library.md`. `lib:higher_order` is a control: it is the same
+library path as `higher_order` in `results.csv`.
+
+| Scorer | Same features as reference (PhiUSIIL / Breast Cancer / Wine) | Max abs. accuracy change in a single run | Scoring time per fit (lib vs ref) |
+|---|---|---|---|
+| `higher_order` (control) | 100% / 100% / 100% | 0 | 0.03 s vs 0.07 s |
+| `ks` | 100% / 100% / 100% | 0 | 0.04 s vs 9.5 s |
+| `hellinger` | 100% / 90% / 86% | 0.056 (Wine, one seed) | 0.06 s vs 0.09 s |
+| `jensen_shannon` | 100% / 98% / 88% | 0.028 | 0.05 s vs 0.11 s |
+| `mutual_info` | 100% / 98% / 86% | 0.056 (Wine, one seed) | 0.49 s vs 0.78 s |
+
+- Mean accuracies agree to within 0.009 everywhere, well inside the seed spread (±0.03–0.08). PhiUSIIL is unchanged
+  in every run, so every conclusion above stands.
+- The Breast Cancer and Wine differences have known causes:
+  - The library bins Hellinger and JS on quantiles of the pooled class-vs-rest sample, with inverted-CDF edges and
+    `searchsorted`. The reference bins on the whole feature with `np.histogram`.
+  - The library's MI uses `random_state=0` on a standardised, mean-imputed matrix. The reference used the split
+    seed.
+- KS's speedup comes from computing the statistic directly instead of calling `scipy.stats.ks_2samp`, which also
+  computes p-values.
+

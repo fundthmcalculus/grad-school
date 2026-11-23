@@ -1,0 +1,6 @@
+Rank,wasserstein,bhattacharyya,composite,higher_order,hellinger,jensen_shannon,ks,mutual_info
+1,HasSocialNet (1.000),IsHTTPS (1.000),IsHTTPS (1.000),NoOfLettersInURL (1.000),LineOfCode (1.000),LineOfCode (1.000),NoOfExternalRef (1.000),LineOfCode (1.000)
+2,HasCopyrightInfo (0.858),HasSocialNet (0.848),HasSocialNet (0.975),URLLength (0.852),NoOfExternalRef (0.972),NoOfExternalRef (0.986),LineOfCode (0.988),NoOfExternalRef (0.935)
+3,HasDescription (0.726),NoOfQMarkInURL (0.810),HasTitle (0.827),LineOfCode (0.564),NoOfSelfRef (0.948),NoOfImage (0.931),NoOfSelfRef (0.981),NoOfImage (0.919)
+4,DomainTitleMatchScore (0.544),IsDomainIP (0.761),NoOfCSS (0.800),NoOfExternalRef (0.500),NoOfImage (0.938),NoOfSelfRef (0.930),NoOfImage (0.955),NoOfSelfRef (0.885)
+5,HasSubmitButton (0.539),NoOfEqualsInURL (0.744),NoOfSelfRef (0.795),NoOfPopup (0.417),NoOfJS (0.901),NoOfJS (0.876),NoOfJS (0.927),NoOfJS (0.832)

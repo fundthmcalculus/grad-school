@@ -1,9 +1,13 @@
 """Appendix A.4 -- feature ranking by scorer, and what the ranking costs.
 
-Two tables:
+Tables:
 
   A.1  the top features each scorer selects, side by side
   A.2  accuracy and fit time against the number of features kept
+  A.2b selection consistency: how many features every one of the ten seeds'
+       fits agrees on, per scorer and budget (`table_a2b_selection_consistency`)
+  table_a2_feature_runs.csv  one line per fit (scorer, k, seed, accuracy,
+       fit seconds, features kept) -- the evidence A.2b and Figure A.1 read
 
 The point is that these are the same model and the same data; only the feature
 *ranking* differs. On PhiUSIIL one scorer puts the single most informative
@@ -13,7 +17,9 @@ difference is 0.9969 against 0.4251 at one feature.
 A scorer the library does not know reports N/A with the reason rather than
 being quietly dropped (the four-metric composite was removed upstream in
 tribble-fis #34 and is accepted again by the pinned build; `higher_order` -- a
-moment distance through skewness and kurtosis -- arrived with tribble-fis #239).
+moment distance through skewness and kurtosis -- arrived with tribble-fis #239;
+the rank/bin scorers `hellinger`, `jensen_shannon`, `ks` and the kNN
+`mutual_info` arrived with tribble-fis #253).
 
 Run (from repo root):
     uv run --project tribble-fis python reproduce/tables/table_a1_feature_scoring.py
@@ -21,7 +27,8 @@ Run (from repo root):
 Knobs:
     REPRO_SEEDS="0,1"          seeds (2 is plenty; the effect is enormous)
     REPRO_PHIUSIIL_N="20000"   sample size
-    REPRO_SCORERS="wasserstein,bhattacharyya,composite,higher_order"
+    REPRO_SCORERS="wasserstein,bhattacharyya,composite,higher_order,
+                   hellinger,jensen_shannon,ks,mutual_info"
 """
 
 from __future__ import annotations
@@ -48,7 +55,9 @@ SAMPLE_N = int(os.environ.get("REPRO_PHIUSIIL_N", "20000"))
 SCORERS = [
     s.strip()
     for s in os.environ.get(
-        "REPRO_SCORERS", "wasserstein,bhattacharyya,composite,higher_order"
+        "REPRO_SCORERS",
+        "wasserstein,bhattacharyya,composite,higher_order,"
+        "hellinger,jensen_shannon,ks,mutual_info",
     ).split(",")
 ]
 K_GRID = [1, 2, 3, 4, 5, 7, 10, 15, 20]
@@ -69,8 +78,12 @@ def _rank(scorer, X, y_series):
         return None
 
 
-def _sweep(scorer, X, y):
+def _sweep(scorer, X, y, runs):
     """(accuracy, fit_seconds) per k, with `scoring_method=scorer` for every fit.
+
+    Appends one row per fit to `runs`: the features the fitted model actually
+    kept (`top_features_`, after the 0.85 redundancy filter), so selection
+    consistency across seeds is measured on the model, not on a re-ranking.
 
     Uses the estimator's own `scoring_method` (tribble-fis #239) instead of the
     monkeypatch of `calculate_gaussian_correlation` this used to need, which
@@ -91,7 +104,13 @@ def _sweep(scorer, X, y):
             start = time.perf_counter()
             model.fit(Xtr, ytr)
             secs.append(time.perf_counter() - start)
-            accs.append(accuracy_score(yte, np.asarray(model.predict(Xte))))
+            acc = accuracy_score(yte, np.asarray(model.predict(Xte)))
+            accs.append(acc)
+            kept = [str(f) for f in (model.top_features_ or [])]
+            runs.append(
+                [scorer, k, seed, f"{acc:.6f}", f"{secs[-1]:.4f}", len(kept)]
+                + ["|".join(kept)]
+            )
         out[k] = (float(np.mean(accs)), float(np.mean(secs)))
     return out
 
@@ -135,7 +154,8 @@ def main():
     )
 
     # ---- Table A.2: what the ranking costs ----
-    sweeps = {s: _sweep(s, X, y) for s in available}
+    runs = []
+    sweeps = {s: _sweep(s, X, y, runs) for s in available}
     header2 = ["Features kept"] + [f"{s} (acc / fit s)" for s in available]
     rows2 = []
     for k in K_GRID:
@@ -166,6 +186,36 @@ def main():
             "row -- the gap between scorers at a fixed budget is the effect this "
             "table measures. See Appendix A.4, PROVENANCE_MAP note 31, and "
             "tribble-fis #49."
+        ),
+    )
+
+    # ---- per-fit evidence, and selection consistency across seeds ----
+    C.write_csv(
+        os.path.join(C.OUTPUT_DIR, "table_a2_feature_runs.csv"),
+        ["scorer", "k", "seed", "accuracy", "fit_seconds", "n_kept", "features"],
+        runs,
+    )
+    header3 = ["Features kept"] + [f"{s} (all seeds / any seed)" for s in available]
+    rows3 = []
+    for k in K_GRID:
+        row = [str(k)]
+        for s in available:
+            sets = [
+                set(r[6].split("|")) - {""} for r in runs if r[0] == s and r[1] == k
+            ]
+            row.append(f"{len(set.intersection(*sets))} / {len(set.union(*sets))}")
+        rows3.append(row)
+    C.emit(
+        "table_a2b_selection_consistency",
+        "Table A.2b -- Features every seed's fit keeps, vs features any seed keeps (PhiUSIIL)",
+        header3,
+        rows3,
+        note=(
+            "Same fits as Table A.2. 'all seeds' counts the features present in "
+            "every one of the ten fitted models' top_features_ (after the 0.85 "
+            "redundancy filter); 'any seed' counts the features used by at least "
+            "one. A scorer whose selection depends only on the data, not on which "
+            "80% split it saw, reads k / k."
         ),
     )
 

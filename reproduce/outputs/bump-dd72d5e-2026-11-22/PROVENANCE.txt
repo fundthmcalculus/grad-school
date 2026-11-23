@@ -1,0 +1,78 @@
+=============================================================================
+READ FIRST -- bump-dd72d5e-2026-11-22: tribble-fis pin 03d327a -> dd72d5e
+=============================================================================
+Pin-bump check (AGENTS.md rule 5): every generator in run_all_tables.sh, ten
+seeds, on the run-of-record host (i9-13980HX), diffed cell by cell against
+full-03d327a-2026-11-21 with reproduce/compare_runs.py. 18/18 ok.
+
+Result: no non-timing cell moved except ANFIS (Table 4.1 / 4.1c, Bike Sharing
+0.561 -> 0.574; PhiUSIIL spread 0.002 -> 0.003). ANFIS imports nothing from
+tribblefis and is nondeterministic run to run (0.534-0.577 across archives at
+one pin; 0.561 vs 0.556 between Tables 4.1 and 4.1c inside the same run).
+Concrete, G.5, 4.4, 4.8, 4.9, 6.1, Chapter 3 and Chapter 5 tables: identical.
+
+Working tree: grad-school c9c4268 PLUS the uncommitted change to
+reproduce/tables/table_a1_feature_scoring.py that adds the tribble-fis #253
+scorers (hellinger, jensen_shannon, ks, mutual_info) to Table A.1/A.2's
+default. The four original A.1/A.2 columns are identical to the run of record
+(accuracy and rankings; fit seconds excluded); the four new columns are new.
+
+Backfill 2026-11-23 (same pins, same host, grad-school 0b087f7 + the
+table_a1_feature_scoring.py change that records per-fit selections):
+Table A.1/A.2 re-run into this archive. A.1 byte-identical, A.2 accuracies
+identical; adds table_a2_feature_runs.csv (one line per fit) and
+table_a2b_selection_consistency. Log: logs/table_a1_feature_scoring.backfill.log.
+Appendix A.4 (Tables A.1, A.2, A.2b, Figure A.4) quotes this archive.
+
+Removed from this archive, as in full-03d327a: 19 files the archiver sweeps
+from outputs/ that this run did not produce (ch5_end_to_end*,
+diagnose_bounded_normalization*, FIX_IMPACT.md, dated notes).
+=============================================================================
+
+label:       bump-dd72d5e-2026-11-22
+generated:   2026-11-22T18:51:05Z
+tribble-fis: dd72d5ecf0b026eb4e7fa6f78dc555bf006d28ba
+tribble-cluster: 20264b3b5bf1851285794eb33acfb4506a87ae2e
+tribble-opt: c21d543f1b4458ff59b181365af38c1e17dd716b
+grad-school: c9c426857bb02bce2c81b65f14ebfb52ffe7ef31
+imported:
+  tribble-fis          dir file:///home/scott/grad-school/tribble-fis
+  tribble-clustering   not installed
+  optimizers           c21d543f1b4458ff59b181365af38c1e17dd716b
+seeds:       0,1,2,3,4,5,6,7,8,9
+thetas:      0.5,0.6,0.7,0.8,0.9,0.99,1.1 (table_4_4b operating curve)
+
+machine:
+  host             asus-g614jv
+  os               openSUSE Tumbleweed-Slowroll
+  kernel           Linux 7.3.4-1-default x86_64
+  cpu              13th Gen Intel(R) Core(TM) i9-13980HX
+  cores            24 physical, 32 logical
+  ram              93.9 GiB (100.8 GB decimal)
+  governor         powersave
+  boost            n/a
+  gpu              NVIDIA-SMI has failed because it couldn't communicate with the NVIDIA driver. Make sure that the latest NVIDIA driver is installed and running.
+  gpu              
+  python           Python 3.13.16
+  numpy            2.4.6  scipy 1.17.1  sklearn 1.9.0  python 3.13.16
+  blas             scipy-openblas 0.3.31.188.0
+
+status:
+  table_concrete_reconciliation          ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_hyperparam_normalization         ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_g5_output_partitioning           ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_g5b_skew_sweep                   ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_4_1_mog_baselines                ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=5
+  table_4_1c_topn_sweep                  ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_6_1_model_family                 ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=3
+  table_norm_conorm_matrix               ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_4_4_openset                      ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_a1_feature_scoring               ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_4_8_mf_dedup                     ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_3_1_pvat_scaling                 ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=2
+  table_3_1_reorder_three_arm            ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=10
+  table_3_2_memory_precision             ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_3_7_g2_dtw_nonmetric             ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_3_7_g2_downstream                ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_5_1_3_ch5_tables                 ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=6
+  table_5_4_ch5_g1_scaling               ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
