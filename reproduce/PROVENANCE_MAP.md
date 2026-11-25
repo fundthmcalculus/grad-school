@@ -18,6 +18,32 @@ as having no generator yet.
 
 ---
 
+## 2026-11-25 — Table A.2c / Figure A.4b: scorer runtime / accuracy front on three datasets, `outputs/a2c-pareto-dd72d5e-2026-11-25/`
+
+**Status: new table and figure, reproduced. Nothing previously quoted moved. Same pins as `bump-dd72d5e-2026-11-22`.**
+
+- New generator `reproduce/tables/table_a2c_scorer_pareto.py`, wired into `run_all_tables.sh` (FIS group).
+  - It runs Table A.2's fits (eight library scorers, every `top_n`, ten seeds, redundancy filter on) on PhiUSIIL,
+    Breast Cancer and Wine (both scikit-learn bundled; Wine is the UCI *recognition* set, not `data/winequality-*`) in one
+    process.
+  - Outputs: `table_a2c_scorer_runs.csv` (per fit), `table_a2c_scorer_pareto` (per-dataset fronts),
+    `table_a2c_pooled_pareto` (pooled front).
+  - Normalization: fit time ÷ the dataset's mean over every scorer at k = 1–10 (the budgets all three take); the
+    pooled runtime is the geometric mean over the datasets of that ratio.
+- Run by `run_all_tables.sh a2c-pareto-dd72d5e-2026-11-25 table_a2c_scorer_pareto`, ten seeds, 0 N/A cells, preflight
+  green, on the host of record with the CPU otherwise idle. 77 files the archiver swept from `outputs/` were removed.
+- **Consistency check (registered before reading the table):** PhiUSIIL uses the same rows, splits and model as Table
+  A.2, so all 720 PhiUSIIL fits must match `bump-dd72d5e-2026-11-22/table_a2_feature_runs.csv`. They do: 0 accuracy and
+  0 kept-feature differences. Per-scorer mean fit seconds agree with A.2's to within 3%.
+- `table_a1_feature_scoring._sweep` gained an optional `k_grid` argument (default unchanged), so A.2c reuses the fit loop
+  rather than copying it.
+- Headline: pooled over the three datasets, KS at five features is 0.956 at 0.79× a typical fit. The only configuration
+  past it is mutual information at seven features (+0.0001 at 2.67×). Five of the ten front points are KS.
+- Prose: Appendix A.4 gains Table A.2c and Figure A.4b (`fig_a4b_scorer_pareto.py`, prose name `a4b-scorer-pareto`).
+  The Breast Cancer / Wine paragraph is re-quoted from this archive instead of the exploratory
+  `experiments/feature-scoring-metrics/` run (filter off), and the "now as cheap as the Gaussian scorers" claim for KS is
+  replaced by the measured front.
+
 ## 2026-11-22 — `tribble-fis` pin `03d327a` → `dd72d5e` (#253 scorers, #252 kept count), `outputs/bump-dd72d5e-2026-11-22/`
 
 **Status: nothing the proposal quotes moved. Table A.1/A.2 gains four scorer columns. Not itself the run of record.**
@@ -1703,6 +1729,7 @@ citable as device numbers.
 |---|---|---|---|
 | A.1 Feature ranking by scorer | `reproduce/tables/table_a1_feature_scoring.py` | `outputs/table_a1_feature_ranking.{md,csv}` | **re-derived leak-free** at `phiusiil-leakfree-2026-08-30` and re-transcribed into `prose/appendix.md`. `URLSimilarityIndex` is gone from all three columns; the scorers now disagree at rank 1 (wasserstein `HasSocialNet`, the others `IsHTTPS`) — note 31 |
 | A.2 Accuracy and fit time vs features kept | `reproduce/tables/table_a1_feature_scoring.py` | `outputs/table_a2_feature_count.{md,csv}` | **re-derived leak-free** and A.4 rewritten, not re-quoted: the one-feature row goes 0.9967/0.4267 → **0.5733/0.7924**, the scorer ordering INVERTS, and the section's conclusion that Wasserstein is the better default — the shipped tribble-fis default — is withdrawn. Note 12's specific deltas are withdrawn with it (the numbers they described no longer exist); the do-not-quote-across-machines instruction stands — notes 31, 31(a) |
+| A.2c Runtime / accuracy front, three datasets (+ Figure A.4b) | `reproduce/tables/table_a2c_scorer_pareto.py` | `outputs/table_a2c_{scorer,pooled}_pareto.{md,csv}`, `table_a2c_scorer_runs.csv` | **reproduced** at `a2c-pareto-dd72d5e-2026-11-25` (2026-11-25); PhiUSIIL fits identical to A.2's; quoted in A.4 |
 
 **Note 12 — one arm of A.2 moves between environments, it is the arm the appendix
 is least resting on, and the cause is now measured rather than guessed.** Against

@@ -1,0 +1,67 @@
+=============================================================================
+READ FIRST -- a2c-pareto-dd72d5e-2026-11-25: Table A.2c only
+=============================================================================
+A filtered run: only table_a2c_scorer_pareto ran (ten seeds, 0 N/A). Every
+other table is "not-run-this-pass" and its swept loose copy (77 files) was
+removed from this archive, so nothing here is a carried-forward table.
+
+Pins are those of bump-dd72d5e-2026-11-22. Working tree: grad-school 0d9da96
+PLUS the uncommitted new generator table_a2c_scorer_pareto.py, its line in
+run_all_tables.sh, and an optional k_grid argument on
+table_a1_feature_scoring._sweep (default behaviour unchanged).
+
+Check: the PhiUSIIL rows reproduce Table A.2's 720 fits exactly
+(bump-dd72d5e-2026-11-22/table_a2_feature_runs.csv: 0 accuracy and 0
+kept-feature differences); per-scorer mean fit seconds within 3%.
+Host was otherwise idle (load average < 1 at start). Appendix A.4's Table
+A.2c and Figure A.4b quote this archive.
+=============================================================================
+
+
+--- backfill 2026-11-25T08:59:51Z: table_a2c_scorer_pareto ---
+tribble-fis: dd72d5ecf0b026eb4e7fa6f78dc555bf006d28ba
+tribble-cluster: 20264b3b5bf1851285794eb33acfb4506a87ae2e
+tribble-opt: c21d543f1b4458ff59b181365af38c1e17dd716b
+grad-school: 0d9da96882a4a2c97e16c3e6d11654d633703cba
+imported:
+  tribble-fis          dir file:///home/scott/grad-school/tribble-fis
+  tribble-clustering   not installed
+  optimizers           c21d543f1b4458ff59b181365af38c1e17dd716b
+seeds:       0,1,2,3,4,5,6,7,8,9
+thetas:      0.5,0.6,0.7,0.8,0.9,0.99,1.1 (table_4_4b operating curve)
+
+machine:
+  host             asus-g614jv
+  os               openSUSE Tumbleweed-Slowroll
+  kernel           Linux 7.3.4-1-default x86_64
+  cpu              13th Gen Intel(R) Core(TM) i9-13980HX
+  cores            24 physical, 32 logical
+  ram              93.9 GiB (100.8 GB decimal)
+  governor         powersave
+  boost            n/a
+  gpu              NVIDIA-SMI has failed because it couldn't communicate with the NVIDIA driver. Make sure that the latest NVIDIA driver is installed and running.
+  gpu              
+  python           Python 3.13.16
+  numpy            2.4.6  scipy 1.17.1  sklearn 1.9.0  python 3.13.16
+  blas             scipy-openblas 0.3.31.188.0
+
+status:
+  table_concrete_reconciliation          not-run-this-pass seeds=—
+  table_hyperparam_normalization         not-run-this-pass seeds=—
+  table_g5_output_partitioning           not-run-this-pass seeds=—
+  table_g5b_skew_sweep                   not-run-this-pass seeds=—
+  table_4_1_mog_baselines                not-run-this-pass seeds=—
+  table_4_1c_topn_sweep                  not-run-this-pass seeds=—
+  table_6_1_model_family                 not-run-this-pass seeds=—
+  table_norm_conorm_matrix               not-run-this-pass seeds=—
+  table_4_4_openset                      not-run-this-pass seeds=—
+  table_a1_feature_scoring               not-run-this-pass seeds=—
+  table_a2c_scorer_pareto                ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_4_8_mf_dedup                     not-run-this-pass seeds=—
+  table_3_1_pvat_scaling                 not-run-this-pass seeds=—
+  table_3_1_reorder_three_arm            not-run-this-pass seeds=—
+  table_3_2_memory_precision             not-run-this-pass seeds=—
+  table_3_7_g2_dtw_nonmetric             not-run-this-pass seeds=—
+  table_3_7_g2_downstream                not-run-this-pass seeds=—
+  table_5_1_3_ch5_tables                 not-run-this-pass seeds=—
+  table_5_4_ch5_g1_scaling               not-run-this-pass seeds=—

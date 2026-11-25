@@ -367,6 +367,14 @@ FIGURES = [
         archive="bump-dd72d5e-2026-11-22",
     ),
     Figure(
+        "a4b-scorer-pareto",
+        "A.4b",
+        "Feature scorers on three datasets: the runtime / accuracy front",
+        module="fig_a4b_scorer_pareto",
+        extras=("matplotlib",),
+        archive="a2c-pareto-dd72d5e-2026-11-25",
+    ),
+    Figure(
         "06-ruspini-export",
         "6.5",
         "The Ruspini export: triangular partition of unity, and apex-only refinement",

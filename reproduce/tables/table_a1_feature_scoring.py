@@ -78,8 +78,11 @@ def _rank(scorer, X, y_series):
         return None
 
 
-def _sweep(scorer, X, y, runs):
+def _sweep(scorer, X, y, runs, k_grid=None):
     """(accuracy, fit_seconds) per k, with `scoring_method=scorer` for every fit.
+
+    `k_grid` defaults to K_GRID; Table A.2c passes a grid capped at a smaller
+    dataset's feature count.
 
     Appends one row per fit to `runs`: the features the fitted model actually
     kept (`top_features_`, after the 0.85 redundancy filter), so selection
@@ -92,7 +95,7 @@ def _sweep(scorer, X, y, runs):
     import tribblefis.gaussian_classifier as gc
 
     out = {}
-    for k in K_GRID:
+    for k in K_GRID if k_grid is None else k_grid:
         accs, secs = [], []
         for seed in C.SEEDS:
             Xtr, Xte, ytr, yte = train_test_split(

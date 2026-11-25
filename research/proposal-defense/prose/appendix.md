@@ -281,7 +281,8 @@ default is still `wasserstein`. These tables are test-split accuracies on a fixe
 are much better here at small budgets", not "KS is the best scorer". Changing the default should rest on a
 validation-split selection and on more than one dataset. tribble-fis #253 deliberately leaves the default unchanged for
 that reason. Re-examining it is owed work, and KS is the obvious first candidate: it ties for the best accuracy at four
-and five features, holds a fully stable selection at every budget, and is now as cheap as the Gaussian scorers.
+and five features, holds a fully stable selection at every budget, and makes up most of the pooled runtime / accuracy
+front across three datasets (Table A.2c).
 
 **One dataset carries the tables, and it is not a neutral one.** Tables A.1–A.2b are PhiUSIIL only. Chapter 6 says twice
 that PhiUSIIL is saturated, every method landing within a fraction of a perfect score, and that it should carry no weight
@@ -289,13 +290,56 @@ in a comparison between methods. That verdict does not void this section, becaus
 holds the model fixed and varies the ranking. PhiUSIIL's mix of binary flags and heavy-tailed counts is exactly what makes
 scorers disagree.
 
-The exploratory study (`experiments/feature-scoring-metrics/`, filter off, the same ten splits) adds Breast Cancer and Wine,
-whose features are continuous and roughly unimodal. At four features the library's eight scorers land at 0.92–0.93 on Breast Cancer, with
-`higher_order` the exception at 0.84, and at 0.91–0.95 on Wine, all inside seed spreads of ±0.02–0.07. No ranking among
-them is supported. So the scorer choice
-matters when a dataset mixes flags with many-valued counts, which describes much tabular security data. Where the signal
-sits in the bulk of continuous features, it matters little. How often the first case occurs is what A.2.3's broadened suite
-would measure.
+Table A.2c runs the same fits (same model, redundancy filter on, ten splits) on Breast Cancer and Wine as well, whose
+features are continuous and roughly unimodal. At four features the eight scorers land at 0.925–0.933 on Breast Cancer, with
+`higher_order` the exception at 0.84, and at 0.91–0.95 on Wine, all inside seed spreads of ±0.03–0.05. No ranking among
+them is supported. So the scorer choice matters when a dataset mixes flags with many-valued counts, which describes much
+tabular security data. Where the signal sits in the bulk of continuous features, it matters little. How often the first
+case occurs is what A.2.3's broadened suite would measure.
+
+**What each scorer costs: the runtime / accuracy front.** Fit time includes scoring, since the scorer runs inside `fit`.
+So the cost of a configuration (scorer, features kept) is its mean fit time. To put three datasets of different sizes on
+one axis, each configuration's fit time is divided by its dataset's mean over every scorer at one to ten features (the
+budgets all three datasets can take). 1.0× is then "a typical fit on this dataset", and a bigger dataset does not look
+worse merely for being bigger. A configuration is on the front if no other is both at least as accurate and at least as
+fast. The pooled view averages accuracy over the three datasets and takes the geometric mean of the normalized fit
+times, so no one dataset's scale dominates.
+
+**Table A.2c — The pooled runtime / accuracy front.** Front configurations only, cheapest first, ten seeds; per-dataset
+fronts and every off-front configuration are in the archive (`a2c-pareto-dd72d5e-2026-11-25`). Fit time is relative to
+each dataset's mean (PhiUSIIL 0.40 s, Breast Cancer 0.14 s, Wine 0.34 s on the host of record).
+
+| Scorer        | Features kept | Accuracy (mean of three) | Fit time (geo. mean) | PhiUSIIL | Breast Cancer | Wine  |
+|---------------|--------------:|-------------------------:|---------------------:|---------:|--------------:|------:|
+| Bhattacharyya |             1 |          0.8189 ± 0.0125 |                0.24× |    0.12× |         0.30× | 0.37× |
+| KS            |             1 |          0.8197 ± 0.0192 |                0.24× |    0.31× |         0.16× | 0.27× |
+| Composite     |             1 |          0.8227 ± 0.0135 |                0.26× |    0.14× |         0.28× | 0.43× |
+| Bhattacharyya |             2 |          0.8448 ± 0.0203 |                0.31× |    0.15× |         0.43× | 0.49× |
+| KS            |             2 |          0.8836 ± 0.0277 |                0.35× |    0.43× |         0.25× | 0.40× |
+| Hellinger     |             2 |          0.8934 ± 0.0320 |                0.47× |    0.44× |         0.53× | 0.44× |
+| KS            |             3 |          0.9295 ± 0.0236 |                0.48× |    0.62× |         0.32× | 0.55× |
+| KS            |             4 |          0.9432 ± 0.0183 |                0.63× |    0.82× |         0.41× | 0.75× |
+| **KS**        |         **5** |      **0.9560 ± 0.0125** |            **0.79×** |    0.99× |         0.51× | 0.96× |
+| Mutual info.  |             7 |          0.9561 ± 0.0156 |                2.67× |    3.85× |         3.13× | 1.58× |
+
+**Figure A.4b — The runtime / accuracy front, per dataset and pooled.** (a) Every configuration on all three datasets;
+each dataset's front is a step line (marker shape and dash pattern), its points coloured by scorer. (b) The pooled view
+of Table A.2c. Grey points are off the front. Seed spread is not drawn.
+`![a4b-scorer-pareto](fig/a4b-scorer-pareto.png)`
+
+**KS is most of the pooled front, and nothing beyond it is worth the cost.** Five of the ten front points are KS, and
+from three features up it is the only scorer on the front. KS at five features is 0.956 at 0.79× a typical fit, below
+average cost on all three datasets. The only configuration past it is mutual information at seven features, 0.0001 more
+accurate at 3.4 times the cost: a tie bought with the kNN estimator. The cheap end of the front (one or two features) mixes
+Bhattacharyya, composite, KS and Hellinger at accuracies of 0.82–0.89, below what a usable rule base needs. Per dataset
+the picture is the same where the scorers differ. On PhiUSIIL, KS is on the front at two, three, four, five and seven
+features. On Wine it is the most accurate configuration outright (0.9722 at five features, 0.96×). On Breast Cancer the
+front's points from two features on lie within 0.927–0.942, inside one seed spread (±0.03): the "matters little" case
+above.
+
+The front is read off means. On the two small datasets most neighbouring front points sit inside each other's spread, so
+"on the front" there means "not beaten on average", not "better". The climb along KS from two to five features (0.884 to
+0.956 pooled) is larger than its spreads (±0.01–0.03).
 
 **A portability caveat, and it has not been re-established.** The bhattacharyya accuracies of an earlier, leak-era
 version of Table A.2 moved by up to 0.043 between two hosts at identical code, identical seeds and a byte-identical Table
@@ -309,7 +353,9 @@ within this host. The instruction stands: **do not quote these columns to four d
 
 *Reproduced by `reproduce/tables/table_a1_feature_scoring.py` (Tables A.1, A.2, A.2b and the per-fit file
 `table_a2_feature_runs.csv`) and `reproduce/figures/fig_a4_scorer_consistency.py` (Figure A.4), archive
-`reproduce/outputs/bump-dd72d5e-2026-11-22/`. Upstream: tribble-fis issues #49 (the regression), #50 (`top_p`
+`reproduce/outputs/bump-dd72d5e-2026-11-22/`; and by `reproduce/tables/table_a2c_scorer_pareto.py` (Table A.2c, per-fit
+file `table_a2c_scorer_runs.csv`) and `reproduce/figures/fig_a4b_scorer_pareto.py` (Figure A.4b), archive
+`reproduce/outputs/a2c-pareto-dd72d5e-2026-11-25/`. Upstream: tribble-fis issues #49 (the regression), #50 (`top_p`
 semantics) and #253 (the rank/bin scorers).*
 
 ---
