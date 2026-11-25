@@ -82,7 +82,29 @@ Rust (std threads, C ABI, ctypes).
 
 ## 4. Results
 
-RESULTS_PLACEHOLDER
+These runs used 4 CPUs, 15 GB of RAM, d=10 and 8 Gaussian blobs. Times are
+end to end from points, and peak RSS was measured in a fresh subprocess per
+point. Full tables and Pareto plots are in `clustering/benchmarks/README.md`,
+with the raw data in `benchmarks/baselines/mst_pareto_vm.json`.
+
+| Task (f64) | Existing best | Cert+filter (C) | Δ |
+|---|---|---|---|
+| VAT order, n=24k, from points | Prim on matrix 3.97 s / 4.61 GB; Prim from points 5.03 s / 2 MB | **1.50 s / 6 MB** | 2.6× faster than Prim on the matrix at ~770× less memory; 3.4× faster than Prim from points |
+| iVAT image, n=16k | in-place iVAT 4.05 s / 2.05 GB (input destroyed) | **1.19 s / 2.05 GB** (input kept) | 3.4× faster, same memory |
+| MST stage given D, n=24k | Prim 1.45 s | **0.66 s** (4 threads); 2.15 s (1 thread) | the win is all parallelism |
+
+Language comparison, using the same algorithm and passes:
+
+| Path | Cython | Rust (std threads) |
+|---|---|---|
+| MST stage on the matrix, n=24k f64 / f32 | 663 / 516 ms | 756 / 492 ms |
+| VAT order from points, n=24k f64 | 1.50 s | 2.12 s |
+| Serial dense Prim, n=24k f64 | 1448 ms | 2111 ms |
+
+The paths bound by memory bandwidth are equal. On the compute-bound ones
+Rust is 1.4–1.5× slower, because Cython is built with `-ffast-math`, which
+lets GCC vectorize the floating-point reductions, and stable Rust cannot opt
+into that.
 
 ## 5. Takeaways for the thesis
 
@@ -97,6 +119,10 @@ RESULTS_PLACEHOLDER
    parallel VAT needs parallel Borůvka (O(n² log n) work): certificate+filter
    is O(n²) work, ~3 passes, independent of the number of clusters up to the
    256-component contraction cap.
-4. Language: Rust and Cython land in the same band on the matrix path (memory
-   bandwidth bound); on the points path Cython's `-ffast-math` lets GCC
-   vectorize the distance kernel, which stable Rust cannot opt into.
+4. Language: Rust and Cython are equal on the paths bound by memory
+   bandwidth. Rust is 1.4–1.5× slower on the compute-bound kernels because it
+   has no fast-math. Rust adds no Pareto point.
+5. Open: the 4-core box understates the parallel gain, so re-run
+   `mst_pareto` on the 32-core reference machine. The single-thread
+   crossover is ~1.5×, so the gain should grow roughly with core count until
+   memory bandwidth saturates.
